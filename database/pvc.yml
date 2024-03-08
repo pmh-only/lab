@@ -9,5 +9,3 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  hostPath:
-      path: /data/db/
