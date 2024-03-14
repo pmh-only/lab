@@ -15,9 +15,6 @@ spec:
       containers:
       - name: mariadb
         image: yobasystems/alpine-mariadb:latest
-        command:
-          - --character-set-server=utf8mb4
-          - --collation-server=utf8mb4_unicode_ci
         resources:
           requests:
             memory: "256Mi"
@@ -28,6 +25,10 @@ spec:
         ports:
         - containerPort: 3306
         env:
+        - name: MYSQL_CHARSET
+          value: utf8mb4
+        - name: MYSQL_COLLATION
+          value: utf8mb4_general_ci
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
