@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ghost
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ghost
+  template:
+    metadata:
+      labels:
+        app: ghost
+    spec:
+      containers:
+      - name: ghost
+        image: ghost:alpine
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 2368
+        env:
+        - name: database__client
+          value: mysql
+        - name: database__connection__host
+          value: mariadb-service.database.svc.cluster.local
+        - name: database__connection__user
+          value: ghost
+        - name: database__connection__password
+          valueFrom:
+            secretKeyRef:
+              name: ghost-secrets
+              key: database__connection__password
+        - name: database__connection__database
+          value: ghost
+        - name: mail__transport
+          value: SMTP
+        - name: mail__options__service
+          value: Google
+        - name: mail__options__host
+          value: smtp.gmail.com
+        - name: mail__options__port
+          value: "587"
+        - name: mail__options__auth__user
+          valueFrom:
+            secretKeyRef:
+              name: ghost-secrets
+              key: mail__options__auth__user
+        - name: mail__options__auth__pass
+          valueFrom:
+            secretKeyRef:
+              name: ghost-secrets
+              key: mail__options__auth__pass
+        - name: mail__from
+          value: "'Minhyeok Park' <pmh_only@pmh.codes>"
+        - name: admin__url
+          value: https://admin.pmh.codes
+        - name: adapters__tenor__googleApiKey
+          valueFrom:
+            secretKeyRef:
+              name: ghost-secrets
+              key: adapters__tenor__googleApiKey
+        - name: url
+          value: https://pmh.codes
+        volumeMounts:
+        - mountPath: /var/lib/ghost/content
+          name: ghost-storage
+      volumes:
+      - name: ghost-storage
+        persistentVolumeClaim:
+          claimName: ghost-pvc
