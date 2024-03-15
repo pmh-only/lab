@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bitwarden-ingress
+spec:
+  ingressClassName: cloudflare-tunnel
+  rules:
+  - host: vault.pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bitwarden-service
+            port:
+              number: 80
