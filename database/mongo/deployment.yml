@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: mongo
-        image: mongo:8
+        image: mongo
         resources:
           requests:
             memory: "256Mi"
