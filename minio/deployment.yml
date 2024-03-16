@@ -19,8 +19,10 @@ spec:
           - minio
           - server
           - /data
-          - --address :9000
-          - --console-address :9001
+          - --address
+          - :9000
+          - --console-address
+          - :9001
         resources:
           requests:
             memory: "256Mi"
