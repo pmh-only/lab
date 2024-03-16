@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mariadb-service
+  name: mysql-service
 spec:
   selector:
-    app: mariadb
+    app: mysql
   ports:
     - protocol: TCP
       port: 3306

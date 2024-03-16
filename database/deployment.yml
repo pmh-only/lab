@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mariadb
+  name: mysql
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mariadb
+      app: mysql
   template:
     metadata:
       labels:
-        app: mariadb
+        app: mysql
     spec:
       containers:
-      - name: mariadb
-        image: yobasystems/alpine-mariadb:latest
+      - name: mysql
+        image: mysql:8
         resources:
           requests:
             memory: "256Mi"
@@ -25,19 +25,15 @@ spec:
         ports:
         - containerPort: 3306
         env:
-        - name: MYSQL_CHARSET
-          value: utf8mb4
-        - name: MYSQL_COLLATION
-          value: utf8mb4_general_ci
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mariadb-root-password
+              name: mysql-root-password
               key: password
         volumeMounts:
         - mountPath: /var/lib/mysql
-          name: mariadb-storage
+          name: mysql-storage
       volumes:
-      - name: mariadb-storage
+      - name: mysql-storage
         persistentVolumeClaim:
-          claimName: mariadb-pvc
+          claimName: mysql-pvc
