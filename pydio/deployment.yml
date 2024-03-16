@@ -28,7 +28,7 @@ spec:
         - name: CELLS_SITE_EXTERNAL
           value: drive.pmh.codes
         volumeMounts:
-        - mountPath: /data/cells
+        - mountPath: /var/cells
           name: pydio-storage
       volumes:
       - name: pydio-storage
