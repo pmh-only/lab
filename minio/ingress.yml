@@ -15,16 +15,6 @@ spec:
             name: minio-service
             port:
               number: 9000
-  - host: "*.s3.pmh.codes"
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: minio-service
-            port:
-              number: 9000
   - host: minio.pmh.codes
     http:
       paths:
