@@ -28,7 +28,7 @@ spec:
         - name: database__client
           value: mysql
         - name: database__connection__host
-          value: mariadb-service.database.svc.cluster.local
+          value: mysql-service.database.svc.cluster.local
         - name: database__connection__user
           value: ghost
         - name: database__connection__password
