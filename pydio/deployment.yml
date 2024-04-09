@@ -15,13 +15,6 @@ spec:
       containers:
       - name: pydio
         image: ghcr.io/pmh-only/pydio
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "4096Mi"
-            cpu: "512m"
         ports:
         - containerPort: 8080
         env:
