@@ -23,13 +23,6 @@ spec:
           - :9000
           - --console-address
           - :9001
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
         ports:
         - containerPort: 9000
         - containerPort: 9001
