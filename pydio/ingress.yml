@@ -3,8 +3,8 @@ kind: Ingress
 metadata:
   name: pydio-ingress
   annotations:
-    - cloudflare-tunnel-ingress-controller.strrl.dev/backend-protocol=https
-    - cloudflare-tunnel-ingress-controller.strrl.dev/proxy-ssl-verify=off
+    cloudflare-tunnel-ingress-controller.strrl.dev/backend-protocol: https
+    cloudflare-tunnel-ingress-controller.strrl.dev/proxy-ssl-verify: off
 spec:
   ingressClassName: cloudflare-tunnel
   rules:
