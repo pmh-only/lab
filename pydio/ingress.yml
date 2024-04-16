@@ -2,11 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: pydio-ingress
-  annotations:
-    cloudflare-tunnel-ingress-controller.strrl.dev/backend-protocol: https
-    cloudflare-tunnel-ingress-controller.strrl.dev/proxy-ssl-verify: off
 spec:
-  ingressClassName: cloudflare-tunnel
+  ingressClassName: nginx
   rules:
   - host: drive.pmh.codes
     http:
