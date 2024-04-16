@@ -28,7 +28,7 @@ spec:
         - containerPort: 9001
         env:
         - name: MINIO_DOMAIN
-          value: s3.pmh.codes
+          value: pmh.codes
         - name: MINIO_SERVER_URL
           value: http://minio-service.minio.svc.cluster.local:9000
         - name: MINIO_BROWSER_REDIRECT_URL
