@@ -4,6 +4,8 @@ metadata:
   name: minio-ingress
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_intercept_errors on;
+
       if ($uri ~ "^/$") { 
         set $test A; 
       } 
@@ -14,8 +16,7 @@ metadata:
       
       if ($test = AB) {
         rewrite ^/$ /index.html break;
-        proxy_intercept_errors on;
-        error_page 404 = @reallynotfound;
+        error_page 400 = @reallynotfound;
       }
 
       location @reallynotfound {
