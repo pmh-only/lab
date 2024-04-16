@@ -4,7 +4,15 @@ metadata:
   name: minio-ingress
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      if ($uri ~ "^/$") {
+      if ($uri ~ "^/$") { 
+        set $test A; 
+      } 
+    
+      if ($host !~* minio.pmh.codes) { 
+        set $test "${test}B"; 
+      }
+      
+      if ($test = AB) {
         rewrite ^/$ /index.html break;
       }
 spec:
