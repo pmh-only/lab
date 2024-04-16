@@ -5,7 +5,7 @@ metadata:
 spec:
   ingressClassName: cloudflare-tunnel
   rules:
-  - host: s3.pmh.codes
+  - host: "*.pmh.codes"
     http:
       paths:
       - path: /
