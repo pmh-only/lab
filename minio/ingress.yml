@@ -5,16 +5,16 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  # - host: "*.pmh.codes"
-  #   http:
-  #     paths:
-  #     - path: /
-  #       pathType: Prefix
-  #       backend:
-  #         service:
-  #           name: minio-service
-  #           port:
-  #             number: 9000
+  - host: "*.pmh.codes"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: minio-service
+            port:
+              number: 9000
   - host: minio.pmh.codes
     http:
       paths:
