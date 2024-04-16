@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: ghost-ingress
 spec:
-  ingressClassName: cloudflare-tunnel
+  ingressClassName: nginx
   rules:
   - host: pmh.codes
     http:

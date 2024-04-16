@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: bitwarden-ingress
 spec:
-  ingressClassName: cloudflare-tunnel
+  ingressClassName: nginx
   rules:
   - host: vault.pmh.codes
     http:
