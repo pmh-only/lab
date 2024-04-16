@@ -4,25 +4,19 @@ metadata:
   name: minio-ingress
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      server {
-        proxy_intercept_errors on;
+      proxy_intercept_errors on;
 
-        if ($uri ~ "^/$") { 
-          set $test A; 
-        } 
+      if ($uri ~ "^/$") { 
+        set $test A; 
+      } 
+    
+      if ($host !~* minio.pmh.codes) { 
+        set $test "${test}B"; 
+      }
       
-        if ($host !~* minio.pmh.codes) { 
-          set $test "${test}B"; 
-        }
-        
-        if ($test = AB) {
-          rewrite ^/$ /index.html break;
-          error_page 400 = @reallynotfound;
-        }
-
-        location @reallynotfound {
-          return 302 https://pmh.codes
-        }
+      if ($test = AB) {
+        rewrite ^/$ /index.html break;
+        error_page 400 =302 https://pmh.codes;
       }
 spec:
   ingressClassName: nginx
