@@ -16,7 +16,7 @@ metadata:
       
       if ($test = AB) {
         rewrite ^/$ /index.html break;
-        error_page 400 =302 https://pmh.codes;
+        error_page 4xx =302 https://pmh.codes;
       }
 spec:
   ingressClassName: nginx
