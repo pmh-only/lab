@@ -1,9 +1,21 @@
-FROM docker.io/arm64v8/eclipse-temurin:17-alpine-jre as runtime
+FROM alpine as builder
 
-WORKDIR /app
+WORKDIR /build
 
-USER 1000:1000
+RUN apk add git nodejs npm openjdk17-jdk
 
-COPY app.jar ./app.jar
+ARG DISABLE_CACHE
 
-CMD ["java", "-jar", "./app.jar"]
+RUN git clone https://github.com/pmh-only/guess-ai-word.git .
+
+WORKDIR /build/backend
+
+RUN ./gradlew bootjar
+
+FROM builder as runtime
+
+RUN apk add --no-cache openjdk17-jre
+
+COPY --from=builder /build/libs/guessaiword-0.0.1-SNAPSHOT.jar /app/app.jar
+
+CMD ["java", "-jar", "/app/app.jar"]
