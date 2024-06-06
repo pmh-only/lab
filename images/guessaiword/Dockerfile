@@ -1,21 +1,9 @@
-FROM docker.io/amazoncorretto:17-alpine-jdk as builder
+FROM docker.io/arm64v8/eclipse-temurin:17-alpine-jre as runtime
 
-WORKDIR /build
+WORKDIR /app
 
-RUN apk add git
+USER 1000:1000
 
-RUN apk add nodejs npm
+COPY app.jar ./app.jar
 
-ARG DISABLE_CACHE
-
-RUN git clone https://github.com/pmh-only/guess-ai-word.git .
-
-WORKDIR /build/backend
-
-RUN ./gradlew bootjar
-
-FROM docker.io/amazoncorretto:17-al2023-headless as runtime
-
-COPY --from=builder /build/libs/guessaiword-0.0.1-SNAPSHOT.jar /app/app.jar
-
-CMD ["java", "-jar", "/app/app.jar"]
+CMD ["java", "-jar", "./app.jar"]
