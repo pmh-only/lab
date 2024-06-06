@@ -14,7 +14,7 @@ WORKDIR /build/backend
 
 RUN ./gradlew bootjar
 
-FROM eclipse-teurin:17-jre-alpine as runtime
+FROM docker.io/eclipse-temurin:17-jre-alpine as runtime
 
 COPY --from=builder /build/libs/guessaiword-0.0.1-SNAPSHOT.jar /app/app.jar
 
