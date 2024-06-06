@@ -25,6 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        platform:
+          - linux/arm64
+          - linux/amd64
         target: ${{fromJSON(needs.find_targets.outputs.targets)}}
     steps:
       - uses: actions/checkout@v4
@@ -47,7 +50,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          platforms: linux/amd64, linux/arm64
+          platforms: ${{ matrix.platform }}
           context: images/${{ matrix.target }}
           build-args: DISABLE_CACHE=${{ github.event.repository.updated_at }}
           tags: ghcr.io/pmh-only/${{ matrix.target }}

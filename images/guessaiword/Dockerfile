@@ -12,10 +12,14 @@ WORKDIR /build/backend
 
 RUN ./gradlew bootjar
 
-FROM builder as runtime
+FROM alpine as runtime
 
 RUN apk add --no-cache openjdk17-jre
 
+USER 1000:1000
+
+WORKDIR /app
+
 COPY --from=builder /build/libs/guessaiword-0.0.1-SNAPSHOT.jar /app/app.jar
 
-CMD ["java", "-jar", "/app/app.jar"]
+CMD ["java", "-jar", "./app.jar"]
