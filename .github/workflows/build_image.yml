@@ -12,13 +12,13 @@ jobs:
   find_targets:
     runs-on: ubuntu-latest
     outputs:
-      targets: ${{ steps.targets.outputs.value }}
+      targets: ${{ steps.targets.outputs.targets }}
     steps:
       - uses: actions/checkout@v4
         name: Checkout files
       - id: targets
         run: |
-          ls images | jq -Rsc 'split("\n")[:-1]' >> $GITHUB_OUTPUT
+          echo "targets=$(ls images | jq -Rsc 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
   build:
     needs: [find_targets]
     runs-on: ubuntu-latest
