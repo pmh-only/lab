@@ -48,6 +48,7 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           context: images/${{ matrix.target }}
+          build-args: DISABLE_CACHE=${{ github.event.repository.updated_at }}
           tags: ghcr.io/pmh-only/${{ matrix.target }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
