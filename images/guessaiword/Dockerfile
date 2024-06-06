@@ -1,4 +1,4 @@
-FROM docker.io/eclipse-temurin:17-jdk-alpine as builder
+FROM docker.io/amazoncorretto:17-alpine-jdk as builder
 
 WORKDIR /build
 
@@ -14,7 +14,7 @@ WORKDIR /build/backend
 
 RUN ./gradlew bootjar
 
-FROM docker.io/eclipse-temurin:17-jre-alpine as runtime
+FROM docker.io/amazoncorretto:17-al2023-headless as runtime
 
 COPY --from=builder /build/libs/guessaiword-0.0.1-SNAPSHOT.jar /app/app.jar
 
