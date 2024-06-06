@@ -47,7 +47,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          platforms: linux/arm64
+          platforms: linux/amd64, linux/arm64
           context: images/${{ matrix.target }}
           build-args: DISABLE_CACHE=${{ github.event.repository.updated_at }}
           tags: ghcr.io/pmh-only/${{ matrix.target }}
