@@ -4,7 +4,12 @@ metadata:
   name: pydio-ingress
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    cert-manager.io/cluster-issuer: letsencrypt
 spec:
+  tls:
+  - hosts:
+    - drive.pmh.codes
+    secretName: pydio-ingress-tls
   ingressClassName: nginx
   rules:
   - host: drive.pmh.codes

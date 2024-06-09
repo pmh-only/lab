@@ -2,7 +2,13 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: bitwarden-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
 spec:
+  tls:
+  - hosts:
+    - vault.pmh.codes
+    secretName: bitwarden-ingress-tls
   ingressClassName: nginx
   rules:
   - host: vault.pmh.codes
