@@ -21,6 +21,7 @@ jobs:
         name: Checkout files
       - id: targets
         run: |
+          sudo apt install -y jq
           echo "targets=$(ls images | jq -Rsc 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
   build:
     needs: [find_targets]
