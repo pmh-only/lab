@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   find_targets:
-    runs-on: ubuntu-latest
+    runs-on: arc-runner
     outputs:
       targets: ${{ steps.targets.outputs.targets }}
     steps:
