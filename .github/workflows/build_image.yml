@@ -12,6 +12,8 @@ permissions:
 jobs:
   find_targets:
     runs-on: arc-runner
+    container:
+      image: ubuntu
     outputs:
       targets: ${{ steps.targets.outputs.targets }}
     steps:
@@ -22,7 +24,9 @@ jobs:
           echo "targets=$(ls images | jq -Rsc 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
   build:
     needs: [find_targets]
-    runs-on: ubuntu-latest
+    runs-on: arc-runner
+    container:
+      image: ubuntu
     strategy:
       matrix:
         target: ${{fromJSON(needs.find_targets.outputs.targets)}}
