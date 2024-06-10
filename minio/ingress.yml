@@ -26,8 +26,10 @@ spec:
   tls:
   - hosts:
     - '*.pmh.codes'
+    secretName: minio-bucket-ingress-tls
+  - hosts:
     - 'minio.pmh.codes'
-    secretName: minio-ingress-tls
+    secretName: minio-home-ingress-tls
   ingressClassName: nginx
   rules:
   - host: "*.pmh.codes"
