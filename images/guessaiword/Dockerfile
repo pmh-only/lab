@@ -1,8 +1,8 @@
-FROM alpine as build
+FROM gradle:jdk17-alpine as build
 
 WORKDIR /build
 
-RUN apk add git nodejs npm openjdk17-jdk
+RUN apk add nodejs npm
 
 WORKDIR /build/frontend/
 
@@ -26,7 +26,7 @@ RUN echo "#!/bin/sh" > scripts/runFrontendScript.sh && \
     mkdir -p src/main/resources/frontend && \
     cp -r /build/frontend/dist src/main/resources/frontend/dist
 
-RUN ./gradlew bootjar
+RUN gradle bootjar
 
 FROM build as runtime
 
