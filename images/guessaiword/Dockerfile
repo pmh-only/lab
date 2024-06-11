@@ -1,4 +1,4 @@
-FROM alpine as builder
+FROM alpine as build
 
 WORKDIR /build
 
@@ -24,7 +24,7 @@ RUN cp /build/frontend/dist src/main/resources/frontend/dist
 
 RUN ./gradlew bootjar
 
-FROM alpine as runtime
+FROM build as runtime
 
 RUN apk add --no-cache openjdk17-jre
 
