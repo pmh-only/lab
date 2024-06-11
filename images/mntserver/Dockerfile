@@ -23,7 +23,7 @@ RUN pnpm run build
 FROM builder-base as dep-resolver
 
 COPY source/package.json \
-     source/pnpm-lock.json \
+     source/pnpm-lock.yaml \
      /build/
 
 RUN pnpm i --omit=dev
