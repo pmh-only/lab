@@ -2,7 +2,7 @@ FROM gradle:jdk17 as build
 
 WORKDIR /build
 
-RUN apt-get install git curl make
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install make -y
 RUN curl -L https://bit.ly/n-install | bash -s -- -y
 
 WORKDIR /build/frontend/
