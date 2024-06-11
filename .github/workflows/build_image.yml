@@ -33,9 +33,6 @@ jobs:
       - uses: actions/checkout@v4
         name: Checkout files
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -50,7 +47,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          platforms: linux/arm64, linux/amd64
           context: images/${{ matrix.target }}
           build-args: DISABLE_CACHE=${{ github.event.repository.updated_at }}
           tags: ghcr.io/pmh-only/${{ matrix.target }}
