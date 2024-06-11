@@ -9,7 +9,7 @@ RUN npm i -g pnpm
 FROM builder-base as builder
 
 COPY source/package.json \
-     source/pnpm-lock.json \
+     source/pnpm-lock.yaml \
      /build/
 
 RUN pnpm i
