@@ -1,35 +1,27 @@
-name: Build images
+name: Build images - mntserver
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'images/**'
-      - '!images/guessaiword/**'
+      - 'images/mntserver/**'
 
 permissions:
   contents: write
   packages: write
 
 jobs:
-  find_targets:
-    runs-on: ubuntu-latest
-    outputs:
-      targets: ${{ steps.targets.outputs.targets }}
-    steps:
-      - uses: actions/checkout@v4
-        name: Checkout files
-      - id: targets
-        run: echo "targets=$(ls images | jq -Rsc 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
   build:
-    needs: [find_targets]
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        target: ${{fromJSON(needs.find_targets.outputs.targets)}}
     steps:
       - uses: actions/checkout@v4
         name: Checkout files
-        
+
+      - uses: actions/checkout@v4
+        name: Checkout files - source
+        with:
+          repository: pmh-only/djs-bot-for-my-server
+          path: 'images/mntserver/source'
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -48,8 +40,7 @@ jobs:
         with:
           push: true
           platforms: linux/arm64
-          context: images/${{ matrix.target }}
-          build-args: DISABLE_CACHE=${{ github.event.repository.updated_at }}
-          tags: ghcr.io/pmh-only/${{ matrix.target }}
+          context: images/mntserver
+          tags: ghcr.io/pmh-only/mntserver
           cache-from: type=gha
           cache-to: type=gha,mode=max
