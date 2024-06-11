@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mntserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mntserver
+  template:
+    metadata:
+      labels:
+        app: mntserver
+    spec:
+      containers:
+      - name: mntserver
+        image: ghcr.io/pmh-only/mntserver
+        env:
+        - name: DISCORD_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: mntserver-secrets
+              key: DISCORD_TOKEN
