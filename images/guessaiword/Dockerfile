@@ -2,7 +2,10 @@ FROM gradle:jdk17 as build
 
 WORKDIR /build
 
-RUN apk add nodejs npm
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs npm
+
+RUN npm i -g n && n lts
 
 WORKDIR /build/frontend/
 
