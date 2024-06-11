@@ -1,37 +1,26 @@
-name: Build images
+name: Build images - guessaiword
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'images/**'
-      - '!images/guessaiword/**'
+      - 'images/guessaiword/**'
 
 permissions:
   contents: write
   packages: write
 
 jobs:
-  find_targets:
-    runs-on: arc-runner
-    outputs:
-      targets: ${{ steps.targets.outputs.targets }}
-    steps:
-      - uses: actions/checkout@v4
-        name: Checkout files
-      - id: targets
-        run: |
-          sudo apt update -y
-          sudo apt install -y jq
-          echo "targets=$(ls images | jq -Rsc 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
   build:
-    needs: [find_targets]
     runs-on: arc-runner
-    strategy:
-      matrix:
-        target: ${{fromJSON(needs.find_targets.outputs.targets)}}
     steps:
       - uses: actions/checkout@v4
         name: Checkout files
+
+      - uses: actions/checkout@v4
+        name: Checkout files - source
+        with:
+          repository: pmh-only/guess-ai-word
+          path: 'source'
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -51,8 +40,8 @@ jobs:
         with:
           push: true
           platforms: linux/arm64, linux/amd64
-          context: images/${{ matrix.target }}
+          context: images/guessaiword
           build-args: DISABLE_CACHE=${{ github.event.repository.updated_at }}
-          tags: ghcr.io/pmh-only/${{ matrix.target }}
+          tags: ghcr.io/pmh-only/guessaiword
           cache-from: type=gha
           cache-to: type=gha,mode=max
