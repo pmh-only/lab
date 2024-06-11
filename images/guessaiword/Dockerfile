@@ -12,6 +12,8 @@ COPY source/frontend/package.json \
 RUN npm i
 
 COPY source/frontend/* /build/frontend/
+COPY source/frontend/src /build/frontend/src
+COPY source/frontend/public /build/frontend/public
 
 RUN npm run build
 
