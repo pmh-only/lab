@@ -1,11 +1,7 @@
-FROM gradle:jdk17 as build
+FROM alpine as build
 
-WORKDIR /build
-
-RUN export DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install make -y
-RUN curl -L https://bit.ly/n-install | bash -s -- -y
-RUN sh -c 'export PATH=$PATH:/root/n/bin'
+RUN apk add openjdk17-jdk
+RUN apk add gradle --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
 
 WORKDIR /build/frontend/
 
@@ -31,7 +27,7 @@ RUN echo "#!/bin/sh" > scripts/runFrontendScript.sh && \
 
 RUN gradle bootjar
 
-FROM build as runtime
+FROM alpine as runtime
 
 RUN apk add --no-cache openjdk17-jre
 
