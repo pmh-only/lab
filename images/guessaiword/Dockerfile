@@ -2,6 +2,7 @@ FROM gradle:jdk17 as build
 
 WORKDIR /build
 
+RUN apt-get install git curl make
 RUN curl -L https://bit.ly/n-install | bash -s -- -y
 
 WORKDIR /build/frontend/
