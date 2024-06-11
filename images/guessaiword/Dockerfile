@@ -24,7 +24,7 @@ COPY source/backend/ /build/backend/
 RUN echo "#!/bin/sh" > scripts/runFrontendScript.sh && \
     rm src/main/resources/frontend && \
     mkdir -p src/main/resources/frontend && \
-    cp /build/frontend/dist src/main/resources/frontend/dist
+    cp -r /build/frontend/dist src/main/resources/frontend/dist
 
 RUN ./gradlew bootjar
 
