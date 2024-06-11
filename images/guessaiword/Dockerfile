@@ -2,8 +2,10 @@ FROM gradle:jdk17 as build
 
 WORKDIR /build
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install make -y
+RUN export DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install make -y
 RUN curl -L https://bit.ly/n-install | bash -s -- -y
+RUN sh -c 'export PATH=$PATH:/root/n/bin'
 
 WORKDIR /build/frontend/
 
