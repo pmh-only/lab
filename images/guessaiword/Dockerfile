@@ -7,7 +7,6 @@ RUN apk add git nodejs npm openjdk17-jdk
 WORKDIR /build/frontend/
 
 COPY source/frontend/package.json \
-     source/frontend/package-lock.json \
      /build/frontend/
 
 RUN npm i
