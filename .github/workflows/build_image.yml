@@ -12,23 +12,16 @@ permissions:
 jobs:
   find_targets:
     runs-on: arc-runner
-    container:
-      image: ubuntu
     outputs:
       targets: ${{ steps.targets.outputs.targets }}
     steps:
       - uses: actions/checkout@v4
         name: Checkout files
       - id: targets
-        run: |
-          apt-get update -y
-          apt-get install -y jq
-          echo "targets=$(ls images | jq -Rsc 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+        run: echo "targets=$(ls images | jq -Rsc 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
   build:
     needs: [find_targets]
     runs-on: arc-runner
-    container:
-      image: ubuntu
     strategy:
       matrix:
         target: ${{fromJSON(needs.find_targets.outputs.targets)}}
