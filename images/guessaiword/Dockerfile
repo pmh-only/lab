@@ -4,23 +4,26 @@ WORKDIR /build
 
 RUN apk add git nodejs npm openjdk17-jdk
 
-COPY /source/frontend/ /build/frontend/
-
 WORKDIR /build/frontend/
+
+COPY source/frontend/package.json \
+     source/frontend/package-lock.json \
+     /build/frontend/
 
 RUN npm i
 
-RUN npm run build
+COPY source/frontend/* .
 
-COPY /source/backend/ /build/backend/
+RUN npm run build
 
 WORKDIR /build/backend
 
-RUN echo "#!/bin/sh" > scripts/runFrontendScript.sh
+COPY source/backend/* .
 
-RUN rm src/main/resources/frontend && mkdir -p src/main/resources/frontend
-
-RUN cp /build/frontend/dist src/main/resources/frontend/dist
+RUN echo "#!/bin/sh" > scripts/runFrontendScript.sh && \
+    rm src/main/resources/frontend && \
+    mkdir -p src/main/resources/frontend && \
+    cp /build/frontend/dist src/main/resources/frontend/dist
 
 RUN ./gradlew bootjar
 
