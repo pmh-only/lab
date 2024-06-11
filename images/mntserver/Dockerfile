@@ -26,7 +26,7 @@ COPY source/package.json \
      source/pnpm-lock.yaml \
      /build/
 
-RUN pnpm i --omit=dev
+RUN pnpm i -P
 
 FROM alpine as runner
 
