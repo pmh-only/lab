@@ -1,6 +1,6 @@
 FROM alpine as build
 
-RUN apk add openjdk17-jdk
+RUN apk add openjdk17-jdk nodejs npm
 RUN apk add gradle --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
 
 WORKDIR /build/frontend/
