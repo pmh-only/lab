@@ -1,7 +1,9 @@
-FROM alpine as build
+FROM ubuntu as build
 
-RUN apk add openjdk17-jdk nodejs npm
-RUN apk add gradle --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+RUN apt-get update && \
+    apt-get install -y curl gnupg
+RUN curl -sL https://deb.nodesource.com/setup_20.x  | bash -
+RUN apt-get -y install openjdk-17-jdk nodejs
 
 WORKDIR /build/frontend/
 
@@ -25,7 +27,7 @@ RUN echo "#!/bin/sh" > scripts/runFrontendScript.sh && \
     mkdir -p src/main/resources/frontend && \
     cp -r /build/frontend/dist src/main/resources/frontend/dist
 
-RUN gradle bootjar
+RUN ./gradlew bootjar
 
 FROM alpine as runtime
 
