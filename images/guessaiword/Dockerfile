@@ -37,6 +37,6 @@ USER 1000:1000
 
 WORKDIR /app
 
-COPY --from=build /build/backend/output/libs/guessaiword-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --from=build /build/backend/build/libs/guessaiword-0.0.1-SNAPSHOT.jar /app/app.jar
 
 CMD ["java", "-jar", "./app.jar"]
