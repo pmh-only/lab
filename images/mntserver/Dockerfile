@@ -14,9 +14,8 @@ COPY source/package.json \
 
 RUN pnpm i
 
-COPY source/tsconfig.json \
-     source/src \
-     /build/
+COPY source/tsconfig.json /build/
+COPY source/src/ /build/src/
 
 RUN pnpm run build
 
