@@ -40,7 +40,7 @@ jobs:
         with:
           push: true
           platforms: linux/arm64, linux/amd64
-          context: images/guessaiword
+          file: images/guessaiword/Dockerfile
           build-args: DISABLE_CACHE=${{ github.event.repository.updated_at }}
           tags: ghcr.io/pmh-only/guessaiword
           cache-from: type=gha
