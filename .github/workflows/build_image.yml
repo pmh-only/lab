@@ -12,26 +12,26 @@ permissions:
 
 jobs:
   find_targets:
-    runs-on: arc-runner
+    runs-on: ubuntu-latest
     outputs:
       targets: ${{ steps.targets.outputs.targets }}
     steps:
       - uses: actions/checkout@v4
         name: Checkout files
       - id: targets
-        run: |
-          sudo apt update -y
-          sudo apt install -y jq
-          echo "targets=$(ls images | jq -Rsc 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+        run: echo "targets=$(ls images | jq -Rsc 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
   build:
     needs: [find_targets]
-    runs-on: arc-runner
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         target: ${{fromJSON(needs.find_targets.outputs.targets)}}
     steps:
       - uses: actions/checkout@v4
         name: Checkout files
+        
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -47,6 +47,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
+          platforms: linux/arm64
           context: images/${{ matrix.target }}
           build-args: DISABLE_CACHE=${{ github.event.repository.updated_at }}
           tags: ghcr.io/pmh-only/${{ matrix.target }}
