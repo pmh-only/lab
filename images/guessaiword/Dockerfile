@@ -11,13 +11,13 @@ COPY source/frontend/package.json \
 
 RUN npm i
 
-COPY source/frontend/* .
+COPY source/frontend/* /build/frontend/
 
 RUN npm run build
 
 WORKDIR /build/backend
 
-COPY source/backend/* .
+COPY source/backend/* /build/backend/
 
 RUN echo "#!/bin/sh" > scripts/runFrontendScript.sh && \
     rm src/main/resources/frontend && \
