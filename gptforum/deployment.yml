@@ -18,6 +18,10 @@ spec:
         env:
         - name: DATABASE_HOST
           value: mysql-service.database.svc.cluster.local
+        - name: DATABASE_USER
+          value: gptforum
+        - name: DATABASE_SCHEMA
+          value: gptforum
         - name: DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
