@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gptforum
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gptforum
+  template:
+    metadata:
+      labels:
+        app: gptforum
+    spec:
+      containers:
+      - name: gptforum
+        image: ghcr.io/pmh-only/gptforum
+        env:
+        - name: DATABASE_HOST
+          value: mysql-service.database.svc.cluster.local
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gptforum-secrets
+              key: DATABASE_PASSWORD
+        - name: DISCORD_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: gptforum-secrets
+              key: DISCORD_TOKEN
+        - name: DISCORD_FORUM_ID
+          valueFrom:
+            secretKeyRef:
+              name: gptforum-secrets
+              key: DISCORD_FORUM_ID
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: gptforum-secrets
+              key: OPENAI_API_KEY
