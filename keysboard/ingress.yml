@@ -20,4 +20,4 @@ spec:
           service:
             name: keysboard-service
             port:
-              number: 8080
+              number: 3000
