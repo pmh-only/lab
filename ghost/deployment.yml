@@ -51,8 +51,6 @@ spec:
               key: mail__options__auth__pass
         - name: mail__from
           value: "'Minhyeok Park' <pmh_only@pmh.codes>"
-        - name: admin__url
-          value: https://admin.pmh.codes
         - name: adapters__tenor__googleApiKey
           valueFrom:
             secretKeyRef:
