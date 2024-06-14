@@ -22,13 +22,3 @@ spec:
             name: ghost-service
             port:
               number: 2368
-  - host: admin.pmh.codes
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: ghost-service
-            port:
-              number: 2368
