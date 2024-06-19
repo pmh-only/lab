@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: minio
+      annotations:
+        backup.velero.io/backup-volumes-excludes: minio-storage
     spec:
       containers:
       - name: minio
