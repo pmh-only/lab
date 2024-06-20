@@ -2,7 +2,7 @@ FROM jupyter/minimal-notebook
 
 USER root
 
-RUN apt update -y && apt install -y libtool pkg-config build-essential autoconf automake libzmq3-dev
+RUN apt update -y && apt install -y libtool pkg-config build-essential autoconf automake libzmq3-dev cmake
 
 RUN curl -fsSL https://raw.githubusercontent.com/tj/n/master/bin/n | bash -s lts
 
