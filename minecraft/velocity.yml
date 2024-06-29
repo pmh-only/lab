@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: velocity
+spec:
+  selector:
+    app: velocity
+  type: ClusterIP
+  ports:
+  - name: velocity
+    protocol: TCP
+    port: 25565
+    targetPort: 25565
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: velocity
+spec:
+  selector:
+    matchLabels:
+      app: velocity
+  serviceName: "velocity"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: velocity
+    spec:
+      containers:
+      - name: velocity
+        image: ghcr.io/pmh-only/velocity:latest
+        ports:
+        - containerPort: 80
+          name: velocity
+        volumeMounts:
+        - name: app
+          mountPath: /app
+  volumeClaimTemplates:
+  - metadata:
+      name: app
+    spec:
+      storageClassName: local-path
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
