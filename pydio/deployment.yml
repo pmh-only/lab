@@ -17,6 +17,13 @@ spec:
         image: ghcr.io/pmh-only/pydio
         ports:
         - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 500MiB
+          limits:
+            cpu: 100m
+            memory: 500MiB
         env:
         - name: CELLS_SITE_EXTERNAL
           value: https://drive.pmh.codes

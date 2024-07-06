@@ -17,6 +17,13 @@ spec:
         image: vaultwarden/server:latest
         ports:
         - containerPort: 80
+        resources:
+          requests:
+            cpu: 10m
+            memory: 100MiB
+          limits:
+            cpu: 10m
+            memory: 100MiB
         env:
         - name: SIGNUPS_ALLOWED
           value: "false"

@@ -15,3 +15,10 @@ spec:
       containers:
       - name: redis
         image: redis:alpine
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10MiB
+          limits:
+            cpu: 10m
+            memory: 10MiB
