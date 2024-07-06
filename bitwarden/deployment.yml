@@ -20,10 +20,10 @@ spec:
         resources:
           requests:
             cpu: 10m
-            memory: 100MiB
+            memory: 100Mi
           limits:
             cpu: 10m
-            memory: 100MiB
+            memory: 100Mi
         env:
         - name: SIGNUPS_ALLOWED
           value: "false"
