@@ -15,13 +15,6 @@ spec:
       containers:
       - name: keysboard
         image: ghcr.io/pmh-only/keysboard
-        resources:
-          requests:
-            cpu: 10m
-            memory: 50Mi
-          limits:
-            cpu: 10m
-            memory: 50Mi
         env:
         - name: ORIGIN
           value: https://keys.pmh.codes

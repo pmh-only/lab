@@ -28,13 +28,6 @@ spec:
         ports:
         - containerPort: 9000
         - containerPort: 9001
-        resources:
-          requests:
-            cpu: 100m
-            memory: 300Mi
-          limits:
-            cpu: 100m
-            memory: 300Mi
         env:
         - name: MINIO_DOMAIN
           value: pmh.codes
