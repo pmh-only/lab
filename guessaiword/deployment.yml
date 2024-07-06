@@ -15,13 +15,6 @@ spec:
       containers:
       - name: guessaiword
         image: ghcr.io/pmh-only/guessaiword
-        resources:
-          requests:
-            cpu: 100m
-            memory: 300Mi
-          limits:
-            cpu: 100m
-            memory: 300Mi
         ports:
         - containerPort: 8080
         volumeMounts:

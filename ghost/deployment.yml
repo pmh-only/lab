@@ -17,13 +17,6 @@ spec:
         image: ghost:alpine
         ports:
         - containerPort: 2368
-        resources:
-          requests:
-            cpu: 100m
-            memory: 300Mi
-          limits:
-            cpu: 100m
-            memory: 300Mi
         env:
         - name: database__client
           value: mysql
