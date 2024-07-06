@@ -20,10 +20,10 @@ spec:
         resources:
           requests:
             cpu: 100m
-            memory: 500MiB
+            memory: 500Mi
           limits:
             cpu: 100m
-            memory: 500MiB
+            memory: 500Mi
         env:
         - name: CELLS_SITE_EXTERNAL
           value: https://drive.pmh.codes

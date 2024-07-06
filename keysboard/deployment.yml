@@ -18,10 +18,10 @@ spec:
         resources:
           requests:
             cpu: 10m
-            memory: 50MiB
+            memory: 50Mi
           limits:
             cpu: 10m
-            memory: 50MiB
+            memory: 50Mi
         env:
         - name: ORIGIN
           value: https://keys.pmh.codes

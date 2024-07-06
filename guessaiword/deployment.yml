@@ -18,10 +18,10 @@ spec:
         resources:
           requests:
             cpu: 100m
-            memory: 300MiB
+            memory: 300Mi
           limits:
             cpu: 100m
-            memory: 300MiB
+            memory: 300Mi
         ports:
         - containerPort: 8080
         volumeMounts:

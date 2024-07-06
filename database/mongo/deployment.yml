@@ -20,10 +20,10 @@ spec:
         resources:
           requests:
             cpu: 10m
-            memory: 800MiB
+            memory: 800Mi
           limits:
             cpu: 10m
-            memory: 800MiB
+            memory: 800Mi
         volumeMounts:
         - mountPath: /data/db
           name: mongo-storage
