@@ -15,6 +15,13 @@ spec:
       containers:
       - name: gptforum
         image: ghcr.io/pmh-only/gptforum
+        resources:
+          requests:
+            cpu: 10m
+            memory: 100MiB
+          limits:
+            cpu: 10m
+            memory: 100MiB
         env:
         - name: OPENAI_API_MODEL
           value: gpt-4o
