@@ -4,3 +4,5 @@ namespace: minecraft
 resources:
   - ./velocity.yml
   - ./lobby.yml
+  - ./survival.yml
+  - ./creative.yml
