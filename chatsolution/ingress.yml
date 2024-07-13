@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chatsolution-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+  - hosts:
+    - ch.pmh.codes
+    secretName: chatsolution-ingress-tls
+  ingressClassName: nginx
+  rules:
+  - host: ch.pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: chatsolution-service
+            port:
+              number: 80
