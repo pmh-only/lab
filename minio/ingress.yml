@@ -23,10 +23,10 @@ metadata:
         local host = ngx.req.get_headers()["host"];
         local reg = "^(?<bucket>[^.]+).pmh.codes$";
         local m = ngx.re.match(host, reg);
+        ngx.log(ngx.STDERR, m['bucket'])
+        ngx.log(ngx.STDERR, host)
         return m['bucket'];
       }
-
-      add_header test $bucket;
 
       if ($test = BC) {
         more_set_input_headers 'Host: $bucket.s3.pmh.codes';
