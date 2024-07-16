@@ -21,7 +21,7 @@ metadata:
 
       set_by_lua_block $bucket {
         local host = ngx.req.get_headers()["host"];
-        local reg = "^(?<bucket>[^.]+)\.pmh\.codes$";
+        local reg = "^(?<bucket>[^.]+).pmh.codes$";
         local m = ngx.re.match(host, reg);
         return m['bucket'];
       }
