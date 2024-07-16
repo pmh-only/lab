@@ -15,8 +15,12 @@ metadata:
         set $test "${test}B"; 
       }
       
+      if ($host !~* s3.pmh.codes) { 
+        set $test "${test}B"; 
+      }
+
       if ($test = AB) {
-        rewrite ^/$ /index.html break;
+        rewrite ^/$ https://$1.s3.pmh.codes/index.html break;
         error_page 400 =302 https://pmh.codes;
         error_page 401 =302 https://pmh.codes;
         error_page 403 =302 https://pmh.codes;
@@ -32,7 +36,7 @@ spec:
     secretName: minio-home-ingress-tls
   ingressClassName: nginx
   rules:
-  - host: "*.pmh.codes"
+  - host: "~^([^.]+).pmh.codes$"
     http:
       paths:
       - path: /
