@@ -33,6 +33,8 @@ spec:
           value: s3.pmh.codes
         - name: MINIO_SERVER_URL
           value: http://minio-service.minio.svc.cluster.local:9000
+        - name: MINIO_BROWSER_REDIRECT_URL
+          value: https://minio.pmh.codes
         - name: MINIO_ROOT_USER
           valueFrom:
             secretKeyRef:
