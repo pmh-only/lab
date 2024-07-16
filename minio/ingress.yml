@@ -32,7 +32,7 @@ metadata:
 
       if ($test = ABC) {
         rewrite ^/$ /index.html break;
-        proxy_set_header Host $bucket.s3.pmh.codes;
+        more_set_input_headers 'Host: $bucket.s3.pmh.codes';
         error_page 400 =302 https://pmh.codes;
         error_page 401 =302 https://pmh.codes;
         error_page 403 =302 https://pmh.codes;
