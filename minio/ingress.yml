@@ -27,7 +27,7 @@ metadata:
       }
 
       if ($test = BC) {
-        proxy_set_header Host $bucket.s3.pmh.codes;
+        more_set_input_headers 'Host: $bucket.s3.pmh.codes';
       }
 
       if ($test = ABC) {
