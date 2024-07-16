@@ -16,11 +16,23 @@ metadata:
       }
       
       if ($host !~* s3.pmh.codes) { 
-        set $test "${test}B"; 
+        set $test "${test}C"; 
       }
 
-      if ($test = AB) {
-        rewrite ^/$ https://$1.s3.pmh.codes/index.html break;
+      set_by_lua_block $bucket {
+        local host = ngx.req.get_headers()["host"];
+        local reg = "^(?<bucket>[^.]+)\.pmh\.codes$";
+        local m = ngx.re.match(host, reg);
+        return m['bucket'];
+      }
+
+      if ($test = BC) {
+        proxy_set_header Host $bucket.s3.pmh.codes;
+      }
+
+      if ($test = ABC) {
+        rewrite ^/$ /index.html break;
+        proxy_set_header Host $bucket.s3.pmh.codes;
         error_page 400 =302 https://pmh.codes;
         error_page 401 =302 https://pmh.codes;
         error_page 403 =302 https://pmh.codes;
@@ -36,7 +48,7 @@ spec:
     secretName: minio-home-ingress-tls
   ingressClassName: nginx
   rules:
-  - host: "~^([^.]+).pmh.codes$"
+  - host: "*.pmh.codes"
     http:
       paths:
       - path: /
