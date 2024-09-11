@@ -116,12 +116,12 @@ data:
           period: 24h
 
     storage_config:
-    tsdb_shipper:
-      active_index_directory: /loki/index
-      cache_location: /loki/index_cache
-    aws:
-      s3: s3://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@minio-service.minio.svc.cluster.local/loki-longterm
-      s3forcepathstyle: true
+      tsdb_shipper:
+        active_index_directory: /loki/index
+        cache_location: /loki/index_cache
+      aws:
+        s3: s3://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@minio-service.minio.svc.cluster.local/loki-longterm
+        s3forcepathstyle: true
 ---
 apiVersion: v1
 kind: Service
