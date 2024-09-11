@@ -24,7 +24,6 @@ spec:
               port: http-metrics
             initialDelaySeconds: 5
             timeoutSeconds: 5
-          name: kube-state-metrics
           ports:
           - containerPort: 8080
             name: http-metrics
