@@ -7,3 +7,4 @@ resources:
   - ./mimir.yml
   - ./alloy.yml
   - ./ksm.yml
+  - ./ne.yml
