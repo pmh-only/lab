@@ -60,7 +60,7 @@ spec:
             - mountPath: /var/lib/grafana
               name: grafana-pvc
             - name: grafana-config
-              mountPath: /etc/grafana
+              mountPath: /etc/grafana/grafana.ini
               subPath: grafana.ini
       volumes:
         - name: grafana-pvc
