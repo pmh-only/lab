@@ -159,6 +159,7 @@ data:
     }
 
     prometheus.scrape "node" {
+      scheme = "https"
       targets    = discovery.kubernetes.node.targets
       forward_to = [prometheus.remote_write.default.receiver]
 
@@ -172,6 +173,7 @@ data:
     }
     
     prometheus.scrape "cadvisor" {
+      scheme = "https"
       metrics_path = "/metrics/cadvisor"
       targets    = discovery.kubernetes.node.targets
       forward_to = [prometheus.remote_write.default.receiver]
@@ -182,6 +184,40 @@ data:
       
       authorization {
         credentials_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      }
+    }
+
+    discovery.kubernetes "apiserver" {
+      role = "endpoints"
+    }
+
+    prometheus.scrape "apiserver" {
+      scheme = "https"
+      targets    = discovery.kubernetes.apiserver.targets
+      forward_to = [prometheus.relabel.apiserver.receiver]
+
+      tls_config {
+        ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+      }
+      
+      authorization {
+        credentials_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      }
+    }
+
+    prometheus.relabel "apiserver" {
+      forward_to = [
+        prometheus.remote_write.default.receiver,
+      ]
+
+      rule {
+        - source_labels = [
+            "__meta_kubernetes_namespace",
+            "__meta_kubernetes_service_name",
+            "__meta_kubernetes_endpoint_port_name"
+          ]
+          action = "keep"
+          regex = "default;kubernetes;https"
       }
     }
 
