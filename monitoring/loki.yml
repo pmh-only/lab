@@ -141,6 +141,6 @@ kind: Secret
 metadata:
   name: loki-secret
   namespace: monitoring
-data:
-  MINIO_ACCESS_KEY: eW91c2hhbGxub3RwYXNz= # youshallnotpass
-  MINIO_SECRET_KEY: eW91c2hhbGxub3RwYXNz=
+stringData:
+  MINIO_ACCESS_KEY: youshallnotpass
+  MINIO_SECRET_KEY: youshallnotpass
