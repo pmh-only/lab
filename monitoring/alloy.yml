@@ -154,6 +154,29 @@ data:
       forward_to = [prometheus.remote_write.default.receiver]
     }
 
+    discovery.kubernetes "node" {
+      role = "node"
+    }
+
+    prometheus.scrape "node" {
+      targets    = discovery.kubernetes.node.targets
+      forward_to = [prometheus.remote_write.default.receiver]
+      tls_config {
+        ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+        cert_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      }
+    }
+    
+    prometheus.scrape "cadvisor" {
+      metrics_path = "/metrics/cadvisor"
+      targets    = discovery.kubernetes.node.targets
+      forward_to = [prometheus.remote_write.default.receiver]
+      tls_config {
+        ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+        cert_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      }
+    }
+
     prometheus.remote_write "default" {
       endpoint {
         url = "http://mimir:8080/api/v1/push"
@@ -172,8 +195,10 @@ metadata:
   name: alloy-role
 rules:
 - apiGroups: [""]
-  resources: ["pods", "pods/log"]
+  resources: ["pods", "nodes", "nodes/metrics", "pods/log"]
   verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+  verbs: ["get"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
