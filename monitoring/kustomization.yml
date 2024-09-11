@@ -4,3 +4,4 @@ namespace: monitoring
 resources:
   - ./loki.yml
   - ./grafana.yml
+  - ./alloy.yml
