@@ -63,9 +63,9 @@ spec:
               mountPath: /etc/grafana
               subPath: grafana.ini
       volumes:
-        - name: grafana-pv
+        - name: grafana-pvc
           persistentVolumeClaim:
-            claimName: grafana-pv
+            claimName: grafana-pvc
         - name: grafana-config
           configMap:
             name: grafana-config
