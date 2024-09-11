@@ -17,7 +17,7 @@ spec:
       serviceAccountName: ksm-sa
       containers:
         - name: ksm
-          image: registry.k8s.io/kube-state-metrics/kube-state-metrics:latest
+          image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.13.0
           livenessProbe:
             httpGet:
               path: /livez
