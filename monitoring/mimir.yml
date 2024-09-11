@@ -33,14 +33,14 @@ spec:
                 name: mimir-secret
                 key: MINIO_SECRET_KEY
           ports:
-            - containerPort: 9009
+            - containerPort: 8080
               name: http-mimir
               protocol: TCP
           readinessProbe:
             failureThreshold: 3
             httpGet:
               path: /ready
-              port: 9009
+              port: 8080
               scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 30
@@ -52,7 +52,7 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             tcpSocket:
-              port: 9009
+              port: 8080
             timeoutSeconds: 1
           resources:
             requests:
@@ -103,7 +103,7 @@ metadata:
   namespace: monitoring
 spec:
   ports:
-    - port: 9009
+    - port: 8080
       protocol: TCP
       targetPort: http-mimir
   selector:
