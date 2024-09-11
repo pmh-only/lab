@@ -20,6 +20,7 @@ spec:
           command:
             - /bin/mimir
             - -config.file=/etc/mimir/local-config.yaml
+            - -config.expand-env=true
           env:
           - name: MINIO_ACCESS_KEY
             valueFrom:
