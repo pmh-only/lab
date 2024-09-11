@@ -18,7 +18,7 @@ spec:
         - name: mimir
           image: grafana/mimir:latest
           command:
-            - /usr/bin/mimir
+            - /bin/mimir
             - -config.file=/etc/mimir/local-config.yaml
           env:
           - name: MINIO_ACCESS_KEY
