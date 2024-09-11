@@ -34,6 +34,8 @@ spec:
         - name: loki
           image: grafana/loki:latest
           imagePullPolicy: IfNotPresent
+          command:
+            - -config.expand-env=true
           env:
           - name: MINIO_ACCESS_KEY
             valueFrom:
