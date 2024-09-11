@@ -73,7 +73,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: alloy-config
+  name: grafana-config
   namespace: monitoring
 data:
   grafana.ini: |
