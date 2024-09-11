@@ -18,7 +18,7 @@ spec:
         - name: ne
           image: quay.io/prometheus/node-exporter:latest
           args:
-            - --web.listen-address=127.0.0.1:9100
+            - --web.listen-address=0.0.0.0:9100
             - --path.sysfs=/host/sys
             - --path.rootfs=/host/root
             - --path.udev.data=/host/root/run/udev/data
