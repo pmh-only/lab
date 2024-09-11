@@ -119,7 +119,7 @@ data:
         active_index_directory: /loki/index
         cache_location: /loki/index_cache
       aws:
-        s3: s3://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@minio-service.minio.svc.cluster.local/loki-longterm
+        s3: s3://${MINIO_ACCESS_KEY}:${MINIO_SECRET_KEY}@minio-service.minio.svc:9000/loki-longterm
         s3forcepathstyle: true
 ---
 apiVersion: v1
