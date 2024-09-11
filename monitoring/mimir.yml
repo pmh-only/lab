@@ -21,6 +21,8 @@ spec:
             - /bin/mimir
             - -config.file=/etc/mimir/local-config.yaml
             - -config.expand-env=true
+            - -auth.multitenancy-enabled=false
+            
           env:
           - name: MINIO_ACCESS_KEY
             valueFrom:
