@@ -239,6 +239,19 @@ data:
       forward_to = [prometheus.remote_write.default.receiver]
     }
 
+    discovery.kubernetes "minecraft" {
+      role = "pod"
+
+      namespaces {
+        names = ["minecraft"]
+      }
+    }
+
+    prometheus.scrape "minecraft" {
+      targets    = discovery.kubernetes.minecraft.targets
+      forward_to = [prometheus.remote_write.default.receiver]
+    }
+
     prometheus.remote_write "default" {
       endpoint {
         url = "http://mimir:8080/api/v1/push"
