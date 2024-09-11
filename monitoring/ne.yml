@@ -57,6 +57,19 @@ spec:
             readOnly: true
       nodeSelector:
         kubernetes.io/os: linux
+      volumes:
+      - hostPath:
+          path: /sys
+        name: sys
+      - hostPath:
+          path: /
+        name: root
+      securityContext:
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      hostNetwork: true
+      hostPID: true
 ---
 apiVersion: v1
 kind: Service
