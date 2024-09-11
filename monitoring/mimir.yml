@@ -22,6 +22,7 @@ spec:
             - -config.file=/etc/mimir/local-config.yaml
             - -config.expand-env=true
             - -auth.multitenancy-enabled=false
+            - -target=all,alertmanager
             
           env:
           - name: MINIO_ACCESS_KEY
