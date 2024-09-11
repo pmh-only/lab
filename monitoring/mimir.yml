@@ -23,7 +23,7 @@ spec:
             - -config.expand-env=true
             - -auth.multitenancy-enabled=false
             - -target=all,alertmanager
-            
+            - -ingester.ring.replication-factor=1
           env:
           - name: MINIO_ACCESS_KEY
             valueFrom:
