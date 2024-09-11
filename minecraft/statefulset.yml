@@ -21,6 +21,8 @@ spec:
         ports:
         - containerPort: 80
           name: minecraft
+        - containerPort: 9100
+          name: metrics
         volumeMounts:
         - name: app
           mountPath: /app
