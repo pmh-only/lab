@@ -161,9 +161,13 @@ data:
     prometheus.scrape "node" {
       targets    = discovery.kubernetes.node.targets
       forward_to = [prometheus.remote_write.default.receiver]
+
       tls_config {
-        cert_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-        key_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+        ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+      }
+      
+      authorization {
+        credentials_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
       }
     }
     
@@ -171,9 +175,13 @@ data:
       metrics_path = "/metrics/cadvisor"
       targets    = discovery.kubernetes.node.targets
       forward_to = [prometheus.remote_write.default.receiver]
+      
       tls_config {
-        cert_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-        key_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+        ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+      }
+      
+      authorization {
+        credentials_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
       }
     }
 
