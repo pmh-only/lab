@@ -129,8 +129,28 @@ data:
       }
     }
 
-    prometheus.scrape "pods" {
+    prometheus.scrape "ksm" {
       targets    = discovery.kubernetes.ksm.targets
+      forward_to = [prometheus.remote_write.default.receiver]
+    }
+
+    
+    discovery.kubernetes "ne" {
+      role = "pod"
+
+      namespaces {
+        own_namespace = true
+        names = ["monitoring"]
+      }
+
+      selectors {
+        role  = "pod"
+        label = "app = ne"
+      }
+    }
+
+    prometheus.scrape "ne" {
+      targets    = discovery.kubernetes.ne.targets
       forward_to = [prometheus.remote_write.default.receiver]
     }
 
@@ -139,7 +159,6 @@ data:
         url = "http://mimir:8080/api/v1/push"
       }
     }
-
 ---
 apiVersion: v1
 kind: ServiceAccount
