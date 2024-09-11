@@ -4,3 +4,4 @@ namespace: minecraft
 resources:
   - ./statefulset.yml
   - ./service.yml
+  - ./ingress.yml
