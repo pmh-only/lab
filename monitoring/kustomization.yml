@@ -6,3 +6,4 @@ resources:
   - ./grafana.yml
   - ./mimir.yml
   - ./alloy.yml
+  - ./ksm.yml
