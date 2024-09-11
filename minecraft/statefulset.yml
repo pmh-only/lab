@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: minecraft
-        image: ghcr.io/pmh-only/paper:experimental
+        image: ghcr.io/pmh-only/paper
         tty: true
         stdin: true
         ports:
