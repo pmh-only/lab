@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: keysboard-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+  - hosts:
+    - maps.pmh.codes
+    secretName: minecraftmap-ingress-tls
+  ingressClassName: nginx
+  rules:
+  - host: maps.pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: minecarft
+            port:
+              number: 8100
