@@ -163,7 +163,7 @@ data:
       forward_to = [prometheus.remote_write.default.receiver]
       tls_config {
         ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-        cert_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+        key_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
       }
     }
     
@@ -173,7 +173,7 @@ data:
       forward_to = [prometheus.remote_write.default.receiver]
       tls_config {
         ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-        cert_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+        key_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
       }
     }
 
