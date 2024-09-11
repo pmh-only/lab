@@ -58,7 +58,7 @@ spec:
               memory: 750Mi
           volumeMounts:
             - mountPath: /var/lib/grafana
-              name: grafana-pv
+              name: grafana-pvc
             - name: grafana-config
               mountPath: /etc/grafana
               subPath: grafana.ini
