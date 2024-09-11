@@ -26,14 +26,9 @@ spec:
       labels:
         app: loki
     spec:
-      securityContext:
-        fsGroup: 472
-        supplementalGroups:
-          - 0
       containers:
         - name: loki
           image: grafana/loki:latest
-          imagePullPolicy: IfNotPresent
           command:
             - /usr/bin/loki
             - -config.file=/etc/loki/local-config.yaml
