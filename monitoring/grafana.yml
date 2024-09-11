@@ -59,10 +59,29 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-pv
+            - name: grafana-config
+              mountPath: /etc/grafana
+              subPath: grafana.ini
       volumes:
         - name: grafana-pv
           persistentVolumeClaim:
-            claimName: grafana-pvc
+            claimName: grafana-pv
+        - name: grafana-config
+          configMap:
+            name: grafana-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-config
+  namespace: monitoring
+data:
+  grafana.ini: |
+    [auth.anonymous]
+    enabled = true
+    org_name = Main Org.
+    org_role = Viewer
+    hide_version = true
 ---
 apiVersion: v1
 kind: Service
