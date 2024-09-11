@@ -35,6 +35,8 @@ spec:
           image: grafana/loki:latest
           imagePullPolicy: IfNotPresent
           command:
+            - /usr/bin/loki
+            - -config.file=/etc/loki/local-config.yaml
             - -config.expand-env=true
           env:
           - name: MINIO_ACCESS_KEY
