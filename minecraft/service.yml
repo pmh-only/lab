@@ -11,3 +11,7 @@ spec:
     protocol: TCP
     port: 25565
     targetPort: 25565
+  - name: minecraftmap
+    protocol: TCP
+    port: 8100
+    targetPort: 8100
