@@ -37,9 +37,14 @@ metadata:
   namespace: monitoring
 data:
   config.alloy: |
+    logging {
+      level  = "debug"
+      format = "logfmt"
+    }
+
     loki.write "default" {
       endpoint {
-        url = "http://loki:3100"
+        url = "http://loki:3100/loki/api/v1/push"
       }
     }
 
