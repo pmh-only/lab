@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: image-renderer
+  name: image-renderer
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: image-renderer
+  template:
+    metadata:
+      labels:
+        app: image-renderer
+    spec:
+      containers:
+        - name: image-renderer
+          image: image-renderer/grafana:latest
+          env:
+            - name: HTTP_HOST
+              value: 0.0.0.0
+            - name: BROWSER_TZ
+              value: Asia/Seoul
+            - name: RENDERING_MODE
+              value: clustered
+            - name: RENDERING_CLUSTERING_MODE
+              value: browser
+            - name: RENDERING_CLUSTERING_MAX_CONCURRENCY
+              value: '5'
+            - name: RENDERING_CLUSTERING_TIMEOUT
+              value: '30'
+          ports:
+            - containerPort: 8081
+              name: http-image-renderer
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 8081
+            timeoutSeconds: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: image-renderer
+  namespace: monitoring
+spec:
+  ports:
+    - port: 8081
+      protocol: TCP
+      targetPort: http-image-renderer
+  selector:
+    app: image-renderer
