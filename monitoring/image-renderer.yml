@@ -32,7 +32,7 @@ spec:
               value: '30'
           ports:
             - containerPort: 8081
-              name: http-image-renderer
+              name: http-imgrender
               protocol: TCP
           readinessProbe:
             failureThreshold: 3
