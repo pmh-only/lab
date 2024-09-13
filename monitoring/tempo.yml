@@ -96,6 +96,7 @@ data:
   local-config.yaml: |
     server:
       http_listen_port: 8080
+      grpc_listen_port: 9095
 
     distributor:
       receivers:
