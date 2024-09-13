@@ -311,6 +311,7 @@ data:
     otelcol.exporter.otlp "tempo" {
       client {
         endpoint = "tempo:8080"
+        insecure = true
       }
     }
 
