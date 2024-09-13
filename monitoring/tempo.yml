@@ -147,10 +147,12 @@ metadata:
   namespace: monitoring
 spec:
   ports:
-    - port: 8080
+    - name: http-tempo
+      port: 8080
       protocol: TCP
       targetPort: http-tempo
-    - port: 9095
+    - name: grpc-tempo
+      port: 9095
       protocol: TCP
       targetPort: grpc-tempo
   selector:
