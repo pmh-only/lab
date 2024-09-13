@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: ghost
-        image: ghost:alpine
+        image: ghcr.io/pmh-only/ghost:alpine
         ports:
         - containerPort: 2368
         env:

@@ -17,7 +17,7 @@ spec:
       serviceAccountName: alloy-sa
       containers:
         - name: alloy
-          image: grafana/alloy:latest
+          image: ghcr.io/pmh-only/alloy:latest
           resources:
             requests:
               cpu: 250m

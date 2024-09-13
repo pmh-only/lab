@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: grafana
-          image: grafana/grafana:latest
+          image: ghcr.io/pmh-only/grafana:latest
           env:
             - name: GF_RENDERING_SERVER_URL
               value: http://image-renderer:8081/render

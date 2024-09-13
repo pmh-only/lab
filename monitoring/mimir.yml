@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: mimir
-          image: grafana/mimir:latest
+          image: ghcr.io/pmh-only/mimir:latest
           command:
             - /bin/mimir
             - -config.file=/etc/mimir/local-config.yaml
