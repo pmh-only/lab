@@ -125,8 +125,8 @@ data:
           enable_dual_stack: false
           endpoint: minio-service.minio.svc:9000
           region: us-east-1
-          access_key_id: "${MINIO_ACCESS_KEY}"
-          secret_access_key: "${MINIO_SECRET_KEY}"
+          access_key: "${MINIO_ACCESS_KEY}"
+          secret_key: "${MINIO_SECRET_KEY}"
           insecure: true
         wal:
           path: /var/tempo/wal
