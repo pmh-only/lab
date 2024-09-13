@@ -48,6 +48,9 @@ spec:
             - containerPort: 8080
               name: http-tempo
               protocol: TCP
+            - containerPort: 9095
+              name: http-grpc
+              protocol: TCP
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -147,6 +150,9 @@ spec:
     - port: 8080
       protocol: TCP
       targetPort: http-tempo
+    - port: 9095
+      protocol: TCP
+      targetPort: grpc-tempo
   selector:
     app: tempo
 ---
