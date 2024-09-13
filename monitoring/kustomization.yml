@@ -4,8 +4,9 @@ namespace: monitoring
 resources:
   - ./loki.yml
   - ./grafana.yml
-  - ./image-renderer.yml
+  - ./tempo.yml
   - ./mimir.yml
   - ./alloy.yml
+  - ./image-renderer.yml
   - ./ksm.yml
   - ./ne.yml
