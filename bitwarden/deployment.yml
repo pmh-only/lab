@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: bitwarden
-        image: vaultwarden/server:latest
+        image: ghcr.io/dani-garcia/vaultwarden:latest
         ports:
         - containerPort: 80
         env:

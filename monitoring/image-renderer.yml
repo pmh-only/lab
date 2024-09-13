@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: image-renderer
-          image: grafana/grafana-image-renderer:latest
+          image: ghcr.io/pmh-only/grafana-image-renderer:latest
           env:
             - name: HTTP_HOST
               value: 0.0.0.0

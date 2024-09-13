@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: mysql
-        image: mysql:8
+        image: ghcr.io/pmh-only/mysql:8
         ports:
         - containerPort: 3306
         env:

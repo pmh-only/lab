@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: loki
-          image: grafana/loki:latest
+          image: ghcr.io/pmh-only/loki:latest
           command:
             - /usr/bin/loki
             - -config.file=/etc/loki/local-config.yaml
