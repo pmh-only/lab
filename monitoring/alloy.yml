@@ -38,10 +38,12 @@ metadata:
   namespace: monitoring
 spec:
   ports:
-    - port: 4317
+    - name: grpc-otel
+      port: 4317
       protocol: TCP
       targetPort: 4317
-    - port: 4318
+    - name: http-otel
+      port: 4318
       protocol: TCP
       targetPort: 4318
   selector:
