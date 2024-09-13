@@ -292,8 +292,8 @@ data:
 
     otelcol.processor.batch "default" {
       output {
-        metrics = [otelcol.exporter.otlp.mimir.input]
-        logs    = [otelcol.exporter.otlp.loki.input]
+        metrics = [otelcol.exporter.prometheus.mimir.input]
+        logs    = [otelcol.exporter.loki.loki.input]
         traces  = [otelcol.exporter.otlp.tempo.input]
       }
     }
