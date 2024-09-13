@@ -1,0 +1,160 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tempo-pvc
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tempo
+  name: tempo
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: tempo
+  template:
+    metadata:
+      labels:
+        app: tempo
+    spec:
+      containers:
+        - name: tempo
+          image: ghcr.io/pmh-only/tempo:latest
+          command:
+            - /tempo
+            - -config.file=/etc/tempo/local-config.yaml
+            - -config.expand-env=true
+          env:
+          - name: MINIO_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: tempo-secret
+                key: MINIO_ACCESS_KEY
+          - name: MINIO_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: tempo-secret
+                key: MINIO_SECRET_KEY
+          ports:
+            - containerPort: 8080
+              name: http-tempo
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 250m
+              memory: 750Mi
+          volumeMounts:
+            - mountPath: /var/tempo
+              name: tempo-pv
+            - name: tempo-config
+              mountPath: /etc/tempo/local-config.yaml
+              subPath: local-config.yaml
+      volumes:
+        - name: tempo-pv
+          persistentVolumeClaim:
+            claimName: tempo-pvc
+        - name: tempo-config
+          configMap:
+            name: tempo-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempo-config
+  namespace: monitoring
+data:
+  local-config.yaml: |
+    server:
+      http_listen_port: 8080
+
+    distributor:
+      receivers:
+          otlp:
+            protocols:
+              http:
+              grpc:
+
+    compactor:
+      compaction:
+        block_retention: 48h
+
+    metrics_generator:
+      registry:
+        external_labels:
+          source: tempo
+          cluster: pmhoci
+      storage:
+        path: /var/tempo/generator/wal
+        remote_write:
+        - url: http://mimir:8080/api/v1/push
+          send_exemplars: true
+
+    storage:
+      trace:
+        backend: s3
+        s3:
+          bucket: tempo-longterm
+          forcepathstyle: true
+          enable_dual_stack: false
+          endpoint: minio-service.minio.svc:9000
+          region: us-east-1
+          access_key_id: "${MINIO_ACCESS_KEY}"
+          secret_access_key: "${MINIO_SECRET_KEY}"
+          insecure: true
+        wal:
+          path: /var/tempo/wal
+        local:
+          path: /var/tempo/blocks
+    overrides:
+      defaults:
+        metrics_generator:
+          processors: [service-graphs, span-metrics]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo
+  namespace: monitoring
+spec:
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: http-tempo
+  selector:
+    app: tempo
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: tempo-secret
+  namespace: monitoring
+stringData:
+  MINIO_ACCESS_KEY: youshallnotpass
+  MINIO_SECRET_KEY: youshallnotpass

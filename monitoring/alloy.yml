@@ -32,6 +32,22 @@ spec:
             name: alloy-config
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  name: alloy
+  namespace: monitoring
+spec:
+  ports:
+    - port: 4317
+      protocol: TCP
+      targetPort: 4317
+    - port: 4318
+      protocol: TCP
+      targetPort: 4318
+  selector:
+    app: alloy
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: alloy-config
@@ -257,6 +273,45 @@ data:
         url = "http://mimir:8080/api/v1/push"
       }
     }
+
+    otelcol.receiver.otlp "default" {
+      grpc {
+        endpoint = "0.0.0.0:4317"
+      }
+
+      http {
+        endpoint = "0.0.0.0:4318"
+      }
+
+      output {
+        metrics = [otelcol.processor.batch.default.input]
+        logs    = [otelcol.processor.batch.default.input]
+        traces  = [otelcol.processor.batch.default.input]
+      }
+    }
+
+    otelcol.processor.batch "default" {
+      output {
+        metrics = [otelcol.exporter.otlp.mimir.input]
+        logs    = [otelcol.exporter.otlp.loki.input]
+        traces  = [otelcol.exporter.otlp.tempo.input]
+      }
+    }
+
+    otelcol.exporter.prometheus "mimir" {
+      forward_to = [prometheus.remote_write.default.receiver]
+    }
+
+    otelcol.exporter.loki "loki" {
+      forward_to = [loki.write.default.receiver]
+    }
+
+    otelcol.exporter.otlp "tempo" {
+      client {
+        endpoint = "tempo:8080"
+      }
+    }
+
 ---
 apiVersion: v1
 kind: ServiceAccount
