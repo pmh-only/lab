@@ -308,9 +308,12 @@ data:
       forward_to = [loki.write.default.receiver]
     }
 
-    otelcol.exporter.otlphttp "tempo" {
+    otelcol.exporter.otlp "tempo" {
       client {
-        endpoint = "http://tempo:8080"
+        endpoint = "tempo:4317"
+        tls {
+          insecure = false
+        }
       }
     }
 
