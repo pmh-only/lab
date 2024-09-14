@@ -312,7 +312,7 @@ data:
       client {
         endpoint = "tempo:4317"
         tls {
-          insecure = false
+          insecure = true
         }
       }
     }
