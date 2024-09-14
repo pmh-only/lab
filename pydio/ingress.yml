@@ -3,8 +3,14 @@ kind: Ingress
 metadata:
   name: pydio-ingress
   annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location / {
+        if ($http_content_type = "application/grpc") {
+          grpc_pass grpcs://pydio-service.pydio.svc:8080;
+        }
+      }
 spec:
   tls:
   - hosts:
