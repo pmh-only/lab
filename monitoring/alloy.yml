@@ -296,7 +296,7 @@ data:
       output {
         metrics = [otelcol.exporter.prometheus.mimir.input]
         logs    = [otelcol.exporter.loki.loki.input]
-        traces  = [otelcol.exporter.otlphttp.tempo.input]
+        traces  = [otelcol.exporter.otlp.tempo.input]
       }
     }
 
