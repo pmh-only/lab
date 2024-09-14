@@ -9,3 +9,15 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: collabora-service
+spec:
+  selector:
+    app: collabora
+  ports:
+    - protocol: TCP
+      port: 9980
+      targetPort: 9980
