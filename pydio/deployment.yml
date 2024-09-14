@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: pydio
-        image: ghcr.io/pmh-only/pydio
+        image: ghcr.io/pmh-only/pydio:latest
         ports:
         - containerPort: 8080
         env:
@@ -27,3 +27,26 @@ spec:
       - name: pydio-storage
         persistentVolumeClaim:
           claimName: pydio-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: collabora
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: collabora
+  template:
+    metadata:
+      labels:
+        app: collabora
+    spec:
+      containers:
+      - name: collabora
+        image: ghcr.io/pmh-only/collabora-code:latest
+        ports:
+        - containerPort: 9980
+        env:
+        - name: domain
+          value: drive.pmh.codes

@@ -26,3 +26,10 @@ spec:
             name: pydio-service
             port:
               number: 8080
+      - path: /cool/
+        pathType: Prefix
+        backend:
+          service:
+            name: collabora-service
+            port:
+              number: 9980
