@@ -48,6 +48,9 @@ spec:
             - containerPort: 8080
               name: http-tempo
               protocol: TCP
+            - containerPort: 4317
+              name: grpc-otel
+              protocol: TCP
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -98,8 +101,8 @@ data:
       receivers:
           otlp:
             protocols:
-              http:
               grpc:
+                endpoint: "0.0.0.0:4317"
 
     compactor:
       compaction:
@@ -148,6 +151,10 @@ spec:
       port: 8080
       protocol: TCP
       targetPort: http-tempo
+    - name: grpc-otel
+      port: 4317
+      protocol: TCP
+      targetPort: grpc-otel
   selector:
     app: tempo
 ---
