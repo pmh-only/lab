@@ -50,3 +50,5 @@ spec:
         env:
         - name: domain
           value: drive.pmh.codes
+        - name: extra_params
+          value: -o:tls.enable=true
