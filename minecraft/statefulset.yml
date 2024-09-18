@@ -18,7 +18,10 @@ spec:
         - name: rcon
           image: ghcr.io/pmh-only/rcon
           restartPolicy: Always
-          command: ['sleep', 'infinity']
+          command: 
+            - sh
+            - -c
+            - trap "exit 0" SIGTERM; while :; do sleep 1; done
           lifecycle:
             preStop:
               exec:
