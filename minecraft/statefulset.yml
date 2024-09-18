@@ -13,7 +13,7 @@ spec:
       labels:
         app: minecraft
     spec:
-      terminationGracePeriodSeconds: 60
+      terminationGracePeriodSeconds: 120
       initContainers:
         - name: rcon
           image: ghcr.io/pmh-only/rcon
@@ -25,7 +25,12 @@ spec:
                 command:
                   - sh
                   - -c
-                  - './rcon -a 127.0.0.1:25575 "kick @a Server is now updating! Come back after 10s" "stop"'
+                  - ./rcon -a 127.0.0.1:25575 -p mcrcon
+                    "say @a [ALERT] Update found... Restart server in 30s..."
+                  - sleep 30
+                  - ./rcon -a 127.0.0.1:25575 -p mcrcon
+                    "kick @a Server is now updating! Come back after 10s"
+                    "stop"
       containers:
       - name: minecraft
         image: ghcr.io/pmh-only/paper
