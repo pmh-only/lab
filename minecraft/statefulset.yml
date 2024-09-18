@@ -29,10 +29,16 @@ spec:
                   - sh
                   - -c
                   - ./rcon -a 127.0.0.1:25575 -p mcrcon
-                    "say @a [ALERT] Update found... Restart server in 30s..." &&
-                    sleep 30 &&
+                    "say Update found... Restart server in 30s..." &&
+                    sleep 15 &&
                     ./rcon -a 127.0.0.1:25575 -p mcrcon
-                    "kick @a Server is now updating! Come back after 10s"
+                    "say Update found... Restart server in 15s..." &&
+                    sleep 10 &&
+                    ./rcon -a 127.0.0.1:25575 -p mcrcon
+                    "say Update found... Restart server in 5s..." &&
+                    sleep 5 &&
+                    ./rcon -a 127.0.0.1:25575 -p mcrcon
+                    "kick @a Server is now updating! Come back after 30s"
                     "stop"
       containers:
       - name: minecraft
