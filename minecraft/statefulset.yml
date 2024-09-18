@@ -22,10 +22,10 @@ spec:
           lifecycle:
             preStop:
               exec:
-                - sh
-                - -c
-                - './rcon -a 127.0.0.1:25575 "kick @a Server is now updating! Come back after 10s" "stop"'
-
+                command:
+                  - sh
+                  - -c
+                  - './rcon -a 127.0.0.1:25575 "kick @a Server is now updating! Come back after 10s" "stop"'
       containers:
       - name: minecraft
         image: ghcr.io/pmh-only/paper
