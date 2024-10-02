@@ -77,6 +77,9 @@ metadata:
   namespace: monitoring
 data:
   local-config.yaml: |
+    limits:
+      max_global_series_per_user: 0
+
     common:
       storage:
         backend: s3
