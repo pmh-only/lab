@@ -32,7 +32,6 @@ spec:
         volumeMounts:
         - name: gitea-data
           mountPath: "/data"
-          readOnly: true
       volumes:
       - name: gitea-data
         persistentVolumeClaim:
