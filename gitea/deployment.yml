@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitea
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitea
+  template:
+    metadata:
+      labels:
+        app: gitea
+    spec:
+      containers:
+      - name: gitea
+        image: ghcr.io/pmh-only/gitea:latest
+        env:
+          - name: GITEA__database__DB_TYPE
+            value: mysql
+          - name: GITEA__database__HOST
+            value: mysql-service.database.svc.cluster.local
+          - name: GITEA__database__NAME
+            value: gitea
+          - name: GITEA__database__USER
+            value: gitea
+          - name: GITEA__database__PASSWD
+            valueFrom:
+              secretKeyRef:
+                name: gitea-secret
+                key: GITEA__database__PASSWD
+        volumeMounts:
+        - name: gitea-data
+          mountPath: "/data"
+          readOnly: true
+      volumes:
+      - name: gitea-data
+        persistentVolumeClaim:
+          claimName: gitea-pvc
