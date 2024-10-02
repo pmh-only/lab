@@ -294,7 +294,10 @@ data:
       output {
         metrics = [otelcol.processor.batch.default.input]
         logs    = [otelcol.processor.batch.default.input]
-        traces  = [otelcol.processor.batch.default.input]
+        traces  = [
+          otelcol.processor.batch.default.input,
+          otelcol.connector.servicegraph.default.input
+        ]
       }
     }
 
@@ -303,6 +306,13 @@ data:
         metrics = [otelcol.exporter.prometheus.mimir.input]
         logs    = [otelcol.exporter.loki.loki.input]
         traces  = [otelcol.exporter.otlp.tempo.input]
+      }
+    }
+
+    otelcol.connector.servicegraph "default" {
+      dimensions = ["http.method", "http.target"]
+      output {
+        metrics = [otelcol.exporter.otlp.tempo.input]
       }
     }
 
