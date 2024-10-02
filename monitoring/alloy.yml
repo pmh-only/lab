@@ -296,7 +296,7 @@ data:
         logs    = [otelcol.processor.batch.default.input]
         traces  = [
           otelcol.processor.batch.default.input,
-          otelcol.connector.servicegraph.default.input
+          otelcol.connector.servicegraph.default.input,
         ]
       }
     }
