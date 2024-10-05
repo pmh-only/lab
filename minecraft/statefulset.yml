@@ -50,8 +50,10 @@ spec:
         tty: true
         stdin: true
         ports:
-        - containerPort: 80
+        - containerPort: 25565
           name: minecraft
+        - containerPort: 8100
+          name: minecraftmap
         - containerPort: 9100
           name: metrics
         volumeMounts:
