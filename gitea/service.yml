@@ -10,17 +10,8 @@ spec:
       protocol: TCP
       port: 3000
       targetPort: 3000
----     
-apiVersion: v1
-kind: Service
-metadata:
-  name: gitea-direct-service
-spec:
-  type: LoadBalancer
-  selector:
-    app: gitea
-  ports:
     - name: gitea-ssh
       protocol: TCP
       port: 22
       targetPort: 22
+      
