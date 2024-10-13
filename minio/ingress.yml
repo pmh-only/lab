@@ -24,7 +24,7 @@ metadata:
         local reg = "^(?<bucket>[^.]+).pmh.codes$";
         local m = ngx.re.match(host, reg);
 
-        return (m['bucket'] != nil and m['bucket'] or "www");
+        return (m['bucket'] ~= nil and m['bucket'] or "www");
       }
 
       if ($test = BC) {
