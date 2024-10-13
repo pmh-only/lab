@@ -23,7 +23,8 @@ metadata:
         local host = ngx.req.get_headers()["host"];
         local reg = "^(?<bucket>[^.]+).pmh.codes$";
         local m = ngx.re.match(host, reg);
-        return m['bucket'];
+
+        return (m['bucket'] != nil and m['bucket'] or "www");
       }
 
       if ($test = BC) {
@@ -41,6 +42,7 @@ metadata:
 spec:
   tls:
   - hosts:
+    - pmh.codes
     - '*.pmh.codes'
     secretName: minio-bucket-ingress-tls
   - hosts:
@@ -48,6 +50,16 @@ spec:
     secretName: minio-home-ingress-tls
   ingressClassName: nginx
   rules:
+  - host: pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: minio-service
+            port:
+              number: 9000
   - host: "*.pmh.codes"
     http:
       paths:
