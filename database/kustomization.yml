@@ -11,6 +11,3 @@ resources:
   - ./mongo/service.yml
   - ./redis/deployment.yml
   - ./redis/service.yml
-  - ./adminer/deployment.yml
-  - ./adminer/service.yml
-  - ./adminer/ingress.yml
