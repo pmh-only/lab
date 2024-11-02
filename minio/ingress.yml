@@ -3,7 +3,6 @@ kind: Ingress
 metadata:
   name: minio-ingress
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_intercept_errors on;
 
@@ -40,14 +39,6 @@ metadata:
         error_page 404 =302 https://pmh.codes;
       }
 spec:
-  tls:
-  - hosts:
-    - pmh.codes
-    - '*.pmh.codes'
-    secretName: minio-bucket-ingress-tls
-  - hosts:
-    - 'minio.pmh.codes'
-    secretName: minio-home-ingress-tls
   ingressClassName: nginx
   rules:
   - host: pmh.codes

@@ -3,17 +3,12 @@ kind: Ingress
 metadata:
   name: pydio-ingress
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     nginx.ingress.kubernetes.io/configuration-snippet: |
       if ($http_content_type = "application/grpc") {
         grpc_pass grpcs://upstream_balancer;
       }
 spec:
-  tls:
-  - hosts:
-    - drive.pmh.codes
-    secretName: pydio-ingress-tls
   ingressClassName: nginx
   rules:
   - host: drive.pmh.codes
