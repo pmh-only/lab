@@ -106,13 +106,7 @@ kind: Ingress
 metadata:
   name: grafana-ingress
   namespace: monitoring
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
 spec:
-  tls:
-  - hosts:
-    - grafana.pmh.codes
-    secretName: grafana-ingress-tls
   ingressClassName: nginx
   rules:
   - host: grafana.pmh.codes

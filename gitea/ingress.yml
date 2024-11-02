@@ -2,13 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: gitea-ingress
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
 spec:
-  tls:
-  - hosts:
-    - src.pmh.codes
-    secretName: gitea-ingress-tls
   ingressClassName: nginx
   rules:
   - host: src.pmh.codes

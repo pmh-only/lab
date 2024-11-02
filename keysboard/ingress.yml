@@ -2,13 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: keysboard-ingress
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
 spec:
-  tls:
-  - hosts:
-    - keys.pmh.codes
-    secretName: keysboard-ingress-tls
   ingressClassName: nginx
   rules:
   - host: keys.pmh.codes
