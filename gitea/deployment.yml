@@ -54,7 +54,7 @@ spec:
       containers:
       - name: gitea-runner
         image: ghcr.io/pmh-only/gitea-runner:latest
-        command: ["sh", "-c", "while ! nc -z localhost 2376 </dev/null; do echo 'waiting for docker daemon...'; sleep 5; done; /sbin/tini -- /opt/act/run.sh"]
+        command: ["sh", "-c", "sleep 10; /opt/act/run.sh"]
         env:
         - name: GITEA_INSTANCE_URL
           value: http://gitea-service.gitea.svc.cluster.local:3000
@@ -64,8 +64,8 @@ spec:
               name: gitea-runner-secret
               key: token
         volumeMounts:
-        - name: docker-certs
-          mountPath: /certs
+        - name: docker-socket
+          mountPath: /var/run
         - name: runner-data
           mountPath: "/data"
       - name: daemon
@@ -76,10 +76,10 @@ spec:
         securityContext:
           privileged: true
         volumeMounts:
-        - name: docker-certs
-          mountPath: /certs
+        - name: docker-socket
+          mountPath: /var/run/
       volumes:
-      - name: docker-certs
+      - name: docker-socket
         emptyDir: {}
       - name: runner-data
         persistentVolumeClaim:
