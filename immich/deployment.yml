@@ -27,8 +27,8 @@ spec:
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                key: immich-secret
-                name: "DB_PASSWORD"
+                key: DB_PASSWORD
+                name: immich-secret
         volumeMounts:
           - mountPath: /usr/src/app/upload
             name: immich-pvc
