@@ -45,12 +45,6 @@ spec:
             secretKeyRef:
               name: minio-secrets
               key: MINIO_ROOT_PASSWORD
-        - name: MINIO_PROMETHEUS_AUTH_TYPE
-          value: public
-        - name: MINIO_PROMETHEUS_URL
-          value: http://grafana-kube-prometheus-st-prometheus.monitoring.svc.cluster.local:9090
-        - name: MINIO_PROMETHEUS_JOB_ID
-          value: minio-cluster
         volumeMounts:
         - mountPath: /data
           name: minio-storage
