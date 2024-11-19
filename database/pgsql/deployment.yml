@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgsql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgsql
+  template:
+    metadata:
+      labels:
+        app: pgsql
+    spec:
+      containers:
+      - name: pgsql
+        image: ghcr.io/pmh-only/pgvecto-rs:pg14-v0.2.0
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: admin
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pgsql-root-password
+              key: password
+        - name: POSTGRES_INITDB_ARGS
+          value: --data-checksums
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: pgsql-storage
+      volumes:
+      - name: pgsql-storage
+        persistentVolumeClaim:
+          claimName: pgsql-pvc
