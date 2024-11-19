@@ -6,6 +6,10 @@ resources:
   - ./mysql/deployment.yml
   - ./mysql/secret.yml
   - ./mysql/service.yml
+  - ./pgsql/pvc.yml
+  - ./pgsql/deployment.yml
+  - ./pgsql/secret.yml
+  - ./pgsql/service.yml
   - ./mongo/pvc.yml
   - ./mongo/deployment.yml
   - ./mongo/service.yml
