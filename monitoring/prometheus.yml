@@ -238,7 +238,7 @@ metadata:
   name: prometheus-role
 rules:
 - apiGroups: [""]
-  resources: ["pods", "nodes", "nodes/metrics", "pods/log"]
+  resources: ["pods", "nodes", "nodes/metrics", "pods/log", "services", "ingresses", "endpoints"]
   verbs: ["get", "list", "watch"]
 - nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
   verbs: ["get"]
