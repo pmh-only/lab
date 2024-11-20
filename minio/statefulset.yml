@@ -33,7 +33,7 @@ spec:
         command:
           - minio
           - server
-          - http://minio-{1...2}.minio-service.minio.svc.cluster.local/data
+          - http://minio-{0...1}.minio-service.minio.svc.cluster.local/data
           - --address
           - :9000
           - --console-address
