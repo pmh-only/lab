@@ -3,8 +3,7 @@ kind: Kustomization
 namespace: monitoring
 resources:
   - ./grafana.yml
-  - ./mimir.yml
-  - ./alloy.yml
   - ./image-renderer.yml
   - ./ksm.yml
   - ./ne.yml
+  - ./prometheus.yml
