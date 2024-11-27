@@ -1,33 +1,26 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: minio
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: minio
-  serviceName: minio-service
-  replicas: 2
   template:
     metadata:
       labels:
         app: minio
+      annotations:
+        backup.velero.io/backup-volumes-excludes: minio-storage
     spec:
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: ScheduleAnyway
-          labelSelector:
-            matchLabels:
-              app: minio
       containers:
       - name: minio
         image: quay.io/minio/minio:latest
         command:
           - minio
           - server
-          - http://minio-0.minio-service.minio.svc.cluster.local/data
-          - http://minio-1.minio-service.minio.svc.cluster.local/data
+          - /data
           - --address
           - :9000
           - --console-address
@@ -55,13 +48,7 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: minio-storage
-  volumeClaimTemplates:
-  - metadata:
-      name: minio-storage
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      storageClassName: local-path
-      resources:
-        requests:
-          storage: 10Gi
+      volumes:
+      - name: minio-storage
+        persistentVolumeClaim:
+          claimName: minio-pvc
