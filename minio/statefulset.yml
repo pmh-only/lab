@@ -7,23 +7,16 @@ spec:
     matchLabels:
       app: minio
   serviceName: minio-service
-  replicas: 2
+  replicas: 4
   template:
     metadata:
       labels:
         app: minio
     spec:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - topologyKey: kubernetes.io/hostname
-            labelSelector:
-              matchLabels:
-                app: minio
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
+          whenUnsatisfiable: ScheduleAnyway
           labelSelector:
             matchLabels:
               app: minio
@@ -33,7 +26,7 @@ spec:
         command:
           - minio
           - server
-          - http://minio-{0...1}.minio-service.minio.svc.cluster.local/data
+          - http://minio-{0...3}.minio-service.minio.svc.cluster.local/data
           - --address
           - :9000
           - --console-address
