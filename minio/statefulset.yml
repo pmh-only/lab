@@ -7,7 +7,7 @@ spec:
     matchLabels:
       app: minio
   serviceName: minio-service
-  replicas: 4
+  replicas: 2
   template:
     metadata:
       labels:
@@ -26,7 +26,8 @@ spec:
         command:
           - minio
           - server
-          - http://minio-{0...3}.minio-service.minio.svc.cluster.local/data
+          - http://minio-0.minio-service.minio.svc.cluster.local/data
+          - http://minio-1.minio-service.minio.svc.cluster.local/data
           - --address
           - :9000
           - --console-address
