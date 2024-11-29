@@ -32,9 +32,6 @@ spec:
         - name: speedtest-cm
           configMap:
             name: speedtest-cm
-            items:
-              - key: servers.json
-                path: servers.json
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -70,6 +67,3 @@ spec:
         - name: speedtest-cm
           configMap:
             name: speedtest-cm
-            items:
-              - key: servers.json
-                path: servers.json
