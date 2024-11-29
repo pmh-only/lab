@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: speedtest-pmhoci
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: speedtest
+      node: pmhoci
+  template:
+    metadata:
+      labels:
+        app: speedtest
+        node: pmhoci
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: pmhoci
+      containers:
+      - name: speedtest
+        image: ghcr.io/librespeed/speedtest:latest
+        env:
+          - name: TITLE
+            value: speed.pmh.codes
+          - name: MODE
+            value: dual
+        volumeMounts:
+          - mountPath: /servers.json
+            name: speedtest-cm
+            subpath: servers.json
+      volumes:
+        - name: speedtest-cm
+          configMap:
+            name: speedtest-cm
+            items:
+              - key: servers.json
+                path: servers.json
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: speedtest-pmhoci2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: speedtest
+      node: pmhoci2
+  template:
+    metadata:
+      labels:
+        app: speedtest
+        node: pmhoci2
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: pmhoci2
+      containers:
+      - name: speedtest
+        image: ghcr.io/librespeed/speedtest:latest
+        env:
+          - name: TITLE
+            value: speed.pmh.codes
+          - name: MODE
+            value: dual
+        volumeMounts:
+          - mountPath: /servers.json
+            name: speedtest-cm
+            subpath: servers.json
+      volumes:
+        - name: speedtest-cm
+          configMap:
+            name: speedtest-cm
+            items:
+              - key: servers.json
+                path: servers.json
