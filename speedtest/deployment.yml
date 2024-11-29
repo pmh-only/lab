@@ -25,13 +25,21 @@ spec:
           - name: MODE
             value: dual
         volumeMounts:
-          - mountPath: /
+          - mountPath: /tmp-config
+            name: tmp-volume
+          - mountPath: /tmp-config/servers.json
             name: speedtest-cm
-            subpath: servers.json
+            subPath: servers.json
+        lifecycle:
+          postStart:
+            exec:
+              command: ["sh", "-c", "cp /tmp-config/servers.json /servers.json"]
       volumes:
         - name: speedtest-cm
           configMap:
             name: speedtest-cm
+        - name: tmp-volume
+          emptyDir: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -60,10 +68,18 @@ spec:
           - name: MODE
             value: dual
         volumeMounts:
-          - mountPath: /
+          - mountPath: /tmp-config
+            name: tmp-volume
+          - mountPath: /tmp-config/servers.json
             name: speedtest-cm
-            subpath: servers.json
+            subPath: servers.json
+        lifecycle:
+          postStart:
+            exec:
+              command: ["sh", "-c", "cp /tmp-config/servers.json /servers.json"]
       volumes:
         - name: speedtest-cm
           configMap:
             name: speedtest-cm
+        - name: tmp-volume
+          emptyDir: {}
