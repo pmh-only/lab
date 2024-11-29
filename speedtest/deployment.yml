@@ -25,7 +25,7 @@ spec:
           - name: MODE
             value: dual
         volumeMounts:
-          - mountPath: /servers.json
+          - mountPath: /
             name: speedtest-cm
             subpath: servers.json
       volumes:
@@ -60,7 +60,7 @@ spec:
           - name: MODE
             value: dual
         volumeMounts:
-          - mountPath: /servers.json
+          - mountPath: /
             name: speedtest-cm
             subpath: servers.json
       volumes:
