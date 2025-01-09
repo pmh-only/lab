@@ -17,7 +17,7 @@ spec:
         image: ghcr.io/pmh-only/gptforum
         env:
         - name: OPENAI_API_MODEL
-          value: gpt-4o
+          value: o1-mini
         - name: DATABASE_HOST
           value: mysql-service.database.svc.cluster.local
         - name: DATABASE_USER
