@@ -19,11 +19,19 @@ metadata:
       }
 
       set_by_lua_block $bucket {
-        local host = ngx.req.get_headers()["host"];
-        local reg = "^(?<bucket>[^.]+).pmh.codes$";
-        local m = ngx.re.match(host, reg);
+        local host = ngx.req.get_headers()["host"]
+        local reg = "^(?<bucket>[^.]+).pmh.codes$"
+        local m = ngx.re.match(host, reg)
 
-        return (m ~= nil and m['bucket'] or "www");
+        if m ~= nil or m['bucket'] ~= nil then
+          return "www"
+        end
+
+        if string.len(m['bucket']) < 3 or m['bucket']:sub(1, 4) == "xn--" then
+          return "a-" .. m['bucket']
+        end
+
+        return m['bucket']
       }
 
       if ($test = BC) {
