@@ -33,6 +33,8 @@ spec:
           value: ghost
         - name: mail__transport
           value: SMTP
+        - name: mail__options__tls__rejectUnauthorized
+          value: "false"
         - name: mail__options__service
           value: Google
         - name: mail__options__host
