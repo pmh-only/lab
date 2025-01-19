@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mail
+spec:
+  selector:
+    matchLabels:
+      app: mail
+  serviceName: mail
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mail
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: mail
+        image: ghcr.io/pmh-only/protonmail-bridge:latest
+        ports:
+        - containerPort: 1143
+          name: imap
+        - containerPort: 1025
+          name: smtp
+        volumeMounts:
+        - name: data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      storageClassName: local-path
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
