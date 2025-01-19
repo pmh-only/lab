@@ -4,4 +4,3 @@ namespace: mail
 resources:
   - ./statefulset.yml
   - ./service.yml
-  - ./ingress.yml
