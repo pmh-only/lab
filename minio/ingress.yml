@@ -23,7 +23,7 @@ metadata:
         local reg = "^(?<bucket>[^.]+).pmh.codes$"
         local m = ngx.re.match(host, reg)
 
-        if m ~= nil or m['bucket'] ~= nil then
+        if m == nil or m['bucket'] == nil then
           return "www"
         end
 
