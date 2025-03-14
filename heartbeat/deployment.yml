@@ -14,7 +14,7 @@ spec:
     spec:
       initContainers: 
       - name: heartbeat-migrator
-        image: ghcr.io/pmh-only/heartbeat:migrator
+        image: ghcr.io/pmh-only/heartbeat-migrator:latest
         env:
         - name: DATABASE_URL
           valueFrom:
