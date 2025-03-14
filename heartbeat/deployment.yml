@@ -13,7 +13,7 @@ spec:
         app: heartbeat 
     spec:
       initContainers: 
-      - name: heartbeat 
+      - name: heartbeat-migrator
         image: ghcr.io/pmh-only/heartbeat:migrator
         env:
         - name: DATABASE_URL
