@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: heartbeat-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: heart.pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: heartbeat-service
+            port:
+              number: 8080
