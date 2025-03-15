@@ -12,15 +12,6 @@ spec:
       labels:
         app: heartbeat 
     spec:
-      initContainers: 
-      - name: heartbeat-migrator
-        image: ghcr.io/pmh-only/heartbeat-migrator:latest
-        env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: heartbeat-secret
-              key: DATABASE_URL
       containers:
       - name: heartbeat 
         image: ghcr.io/pmh-only/heartbeat:latest
