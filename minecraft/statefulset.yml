@@ -43,7 +43,7 @@ spec:
       containers:
       - name: minecraft
         image: ghcr.io/pmh-only/paper
-        arg:
+        args:
           - -Xms6144M
           - -Xmx6144M
         tty: true
