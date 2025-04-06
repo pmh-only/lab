@@ -11,7 +11,7 @@ spec:
   source:
     chart: cert-manager
     helm:
-      values: |
+      values: |-
         crds:
           enabled: true
     repoURL: https://charts.jetstack.io
