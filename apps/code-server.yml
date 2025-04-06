@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd-image-updater.argoproj.io/code-server.update-strategy: digest
+    argocd-image-updater.argoproj.io/image-list: code-server=codercom/code-server:latest
+  name: code-server
+  namespace: argocd
+spec:
+  destination:
+    namespace: code-server
+    server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: Secret
+  project: default
+  source:
+    path: ci/helm-chart
+    repoURL: https://github.com/coder/code-server
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true

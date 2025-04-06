@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: descheduler
+  namespace: argocd
+spec:
+  destination:
+    namespace: descheduler
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: descheduler
+    helm:
+      parameters:
+        - name: kind
+          value: Deployment
+    repoURL: https://kubernetes-sigs.github.io/descheduler/
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
