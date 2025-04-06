@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: protonmail-bridge=ghcr.io/pmh-only/protonmail-bridge:latest
+    argocd-image-updater.argoproj.io/protonmail-bridge.update-strategy: digest
+  name: mail
+  namespace: argocd
+spec:
+  destination:
+    namespace: mail
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: mail
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

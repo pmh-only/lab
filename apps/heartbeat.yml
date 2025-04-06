@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd-image-updater.argoproj.io/heartbeat-migrator.update-strategy: digest
+    argocd-image-updater.argoproj.io/heartbeat.update-strategy: digest
+    argocd-image-updater.argoproj.io/image-list: heartbeat=ghcr.io/pmh-only/heartbeat:latest,heartbeat-migrator=ghcr.io/pmh-only/heartbeat-migrator:latest
+  name: heartbeat
+  namespace: argocd
+spec:
+  destination:
+    namespace: heartbeat
+    server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: Secret
+  project: default
+  source:
+    path: heartbeat
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+      - ServerSideApply=true

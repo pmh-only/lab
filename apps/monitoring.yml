@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd-image-updater.argoproj.io/grafana-image-renderer.update-strategy: digest
+    argocd-image-updater.argoproj.io/grafana.update-strategy: digest
+    argocd-image-updater.argoproj.io/image-list: grafana=ghcr.io/pmh-only/grafana=latest,grafana-image-renderer=ghcr.io/pmh-only/grafana-image-renderer:latest,node-exporter=quay.io/prometheus/node-exporter:latest,prometheus=quay.io/prometheus/prometheus:latest,kube-state-metrics=registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.13.0
+    argocd-image-updater.argoproj.io/kube-state-metrics.update-strategy: digest
+    argocd-image-updater.argoproj.io/node-exporter.update-strategy: digest
+    argocd-image-updater.argoproj.io/prometheus.update-strategy: digest
+  name: monitoring
+  namespace: argocd
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: Secret
+  project: default
+  source:
+    path: monitoring
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
