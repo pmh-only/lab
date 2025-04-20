@@ -42,7 +42,7 @@ spec:
               name: bitwarden-secrets
               key: SMTP_PASSWORD
         - name: SMTP_ACCEPT_INVALID_CERTS
-          value: 'false'
+          value: 'true'
         - name: ADMIN_TOKEN
           valueFrom:
             secretKeyRef:
