@@ -7,3 +7,4 @@ resources:
   - ./secret.yml
   - ./service.yml
   - ./ingress.yml
+  - ./anubis.yml
