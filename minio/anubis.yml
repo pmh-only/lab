@@ -47,8 +47,6 @@ spec:
             value: ".pmh.codes"
           - name: "COOKIE_PARTITIONED"
             value: "true"
-          - name: "DIFFICULTY"
-            value: "5"
           - name: "WEBMASTER_EMAIL"
             value: "i_hate_this_anime_girl@pmh.codes"
 ---
