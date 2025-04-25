@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: anubis-minio-secrets
+type: Opaque
+data:
+  ED25519_PRIVATE_KEY_HEX: eW91c2hhbGxub3RwYXNz # youshallnotpass
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anubis-minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: anubis-minio
+  template:
+    metadata:
+      labels:
+        app: anubis-minio
+    spec:
+      containers:
+      - name: anubis-minio
+        image: ghcr.io/techarohq/anubis:latest
+        ports:
+          - containerPort: 8080
+        env:
+          - name: "BIND"
+            value: ":8080"
+          - name: "DIFFICULTY"
+            value: "4"
+          - name: ED25519_PRIVATE_KEY_HEX
+            valueFrom:
+              secretKeyRef:
+                name: anubis-minio-secrets
+                key: ED25519_PRIVATE_KEY_HEX
+          - name: "SERVE_ROBOTS_TXT"
+            value: "true"
+          - name: "TARGET"
+            value: "http://minio-service.minio.svc.cluster.local:9000"
+          - name: "OG_PASSTHROUGH"
+            value: "true"
+          - name: "OG_EXPIRY_TIME"
+            value: "24h"
+          - name: "COOKIE_DOMAIN"
+            value: ".pmh.codes"
+          - name: "COOKIE_PARTITIONED"
+            value: "true"
+          - name: "DIFFICULTY"
+            value: "6"
+          - name: "WEBMASTER_EMAIL"
+            value: "i_hate_this_anime_girl@pmh.codes"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: anubis-minio-service
+spec:
+  selector:
+    app: anubis-minio
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
