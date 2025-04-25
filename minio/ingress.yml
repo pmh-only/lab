@@ -17,6 +17,10 @@ metadata:
       if ($host !~* s3.pmh.codes) { 
         set $test "${test}C"; 
       }
+      
+      if ($uri !~ "^/\.within\.website") { 
+        set $test "${test}D"; 
+      }
 
       set_by_lua_block $bucket {
         local host = ngx.req.get_headers()["host"]
@@ -39,11 +43,11 @@ metadata:
         return m['bucket']
       }
 
-      if ($test = BC) {
+      if ($test = BCD) {
         rewrite ^/(.*)$ /$bucket/$1 break;
       }
 
-      if ($test = ABC) {
+      if ($test = ABCD) {
         rewrite ^/$ /$bucket/index.html break;
         more_set_input_headers 'Host: $bucket.s3.pmh.codes';
         error_page 400 =302 https://pmh.codes;
