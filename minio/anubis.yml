@@ -43,10 +43,6 @@ spec:
             value: "true"
           - name: "OG_EXPIRY_TIME"
             value: "24h"
-          - name: "COOKIE_DOMAIN"
-            value: ".pmh.codes"
-          - name: "COOKIE_PARTITIONED"
-            value: "true"
           - name: "WEBMASTER_EMAIL"
             value: "i_hate_this_anime_girl@pmh.codes"
 ---
