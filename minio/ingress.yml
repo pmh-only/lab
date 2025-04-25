@@ -61,9 +61,9 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: minio-service
+            name: anubis-minio-service
             port:
-              number: 9000
+              number: 8080
   - host: "*.pmh.codes"
     http:
       paths:
@@ -71,9 +71,9 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: minio-service
+            name: anubis-minio-service
             port:
-              number: 9000
+              number: 8080
   - host: minio.pmh.codes
     http:
       paths:
