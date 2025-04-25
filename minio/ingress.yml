@@ -31,11 +31,6 @@ metadata:
           return "www"
         end
 
-        -- c.pmh.codes
-        if m['bucket'] == "c" and ngx.req.get_headers()["Sec-Fetch-Dest"] == "document" then
-          return "a-c-docs"
-        end
-
         if string.len(m['bucket']) < 3 or m['bucket']:sub(1, 4) == "xn--" then
           return "a-" .. m['bucket']
         end
