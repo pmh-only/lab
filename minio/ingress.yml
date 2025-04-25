@@ -21,6 +21,10 @@ metadata:
       if ($uri !~ "^/\.within\.website") { 
         set $test "${test}D"; 
       }
+      
+      if ($uri ~ "^/\.within\.website\/x\/cmd\/anubis\/static\/img\/") { 
+        set $test "${test}E"; 
+      }
 
       set_by_lua_block $bucket {
         local host = ngx.req.get_headers()["host"]
@@ -50,6 +54,10 @@ metadata:
         error_page 403 =302 https://pmh.codes;
         error_page 404 =302 https://pmh.codes;
       }
+
+      if ($test = E) {
+        return 301 $scheme://anubis-assets.pmh.codes/x$request_uri;
+      }
 spec:
   ingressClassName: nginx
   rules:
@@ -73,6 +81,16 @@ spec:
             name: anubis-minio-service
             port:
               number: 8080
+  - host: "anubis-assets.pmh.codes"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: minio-service
+            port:
+              number: 9000
   - host: minio.pmh.codes
     http:
       paths:
