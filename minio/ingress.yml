@@ -55,7 +55,7 @@ metadata:
         error_page 404 =302 https://pmh.codes;
       }
 
-      if ($test = E) {
+      if ($test = BCE) {
         return 301 $scheme://anubis-assets.pmh.codes/x$request_uri;
       }
 spec:
