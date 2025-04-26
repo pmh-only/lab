@@ -50,16 +50,14 @@ spec:
             count: 1
           mgr:
             count: 1
+          dashboard:
+            ssl: false
         cephFileSystems: []
         cephObjectStores: []
         crashCollector:
           disable: true
         ingress:
           dashboard:
-            annotations:
-              nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-              nginx.ingress.kubernetes.io/server-snippet: |
-                proxy_ssl_verify off;
             ingressClassName: nginx
             host:
               name: storage.pmh.codes
