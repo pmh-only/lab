@@ -50,3 +50,30 @@ spec:
       - RespectIgnoreDifferences=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: seaweedfs-csi
+  namespace: argocd
+spec:
+  destination:
+    namespace: seaweedfs
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: seaweedfs-csi-driver
+    helm:
+      values: |-
+        seaweedfsFiler: "seaweedfs-filer:8888"
+    repoURL: https://seaweedfs.github.io/seaweedfs-csi-driver/helm
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
