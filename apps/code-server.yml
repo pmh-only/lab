@@ -1,9 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/code-server.update-strategy: digest
-    argocd-image-updater.argoproj.io/image-list: code-server=codercom/code-server:latest
   name: code-server
   namespace: argocd
 spec:
