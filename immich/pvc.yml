@@ -5,7 +5,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-path
+  storageClassName: seaweedfs-storage
   resources:
     requests:
       storage: 10Gi
