@@ -52,6 +52,17 @@ spec:
             count: 1
         cephFileSystems: []
         cephObjectStores: []
+        crashCollector:
+          disable: true
+        ingress:
+          dashboard:
+            annotations:
+              nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+              nginx.ingress.kubernetes.io/server-snippet: |
+                proxy_ssl_verify off;
+            ingressClassName: nginx
+            host:
+              name: storage.pmh.codes
     repoURL: https://charts.rook.io/release
     targetRevision: x
   syncPolicy:
