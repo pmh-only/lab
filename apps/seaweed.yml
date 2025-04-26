@@ -12,12 +12,32 @@ spec:
     chart: seaweedfs
     helm:
       values: |-
+        master:
+          nodeSelector: |
+            kubernetes.io/arch: arm64
+          data:
+            type: hostPath
+            hostPathPrefix: /var/seaweedfs
+          logs:
+            type: hostPath
+            hostPathPrefix: /var/seaweedfs
+        filer:
+          nodeSelector: |
+            kubernetes.io/arch: arm64
+          data:
+            type: hostPath
+            hostPathPrefix: /var/seaweedfs
+          logs:
+            type: hostPath
+            hostPathPrefix: /var/seaweedfs
         volume:
           replicas: 2
+          nodeSelector: |
+            kubernetes.io/arch: arm64
           dataDirs:
           - name: data
             type: hostPath
-            hostPathPrefix: /var/seaweedfs/
+            hostPathPrefix: /var/seaweedfs
             maxVolumes: 0
     repoURL: https://seaweedfs.github.io/seaweedfs/helm
     targetRevision: x
