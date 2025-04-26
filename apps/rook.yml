@@ -14,6 +14,10 @@ spec:
       values: |-
         crds:
           enabled: true
+        csi:
+          enableCephfsDriver: false
+          enableRBDSnapshotter: false
+          provisionerReplicas: 1
     repoURL: https://charts.rook.io/release
     targetRevision: x
   syncPolicy:
@@ -46,16 +50,6 @@ spec:
             count: 1
           mgr:
             count: 1
-          resources:
-            mgr: {}
-            mon: {}
-            osd: {}
-            prepareosd: {}
-            mgr-sidecar: {}
-            crashcollector: {}
-            logcollector: {}
-            cleanup: {}
-            exporter: {}
         cephFileSystems: []
         cephObjectStores: []
     repoURL: https://charts.rook.io/release
