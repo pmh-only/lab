@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: seaweedfs
+  namespace: argocd
+spec:
+  destination:
+    namespace: seaweedfs
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: seaweedfs
+    helm:
+      values: |-
+        volume:
+          replicas: 2
+          dataDirs:
+          - name: data
+            type: hostPath
+            hostPathPrefix: /var/seaweedfs/
+            maxVolumes: 0
+    repoURL: https://seaweedfs.github.io/seaweedfs/helm
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
