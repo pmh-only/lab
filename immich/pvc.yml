@@ -8,7 +8,7 @@ spec:
   storageClassName: seaweedfs-storage
   resources:
     requests:
-      storage: 10Gi
+      storage: 100Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
