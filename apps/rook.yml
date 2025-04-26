@@ -1,0 +1,71 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rook-ceph
+  namespace: argocd
+spec:
+  destination:
+    namespace: rook-ceph
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: rook-ceph
+    helm:
+      values: |-
+        crds:
+          enabled: true
+    repoURL: https://charts.rook.io/release
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rook-ceph-cluster
+  namespace: argocd
+spec:
+  destination:
+    namespace: rook-ceph
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: rook-ceph-cluster
+    helm:
+      values: |-
+        operatorNamespace: rook-ceph
+        cephClusterSpec:
+          mon:
+            count: 1
+          mgr:
+            count: 1
+          resources:
+            mgr: {}
+            mon: {}
+            osd: {}
+            prepareosd: {}
+            mgr-sidecar: {}
+            crashcollector: {}
+            logcollector: {}
+            cleanup: {}
+            exporter: {}
+        cephFileSystems: []
+        cephObjectStores: []
+    repoURL: https://charts.rook.io/release
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
