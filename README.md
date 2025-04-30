@@ -5,10 +5,14 @@
 # pmh-only/lab
 Kubernetes Manifest Files for My Homelab Server
 
+### Sync Status
+> ArgoCD instance: https://argo.pmh.codes
+
 <table>
 <thead>
 <tr>
 <th colspan="4">
+<br />
 
 [![apps status](https://argo.pmh.codes/api/badge?name=apps&revision=true&showAppName=true)](https://argo.pmh.codes/applications/apps)
 
