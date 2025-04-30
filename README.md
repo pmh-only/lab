@@ -66,28 +66,6 @@ Kubernetes Manifest Files for My Homelab Server
 <tr>
 <td>
 
-[![descheduler status](https://argo.pmh.codes/api/badge?name=descheduler&showAppName=true)](https://argo.pmh.codes/applications/descheduler)
-
-</td>
-<td>
-
-[![ghost status](https://argo.pmh.codes/api/badge?name=ghost&showAppName=true)](https://argo.pmh.codes/applications/ghost)
-
-</td>
-<td>
-
-[![gitea status](https://argo.pmh.codes/api/badge?name=gitea&showAppName=true)](https://argo.pmh.codes/applications/gitea)
-
-</td>
-<td>
-
-[![gptforum status](https://argo.pmh.codes/api/badge?name=gptforum&showAppName=true)](https://argo.pmh.codes/applications/gptforum)
-
-</td>
-</tr>
-<tr>
-<td>
-
 [![heartbeat status](https://argo.pmh.codes/api/badge?name=heartbeat&showAppName=true)](https://argo.pmh.codes/applications/heartbeat)
 
 </td>
