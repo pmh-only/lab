@@ -36,3 +36,10 @@ spec:
           value: 'True'
         - name: SOSSE_SEARCH_SHORTCUT_CHAR
           value: '/'
+        volumeMounts:
+          - mountPath: /var/lib/sosse
+            name: search-pvc
+      volumes:
+        - name: search-pvc
+          persistentVolumeClaim:
+            claimName: search-pvc
