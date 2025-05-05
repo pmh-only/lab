@@ -40,7 +40,7 @@ spec:
             hostPathPrefix: /var/seaweedfs
             maxVolumes: 0
     repoURL: https://seaweedfs.github.io/seaweedfs/helm
-    targetRevision: x
+    targetRevision: 4.0.386
   syncPolicy:
     automated:
       prune: true
