@@ -12,7 +12,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: traffic-service
+            name: traffic-client-service
             port:
               number: 3002
 ---
