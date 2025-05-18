@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd-image-updater.argoproj.io/image-list: shadowbox=quay.io/outline/shadowbox:stable
+    argocd-image-updater.argoproj.io/image-list: shadowbox=ghcr.io/pmh-only/shadowbox:latest
     argocd-image-updater.argoproj.io/shadowbox.update-strategy: digest
   name: vpn
   namespace: argocd

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: vpn 
-        image: quay.io/outline/shadowbox:stable
+        image: ghcr.io/pmh-only/shadowbox:latest
         ports:
           - containerPort: 8080
             protocol: TCP
