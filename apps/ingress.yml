@@ -12,9 +12,6 @@ spec:
     chart: ingress-nginx
     helm:
       values: |-
-        tcp:
-          '22': gitea/gitea-service:22
-          '25565': minecraft/minecraft:25565
         controller:
           metrics:
             enabled: true
