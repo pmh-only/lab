@@ -32,7 +32,7 @@ spec:
             hsts-preload: 'true'
             proxy-body-size: 10g
             proxy-buffer-size: 1024k
-            proxy-buffers-number: 4 1024k
+            proxy-buffers-number: 4
             proxy-busy-buffers-size: 1024k
             use-forwarded-headers: 'true'
             use-gzip: 'true'
