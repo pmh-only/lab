@@ -37,11 +37,11 @@ spec:
             mountPath: /opt/outline
           - name: vpn-data
             mountPath: /root/shadowbox
-          - name: tls
+          - name: vpn-tls
             readOnly: true
             mountPath: /tmp/shadowbox.crt
             subPath: shadowbox.crt
-          - name: tls
+          - name: vpn-tls
             readOnly: true
             mountPath: /tmp/shadowbox.key
             subPath: shadowbox.key
