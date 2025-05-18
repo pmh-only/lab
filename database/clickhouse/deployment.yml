@@ -18,6 +18,8 @@ spec:
         ports:
         - containerPort: 8123
         env:
+        - name: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
+          value: "1"
         - name: CLICKHOUSE_USER
           value: admin
         - name: CLICKHOUSE_PASSWORD
