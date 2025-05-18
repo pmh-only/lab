@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vpn-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: vpn.pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vpn-service
+            port:
+              number: 80
