@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickhouse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clickhouse
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      containers:
+      - name: clickhouse
+        image: ghcr.io/pmh-only/clickhouse-server:rybbit
+        ports:
+        - containerPort: 8123
+        env:
+        - name: CLICKHOUSE_USER
+          value: admin
+        - name: CLICKHOUSE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: clickhouse-root-password
+              key: password
+        volumeMounts:
+        - mountPath: /var/lib/clickhouse
+          name: clickhouse-storage
+        - mountPath: /etc/clickhouse-server/config.d
+          name: clickhouse-config
+      volumes:
+      - name: clickhouse-storage
+        persistentVolumeClaim:
+          claimName: clickhouse-pvc
+      - name: clickhouse-config
+        persistentVolumeClaim:
+          claimName: clickhouse-config-pvc
