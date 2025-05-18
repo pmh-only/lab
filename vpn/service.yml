@@ -20,8 +20,10 @@ spec:
   type: LoadBalancer
   ports:
     - protocol: TCP
+      name: shadowsock-tcp
       port: 8080
       targetPort: 8080
     - protocol: UDP
+      name: shadowsock-udp
       port: 8080
       targetPort: 8080
