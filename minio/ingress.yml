@@ -7,7 +7,7 @@ metadata:
       proxy_intercept_errors on;
       proxy_set_header Accept-Encoding "";
       
-      sub_filter "</body>" "<script src="https://traffic.pmh.codes/api/script.js" data-site-id="1" defer></script></body>";
+      sub_filter "</body>" "<script src=\"https://traffic.pmh.codes/api/script.js\" data-site-id=\"1\" defer></script></body>";
 
       if ($uri ~ "^/$") { 
         set $test A; 
