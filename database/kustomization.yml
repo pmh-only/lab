@@ -13,7 +13,7 @@ resources:
   - ./clickhouse/pvc.yml
   - ./clickhouse/deployment.yml
   - ./clickhouse/secret.yml
-  - ./clickhouse/service.ymll
+  - ./clickhouse/service.yml
   - ./mongo/pvc.yml
   - ./mongo/deployment.yml
   - ./mongo/service.yml
