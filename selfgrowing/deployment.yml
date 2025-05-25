@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: selfgrowing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: selfgrowing
+  template:
+    metadata:
+      labels:
+        app: selfgrowing
+    spec:
+      containers:
+      - name: selfgrowing
+        image: ghcr.io/pmh-only/selfgrowing:latest
+        imagePullPolicy: Always
+        env:
+        - name: DISCORD_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: selfgrowing-secrets
+              key: DISCORD_TOKEN
+        - name: DISCORD_GUILD_ID
+          valueFrom:
+            secretKeyRef:
+              name: selfgrowing-secrets
+              key: DISCORD_GUILD_ID
+        - name: DISCORD_CHANNEL_ID
+          valueFrom:
+            secretKeyRef:
+              name: selfgrowing-secrets
+              key: DISCORD_CHANNEL_ID
+        volumeMounts:
+        - mountPath: /data
+          name: persistent
+      volumes:
+      - name: persistent
+        persistentVolumeClaim:
+          claimName: selfgrowing-pvc
