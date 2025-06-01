@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: pydio=ghcr.io/pmh-only/pydio:latest
+    argocd-image-updater.argoproj.io/pydio.update-strategy: digest
+  name: pydio
+  namespace: argocd
+spec:
+  destination:
+    namespace: pydio
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: pydio
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true

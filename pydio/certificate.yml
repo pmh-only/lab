@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: pydio-tls
+  namespace: ingress
+spec:
+  dnsNames:
+    - drive.pmh.codes
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt
+  secretName: pydio-tls
+  usages:
+    - digital signature
+    - key encipherment
