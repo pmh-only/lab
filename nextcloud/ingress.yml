@@ -12,6 +12,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: nextcloud-service
+            name: nextcloud
             port:
               number: 80
