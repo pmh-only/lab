@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nextcloud
+  template:
+    metadata:
+      labels:
+        app: nextcloud
+    spec:
+      containers:
+      - name: nextcloud
+        image: ghcr.io/pmh-only/nextcloud:latest
+        ports:
+        - containerPort: 80
+        env:
+          - name: MYSQL_DATABASE
+            value: nextcloud
+          - name: MYSQL_USER
+            value: nextcloud
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: MYSQL_PASSWORD
+                name: nextcloud-secret
+          - name: MYSQL_HOST
+            value: mysql-service.database.svc.cluster.local
+          - name: REDIS_HOST
+            value: redis-service.database.svc.cluster.local
+          - name: REDIS_HOST_PORT
+            value: '6379'
+          - name: SMTP_HOST
+            value: mail.mail.svc.cluster.local
+          - name: SMTP_SECURE
+            value: tls
+          - name: SMTP_PORT
+            value: '1025'
+          - name: SMTP_NAME
+            value: pmh_only@pmh.codes
+          - name: SMTP_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: SMTP_PASSWORD
+                name: nextcloud-secret
+          - name: MAIL_FROM_ADDRESS
+            value: 'pmh_only@pmh.codes'
+          - name: PHP_MEMORY_LIMIT
+            value: 2048M
+          - name: PHP_UPLOAD_LIMIT
+            value: 2048M
+          - name: APACHE_BODY_LIMIT
+            value: '2147483648'
+        volumeMounts:
+        - name: nextcloud-pvc
+          mountPath: /var/www/html
+      volumes:
+      - name: nextcloud-pvc
+        persistentVolumeClaim:
+          claimName: nextcloud-pvc
