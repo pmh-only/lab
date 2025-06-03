@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: pydio-ingress
   annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/backend-protocol: GRPCS
 spec:
   ingressClassName: nginx
   rules:
