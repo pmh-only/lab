@@ -23,13 +23,7 @@ spec:
         volumeMounts:
         - mountPath: /var/cells
           name: pydio-storage
-        - mountPath: /certs
-          name: pydio-tls
-          readOnly: true
       volumes:
       - name: pydio-storage
         persistentVolumeClaim:
           claimName: pydio-pvc
-      - name: pydio-tls
-        secret:
-          secretName: pydio-tls
