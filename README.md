@@ -120,7 +120,7 @@ Kubernetes Manifest Files for My Homelab Server
 </td>
 <td>
 
-[![search status](https://argo.pmh.codes/api/badge?name=search&showAppName=true)](https://argo.pmh.codes/applications/search)
+[![indexgen status](https://argo.pmh.codes/api/badge?name=search&showAppName=true)](https://argo.pmh.codes/applications/indexgen)
 
 </td>
 <td>
