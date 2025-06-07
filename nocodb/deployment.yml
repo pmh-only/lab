@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nocodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nocodb
+  template:
+    metadata:
+      labels:
+        app: nocodb
+    spec:
+      containers:
+      - name: nocodb
+        image: ghcr.io/pmh-only/nocodb:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /usr/app/data/
+          name: nocodb-storage
+        env:
+        - name: NC_DB
+          valueFrom:
+            secretKeyRef:
+              name: nocodb-secret
+              key: NC_DB
+        - name: NC_AUTH_JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: nocodb-secret
+              key: NC_AUTH_JWT_SECRET
+      volumes:
+      - name: nocodb-storage
+        persistentVolumeClaim:
+          claimName: nocodb-pvc
