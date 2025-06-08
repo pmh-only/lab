@@ -3,7 +3,7 @@ kind: Application
 metadata:
   annotations:
     argocd-image-updater.argoproj.io/gptforum.update-strategy: digest
-    argocd-image-updater.argoproj.io/image-list: gptforum=ghcr.io/pmh-only/gptforum:latest
+    argocd-image-updater.argoproj.io/image-list: gptforum=ghcr.io/pmh-only/gptforum:next
   name: gptforum
   namespace: argocd
 spec:
