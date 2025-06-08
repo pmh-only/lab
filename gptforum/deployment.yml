@@ -12,35 +12,33 @@ spec:
       labels:
         app: gptforum
     spec:
+      initContainers:
+        - name: gptforum-migrator
+          image: ghcr.io/pmh-only/gptforum-migrator:next
+          env:
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: gptforum-secrets
+                key: DATABASE_URL
       containers:
       - name: gptforum
-        image: ghcr.io/pmh-only/gptforum
+        image: ghcr.io/pmh-only/gptforum:next
         env:
-        - name: OPENAI_API_MODEL
-          value: o4-mini
-        - name: DATABASE_HOST
-          value: mysql-service.database.svc.cluster.local
-        - name: DATABASE_USER
-          value: gptforum
-        - name: DATABASE_SCHEMA
-          value: gptforum
-        - name: DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: gptforum-secrets
-              key: DATABASE_PASSWORD
         - name: DISCORD_TOKEN
           valueFrom:
             secretKeyRef:
               name: gptforum-secrets
               key: DISCORD_TOKEN
-        - name: DISCORD_FORUM_ID
-          valueFrom:
-            secretKeyRef:
-              name: gptforum-secrets
-              key: DISCORD_FORUM_ID
+        - name: DISCORD_CHANNEL
+          value: '1093337177859039252'
         - name: OPENAI_API_KEY
           valueFrom:
             secretKeyRef:
               name: gptforum-secrets
               key: OPENAI_API_KEY
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: gptforum-secrets
+              key: DATABASE_URL
