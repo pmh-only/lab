@@ -14,6 +14,7 @@ spec:
     spec:
       initContainers:
         - name: gptforum-migrator
+          imagePullPolicy: Always
           image: ghcr.io/pmh-only/gptforum-migrator:next
           env:
           - name: DATABASE_URL
