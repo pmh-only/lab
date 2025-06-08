@@ -32,7 +32,7 @@ spec:
               name: gptforum-secrets
               key: DISCORD_TOKEN
         - name: DISCORD_CHANNEL
-          value: '1093337177859039252'
+          value: '1381075123594858527'
         - name: OPENAI_API_KEY
           valueFrom:
             secretKeyRef:
