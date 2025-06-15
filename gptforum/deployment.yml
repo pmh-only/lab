@@ -33,6 +33,8 @@ spec:
               key: DISCORD_TOKEN
         - name: DISCORD_CHANNEL
           value: '1381075123594858527'
+        - name: DISCORD_QUOTA_DISPLAY_CHANNEL
+          value: '1381946758535450675'
         - name: OPENAI_API_KEY
           valueFrom:
             secretKeyRef:
