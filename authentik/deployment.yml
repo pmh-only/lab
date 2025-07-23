@@ -80,7 +80,7 @@ spec:
       containers:
       - name: authentik
         image: ghcr.io/goauthentik/server:latest
-        command:
+        args:
           - worker
         env:
         - name: AUTHENTIK_SECRET_KEY
