@@ -54,6 +54,8 @@ spec:
       containers:
       - name: gitea-runner
         image: ghcr.io/pmh-only/gitea-runner:latest
+        securityContext:
+          privileged: true
         env:
         - name: GITEA_INSTANCE_URL
           value: http://gitea-service.gitea.svc.cluster.local:3000
