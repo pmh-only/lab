@@ -1,55 +1,31 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: authentik=ghcr.io/goauthentik/server:latest
+    argocd-image-updater.argoproj.io/authentik.update-strategy: digest
   name: authentik
   namespace: argocd
 spec:
   destination:
     namespace: authentik
     server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: Secret
   project: default
   source:
-    chart: authentik
-    helm:
-      values: |-
-        authentik:
-          postgresql:
-            host: pgsql-service.database.svc.cluster.local
-            user: authentik
-            password: file:///postgres-creds/password
-          redis:
-            host: redis-service.database.svc.cluster.local
-        server:
-          ingress:
-            enabled: true
-            hosts:
-              - auth.pmh.codes
-          volumes:
-            - name: postgres-creds
-              secret:
-                secretName: authentik-secret
-          volumeMounts:
-            - name: postgres-creds
-              mountPath: /postgres-creds
-              readOnly: true
-        worker:
-          volumes:
-            - name: postgres-creds
-              secret:
-                secretName: authentik-secret
-          volumeMounts:
-            - name: postgres-creds
-              mountPath: /postgres-creds
-              readOnly: true
-    repoURL: https://charts.goauthentik.io
-    targetRevision: x
+    path: authentik
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - RespectIgnoreDifferences=true
-      - PruneLast=true
-      - ServerSideApply=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
+      - ServerSideApply=true
+      - PruneLast=true
