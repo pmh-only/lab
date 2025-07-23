@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentik-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentik-server
+  template:
+    metadata:
+      labels:
+        app: authentik-server
+    spec:
+      containers:
+      - name: authentik
+        image: ghcr.io/goauthentik/server:latest
+        ports:
+        - containerPort: 9000
+        env:
+        - name: AUTHENTIK_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: authentik-secrets
+              key: AUTHENTIK_SECRET_KEY
+        - name: AUTHENTIK_REDIS__HOST
+          value: redis-service.database.svc.cluster.local
+        - name: AUTHENTIK_POSTGRESQL__HOST
+          value: pgsql-service.database.svc.cluster.local
+        - name: AUTHENTIK_POSTGRESQL__USER
+          value: authentik
+        - name: AUTHENTIK_POSTGRESQL__NAME
+          value: authentik
+        - name: AUTHENTIK_POSTGRESQL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: authentik-secrets
+              key: AUTHENTIK_POSTGRESQL__PASSWORD
+        - name: AUTHENTIK_EMAIL__HOST
+          value: mail.mail.svc.cluster.local
+        - name: AUTHENTIK_EMAIL__USERNAME
+          value: pmh_only@pmh.codes
+        - name: AUTHENTIK_EMAIL__FROM
+          value: pmh_only@pmh.codes
+        - name: AUTHENTIK_EMAIL__PORT
+          value: '1025'
+        - name: AUTHENTIK_EMAIL__USE_TLS
+          value: 'true'
+        - name: AUTHENTIK_EMAIL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: authentik-secrets
+              key: AUTHENTIK_EMAIL__PASSWORD
+        volumeMounts:
+        - mountPath: /media
+          name: authentik-storage
+          subPath: media
+        - mountPath: /templates
+          name: authentik-storage
+          subPath: templates
+      volumes:
+      - name: authentik-storage
+        persistentVolumeClaim:
+          claimName: authentik-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentik-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentik-worker
+  template:
+    metadata:
+      labels:
+        app: authentik-worker
+    spec:
+      containers:
+      - name: authentik
+        image: ghcr.io/goauthentik/server:latest
+        command:
+          - worker
+        env:
+        - name: AUTHENTIK_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: authentik-secrets
+              key: AUTHENTIK_SECRET_KEY
+        - name: AUTHENTIK_REDIS__HOST
+          value: redis-service.database.svc.cluster.local
+        - name: AUTHENTIK_POSTGRESQL__HOST
+          value: pgsql-service.database.svc.cluster.local
+        - name: AUTHENTIK_POSTGRESQL__USER
+          value: authentik
+        - name: AUTHENTIK_POSTGRESQL__NAME
+          value: authentik
+        - name: AUTHENTIK_POSTGRESQL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: authentik-secrets
+              key: AUTHENTIK_POSTGRESQL__PASSWORD
+        - name: AUTHENTIK_EMAIL__HOST
+          value: mail.mail.svc.cluster.local
+        - name: AUTHENTIK_EMAIL__USERNAME
+          value: pmh_only@pmh.codes
+        - name: AUTHENTIK_EMAIL__FROM
+          value: pmh_only@pmh.codes
+        - name: AUTHENTIK_EMAIL__PORT
+          value: '1025'
+        - name: AUTHENTIK_EMAIL__USE_TLS
+          value: 'true'
+        - name: AUTHENTIK_EMAIL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: authentik-secrets
+              key: AUTHENTIK_EMAIL__PASSWORD
+        volumeMounts:
+        - mountPath: /media
+          name: authentik-storage
+          subPath: media
+        - mountPath: /templates
+          name: authentik-storage
+          subPath: templates
+        - mountPath: /certs
+          name: authentik-storage
+          subPath: certs
+      volumes:
+      - name: authentik-storage
+        persistentVolumeClaim:
+          claimName: authentik-pvc
