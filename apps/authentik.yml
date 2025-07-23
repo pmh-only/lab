@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ingress
+  namespace: authentik
+spec:
+  destination:
+    namespace: ingress
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: authentik
+    helm:
+      values: |-
+        authentik:
+          postgresql:
+            host: pgsql-service.database.svc.cluster.local
+            user: authentik
+            password: file:///postgres-creds/password
+          redis:
+            host: redis-service.database.svc.cluster.local
+        server:
+          ingress:
+            enabled: true
+            hosts:
+              - auth.pmh.codes
+          volumes:
+            - name: postgres-creds
+              secret:
+                secretName: authentik-secret
+          volumeMounts:
+            - name: postgres-creds
+              mountPath: /postgres-creds
+              readOnly: true
+        worker:
+          volumes:
+            - name: postgres-creds
+              secret:
+                secretName: authentik-secret
+          volumeMounts:
+            - name: postgres-creds
+              mountPath: /postgres-creds
+              readOnly: true
+    repoURL: https://charts.goauthentik.io
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
