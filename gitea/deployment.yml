@@ -54,6 +54,7 @@ spec:
       containers:
       - name: gitea-runner
         image: ghcr.io/pmh-only/gitea-runner:latest
+        command: ["sh", "-c", "sleep 10; /usr/local/bin/run.sh"]
         env:
         - name: GITEA_INSTANCE_URL
           value: http://gitea-service.gitea.svc.cluster.local:3000
