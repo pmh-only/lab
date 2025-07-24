@@ -15,21 +15,3 @@ spec:
             name: authentik-service
             port:
               number: 9000
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: authentik-outpost-ingress
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: "*.pmh.codes"
-    http:
-      paths:
-      - path: /outpost.goauthentik.io
-        pathType: Prefix
-        backend:
-          service:
-            name: authentik-service
-            port:
-              number: 9000
