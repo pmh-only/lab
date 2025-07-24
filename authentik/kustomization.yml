@@ -6,4 +6,5 @@ resources:
   - ./deployment.yml
   - ./secret.yml
   - ./service.yml
+  - ./rbac.yml
   - ./ingress.yml
