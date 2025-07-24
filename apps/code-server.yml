@@ -27,7 +27,7 @@ spec:
                - /
           annotations:
             nginx.ingress.kubernetes.io/auth-url: |-
-              http://authentik-service.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
+              http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
             nginx.ingress.kubernetes.io/auth-signin: |-
               https://ide.pmh.codes/outpost.goauthentik.io/start?rd=$escaped_request_uri
             nginx.ingress.kubernetes.io/auth-response-headers: |-
