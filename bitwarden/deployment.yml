@@ -24,6 +24,8 @@ spec:
           value: "false"
         - name: SSO_ENABLED 
           value: "true"
+        - name: SSO_FRONTEND
+          value: override
         - name: SSO_ONLY
           value: "true"
         - name: SSO_AUTHORITY
@@ -37,8 +39,6 @@ spec:
             secretKeyRef:
               name: bitwarden-secrets
               key: SSO_CLIENT_SECRET
-        - name: SSO_ALLOW_UNKNOWN_EMAIL_VERIFICATION
-          value: 'true'
         - name: PUSH_ENABLED
           value: "true"
         - name: DOMAIN
