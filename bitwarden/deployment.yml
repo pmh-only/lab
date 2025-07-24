@@ -27,7 +27,7 @@ spec:
         - name: SSO_ONLY
           value: "true"
         - name: SSO_AUTHORITY
-          value: https://auth.pmh.codes/application/o/bitwarden
+          value: https://auth.pmh.codes/application/o/bitwarden/
         - name: SSO_SCOPES
           value: openid profile email
         - name: SSO_CLIENT_ID
