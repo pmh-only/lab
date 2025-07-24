@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: authentik-server
+        app.kubernetes.io/component: server
+        app.kubernetes.io/name: authentik
     spec:
       serviceAccountName: authentik
       containers:
@@ -18,7 +20,6 @@ spec:
         image: ghcr.io/goauthentik/server:latest
         args:
           - server
-          - --v=5
         ports:
         - containerPort: 9000
         env:
@@ -87,7 +88,6 @@ spec:
         image: ghcr.io/goauthentik/server:latest
         args:
           - worker
-          - --v=5
         env:
         - name: AUTHENTIK_SECRET_KEY
           valueFrom:
