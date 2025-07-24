@@ -19,6 +19,7 @@ spec:
             default-ssl-certificate: ingress/default-ingress-tls
             enable-ssl-passthrough: true
           config:
+            strict-validate-path-type: 'false'
             add-headers: ingress/custom-headers
             allow-snippet-annotations: 'true'
             annotations-risk-level: Critical
