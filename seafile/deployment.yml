@@ -39,11 +39,11 @@ spec:
         - name: DB_USER
           value: 'seafile'
         - name: SEAFILE_MYSQL_DB_SEAFILE_DB_NAME
-          value: 'seafile'
+          value: 'seafile_db'
         - name: SEAFILE_MYSQL_DB_CCNET_DB_NAME
-          value: 'seafile_ccnet'
+          value: 'ccnet_db'
         - name: SEAFILE_MYSQL_DB_SEAHUB_DB_NAME
-          value: 'seafile_seahub'
+          value: 'seahub_db'
         - name: INIT_SEAFILE_ADMIN_EMAIL
           value: 'pmh_only@pmh.codes'
         - name: JWT_PRIVATE_KEY
@@ -107,7 +107,7 @@ spec:
         - name: DB_USER
           value: 'seafile'
         - name: DB_NAME
-          value: 'seafile_seahub'
+          value: 'seahub_Db'
         - name: JWT_PRIVATE_KEY
           valueFrom:
             secretKeyRef:
