@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: bitwarden
-        image: ghcr.io/timshel/vaultwarden:latest
+        image: ghcr.io/dani-garcia/vaultwarden:latest
         ports:
         - containerPort: 80
         env:
@@ -22,23 +22,6 @@ spec:
           value: "false"
         - name: INVITATIONS_ALLOWED
           value: "false"
-        - name: SSO_ENABLED 
-          value: "true"
-        - name: SSO_FRONTEND
-          value: override
-        - name: SSO_ONLY
-          value: "true"
-        - name: SSO_AUTHORITY
-          value: https://auth.pmh.codes/application/o/bitwarden/
-        - name: SSO_SCOPES
-          value: openid profile email
-        - name: SSO_CLIENT_ID
-          value: e5XOeIkO2YWFXdWA37LI2W6RDFjxntyKo9UOeypX
-        - name: SSO_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: bitwarden-secrets
-              key: SSO_CLIENT_SECRET
         - name: PUSH_ENABLED
           value: "true"
         - name: DOMAIN
