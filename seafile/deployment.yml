@@ -27,9 +27,9 @@ spec:
         - name: ENABLE_SEADOC
           value: 'true'
         - name: SEADOC_SERVER_URL
-          value: 'https://drivev2.pmh.codes/sdoc-server'
+          value: 'https://drive.pmh.codes/sdoc-server'
         - name: SEAFILE_SERVER_HOSTNAME
-          value: 'drivev2.pmh.codes'
+          value: 'drive.pmh.codes'
         - name: SEAFILE_SERVER_PROTOCOL
           value: 'https'
         - name: DB_HOST
