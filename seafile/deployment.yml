@@ -97,7 +97,7 @@ spec:
         - name: TIME_ZONE
           value: Asia/Seoul
         - name: SEAHUB_SERVICE_URL
-          value: 'https://drivev2.pmh.codes'
+          value: 'http://seafile-service'
         - name: SEAFILE_SERVER_PROTOCOL
           value: 'http'
         - name: DB_HOST
@@ -107,7 +107,7 @@ spec:
         - name: DB_USER
           value: 'seafile'
         - name: DB_NAME
-          value: 'seahub_Db'
+          value: 'seahub_db'
         - name: JWT_PRIVATE_KEY
           valueFrom:
             secretKeyRef:
