@@ -1,0 +1,127 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seafile
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seafile
+  template:
+    metadata:
+      labels:
+        app: seafile
+    spec:
+      containers:
+      - name: seafile
+        image: seafileltd/seafile-pro-mc:12.0.14-arm
+        ports:
+        - containerPort: 80
+        env:
+        - name: TIME_ZONE
+          value: Asia/Seoul
+        - name: SEAFILE_LOG_TO_STDOUT
+          value: 'true'
+        - name: SITE_ROOT
+          value: '/'
+        - name: ENABLE_SEADOC
+          value: 'true'
+        - name: SEADOC_SERVER_URL
+          value: 'https://drivev2.pmh.codes/sdoc-server'
+        - name: SEAFILE_SERVER_HOSTNAME
+          value: 'drivev2.pmh.codes'
+        - name: SEAFILE_SERVER_PROTOCOL
+          value: 'http'
+        - name: DB_HOST
+          value: 'mysql-service.database.svc.cluster.local'
+        - name: DB_PORT
+          value: '3306'
+        - name: DB_USER
+          value: 'seafile'
+        - name: SEAFILE_MYSQL_DB_SEAFILE_DB_NAME
+          value: 'seafile'
+        - name: SEAFILE_MYSQL_DB_CCNET_DB_NAME
+          value: 'seafile_ccnet'
+        - name: SEAFILE_MYSQL_DB_SEAHUB_DB_NAME
+          value: 'seafile_seahub'
+        - name: INIT_SEAFILE_ADMIN_EMAIL
+          value: 'pmh_only@pmh.codes'
+        - name: JWT_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: seafile-secrets
+              key: JWT_PRIVATE_KEY
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: seafile-secrets
+              key: DB_PASSWORD
+        - name: DB_ROOT_PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: seafile-secrets
+              key: DB_PASSWORD
+        - name: INIT_SEAFILE_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: seafile-secrets
+              key: INIT_SEAFILE_ADMIN_PASSWORD
+        volumeMounts:
+        - mountPath: /shared
+          name: seafile-storage
+      volumes:
+      - name: seafile-storage
+        persistentVolumeClaim:
+          claimName: seafile-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seafile-sdoc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seafile-sdoc
+  template:
+    metadata:
+      labels:
+        app: seafile-sdoc
+    spec:
+      containers:
+      - name: seafile
+        image: seafileltd/sdoc-server:1.0.5-arm
+        ports:
+        - containerPort: 80
+        env:
+        - name: TIME_ZONE
+          value: Asia/Seoul
+        - name: SEAHUB_SERVICE_URL
+          value: 'https://drivev2.pmh.codes'
+        - name: SEAFILE_SERVER_PROTOCOL
+          value: 'http'
+        - name: DB_HOST
+          value: 'mysql-service.database.svc.cluster.local'
+        - name: DB_PORT
+          value: '3306'
+        - name: DB_USER
+          value: 'seafile'
+        - name: DB_NAME
+          value: 'seafile_seahub'
+        - name: JWT_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: seafile-secrets
+              key: JWT_PRIVATE_KEY
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: seafile-secrets
+              key: DB_PASSWORD
+        volumeMounts:
+        - mountPath: /opt/seadoc-data
+          name: seafile-seadoc-storage
+      volumes:
+      - name: seafile-seadoc-storage
+        persistentVolumeClaim:
+          claimName: seafile-seadoc-pvc
