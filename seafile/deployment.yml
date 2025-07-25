@@ -60,7 +60,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: seafile-secrets
-              key: DB_PASSWORD
+              key: DB_ROOT_PASSWD
         - name: INIT_SEAFILE_ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
