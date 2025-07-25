@@ -21,3 +21,15 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seafile-noti-service
+spec:
+  selector:
+    app: seafile-noti
+  ports:
+    - protocol: TCP
+      port: 8083
+      targetPort: 8083

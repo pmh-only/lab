@@ -99,7 +99,7 @@ spec:
         - name: SEAHUB_SERVICE_URL
           value: 'http://seafile-service'
         - name: SEAFILE_SERVER_PROTOCOL
-          value: 'http'
+          value: 'https'
         - name: DB_HOST
           value: 'mysql-service.database.svc.cluster.local'
         - name: DB_PORT
@@ -125,3 +125,51 @@ spec:
       - name: seafile-seadoc-storage
         persistentVolumeClaim:
           claimName: seafile-seadoc-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seafile-noti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seafile-noti
+  template:
+    metadata:
+      labels:
+        app: seafile-noti
+    spec:
+      containers:
+      - name: seafile
+        image: seafileltd/notification-server:12.0.11-arm
+        ports:
+        - containerPort: 8083
+        env:
+        - name: SEAFILE_MYSQL_DB_HOST
+          value: 'mysql-service.database.svc.cluster.local'
+        - name: SEAFILE_MYSQL_DB_PORT
+          value: '3306'
+        - name: SEAFILE_MYSQL_DB_USER
+          value: 'seafile'
+        - name: SEAFILE_MYSQL_DB_CCNET_DB_NAME
+          value: 'ccnet_db'
+        - name: SEAFILE_MYSQL_DB_SEAFILE_DB_NAME
+          value: 'seafile_db'
+        - name: JWT_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: seafile-secrets
+              key: JWT_PRIVATE_KEY
+        - name: SEAFILE_MYSQL_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: seafile-secrets
+              key: SEAFILE_MYSQL_DB_PASSWORD
+        volumeMounts:
+        - mountPath: /opt/notification-data
+          name: seafile-noti-storage
+      volumes:
+      - name: seafile-noti-storage
+        persistentVolumeClaim:
+          claimName: seafile-noti-pvc

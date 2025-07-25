@@ -36,6 +36,13 @@ spec:
                 name: seafile-sdoc-service
                 port:
                   number: 80
+          - path: /notification(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: seafile-noti-service
+                port:
+                  number: 8083
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
