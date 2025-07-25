@@ -31,7 +31,7 @@ spec:
         - name: SEAFILE_SERVER_HOSTNAME
           value: 'drivev2.pmh.codes'
         - name: SEAFILE_SERVER_PROTOCOL
-          value: 'http'
+          value: 'https'
         - name: DB_HOST
           value: 'mysql-service.database.svc.cluster.local'
         - name: DB_PORT
