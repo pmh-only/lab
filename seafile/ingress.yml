@@ -2,6 +2,14 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: seafile-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location = /accounts/login/ {
+        if ($arg_next = "/") {
+          return 302 /oauth/login/?next=/$is_args$args;
+        }
+        return 302 /oauth/login/$is_args$args;
+      }
 spec:
   ingressClassName: nginx
   rules:
