@@ -52,7 +52,16 @@ spec:
         - mountPath: /var/lib/onlyoffice
           name: office-storage
           subPath: lib
+        - name: office-cm
+          mountPath: /etc/onlyoffice/documentserver/local-production-linux.json
+          subPath: local-production-linux.json
       volumes:
       - name: office-storage
         persistentVolumeClaim:
           claimName: office-pvc
+      - name: office-cm
+        configMap:
+          name: office-cm
+          items:
+          - key: local-production-linux.json
+            path: local-production-linux.json

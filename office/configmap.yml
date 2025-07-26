@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: office-cm
+  namespace: office
+data:
+  local-production-linux.json: |
+    {
+      "services": {
+        "CoAuthoring": {
+          "autoAssembly": {
+            "enable": true,
+            "interval": "5m"
+          }
+        }
+      },
+      "FileConverter": {
+        "converter": {
+          "downloadAttemptMaxCount": 3
+        }
+      }
+    }
