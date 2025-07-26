@@ -165,7 +165,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: seafile-secrets
-              key: SEAFILE_MYSQL_DB_PASSWORD
+              key: DB_PASSWORD
         volumeMounts:
         - mountPath: /opt/notification-data
           name: seafile-noti-storage
