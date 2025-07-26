@@ -14,4 +14,4 @@ spec:
           service:
             name: office-service
             port:
-              number: 6233
+              number: 80
