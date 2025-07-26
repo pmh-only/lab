@@ -169,6 +169,9 @@ spec:
         volumeMounts:
         - mountPath: /shared
           name: seafile-noti-storage
+        - mountPath: /shared/logs
+          name: seafile-noti-storage
+          subPath: logs
       volumes:
       - name: seafile-noti-storage
         persistentVolumeClaim:
