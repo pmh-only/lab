@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: office
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: office
+  template:
+    metadata:
+      labels:
+        app: office
+    spec:
+      containers:
+      - name: office
+        image: ghcr.io/pmh-only/onlyoffice:latest
+        env:
+        - name: JWT_ENABLED
+          value: 'true'
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: office-secret
+              key: JWT_SECRET
