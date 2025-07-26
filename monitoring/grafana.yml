@@ -87,6 +87,9 @@ data:
     org_name = Main Org.
     org_role = Viewer
     hide_version = true
+    
+    [server]
+    root_url = https://grafana.pmh.codes
 ---
 apiVersion: v1
 kind: Service
