@@ -82,6 +82,9 @@ metadata:
   namespace: monitoring
 data:
   grafana.ini: |
+    [auth]
+    oauth_allow_insecure_email_lookup = true
+
     [auth.anonymous]
     enabled = true
     org_name = Main Org.
