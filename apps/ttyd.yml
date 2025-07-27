@@ -3,6 +3,9 @@ kind: Application
 metadata:
   name: ttyd
   namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/ttyd.update-strategy: digest
+    argocd-image-updater.argoproj.io/image-list: ttyd=ghcr.io/pmh-only/ttyd:latest
 spec:
   destination:
     namespace: ttyd
