@@ -67,6 +67,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: ttyd-service
+            name: ttyd-pmhoci2-service
             port:
               number: 7681
