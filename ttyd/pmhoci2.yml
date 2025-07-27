@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ttyd
+  name: ttyd-pmhoci2
 spec:
   replicas: 1
   selector:
