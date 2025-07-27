@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: seafile
 resources:
   - ./pvc.yml
-  - ./deployment.yml
+  - ./statefulset.yml
   - ./service.yml
   - ./ingress.yml
   - ./secret.yml
