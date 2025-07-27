@@ -21,7 +21,7 @@ spec:
         - containerPort: 7681
         volumeMounts:
         - name: ttyd-secret
-          mountPath: "/home/root/.ssh"
+          mountPath: "/root/.ssh"
           readOnly: true
       volumes:
       - name: ttyd-secret
