@@ -54,7 +54,7 @@ spec:
       volumes:
         - name: roundcube-secret
           secret:
-            name: roundcube-secret
+            secretName: roundcube-secret
             items:
             - key: oidc.inc.php
               path: oidc.inc.php
