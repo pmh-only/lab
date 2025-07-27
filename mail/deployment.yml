@@ -18,6 +18,12 @@ spec:
         ports:
         - containerPort: 2283
         env:
+          - name: ROUNDCUBEMAIL_INSTALL_PLUGINS
+            value: 'true'
+          - name: ROUNDCUBEMAIL_COMPOSER_PLUGINS
+            value: radialapps/roundcube-oidc
+          - name: ROUNDCUBEMAIL_PLUGINS
+            value: 'archive,zipdownload,roundcube_oidc'
           - name: ROUNDCUBEMAIL_DEFAULT_HOST
             value: mail
           - name: ROUNDCUBEMAIL_DEFAULT_PORT
