@@ -48,9 +48,9 @@ spec:
                 key: ROUNDCUBEMAIL_DB_PASSWORD
                 name: roundcube-secret
         volumeMounts:
-          - mountPath: /var/www/html/plugins/roundcube_oidc/
-            name: roundcube-oidc-pvc
+          - mountPath: /var/www/html
+            name: roundcube-pvc
       volumes:
-        - name: roundcube-oidc-pvc
+        - name: roundcube-pvc
           persistentVolumeClaim:
-            claimName: roundcube-oidc-pvc
+            claimName: roundcube-pvc
