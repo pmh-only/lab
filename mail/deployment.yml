@@ -53,7 +53,7 @@ spec:
             subPath: oidc.inc.php
       volumes:
         - name: roundcube-secret
-          configMap:
+          secret:
             name: roundcube-secret
             items:
             - key: oidc.inc.php
