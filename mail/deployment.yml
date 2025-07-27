@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: roundcube
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: roundcube
+  template:
+    metadata:
+      labels:
+        app: roundcube
+    spec:
+      containers:
+      - name: roundcube
+        image: ghcr.io/pmh-only/roundcube:latest
+        ports:
+        - containerPort: 2283
+        env:
+          - name: ROUNDCUBEMAIL_DEFAULT_HOST
+            value: mail
+          - name: ROUNDCUBEMAIL_DEFAULT_PORT
+            value: '1143'
+          - name: ROUNDCUBEMAIL_SMTP_SERVER
+            value: mail
+          - name: ROUNDCUBEMAIL_SMTP_PORT
+            value: '1025'
+          - name: ROUNDCUBEMAIL_USERNAME_DOMAIN
+            value: pmh.codes
+          - name: ROUNDCUBEMAIL_DB_TYPE
+            value: mysql
+          - name: ROUNDCUBEMAIL_DB_USER
+            value: roundcube
+          - name: ROUNDCUBEMAIL_DB_NAME
+            value: roundcube
+          - name: ROUNDCUBEMAIL_DB_HOST
+            value: pgsql-service.database.svc.cluster.local
+          - name: ROUNDCUBEMAIL_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: ROUNDCUBEMAIL_DB_PASSWORD
+                name: roundcube-secret
+        volumeMounts:
+          - mountPath: /var/roundcube/config
+            name: roundcube-pvc
+      volumes:
+        - name: roundcube-pvc
+          persistentVolumeClaim:
+            claimName: roundcube-pvc
