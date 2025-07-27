@@ -1,9 +1,9 @@
-name: Build images - jupyter
+name: Build images - ttyd
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'images/jupyter/**'
+      - 'images/ttyd/**'
 
 permissions:
   contents: write
@@ -34,7 +34,7 @@ jobs:
         with:
           push: true
           platforms: linux/arm64
-          context: images/jupyter
-          tags: ghcr.io/pmh-only/jupyter
+          context: images/ttyd
+          tags: ghcr.io/pmh-only/ttyd
           cache-from: type=gha
           cache-to: type=gha,mode=max
