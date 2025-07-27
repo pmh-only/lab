@@ -1,8 +1,9 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: seafile
 spec:
+  serviceName: seafile-service
   replicas: 1
   selector:
     matchLabels:
@@ -75,10 +76,11 @@ spec:
           claimName: seafile-pvc
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: seafile-sdoc
 spec:
+  serviceName: seafile-sdoc-service
   replicas: 1
   selector:
     matchLabels:
@@ -127,10 +129,11 @@ spec:
           claimName: seafile-seadoc-pvc
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: seafile-noti
 spec:
+  serviceName: seafile-noti-service
   replicas: 1
   selector:
     matchLabels:
