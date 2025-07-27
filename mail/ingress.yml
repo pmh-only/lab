@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: roundcube-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: mail.pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: roundcube
+            port:
+              number: 80

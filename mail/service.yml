@@ -15,4 +15,16 @@ spec:
     protocol: TCP
     port: 1025
     targetPort: 1025
-
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: roundcube
+spec:
+  selector:
+    app: roundcube
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
