@@ -6,7 +6,7 @@ metadata:
     nginx.ingress.kubernetes.io/server-snippet: |
       location = / {
         if ($arg_oidc = "") {
-          return 302 https://$host$request_uri?oidc=1;
+          return 302 https://$host$uri?oidc=1;
         }
         
         proxy_pass http://roundcube;
