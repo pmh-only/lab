@@ -4,7 +4,7 @@ namespace: office
 resources:
   - ./configmap.yml
   - ./secret.yml
-  - ./deployment.yml
+  - ./statefulset.yml
   - ./service.yml
   - ./ingress.yml
   - ./pvc.yml

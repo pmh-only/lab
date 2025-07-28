@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: immich
 resources:
   - ./secret.yml
-  - ./deployment.yml
+  - ./statefulset.yml
   - ./service.yml
   - ./ingress.yml
   - ./pvc.yml

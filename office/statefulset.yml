@@ -1,8 +1,9 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: office
 spec:
+  serviceName: office-service
   replicas: 1
   selector:
     matchLabels:

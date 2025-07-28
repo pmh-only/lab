@@ -1,8 +1,9 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: immich
 spec:
+  serviceName: immich-service
   replicas: 1
   selector:
     matchLabels:
@@ -38,10 +39,11 @@ spec:
             claimName: immich-pvc
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: immich-ml
 spec:
+  serviceName: immich-ml-service
   replicas: 1
   selector:
     matchLabels:
