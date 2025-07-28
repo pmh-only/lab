@@ -52,14 +52,14 @@ spec:
               key: MINIO_IDENTITY_OPENID_CLIENT_SECRET
         - name: MINIO_BROWSER_REDIRECT_URL
           value: https://minio.pmh.codes
+        - name: MINIO_IDENTITY_OPENID_CLAIM_USERINFO
+          value: 'off'
         - name: MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC
           value: 'on'
         - name: MINIO_IDENTITY_OPENID_SCOPES
           value: "openid,profile,email"
         - name: MINIO_IDENTITY_OPENID_ROLE_POLICY
           value: 'consoleAdmin'
-        - name: CONSOLE_IDP_END_SESSION_ENDPOINT
-          value: https://auth.pmh.codes/application/o/minio/end-session/
         - name: MINIO_ROOT_USER
           valueFrom:
             secretKeyRef:
@@ -113,6 +113,8 @@ spec:
               key: MINIO_IDENTITY_OPENID_CLIENT_SECRET
         - name: MINIO_BROWSER_REDIRECT_URL
           value: https://minio.pmh.codes
+        - name: MINIO_IDENTITY_OPENID_CLAIM_USERINFO
+          value: 'off'
         - name: MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC
           value: 'on'
         - name: MINIO_IDENTITY_OPENID_SCOPES
