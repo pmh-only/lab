@@ -39,6 +39,27 @@ spec:
           value: http://prometheus.monitoring.svc.cluster.local:9090
         - name: MINIO_PROMETHEUS_JOB_ID
           value: minio-cluster
+        - name: MINIO_IDENTITY_OPENID_DISPLAY_NAME
+          value: "Login with pmh.codes"
+        - name: MINIO_IDENTITY_OPENID_CONFIG_URL
+          value: https://auth.pmh.codes/application/o/minio/.well-known/openid-configuration
+        - name: MINIO_IDENTITY_OPENID_CLIENT_ID
+          value: mZzRHolEG5DzATfrWgkBxK1VOjLKO2N7rqP2AnOY
+        - name: MINIO_IDENTITY_OPENID_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: minio-secrets
+              key: MINIO_IDENTITY_OPENID_CLIENT_SECRET
+        - name: MINIO_BROWSER_REDIRECT_URL
+          value: https://minio.pmh.codes
+        - name: MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC
+          value: 'on'
+        - name: MINIO_IDENTITY_OPENID_SCOPES
+          value: "openid,profile,email"
+        - name: MINIO_IDENTITY_OPENID_ROLE_POLICY
+          value: 'consoleAdmin'
+        - name: CONSOLE_IDP_END_SESSION_ENDPOINT
+          value: https://auth.pmh.codes/application/o/minio/end-session/
         - name: MINIO_ROOT_USER
           valueFrom:
             secretKeyRef:
@@ -79,3 +100,24 @@ spec:
         env:
         - name: CONSOLE_MINIO_SERVER
           value: http://minio-service.minio.svc.cluster.local:9000
+        - name: MINIO_IDENTITY_OPENID_DISPLAY_NAME
+          value: "Login with pmh.codes"
+        - name: MINIO_IDENTITY_OPENID_CONFIG_URL
+          value: https://auth.pmh.codes/application/o/minio/.well-known/openid-configuration
+        - name: MINIO_IDENTITY_OPENID_CLIENT_ID
+          value: mZzRHolEG5DzATfrWgkBxK1VOjLKO2N7rqP2AnOY
+        - name: MINIO_IDENTITY_OPENID_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: minio-secrets
+              key: MINIO_IDENTITY_OPENID_CLIENT_SECRET
+        - name: MINIO_BROWSER_REDIRECT_URL
+          value: https://minio.pmh.codes
+        - name: MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC
+          value: 'on'
+        - name: MINIO_IDENTITY_OPENID_SCOPES
+          value: "openid,profile,email"
+        - name: CONSOLE_IDP_ROLE_ARN
+          value: arn:minio:iam:::role/DqliUvScbHzQRaRxubejluFPTwM
+        - name: CONSOLE_IDP_END_SESSION_ENDPOINT
+          value: https://auth.pmh.codes/application/o/minio/end-session/
