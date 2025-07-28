@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+spec:
+  serviceName: minio-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: quay.io/minio/minio:latest
+        command:
+          - minio
+          - server
+          - /data
+          - --address
+          - :9000
+          - --console-address
+          - :9001
+        ports:
+        - containerPort: 9000
+        - containerPort: 9001
+        env:
+        - name: MINIO_DOMAIN
+          value: s3.pmh.codes
+        - name: MINIO_SERVER_URL
+          value: http://minio-service.minio.svc.cluster.local:9000
+        - name: MINIO_BROWSER_REDIRECT_URL
+          value: https://minio.pmh.codes
+        - name: MINIO_PROMETHEUS_AUTH_TYPE
+          value: public
+        - name: MINIO_PROMETHEUS_URL
+          value: http://prometheus.monitoring.svc.cluster.local:9090
+        - name: MINIO_PROMETHEUS_JOB_ID
+          value: minio-cluster
+        - name: MINIO_IDENTITY_OPENID_DISPLAY_NAME
+          value: "Login with pmh.codes"
+        - name: MINIO_IDENTITY_OPENID_CONFIG_URL
+          value: https://auth.pmh.codes/application/o/minio/.well-known/openid-configuration
+        - name: MINIO_IDENTITY_OPENID_CLIENT_ID
+          value: mZzRHolEG5DzATfrWgkBxK1VOjLKO2N7rqP2AnOY
+        - name: MINIO_IDENTITY_OPENID_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: minio-secrets
+              key: MINIO_IDENTITY_OPENID_CLIENT_SECRET
+        - name: MINIO_BROWSER_REDIRECT_URL
+          value: https://minio.pmh.codes
+        - name: MINIO_IDENTITY_OPENID_CLAIM_USERINFO
+          value: 'on'
+        - name: MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC
+          value: 'on'
+        - name: MINIO_IDENTITY_OPENID_SCOPES
+          value: "openid,profile,email"
+        - name: MINIO_IDENTITY_OPENID_CLAIM_NAME
+          value: 'policy'
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              name: minio-secrets
+              key: MINIO_ROOT_USER
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: minio-secrets
+              key: MINIO_ROOT_PASSWORD
+        volumeMounts:
+        - mountPath: /data
+          name: minio-storage
+      volumes:
+      - name: minio-storage
+        persistentVolumeClaim:
+          claimName: minio-pvc

@@ -8,3 +8,4 @@ resources:
   - ./service.yml
   - ./ingress.yml
   - ./anubis.yml
+  - ./statefulset.yml
