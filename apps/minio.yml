@@ -2,9 +2,10 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd-image-updater.argoproj.io/image-list: minio=quay.io/minio/minio:latest,anubis=ghcr.io/techarohq/anubis:latest
+    argocd-image-updater.argoproj.io/image-list: minio=quay.io/minio/minio:latest,anubis=ghcr.io/techarohq/anubis:latest,console=ghcr.io/georgmangold/console:latest
     argocd-image-updater.argoproj.io/minio.update-strategy: digest
     argocd-image-updater.argoproj.io/anubis.update-strategy: digest
+    argocd-image-updater.argoproj.io/console.update-strategy: digest
   name: minio
   namespace: argocd
 spec:
