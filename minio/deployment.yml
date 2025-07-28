@@ -56,3 +56,26 @@ spec:
       - name: minio-storage
         persistentVolumeClaim:
           claimName: minio-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-console
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio-console
+  template:
+    metadata:
+      labels:
+        app: minio-console
+    spec:
+      containers:
+      - name: minio
+        image: ghcr.io/georgmangold/console
+        ports:
+        - containerPort: 9090
+        env:
+        - name: CONSOLE_MINIO_SERVER
+          value: http://minio-service.minio.svc.cluster.local:9000
