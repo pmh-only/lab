@@ -2,15 +2,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: roundcube-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/server-snippet: |
-      location = / {
-        if ($arg_oidc = "") {
-          return 302 https://$host$uri?oidc=1;
-        }
-        
-        proxy_pass http://roundcube;
-      }
 spec:
   ingressClassName: nginx
   rules:
