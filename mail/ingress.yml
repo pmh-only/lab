@@ -5,7 +5,11 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/server-snippet: |
       location = / {
-        return 302 https://$host/?oidc=1;
+        if ($arg_oidc = "") {
+          return 302 https://$host$request_uri?oidc=1;
+        }
+        
+        proxy_pass http://roundcube;
       }
 spec:
   ingressClassName: nginx
