@@ -31,7 +31,7 @@ spec:
             type: hostPath
             hostPathPrefix: /var/seaweedfs
         volume:
-          replicas: 2
+          replicas: 3
           nodeSelector: |
             kubernetes.io/arch: arm64
           dataDirs:
