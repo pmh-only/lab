@@ -18,6 +18,8 @@ rules:
       - serviceaccounts
       - configmaps
       - secrets
+      - persistentvolumeclaims
+      - persistentvolumes
     verbs: ["get", "list"]
   - apiGroups: ["apps"]
     resources:
