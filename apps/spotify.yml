@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd-image-updater.argoproj.io/spotify_api.update-strategy: digest
+    argocd-image-updater.argoproj.io/spotify_web.update-strategy: digest
+    argocd-image-updater.argoproj.io/image-list: spotify_api=ghcr.io/yooooomi/your_spotify_server:latest,spotify_web=ghcr.io/yooooomi/your_spotify_client:latest
+  name: spotify
+  namespace: argocd
+spec:
+  destination:
+    namespace: spotify
+    server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: Secret
+  project: default
+  source:
+    path: spotify
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+      - ServerSideApply=true

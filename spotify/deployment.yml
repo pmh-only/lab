@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spotify-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spotify-api
+  template:
+    metadata:
+      labels:
+        app: spotify-api
+    spec:
+      containers:
+      - name: spotify-api
+        image: ghcr.io/yooooomi/your_spotify_server:latest
+        env:
+        - name: CLIENT_ENDPOINT
+          value: https://spotify.pmh.codes
+        - name: API_ENDPOINT
+          value: https://spotify.pmh.codes/api
+        - name: SPOTIFY_PUBLIC
+          value: 500efa190abd45ebac91b4fd5998a37b
+        - name: SPOTIFY_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: spotify-secret
+              key: SPOTIFY_SECRET
+        - name: TIMEZONE
+          value: Asia/Seoul
+        - name: MONGO_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: spotify-secret
+              key: MONGO_ENDPOINT
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spotify-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spotify-web
+  template:
+    metadata:
+      labels:
+        app: spotify-web
+    spec:
+      containers:
+      - name: spotify-api
+        image: ghcr.io/yooooomi/your_spotify_client:latest
+        env:
+        - name: CLIENT_ENDPOINT
+          value: https://spotify.pmh.codes
+        - name: API_ENDPOINT
+          value: https://spotify.pmh.codes/api
+        - name: SPOTIFY_PUBLIC
+          value: 500efa190abd45ebac91b4fd5998a37b
+        - name: SPOTIFY_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: spotify-secret
+              key: SPOTIFY_SECRET
+        - name: TIMEZONE
+          value: Asia/Seoul
+        - name: MONGO_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: spotify-secret
+              key: MONGO_ENDPOINT
