@@ -18,6 +18,8 @@ spec:
           extraArgs:
             default-ssl-certificate: ingress/default-ingress-tls
             enable-ssl-passthrough: true
+          service:
+            externalTrafficPolicy: Local
           config:
             strict-validate-path-type: 'false'
             add-headers: ingress/custom-headers
