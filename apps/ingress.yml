@@ -14,18 +14,15 @@ spec:
       values: |-
         controller:
           kind: DaemonSet
+          hostNetwork: true
+          dnsPolicy: ClusterFirstWithHostNet
+          service:
+            type: ClusterIP
           metrics:
             enabled: true
           extraArgs:
             default-ssl-certificate: ingress/default-ingress-tls
             enable-ssl-passthrough: true
-          hostPort:
-            enabled: true
-            ports:
-              http: 80
-              https: 443
-          service:
-            type: ClusterIP
           config:
             strict-validate-path-type: 'false'
             add-headers: ingress/custom-headers
@@ -46,6 +43,7 @@ spec:
             use-forwarded-headers: 'true'
             real-ip-header: 'X-Forwarded-For'
             use-gzip: 'true'
+            proxy-real-ip-cidr: "0.0.0.0/0"
     repoURL: https://kubernetes.github.io/ingress-nginx
     targetRevision: x
   syncPolicy:
