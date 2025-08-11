@@ -14,15 +14,17 @@ spec:
       values: |-
         controller:
           kind: DaemonSet
-          hostNetwork: true
-          dnsPolicy: ClusterFirstWithHostNet
+          hostPort:
+            enabled: true
+            ports:
+              http: 80
+              https: 443
           service:
             type: ClusterIP
           metrics:
             enabled: true
           extraArgs:
             default-ssl-certificate: ingress/default-ingress-tls
-            enable-ssl-passthrough: false
           config:
             strict-validate-path-type: 'false'
             add-headers: ingress/custom-headers
