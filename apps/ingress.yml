@@ -37,7 +37,8 @@ spec:
             proxy-buffer-size: 1024k
             proxy-buffers-number: 4
             proxy-busy-buffers-size: 1024k
-            use-forwarded-headers: 'false'
+            use-forwarded-headers: 'true'
+            real-ip-header: 'X-Forwarded-For'
             use-gzip: 'true'
     repoURL: https://kubernetes.github.io/ingress-nginx
     targetRevision: x
