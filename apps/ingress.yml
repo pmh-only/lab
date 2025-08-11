@@ -23,8 +23,8 @@ spec:
             externalTrafficPolicy: Local
             type: NodePort
             nodePorts:
-              - 80
-              - 443
+              http: 80
+              https: 443
           config:
             strict-validate-path-type: 'false'
             add-headers: ingress/custom-headers
