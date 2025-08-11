@@ -22,7 +22,7 @@ spec:
             enabled: true
           extraArgs:
             default-ssl-certificate: ingress/default-ingress-tls
-            enable-ssl-passthrough: true
+            enable-ssl-passthrough: false
           config:
             strict-validate-path-type: 'false'
             add-headers: ingress/custom-headers
