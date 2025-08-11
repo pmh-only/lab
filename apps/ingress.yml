@@ -30,7 +30,7 @@ spec:
             add-headers: ingress/custom-headers
             allow-snippet-annotations: 'true'
             annotations-risk-level: Critical
-            compute-full-forwarded-for: 'true'
+            compute-full-forwarded-for: 'false'
             enable-brotli: 'true'
             enable-modsecurity: 'true'
             enable-owasp-modsecurity-crs: 'true'
