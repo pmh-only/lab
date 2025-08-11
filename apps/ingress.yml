@@ -13,6 +13,7 @@ spec:
     helm:
       values: |-
         controller:
+          kind: DaemonSet
           metrics:
             enabled: true
           extraArgs:
@@ -20,6 +21,10 @@ spec:
             enable-ssl-passthrough: true
           service:
             externalTrafficPolicy: Local
+            type: NodePort
+            nodePorts:
+              - 80
+              - 443
           config:
             strict-validate-path-type: 'false'
             add-headers: ingress/custom-headers
