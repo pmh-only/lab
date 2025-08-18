@@ -14,4 +14,4 @@ spec:
             service:
               name: aggregator
               port:
-                number: 7890
+                number: 443
