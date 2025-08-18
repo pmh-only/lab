@@ -47,7 +47,7 @@ spec:
             use-gzip: 'true'
             proxy-real-ip-cidr: "0.0.0.0/0"
             location-snippet: |
-              proxy_set_header Accept-Encoding ""
+              proxy_set_header Accept-Encoding "";
               sub_filter_types text/html;
               sub_filter '<head>' '<head><script src="https://traffic.pmh.codes/api/script.js" data-site-id="1" defer></script>';
     repoURL: https://kubernetes.github.io/ingress-nginx
