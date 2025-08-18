@@ -15,11 +15,6 @@ data:
       Listen  0.0.0.0
       Port    24224
 
-    [FILTER]
-      Name   grep
-      Match  ds.in
-      Regex  $kubernetes['labels']['app.kubernetes.io/name']  ^ingress-nginx$
-
     [OUTPUT]
       Name      file
       Match     ds.in

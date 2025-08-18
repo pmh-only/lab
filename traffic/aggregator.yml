@@ -16,7 +16,10 @@ spec:
       containers:
         - name: goaccess
           image: ghcr.io/pmh-only/goaccess:latest
-          args: ['-p', '/etc/conf/goaccess.conf', '/logs/all.log']
+          args: 
+            - -p
+            - /etc/conf/goaccess.conf
+            - /logs/all.log
           volumeMounts:
             - name: ds-logs
               mountPath: /logs
