@@ -54,7 +54,7 @@ Kubernetes Manifest Files for My Homelab Server
 </td>
 <td>
 
-[![gitea status](https://argo.pmh.codes/api/badge?name=gitea&showAppName=true)](https://argo.pmh.codes/applications/gitea)
+[![seafile status](https://argo.pmh.codes/api/badge?name=seafile&showAppName=true)](https://argo.pmh.codes/applications/seafile)
 
 </td>
 <td>
@@ -115,7 +115,7 @@ Kubernetes Manifest Files for My Homelab Server
 </td>
 <td>
 
-[![pydio status](https://argo.pmh.codes/api/badge?name=pydio&showAppName=true)](https://argo.pmh.codes/applications/pydio)
+[![selfgrowing status](https://argo.pmh.codes/api/badge?name=selfgrowing&showAppName=true)](https://argo.pmh.codes/applications/selfgrowing)
 
 </td>
 <td>
