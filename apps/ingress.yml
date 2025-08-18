@@ -46,6 +46,9 @@ spec:
             real-ip-header: 'X-Forwarded-For'
             use-gzip: 'true'
             proxy-real-ip-cidr: "0.0.0.0/0"
+            location-snippet: |
+              subs_filter_types text/html;
+              subs_filter '<head>' '<head><script src="https://traffic.pmh.codes/api/script.js" data-site-id="1" defer></script>';
     repoURL: https://kubernetes.github.io/ingress-nginx
     targetRevision: x
   syncPolicy:
