@@ -25,7 +25,7 @@ data:
   goaccess.conf: |
     time-format %T
     date-format %d/%b/%Y
-    log-format %^ %^ %^ %h %^ %^ [%d:%t %^] "%m %U %H" %s %b "%R" "%u" %^ %L %^ %^ %^ %^ %^ %^ %^
+    log-format %h %^ %^ [%d:%t %^] "%m %U %H" %s %b "%R" "%u" %^ %L %^ %^ %^ %^ %^ %^ %^
     real-time-html true
     ws-url 0.0.0.0
     port 7890
