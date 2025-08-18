@@ -2,6 +2,11 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: trace-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location = / {
+        return 302 /1;
+      }
 spec:
   ingressClassName: nginx
   rules:
