@@ -9,7 +9,7 @@ spec:
       port: 24224
       targetPort: 24224
     - name: ws
-      port: 7890
-      targetPort: 7890
+      port: 443
+      targetPort: 443
   selector:
     app: aggregator
