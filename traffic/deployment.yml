@@ -47,6 +47,11 @@ spec:
               name: traffic-secrets
               key: POSTGRES_PASSWORD
 
+        - name: REDIS_HOST
+          value: redis-service.database.svc.cluster.local
+        - name: REDIS_PORT
+          value: '6379'
+
         - name: DISABLE_SIGNUP
           value: "true"
         - name: BASE_URL
