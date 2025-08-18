@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: collector
+  namespace: traffic
+spec:
+  selector:
+    matchLabels:
+      app: collector
+  template:
+    metadata:
+      labels:
+        app: collector
+    spec:
+      serviceAccountName: collector-sa
+      containers:
+        - name: fluent-bit
+          image: cr.fluentbit.io/fluent/fluent-bit:latest
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+            - name: fb-config
+              mountPath: /fluent-bit/etc/
+          env:
+            - name: FLUENT_BIT_CONFIG
+              value: /fluent-bit/etc/fluent-bit.conf
+      volumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: fb-config
+          configMap:
+            name: collector-conf
+            items:
+              - key: fluent-bit.conf
+                path: fluent-bit.conf
+              - key: parsers.conf
+                path: parsers.conf
