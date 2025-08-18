@@ -24,9 +24,9 @@ spec:
         - name: CLICKHOUSE_HOST
           value: "http://clickhouse-service.database.svc.cluster.local:8123"
         - name: CLICKHOUSE_DB
-          value: "trace"
+          value: "traffic"
         - name: CLICKHOUSE_USER
-          value: "trace"
+          value: "traffic"
         - name: CLICKHOUSE_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -38,9 +38,9 @@ spec:
         - name: POSTGRES_PORT
           value: "5432"
         - name: POSTGRES_DB
-          value: "trace"
+          value: "traffic"
         - name: POSTGRES_USER
-          value: "trace"
+          value: "traffic"
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
