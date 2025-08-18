@@ -10,6 +10,10 @@ resources:
   - ./pgsql/deployment.yml
   - ./pgsql/secret.yml
   - ./pgsql/service.yml
+  - ./clickhouse/pvc.yml
+  - ./clickhouse/deployment.yml
+  - ./clickhouse/secret.yml
+  - ./clickhouse/service.yml
   - ./mongo/pvc.yml
   - ./mongo/deployment.yml
   - ./mongo/service.yml
