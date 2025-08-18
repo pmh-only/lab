@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aggregator-conf
+  namespace: traffic
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+      Flush      1
+      Log_Level  info
+
+    [INPUT]
+      Name    forward
+      Tag     ds.in
+      Listen  0.0.0.0
+      Port    24224
+
+    [FILTER]
+      Name   grep
+      Match  ds.in
+      Regex  $kubernetes['labels']['app.kubernetes.io/name']  ^ingress-nginx$
+
+    [OUTPUT]
+      Name      file
+      Match     ds.in
+      Path      /logs
+      File      all.log
+      Format    template
+      Template  {log}

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: aggregator-pvc
+  namespace: traffic
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: seaweedfs-storage
+  resources:
+    requests:
+      storage: 100Gi

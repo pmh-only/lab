@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: aggregator
+  namespace: traffic
+spec:
+  ports:
+    - name: forward
+      port: 24224
+      targetPort: 24224
+    - name: ws
+      port: 7890
+      targetPort: 7890
+  selector:
+    app: aggregator

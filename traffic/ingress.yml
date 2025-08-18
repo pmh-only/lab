@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: traffic-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: traffic.pmh.codes
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: aggregator
+              port:
+                number: 7890

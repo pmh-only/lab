@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aggregator
+  namespace: traffic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aggregator
+  template:
+    metadata:
+      labels:
+        app: aggregator
+    spec:
+      containers:
+        - name: goaccess
+          image: ghcr.io/pmh-only/goaccess:latest
+          args:
+            - /bin/sh
+            - -c
+            - >
+              goaccess /logs/all.log
+              --log-format='%^ %^ %^ %h %^ %^ [%d:%t %^] "%m %U %H" %s %b "%R" "%u" %^ %L %^ %^ %^ %^ %^ %^ %^'
+              --date-format='%d/%b/%Y' --time-format='%T'
+              --real-time-html --ws-url=0.0.0.0 --port=7890
+              -o /logs/report.html; sleep infinity
+          volumeMounts:
+            - name: ds-logs
+              mountPath: /logs
+          ports:
+            - name: ws
+              containerPort: 7890
+
+        - name: fluent-bit
+          image: cr.fluentbit.io/fluent/fluent-bit:latest
+          ports:
+            - containerPort: 24224
+              name: forward
+          volumeMounts:
+            - name: ds-logs
+              mountPath: /logs
+            - name: fb-conf
+              mountPath: /fluent-bit/etc/
+          env:
+            - name: FLUENT_BIT_CONFIG
+              value: /fluent-bit/etc/fluent-bit.conf
+              
+      volumes:
+        - name: ds-logs
+          persistentVolumeClaim:
+            claimName: aggregator-pvc
+        - name: fb-conf
+          configMap:
+            name: aggregator-conf
