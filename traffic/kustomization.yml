@@ -7,6 +7,5 @@ resources:
   - ./aggregator_svc.yml
   - ./aggregator.yml
   - ./collector_cm.yml
-  - ./collector_rbac.yml
   - ./collector.yml
   - ./ingress.yml
