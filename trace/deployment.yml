@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: traffic
+  name: trace
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: traffic
+      app: trace
   template:
     metadata:
       labels:
-        app: traffic
+        app: trace
     spec:
       containers:
-      - name: traffic
+      - name: trace
         image: ghcr.io/rybbit-io/rybbit-backend:latest
         ports:
         - containerPort: 3001
@@ -24,13 +24,13 @@ spec:
         - name: CLICKHOUSE_HOST
           value: "http://clickhouse-service.database.svc.cluster.local:8123"
         - name: CLICKHOUSE_DB
-          value: "traffic"
+          value: "trace"
         - name: CLICKHOUSE_USER
-          value: "traffic"
+          value: "trace"
         - name: CLICKHOUSE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: traffic-secrets
+              name: trace-secrets
               key: CLICKHOUSE_PASSWORD
 
         - name: POSTGRES_HOST
@@ -38,13 +38,13 @@ spec:
         - name: POSTGRES_PORT
           value: "5432"
         - name: POSTGRES_DB
-          value: "traffic"
+          value: "trace"
         - name: POSTGRES_USER
-          value: "traffic"
+          value: "trace"
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: traffic-secrets
+              name: trace-secrets
               key: POSTGRES_PASSWORD
 
         - name: REDIS_HOST
@@ -55,29 +55,29 @@ spec:
         - name: DISABLE_SIGNUP
           value: "true"
         - name: BASE_URL
-          value: "https://traffic.pmh.codes"
+          value: "https://trace.pmh.codes"
         - name: BETTER_AUTH_SECRET
           valueFrom:
             secretKeyRef:
-              name: traffic-secrets
+              name: trace-secrets
               key: BETTER_AUTH_SECRET
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: traffic-client
+  name: trace-client
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: traffic-client
+      app: trace-client
   template:
     metadata:
       labels:
-        app: traffic-client
+        app: trace-client
     spec:
       containers:
-      - name: traffic-client
+      - name: trace-client
         image: ghcr.io/rybbit-io/rybbit-client:latest
         ports:
         - containerPort: 3002
@@ -85,6 +85,6 @@ spec:
         - name: NODE_ENV
           value: "production"
         - name: NEXT_PUBLIC_BACKEND_URL
-          value: "https://traffic.pmh.codes"
+          value: "https://trace.pmh.codes"
         - name: NEXT_PUBLIC_DISABLE_SIGNUP
           value: "false"

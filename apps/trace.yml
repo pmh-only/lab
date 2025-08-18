@@ -5,11 +5,11 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: rybbit-backend=ghcr.io/rybbit-io/rybbit-backend:latest,rybbit-client=ghcr.io/rybbit-io/rybbit-client:latest
     argocd-image-updater.argoproj.io/rybbit-backend.update-strategy: digest
     argocd-image-updater.argoproj.io/rybbit-client.update-strategy: digest
-  name: traffic
+  name: trace
   namespace: argocd
 spec:
   destination:
-    namespace: traffic
+    namespace: trace
     server: https://kubernetes.default.svc
   ignoreDifferences:
     - jsonPointers:
@@ -17,7 +17,7 @@ spec:
       kind: Secret
   project: default
   source:
-    path: traffic
+    path: trace
     repoURL: git@github.com:pmh-only/lab.git
     targetRevision: HEAD
   syncPolicy:

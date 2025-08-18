@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: traffic-service
+  name: trace-service
 spec:
   selector:
-    app: traffic
+    app: trace
   ports:
     - protocol: TCP
       port: 3001
@@ -13,10 +13,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: traffic-client-service
+  name: trace-client-service
 spec:
   selector:
-    app: traffic-client
+    app: trace-client
   ports:
     - protocol: TCP
       port: 3002
