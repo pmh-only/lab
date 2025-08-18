@@ -25,8 +25,10 @@ metadata:
   name: spotify-web-ingress
   annotations:
     nginx.ingress.kubernetes.io/server-snippet: |
-      if ($arg_token = "") {
-        return 302 /?token=7e349c70-567e-427f-9a62-6dc2c964589f;
+      location = / {
+        if ($arg_token = "") {
+          return 302 /?token=7e349c70-567e-427f-9a62-6dc2c964589f;
+        }
       }
 spec:
   ingressClassName: nginx
