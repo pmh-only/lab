@@ -12,7 +12,6 @@ spec:
       labels:
         app: collector
     spec:
-      serviceAccountName: collector-sa
       containers:
         - name: fluent-bit
           image: cr.fluentbit.io/fluent/fluent-bit:latest
