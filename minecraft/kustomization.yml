@@ -5,3 +5,4 @@ resources:
   - ./statefulset.yml
   - ./service.yml
   - ./ingress.yml
+  - ./pvc.yml
