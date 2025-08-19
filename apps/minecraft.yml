@@ -2,9 +2,10 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd-image-updater.argoproj.io/image-list: paper=ghcr.io/pmh-only/paper:latest,rcon=ghcr.io/pmh-only/rcon:latest
+    argocd-image-updater.argoproj.io/image-list: paper=ghcr.io/pmh-only/paper:latest,rcon=ghcr.io/pmh-only/rcon:latest,filestash=ghcr.io/pmh-only/filestash:latest
     argocd-image-updater.argoproj.io/paper.update-strategy: digest
     argocd-image-updater.argoproj.io/rcon.update-strategy: digest
+    argocd-image-updater.argoproj.io/filestash.update-strategy: digest
   name: minecraft
   namespace: argocd
 spec:

@@ -19,6 +19,24 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  name: mcfileserver-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: files.mc.pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mcfileserver
+            port:
+              number: 8334
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
   name: minecraft-old-redirect-ingress
   annotations:
     nginx.ingress.kubernetes.io/server-snippet: |
@@ -26,4 +44,4 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: mc.pmh.codes
+  - host: maps.pmh.codes
