@@ -4,7 +4,7 @@ metadata:
   name: trace-ingress
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_set_headers "Access-Control-Allow-Origin: *";
+      more_set_headers "Access-Control-Allow-Headers: signature";
     nginx.ingress.kubernetes.io/server-snippet: |
       location = / {
         return 302 /1;
