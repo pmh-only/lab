@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcfileserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcfileserver
+  template:
+    metadata:
+      labels:
+        app: mcfileserver
+    spec:
+      containers:
+      - name: mcfileserver
+        image: ghcr.io/pmh-only/filestash:latest
+        ports:
+        - containerPort: 8334
+          name: mcfileserver
+        volumeMounts:
+        - name: app
+          mountPath: /maps
+        - name: mcfileserver
+          mountPath: /app/data/state/
+      volumes:
+      - name: app
+        persistentVolumeClaim:
+          claimName: minecraft-pvc
+      - name: mcfileserver
+        persistentVolumeClaim:
+          claimName: mcfileserver-pvc

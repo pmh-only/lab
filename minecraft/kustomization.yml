@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: minecraft
 resources:
   - ./statefulset.yml
+  - ./fileserver.yml
   - ./service.yml
   - ./ingress.yml
   - ./pvc.yml
