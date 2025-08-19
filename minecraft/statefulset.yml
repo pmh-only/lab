@@ -64,13 +64,7 @@ spec:
         volumeMounts:
         - name: app
           mountPath: /app
-  volumeClaimTemplates:
-  - metadata:
-      name: app
-    spec:
-      storageClassName: local-path
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 10Gi
+      volumes:
+      - name: app
+        persistentVolumeClaim:
+          claimName: minecraft-pvc

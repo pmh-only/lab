@@ -5,7 +5,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: maps.pmh.codes
+  - host: maps.mc.pmh.codes
     http:
       paths:
       - path: /
@@ -15,3 +15,15 @@ spec:
             name: minecraft
             port:
               number: 8100
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minecraft-old-redirect-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      return 301 $scheme://maps.mc.pmh.codes$request_uri;
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: mc.pmh.codes
