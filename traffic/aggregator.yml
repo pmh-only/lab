@@ -23,11 +23,27 @@ spec:
           volumeMounts:
             - name: ds-logs
               mountPath: /logs
+            - name: ds-render
+              mountPath: /render
             - name: fb-conf
               mountPath: /etc/conf/
           ports:
             - name: ws
-              containerPort: 7890
+              containerPort: 443
+          
+        - name: servehtml
+          image: ghcr.io/pmh-only/busybox:latest
+          command:
+            - httpd
+            - -f
+            - h
+            - /render
+          volumeMounts:
+            - name: ds-render
+              mountPath: /render
+          ports:
+            - name: http
+              containerPort: 80
 
         - name: fluent-bit
           image: cr.fluentbit.io/fluent/fluent-bit:latest
@@ -50,3 +66,6 @@ spec:
         - name: fb-conf
           configMap:
             name: aggregator-conf
+        - name: ds-render
+          emptyDir: {}
+            
