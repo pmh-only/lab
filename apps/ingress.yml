@@ -36,7 +36,6 @@ spec:
             enable-owasp-modsecurity-crs: 'true'
             enable-real-ip: 'true'
             force-ssl-redirect: 'true'
-            hide-headers: X-Powered-By
             hsts-preload: 'true'
             proxy-body-size: 10g
             proxy-buffer-size: 1024k
