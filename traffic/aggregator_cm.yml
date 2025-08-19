@@ -37,4 +37,4 @@ data:
     anonymize-ip true
     real-os true
 
-    html-prefs='{"theme":"darkBlue"}'
+    html-prefs {"theme":"darkBlue"}
