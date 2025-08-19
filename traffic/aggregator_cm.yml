@@ -26,7 +26,15 @@ data:
     time-format %T
     date-format %d/%b/%Y
     log-format %h %^ %^ [%d:%t %^] "%m %U %H" %s %b "%R" "%u" %^ %L %^ %^ %^ %^ %^ %^ %^
+    
     real-time-html true
     ws-url wss://traffic.pmh.codes/ws
-    port 443
     output /render/index.html
+    port 443
+
+    ignore-panel REQUESTS_STATIC
+    ignore-panel KEYPHRASES
+    anonymize-ip
+    real-os
+
+    html-prefs='{"theme":"darkBlue"}'
