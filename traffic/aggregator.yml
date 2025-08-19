@@ -36,7 +36,7 @@ spec:
           command:
             - httpd
             - -f
-            - h
+            - -h
             - /render
           volumeMounts:
             - name: ds-render
