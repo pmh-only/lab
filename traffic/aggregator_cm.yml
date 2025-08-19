@@ -34,7 +34,7 @@ data:
 
     ignore-panel REQUESTS_STATIC
     ignore-panel KEYPHRASES
-    anonymize-ip
-    real-os
+    anonymize-ip true
+    real-os true
 
     html-prefs='{"theme":"darkBlue"}'
