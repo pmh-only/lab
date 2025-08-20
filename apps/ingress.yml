@@ -58,7 +58,6 @@ spec:
             ssl-ecdh-curve: secp384r1
             ssl-early-data: 'true'
             ssl-protocols: TLSv1.2 TLSv1.3
-            use-http2: 'true'
             server-snippet: |
               listen 443 quic reuseport;
               ssl_conf_command Ciphersuites TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256;
