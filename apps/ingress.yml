@@ -35,6 +35,7 @@ spec:
             enable-modsecurity: 'true'
             enable-owasp-modsecurity-crs: 'true'
             enable-real-ip: 'true'
+            enable-ocsp: 'true'
             force-ssl-redirect: 'true'
             hsts-preload: 'true'
             proxy-body-size: 10g
@@ -47,6 +48,9 @@ spec:
             proxy-real-ip-cidr: "0.0.0.0/0"
             ssl-ciphers: ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305
             ssl-ecdh-curve: secp384r1
+            ssl-early-data: 'true'
+            ssl-protocols: TLSv1.2 TLSv1.3
+            use-http2: 'true'
             server-snippet: |
               ssl_conf_command Ciphersuites TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256;
             location-snippet: |
