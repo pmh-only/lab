@@ -7,6 +7,11 @@ spec:
   destination:
     namespace: ingress
     server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: ConfigMap
+      name: ingress-ingress-nginx-udp
   project: default
   source:
     chart: ingress-nginx
