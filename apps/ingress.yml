@@ -12,6 +12,9 @@ spec:
     chart: ingress-nginx
     helm:
       values: |-
+        udp:
+          "443": "default/ingress-nginx-controller:443"
+
         controller:
           kind: DaemonSet
           hostPort:
@@ -52,6 +55,7 @@ spec:
             ssl-protocols: TLSv1.2 TLSv1.3
             use-http2: 'true'
             server-snippet: |
+              listen 443 quic reuseport;
               ssl_conf_command Ciphersuites TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256;
             location-snippet: |
               proxy_set_header Accept-Encoding "";
