@@ -45,6 +45,8 @@ spec:
             real-ip-header: 'X-Forwarded-For'
             use-gzip: 'true'
             proxy-real-ip-cidr: "0.0.0.0/0"
+            ssl-ciphers: ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES256-GCM-SHA384
+            ssl-ecdh-curve: sect571r1:sect571k1:secp521r1:brainpoolP512r1:sect409r1:sect409k1:brainpoolP384r1:secp384r1:X448
             location-snippet: |
               proxy_set_header Accept-Encoding "";
               sub_filter_types text/html;
