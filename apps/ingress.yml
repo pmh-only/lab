@@ -7,19 +7,11 @@ spec:
   destination:
     namespace: ingress
     server: https://kubernetes.default.svc
-  ignoreDifferences:
-    - jsonPointers:
-        - /data
-      kind: ConfigMap
-      name: ingress-ingress-nginx-udp
   project: default
   source:
     chart: ingress-nginx
     helm:
       values: |-
-        udp:
-          "443": "default/ingress-nginx-controller:443"
-
         controller:
           kind: DaemonSet
           hostPort:
@@ -59,7 +51,6 @@ spec:
             ssl-early-data: 'true'
             ssl-protocols: TLSv1.2 TLSv1.3
             server-snippet: |
-              listen 443 quic reuseport;
               ssl_conf_command Ciphersuites TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256;
             location-snippet: |
               proxy_set_header Accept-Encoding "";
