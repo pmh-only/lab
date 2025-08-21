@@ -101,37 +101,6 @@ data:
         }
       }
     }
-  reload.sh: |
-    #!/bin/sh
-    set -eu
-
-    WATCH_DIR="/etc/nginx/tls"
-
-    echo "[reloader] Watching ${WATCH_DIR} for cert/key changes..."
-
-    csum() {
-      find "$WATCH_DIR" -maxdepth 1 -type f -exec sha256sum {} + 2>/dev/null \
-        | sort -k2 \
-        | sha256sum \
-        | awk '{print $1}'
-    }
-
-    OLD="$(csum || true)"
-
-    inotifywait -m -e create,delete,move,close_write "$WATCH_DIR" 2>/dev/null \
-    | while read -r path action file; do
-        NEW="$(csum || true)"
-        if [ "$NEW" != "${OLD:-}" ]; then
-          echo "[reloader] Change detected (${action} ${file}). Reloading nginx..."
-
-          if ! /usr/local/openresty/bin/openresty -s reload 2>/dev/null; then
-            if [ -f /var/run/nginx.pid ]; then
-              kill -HUP "$(cat /var/run/nginx.pid)" || true
-            fi
-          fi
-          OLD="$NEW"
-        fi
-      done
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -172,16 +141,6 @@ spec:
             - name: nginx-config
               mountPath: /usr/local/openresty/nginx/conf/nginx.conf
               subPath: nginx.conf
-            - name: reload-scripts
-              mountPath: /opt/reload.sh
-              subPath: reload.sh
-          command: ["/bin/sh","-c"]
-          args:
-            - |
-              set -e
-              apk add --no-cache inotify-tools >/dev/null 2>&1
-              /opt/reload.sh &
-              exec /usr/local/openresty/bin/openresty -g 'daemon off;'
           readinessProbe:
             httpGet:
               scheme: HTTPS
@@ -204,7 +163,3 @@ spec:
         - name: nginx-config
           configMap:
             name: gateway-nginx-config
-        - name: reload-scripts
-          configMap:
-            name: gateway-nginx-config
-            defaultMode: 0755
