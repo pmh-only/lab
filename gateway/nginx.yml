@@ -7,7 +7,6 @@ data:
   nginx.conf: |
     worker_processes auto;
     events { worker_connections 1024; }
-    quic_bpf on;
 
     http {
       include /usr/local/openresty/nginx/conf/mime.types;
@@ -147,9 +146,6 @@ spec:
         - name: nginx
           image: ghcr.io/pmh-only/nginx:latest
           imagePullPolicy: Always
-          securityContext:
-            runAsUser: 0
-            runAsGroup: 0
           ports:
             - name: http
               containerPort: 80
