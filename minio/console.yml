@@ -71,3 +71,15 @@ spec:
             name: minio-console-service
             port:
               number: 9090
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-console-old-redirect
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      return 301 $scheme://console.s3.pmh.codes$request_uri;
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: minio.pmh.codes
