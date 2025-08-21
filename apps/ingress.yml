@@ -26,6 +26,7 @@ spec:
             proxy-buffer-size: 1024k
             proxy-buffers-number: 4
             proxy-busy-buffers-size: 1024k
+            use-forwarded-headers: 'true'
             location-snippet: |
               proxy_set_header Accept-Encoding "";
               sub_filter_types text/html;
