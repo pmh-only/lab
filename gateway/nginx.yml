@@ -154,7 +154,7 @@ spec:
             - -c
             - |
               apk add nginx-mod-http-brotli nginx-mod-http-zstd
-              /usr/local/openresty/bin/openresty -g 'daemon off;' -c
+              /usr/local/openresty/bin/openresty -g 'daemon off;'
           ports:
             - name: http
               containerPort: 80
