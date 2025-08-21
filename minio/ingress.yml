@@ -8,10 +8,6 @@ metadata:
 
       if ($uri ~ "^/$") { 
         set $test A; 
-      } 
-    
-      if ($host !~* minio.pmh.codes) { 
-        set $test "${test}B"; 
       }
       
       if ($host !~* s3.pmh.codes) { 
@@ -42,11 +38,11 @@ metadata:
         return m['bucket']
       }
 
-      if ($test = BCD) {
+      if ($test = CD) {
         rewrite ^/(.*)$ /$bucket/$1 break;
       }
 
-      if ($test = ABCD) {
+      if ($test = ACD) {
         rewrite ^/$ /$bucket/index.html break;
         more_set_input_headers 'Host: $bucket.s3.pmh.codes';
         error_page 400 =302 https://pmh.codes;
@@ -55,7 +51,7 @@ metadata:
         error_page 404 =302 https://pmh.codes;
       }
 
-      if ($test = BCE) {
+      if ($test = CE) {
         return 301 $scheme://anubis-assets.pmh.codes/x$request_uri;
       }
 spec:
@@ -101,13 +97,3 @@ spec:
             name: minio-service
             port:
               number: 9000
-  - host: minio.pmh.codes
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: minio-console-service
-            port:
-              number: 9090

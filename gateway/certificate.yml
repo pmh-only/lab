@@ -9,6 +9,7 @@ spec:
     - '*.pmh.codes'
     - '*.host.pmh.codes'
     - '*.mc.pmh.codes'
+    - '*.s3.pmh.codes'
   issuerRef:
     group: cert-manager.io
     kind: ClusterIssuer
