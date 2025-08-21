@@ -4,7 +4,7 @@ metadata:
   name: visualized-ingress
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      sub_filter 'data-session-replay="true"' 'data-session-replay="false"';
+      sub_filter '<head>' '<head data-no-replay>';
 spec:
   ingressClassName: nginx
   rules:
