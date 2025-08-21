@@ -5,13 +5,13 @@ metadata:
   namespace: gateway
 data:
   nginx.conf: |
-    worker_processes auto;
-    events { worker_connections 1024; }
-
     load_module /usr/lib/nginx/modules/ngx_http_brotli_filter_module.so;
     load_module /usr/lib/nginx/modules/ngx_http_brotli_static_module.so;
     load_module /usr/lib/nginx/modules/ngx_http_zstd_filter_module.so;
     load_module /usr/lib/nginx/modules/ngx_http_zstd_static_module.so;
+
+    worker_processes auto;
+    events { worker_connections 1024; }
 
     http {
       include /usr/local/openresty/nginx/conf/mime.types;
