@@ -90,8 +90,8 @@ data:
       }
 
       server {
-        listen 443 ssl http2 default_server;
-        listen [::]:443 ssl http2 default_server;
+        listen 443 ssl default_server;
+        listen [::]:443 ssl default_server;
         listen 443 quic reuseport;
         listen [::]:443 quic reuseport;
         
