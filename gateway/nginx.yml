@@ -5,11 +5,6 @@ metadata:
   namespace: gateway
 data:
   nginx.conf: |
-    load_module /usr/lib/nginx/modules/ngx_http_brotli_filter_module.so;
-    load_module /usr/lib/nginx/modules/ngx_http_brotli_static_module.so;
-    load_module /usr/lib/nginx/modules/ngx_http_zstd_filter_module.so;
-    load_module /usr/lib/nginx/modules/ngx_http_zstd_static_module.so;
-
     worker_processes auto;
     events { worker_connections 1024; }
 
@@ -51,24 +46,6 @@ data:
       http3_hq on;
       quic_gso on;
       quic_retry on;
-      
-      brotli on;
-      brotli_comp_level 5;
-      brotli_buffers 16 8k;
-      brotli_min_length 256;
-      brotli_types
-        text/plain text/css text/xml application/xml
-        application/json application/javascript text/javascript
-        application/manifest+json application/rss+xml
-        image/svg+xml font/woff2;
-
-      zstd on;
-      zstd_comp_level 7;
-      zstd_min_length 256;
-      zstd_types
-        text/plain text/css text/xml application/xml
-        application/json application/javascript text/javascript
-        application/manifest+json application/rss+xml image/svg+xml;
 
       gzip on;
       gzip_comp_level 5;
@@ -149,12 +126,6 @@ spec:
         - name: nginx
           image: ghcr.io/pmh-only/nginx:latest
           imagePullPolicy: Always
-          command:
-            - /bin/sh
-            - -c
-            - |
-              apk add nginx-mod-http-brotli nginx-mod-http-zstd
-              /usr/local/openresty/bin/openresty -g 'daemon off;'
           ports:
             - name: http
               containerPort: 80
