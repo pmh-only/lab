@@ -7,7 +7,20 @@ data:
   nginx.conf: |
     worker_processes auto;
     events { worker_connections 1024; }
+
     http {
+      include /etc/nginx/mime.types;
+      default_type application/octet-stream;
+      sendfile on;
+      tcp_nopush on;
+      tcp_nodelay on;
+      keepalive_timeout 65;
+      types_hash_max_size 2048;
+      server_tokens off;
+
+      client_max_body_size 10g;
+      quic_bpf on;
+
       server {
         listen  80 default_server;
         listen  [::]:80 default_server;
@@ -52,7 +65,6 @@ data:
 
         http3 on;
         http3_hq on;
-        quic_bpf on;
         quic_gso on;
         quic_retry on;
 
