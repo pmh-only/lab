@@ -54,6 +54,7 @@ data:
 
       add_header Alt-Svc 'h3=":443"; ma=86400';
       add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+      add_header Access-Control-Allow-Headers $http_access_control_request_headers always;
       
       proxy_set_header Host $host;
       proxy_set_header X-Real-IP $remote_addr;
