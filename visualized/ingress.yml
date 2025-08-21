@@ -2,6 +2,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: visualized-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      sub_filter 'data-session-replay="true"' 'data-session-replay="false"';
 spec:
   ingressClassName: nginx
   rules:
