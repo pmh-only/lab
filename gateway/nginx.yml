@@ -8,6 +8,11 @@ data:
     worker_processes auto;
     events { worker_connections 1024; }
 
+    load_module /usr/lib/nginx/modules/ngx_http_brotli_filter_module.so;
+    load_module /usr/lib/nginx/modules/ngx_http_brotli_static_module.so;
+    load_module /usr/lib/nginx/modules/ngx_http_zstd_filter_module.so;
+    load_module /usr/lib/nginx/modules/ngx_http_zstd_static_module.so;
+
     http {
       include /usr/local/openresty/nginx/conf/mime.types;
       default_type application/octet-stream;
@@ -17,6 +22,9 @@ data:
       keepalive_timeout 65;
       types_hash_max_size 2048;
       server_tokens off;
+
+      access_log off;
+      error_log /dev/stderr warn;
 
       client_max_body_size 0;
       ssl_certificate     /etc/nginx/tls/tls.crt;
@@ -43,14 +51,34 @@ data:
       http3_hq on;
       quic_gso on;
       quic_retry on;
+      
+      brotli on;
+      brotli_comp_level 5;
+      brotli_buffers 16 8k;
+      brotli_min_length 256;
+      brotli_types
+        text/plain text/css text/xml application/xml
+        application/json application/javascript text/javascript
+        application/manifest+json application/rss+xml
+        image/svg+xml font/woff2;
+
+      zstd on;
+      zstd_comp_level 7;
+      zstd_min_length 256;
+      zstd_types
+        text/plain text/css text/xml application/xml
+        application/json application/javascript text/javascript
+        application/manifest+json application/rss+xml image/svg+xml;
 
       gzip on;
+      gzip_comp_level 5;
+      gzip_min_length 256;
       gzip_vary on;
       gzip_proxied any;
-      gzip_comp_level 6;
-      gzip_types text/plain text/css application/json application/javascript application/x-javascript application/xml application/xml+rss text/javascript;
-      gzip_min_length 1000;
-      gzip_buffers 16 8k;
+      gzip_types
+        text/plain text/css text/xml application/xml
+        application/json application/javascript text/javascript
+        application/manifest+json application/rss+xml image/svg+xml;
 
       add_header Alt-Svc 'h3=":443"; ma=86400';
       add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
@@ -121,6 +149,12 @@ spec:
         - name: nginx
           image: ghcr.io/pmh-only/nginx:latest
           imagePullPolicy: Always
+          command:
+            - /bin/sh
+            - -c
+            - |
+              apk add nginx-mod-http-brotli nginx-mod-http-zstd
+              /usr/local/openresty/bin/openresty -g 'daemon off;' -c
           ports:
             - name: http
               containerPort: 80
