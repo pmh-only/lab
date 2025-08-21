@@ -93,6 +93,11 @@ data:
           proxy_http_version 1.1;
           proxy_pass http://ingress-ingress-nginx-controller.ingress.svc.cluster.local:80;
         }
+
+        location /_gwhealthz {
+          return 200 "Nginx is running";
+          add_header Content-Type text/plain;
+        }
       }
     }
   reload.sh: |
@@ -178,16 +183,16 @@ spec:
               exec /usr/local/openresty/bin/openresty -g 'daemon off;'
           readinessProbe:
             httpGet:
-              scheme: HTTP
-              path: /
-              port: 80
+              scheme: HTTPS
+              path: /_gwhealthz
+              port: 443
             initialDelaySeconds: 2
             periodSeconds: 5
           livenessProbe:
             httpGet:
-              scheme: HTTP
-              path: /
-              port: 80
+              scheme: HTTPS
+              path: /_gwhealthz
+              port: 443
             initialDelaySeconds: 10
             periodSeconds: 10
       volumes:
