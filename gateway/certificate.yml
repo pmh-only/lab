@@ -1,0 +1,31 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: gateway-tls-secret
+  namespace: gateway
+spec:
+  dnsNames:
+    - pmh.codes
+    - '*.pmh.codes'
+    - '*.host.pmh.codes'
+    - '*.mc.pmh.codes'
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt
+  secretName: gateway-tls-secret
+  privateKey:
+    algorithm: ECDSA
+    size: 384
+  usages:
+    - digital signature
+    - key encipherment
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflare-api-token-secret
+  namespace: cert-manager
+type: Opaque
+stringData:
+  api-token: youshallnotpass

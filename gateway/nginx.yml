@@ -1,0 +1,199 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-nginx-config
+  namespace: gateway
+data:
+  nginx.conf: |
+    worker_processes auto;
+    events { worker_connections 1024; }
+    http {
+      server {
+        listen  80 default_server;
+        listen  [::]:80 default_server;
+
+        server_name _;
+
+        location / {
+          return 301 https://$host$request_uri;
+        }
+      }
+
+      server {
+        listen 443 ssl http2 default_server;
+        listen [::]:443 ssl http2 default_server;
+        listen 443 quic reuseport;
+        listen [::]:443 quic reuseport;
+        
+        server_name _;
+
+        ssl_certificate     /etc/nginx/tls/tls.crt;
+        ssl_certificate_key /etc/nginx/tls/tls.key;
+        ssl_trusted_certificate /etc/nginx/tls/ca.crt;
+
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
+        ssl_conf_command Ciphersuites TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256;
+        ssl_ecdh_curve secp384r1;
+
+        ssl_prefer_server_ciphers on;
+
+        ssl_session_timeout 1d;
+        ssl_session_cache shared:SSL:10m;
+
+        ssl_session_tickets off;
+        ssl_stapling on;
+        ssl_stapling_verify on;
+        ssl_early_data on;
+
+        resolver kube-dns.kube-system.svc.cluster.local valid=30s;
+
+        http2 on;
+
+        http3 on;
+        http3_hq on;
+        quic_bpf on;
+        quic_gso on;
+        quic_retry on;
+
+        gzip on;
+        gzip_vary on;
+        gzip_proxied any;
+        gzip_comp_level 6;
+        gzip_types text/plain text/css application/json application/javascript application/x-javascript application/xml application/xml+rss text/javascript;
+        gzip_min_length 1000;
+        gzip_buffers 16 8k;
+
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+
+        location / {
+          proxy_http_version 1.1;
+          proxy_pass http://ingress-ingress-nginx-controller.ingress.svc.cluster.local:80;
+
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header X-Forwarded-Host $host;
+          proxy_set_header X-Forwarded-Port $server_port;
+
+          proxy_set_header Connection "";
+          proxy_set_header Upgrade $http_upgrade;
+
+          proxy_read_timeout 86400;
+          proxy_send_timeout 86400;
+          proxy_buffering off;
+          proxy_cache off;
+          proxy_redirect off;
+          proxy_set_header Accept-Encoding "";
+        }
+      }
+    }
+  reload.sh: |
+    #!/bin/sh
+    set -eu
+
+    WATCH_DIR="/etc/nginx/tls"
+
+    echo "[reloader] Watching ${WATCH_DIR} for cert/key changes..."
+
+    csum() {
+      find "$WATCH_DIR" -maxdepth 1 -type f -exec sha256sum {} + 2>/dev/null \
+        | sort -k2 \
+        | sha256sum \
+        | awk '{print $1}'
+    }
+
+    OLD="$(csum || true)"
+
+    inotifywait -m -e create,delete,move,close_write "$WATCH_DIR" 2>/dev/null \
+    | while read -r path action file; do
+        NEW="$(csum || true)"
+        if [ "$NEW" != "${OLD:-}" ]; then
+          echo "[reloader] Change detected (${action} ${file}). Reloading nginx..."
+
+          if ! /usr/local/openresty/bin/openresty -s reload 2>/dev/null; then
+            if [ -f /var/run/nginx.pid ]; then
+              kill -HUP "$(cat /var/run/nginx.pid)" || true
+            fi
+          fi
+          OLD="$NEW"
+        fi
+      done
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: gateway-nginx
+  namespace: gateway
+spec:
+  selector:
+    matchLabels:
+      app: gateway-nginx
+  template:
+    metadata:
+      labels:
+        app: gateway-nginx
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: nginx
+          image: ghcr.io/pmh-only/nginx:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+              hostPort: 80
+              protocol: TCP
+            - name: https
+              containerPort: 443
+              hostPort: 443
+              protocol: TCP
+            - name: http3
+              containerPort: 443
+              hostPort: 443
+              protocol: UDP
+          volumeMounts:
+            - name: tls
+              mountPath: /etc/nginx/tls
+              readOnly: true
+            - name: nginx-config
+              mountPath: /usr/local/openresty/nginx/conf/nginx.conf
+              subPath: nginx.conf
+            - name: reload-scripts
+              mountPath: /opt/reload.sh
+              subPath: reload.sh
+          command: ["/bin/sh","-c"]
+          args:
+            - |
+              set -e
+              apk add --no-cache inotify-tools >/dev/null 2>&1
+              chmod +x /opt/reload.sh
+              /opt/reload.sh &
+              exec /usr/local/openresty/bin/openresty -g 'daemon off;'
+          readinessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /
+              port: 443
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /
+              port: 443
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: tls
+          secret:
+            secretName: gateway-tls-secret
+            optional: false
+        - name: nginx-config
+          configMap:
+            name: gateway-nginx-config
+        - name: reload-scripts
+          configMap:
+            name: gateway-nginx-config
+            defaultMode: 0755
