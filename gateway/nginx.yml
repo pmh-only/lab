@@ -168,7 +168,6 @@ spec:
             - |
               set -e
               apk add --no-cache inotify-tools >/dev/null 2>&1
-              chmod +x /opt/reload.sh
               /opt/reload.sh &
               exec /usr/local/openresty/bin/openresty -g 'daemon off;'
           readinessProbe:
