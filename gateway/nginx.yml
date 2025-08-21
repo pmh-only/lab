@@ -178,16 +178,16 @@ spec:
               exec /usr/local/openresty/bin/openresty -g 'daemon off;'
           readinessProbe:
             httpGet:
-              scheme: HTTPS
+              scheme: HTTP
               path: /
-              port: 443
+              port: 80
             initialDelaySeconds: 2
             periodSeconds: 5
           livenessProbe:
             httpGet:
-              scheme: HTTPS
+              scheme: HTTP
               path: /
-              port: 443
+              port: 80
             initialDelaySeconds: 10
             periodSeconds: 10
       volumes:
