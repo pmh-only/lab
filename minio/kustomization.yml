@@ -2,10 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: minio
 resources:
-  - ./pvc.yml
-  - ./deployment.yml
   - ./secret.yml
-  - ./service.yml
   - ./ingress.yml
   - ./anubis.yml
-  - ./statefulset.yml
+  - ./explorer.yml
+  - ./minio.yml
+  - ./console.yml

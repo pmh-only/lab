@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-explorer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio-explorer
+  template:
+    metadata:
+      labels:
+        app: minio-explorer
+    spec:
+      containers:
+      - name: minio-explorer
+        image: ghcr.io/pmh-only/filestash:latest
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
+        ports:
+        - containerPort: 8334
+          name: minio-explorer
+        volumeMounts:
+        - name: minio-explorer
+          mountPath: /app/data/state/
+      volumes:
+      - name: minio-explorer
+        persistentVolumeClaim:
+          claimName: minio-explorer-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-explorer-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-explorer
+spec:
+  selector:
+    app: minio-explorer
+  type: ClusterIP
+  ports:
+  - name: minio-explorer
+    protocol: TCP
+    port: 8334
+    targetPort: 8334
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-explorer-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/auth-url: |-
+      http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
+    nginx.ingress.kubernetes.io/auth-signin: |-
+      https://explorer.s3.pmh.codes/outpost.goauthentik.io/start?rd=$escaped_request_uri
+    nginx.ingress.kubernetes.io/auth-response-headers: |-
+      Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+    nginx.ingress.kubernetes.io/auth-snippet: |-
+      proxy_set_header X-Forwarded-Host $http_host;
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: explorer.s3.pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: minio-explorer
+            port:
+              number: 8334

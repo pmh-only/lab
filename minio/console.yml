@@ -41,3 +41,33 @@ spec:
           value: "openid,profile,email"
         - name: CONSOLE_IDP_END_SESSION_ENDPOINT
           value: https://auth.pmh.codes/application/o/minio/end-session/
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-console-service
+spec:
+  selector:
+    app: minio-console
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-console-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: console.s3.pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: minio-console-service
+            port:
+              number: 9090
