@@ -19,7 +19,6 @@ data:
 
       server_tokens off;
       more_clear_headers Server;
-      more_clear_headers X-Powered-By;
 
       access_log off;
       error_log /dev/stderr warn;
