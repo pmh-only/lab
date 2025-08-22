@@ -15,9 +15,6 @@ spec:
       containers:
       - name: minio-explorer
         image: ghcr.io/pmh-only/filestash:latest
-        securityContext:
-          runAsUser: 0
-          runAsGroup: 0
         ports:
         - containerPort: 8334
           name: minio-explorer
