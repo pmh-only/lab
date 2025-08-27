@@ -5,7 +5,9 @@ metadata:
   namespace: gateway
 spec:
   dnsNames:
+    - pmh.so
     - pmh.codes
+    - '*.pmh.so'
     - '*.pmh.codes'
     - '*.host.pmh.codes'
     - '*.mc.pmh.codes'
