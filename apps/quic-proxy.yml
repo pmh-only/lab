@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: quic-proxy
+  namespace: argocd
+spec:
+  destination:
+    namespace: gateway
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: quic-proxy-waf
+    helm:
+      values: |-
+        proxy:
+          kind: daemonset
+          ports:
+            useHostPorts: true
+
+          backend:
+            host: "ingress-ingress-nginx-controller.ingress.svc.cluster.local"
+            port: 80
+
+          tls:
+            certFile: "/etc/ssl/certs/tls.crt"
+            keyFile: "/etc/ssl/private/tls.key"
+            secretName: "gateway-tls-secret"
+
+        waf:
+          enabled: true
+          replicaCount: 1
+
+        service:
+          type: ClusterIP
+    repoURL: https://pmh-only.github.io/quic-proxy/charts
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
