@@ -18,7 +18,7 @@ spec:
           metrics:
             enabled: true
           config:
-            hsts: 'false'
+            hsts-preload: 'true'
             strict-validate-path-type: 'false'
             add-headers: ingress/custom-headers
             allow-snippet-annotations: 'true'
@@ -29,6 +29,7 @@ spec:
             proxy-busy-buffers-size: 1024k
             use-forwarded-headers: 'true'
             location-snippet: |
+              add_header Access-Control-Allow-Headers $http_access_control_request_headers always;
               proxy_set_header Accept-Encoding "";
               sub_filter_types text/html;
               sub_filter '<head>' '<head><script src="https://trace.pmh.codes/api/script.js" data-site-id="1" data-track-errors="true" data-session-replay="true" data-web-vitals="true" defer></script>';
