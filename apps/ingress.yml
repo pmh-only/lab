@@ -18,6 +18,7 @@ spec:
           metrics:
             enabled: true
           config:
+            hsts: 'false'
             strict-validate-path-type: 'false'
             add-headers: ingress/custom-headers
             allow-snippet-annotations: 'true'
