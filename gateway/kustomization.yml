@@ -4,4 +4,3 @@ namespace: gateway
 resources:
   - ./certificate.yml
   - ./clusterissuer.yml
-  - ./nginx.yml
