@@ -27,7 +27,7 @@ spec:
             secretName: "gateway-tls-secret"
 
         waf:
-          enabled: true
+          enabled: false
           replicaCount: 1
 
         service:
