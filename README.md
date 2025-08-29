@@ -17,6 +17,10 @@ Meanwhile, the ArgoCD Image Updater ensures that container images are always kep
 
 ## Traffic routes
 ```mermaid
+---
+config:
+  look: handDrawn
+---
 flowchart TD
     A([User Request])
     A a1@-->|TLSv1.3 / QUIC| B
