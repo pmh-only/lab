@@ -2,6 +2,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: minecraft-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      sub_filter '<head>' '<head><script src="https://trace.pmh.codes/api/script.js" data-site-id="1" data-track-errors="true" data-web-vitals="true" defer></script>';
 spec:
   ingressClassName: nginx
   rules:
