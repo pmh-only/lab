@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pmhso-default-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      return 302 $scheme://pmh.codes$request_uri;
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($host ~* ^(?<subdomain>.+)\.pmh\.so$) {
+        return 302 $scheme://$subdomain.pmh.codes$request_uri;
+      }
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: pmh.so
+  - host: '*.pmh.so'
