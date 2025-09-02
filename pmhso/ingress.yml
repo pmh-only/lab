@@ -3,11 +3,12 @@ kind: Ingress
 metadata:
   name: pmhso-default-ingress
   annotations:
-    nginx.ingress.kubernetes.io/server-snippet: |
-      return 302 $scheme://pmh.codes$request_uri;
     nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($host = "pmh.so") {
+        return 301 $scheme://pmh.codes$request_uri;
+      }
       if ($host ~* ^(?<subdomain>.+)\.pmh\.so$) {
-        return 302 $scheme://$subdomain.pmh.codes$request_uri;
+        return 301 $scheme://$subdomain.pmh.codes$request_uri;
       }
 spec:
   ingressClassName: nginx
