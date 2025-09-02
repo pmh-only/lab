@@ -5,13 +5,18 @@ metadata:
   namespace: gateway
 spec:
   dnsNames:
-    - pmh.so
     - pmh.codes
-    - '*.pmh.so'
+    - pmh.so
+
     - '*.pmh.codes'
     - '*.host.pmh.codes'
     - '*.mc.pmh.codes'
     - '*.s3.pmh.codes'
+
+    - '*.pmh.so'
+    - '*.host.pmh.so'
+    - '*.mc.pmh.so'
+    - '*.s3.pmh.so'
   issuerRef:
     group: cert-manager.io
     kind: ClusterIssuer
