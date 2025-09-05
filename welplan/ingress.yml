@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: welplan-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: welplan.pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: welplan-service
+            port:
+              number: 3000
