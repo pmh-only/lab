@@ -93,7 +93,8 @@ data:
         
         server_name _;
         location / {
-          proxy_pass http://ingress-ingress-nginx-controller.ingress.svc.cluster.local:80;
+          proxy_pass https://ingress-ingress-nginx-controller.ingress.svc.cluster.local:443;
+          proxy_ssl_verify off;
         }
 
         location /_gwhealthz {
