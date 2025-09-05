@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: ghost
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: ghost

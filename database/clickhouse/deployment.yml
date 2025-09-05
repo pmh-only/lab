@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: clickhouse
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: clickhouse

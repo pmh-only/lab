@@ -4,7 +4,6 @@ metadata:
   name: office
 spec:
   serviceName: office-service
-  replicas: 1
   selector:
     matchLabels:
       app: office

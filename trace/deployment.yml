@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: trace
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: trace
@@ -67,7 +66,6 @@ kind: Deployment
 metadata:
   name: trace-client
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: trace-client

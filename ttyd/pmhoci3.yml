@@ -4,7 +4,6 @@ kind: Deployment
 metadata:
   name: ttyd-pmhoci3
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: ttyd-pmhoci3

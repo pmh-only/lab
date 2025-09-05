@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: roundcube
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: roundcube

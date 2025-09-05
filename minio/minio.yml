@@ -4,7 +4,6 @@ metadata:
   name: minio
 spec:
   serviceName: minio-service
-  replicas: 1
   selector:
     matchLabels:
       app: minio
