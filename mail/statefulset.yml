@@ -7,7 +7,6 @@ spec:
     matchLabels:
       app: mail
   serviceName: mail
-  replicas: 1
   template:
     metadata:
       labels:

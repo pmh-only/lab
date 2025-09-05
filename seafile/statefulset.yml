@@ -4,7 +4,6 @@ metadata:
   name: seafile
 spec:
   serviceName: seafile-service
-  replicas: 1
   selector:
     matchLabels:
       app: seafile
@@ -81,7 +80,6 @@ metadata:
   name: seafile-sdoc
 spec:
   serviceName: seafile-sdoc-service
-  replicas: 1
   selector:
     matchLabels:
       app: seafile-sdoc
@@ -134,7 +132,6 @@ metadata:
   name: seafile-noti
 spec:
   serviceName: seafile-noti-service
-  replicas: 1
   selector:
     matchLabels:
       app: seafile-noti

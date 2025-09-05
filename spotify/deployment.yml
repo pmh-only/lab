@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: spotify-api
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: spotify-api
@@ -40,7 +39,6 @@ kind: Deployment
 metadata:
   name: spotify-web
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: spotify-web

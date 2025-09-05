@@ -4,7 +4,6 @@ metadata:
   name: aggregator
   namespace: traffic
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: aggregator

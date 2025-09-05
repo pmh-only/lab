@@ -4,7 +4,6 @@ metadata:
   name: immich
 spec:
   serviceName: immich-service
-  replicas: 1
   selector:
     matchLabels:
       app: immich
@@ -44,7 +43,6 @@ metadata:
   name: immich-ml
 spec:
   serviceName: immich-ml-service
-  replicas: 1
   selector:
     matchLabels:
       app: immich-ml

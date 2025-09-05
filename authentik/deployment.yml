@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: authentik-server
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: authentik-server
@@ -73,7 +72,6 @@ kind: Deployment
 metadata:
   name: authentik-worker
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: authentik-worker
