@@ -4,7 +4,6 @@ namespace: minio
 resources:
   - ./secret.yml
   - ./ingress.yml
-  - ./anubis.yml
   - ./explorer.yml
   - ./minio.yml
   - ./console.yml
