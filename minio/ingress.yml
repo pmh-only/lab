@@ -3,7 +3,6 @@ kind: Ingress
 metadata:
   name: minio-ingress
   annotations:
-    nginx.ingress.kubernetes.io/proxy-pass-headers: "Last-Modified,ETag,Cache-Control"
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_intercept_errors on;
 
