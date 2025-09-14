@@ -125,7 +125,7 @@ spec:
           path: /mnt/data/seafile-seadoc
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: seafile-noti
 spec:
