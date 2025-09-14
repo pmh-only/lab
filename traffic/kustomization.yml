@@ -3,7 +3,6 @@ kind: Kustomization
 namespace: traffic
 resources:
   - ./aggregator_cm.yml
-  - ./aggregator_pvc.yml
   - ./aggregator_svc.yml
   - ./aggregator.yml
   - ./collector_cm.yml

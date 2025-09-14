@@ -1,9 +1,8 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: minio
 spec:
-  serviceName: minio-service
   selector:
     matchLabels:
       app: minio
@@ -73,20 +72,8 @@ spec:
           name: minio-storage
       volumes:
       - name: minio-storage
-        persistentVolumeClaim:
-          claimName: minio-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: minio-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: seaweedfs-storage
-  resources:
-    requests:
-      storage: 50Gi
+        hostPath:
+          path: /mnt/data/minio
 ---
 apiVersion: v1
 kind: Service
