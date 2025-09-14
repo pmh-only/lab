@@ -1,9 +1,8 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: immich
 spec:
-  serviceName: immich-service
   selector:
     matchLabels:
       app: immich
@@ -34,15 +33,14 @@ spec:
             name: immich-pvc
       volumes:
         - name: immich-pvc
-          persistentVolumeClaim:
-            claimName: immich-pvc
+          hostPath:
+            path: /mnt/data/immich
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: immich-ml
 spec:
-  serviceName: immich-ml-service
   selector:
     matchLabels:
       app: immich-ml
@@ -61,5 +59,5 @@ spec:
             name: immich-ml-pvc
       volumes:
         - name: immich-ml-pvc
-          persistentVolumeClaim:
-            claimName: immich-ml-pvc
+          hostPath:
+            path: /mnt/data/immich-ml

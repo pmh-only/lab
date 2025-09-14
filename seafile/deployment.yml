@@ -1,9 +1,8 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: seafile
 spec:
-  serviceName: seafile-service
   selector:
     matchLabels:
       app: seafile
@@ -71,8 +70,8 @@ spec:
           name: seafile-storage
       volumes:
       - name: seafile-storage
-        persistentVolumeClaim:
-          claimName: seafile-pvc
+        hostPath:
+          path: /mnt/data/seafile
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -123,8 +122,8 @@ spec:
           name: seafile-seadoc-storage
       volumes:
       - name: seafile-seadoc-storage
-        persistentVolumeClaim:
-          claimName: seafile-seadoc-pvc
+        hostPath:
+          path: /mnt/data/seafile-seadoc
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -174,5 +173,5 @@ spec:
           subPath: logs
       volumes:
       - name: seafile-noti-storage
-        persistentVolumeClaim:
-          claimName: seafile-noti-pvc
+        hostPath:
+          path: /mnt/data/seafile-noti
