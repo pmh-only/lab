@@ -74,11 +74,10 @@ spec:
           path: /mnt/data/seafile
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: seafile-sdoc
 spec:
-  serviceName: seafile-sdoc-service
   selector:
     matchLabels:
       app: seafile-sdoc
@@ -130,7 +129,6 @@ kind: StatefulSet
 metadata:
   name: seafile-noti
 spec:
-  serviceName: seafile-noti-service
   selector:
     matchLabels:
       app: seafile-noti
