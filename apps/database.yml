@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd-image-updater.argoproj.io/image-list: mongo=ghcr.io/pmh-only/mongo:latest,mysql=ghcr.io/pmh-only/mysql:8,pgvecto-rs=ghcr.io/pmh-only/pgvecto-rs:pg14-v0.2.0,redis=ghcr.io/pmh-only/redis:alpine,clickhouse=ghcr.io/pmh-only/clickhouse-server:rybbit
+    argocd-image-updater.argoproj.io/image-list: mongo=ghcr.io/pmh-only/mongo:latest,mysql=ghcr.io/pmh-only/mysql:8,pgvecto-rs=ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0,redis=ghcr.io/pmh-only/redis:alpine,clickhouse=ghcr.io/pmh-only/clickhouse-server:rybbit
     argocd-image-updater.argoproj.io/mongo.update-strategy: digest
     argocd-image-updater.argoproj.io/mysql.update-strategy: digest
     argocd-image-updater.argoproj.io/pgvecto-rs.update-strategy: digest
