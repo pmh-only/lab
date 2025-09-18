@@ -10,10 +10,10 @@ Kubernetes Manifest Files for [My Homelab Server](https://pmh.codes)
 </div>
 
 ## How it works?
-[An ArgoCD instance](https://argo.pmh.codes/) continuously monitors the [./apps](https://github.com/pmh-only/lab/tree/main/apps) folder, which contains manifest files [referencing each application's manifest directory](https://argo.pmh.codes/applications/argocd/apps).\
-These manifests trigger full resource synchronization when updates occur.
+An [ArgoCD instance](https://argo.pmh.codes/) continuously monitors the [apps folder](https://github.com/pmh-only/lab/tree/main/apps), which contains manifest files that [reference each application's manifest directory](https://argo.pmh.codes/applications/argocd/apps).
+When updates occur, these manifests trigger full resource synchronization.
 
-Meanwhile, the ArgoCD Image Updater ensures that container images are always kept at their latest versions.
+At the same time, the ArgoCD Image Updater ensures that container images always stay up to date with the latest versions.
 
 ## Traffic routes
 ```mermaid
