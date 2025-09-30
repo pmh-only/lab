@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: workflows-service
+spec:
+  selector:
+    app: workflows
+  ports:
+    - protocol: TCP
+      port: 5678 
+      targetPort: 5678 
