@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chatsolution-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: c.pmh.codes
+    http:
+      paths:
+      - path: /socket.io/
+        pathType: Prefix
+        backend:
+          service:
+            name: chatsolution-service
+            port:
+              number: 80 

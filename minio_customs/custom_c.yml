@@ -4,8 +4,6 @@ metadata:
   name: minio-custom-c-root-ingress
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_intercept_errors on;
-
       more_set_input_headers 'Host: a-c.s3.pmh.codes';
 
       if ($http_sec_fetch_mode = "navigate") {
@@ -39,8 +37,6 @@ metadata:
   name: minio-custom-c-ingress
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_intercept_errors on;
-
       more_set_input_headers 'Host: a-c.s3.pmh.codes';
       rewrite ^/(.*)$ /a-c/$1 break;
 spec:
