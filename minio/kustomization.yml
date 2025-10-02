@@ -7,3 +7,4 @@ resources:
   - ./explorer.yml
   - ./minio.yml
   - ./console.yml
+  - ./customs/kustomization.yml
