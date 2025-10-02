@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: minio-custom-c-ingress
+  name: minio-custom-c-root-ingress
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_intercept_errors on;
@@ -27,6 +27,30 @@ spec:
       paths:
       - path: /
         pathType: Exact
+        backend:
+          service:
+            name: minio-service
+            port:
+              number: 9000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-custom-c-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_intercept_errors on;
+
+      more_set_input_headers 'Host: a-c.s3.pmh.codes';
+      rewrite ^/(.*)$ /a-c/$1 break;
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "c.pmh.codes"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
         backend:
           service:
             name: minio-service
