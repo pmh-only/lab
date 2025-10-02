@@ -5,6 +5,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
       more_set_input_headers 'Host: a-c.s3.pmh.codes';
+      add_header Access-Control-Allow-Origin *;
 
       if ($http_sec_fetch_mode = "navigate") {
         set $is_manual_request "1";
@@ -37,6 +38,7 @@ metadata:
   name: minio-custom-c-ingress
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header Access-Control-Allow-Origin *;
       more_set_input_headers 'Host: a-c.s3.pmh.codes';
       rewrite ^/(.*)$ /a-c/$1 break;
 spec:
