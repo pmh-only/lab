@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: chatsolution
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/chatsolution.update-strategy: digest
+    argocd-image-updater.argoproj.io/image-list: chatsolution=gchcr.io/pmh-only/chatsolution:latest
+spec:
+  destination:
+    namespace: chatsolution
+    server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: Secret
+  project: default
+  source:
+    path: chatsolution
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
