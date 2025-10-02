@@ -6,52 +6,21 @@ metadata:
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_intercept_errors on;
 
-      # check if it is root path
-      if ($uri ~ "^/$") { 
-        set $test A; 
+      # bucket from Host header
+      set_by_lua_block $bucket {
+        local host = ngx.req.get_headers()["host"] or ""
+        local m = ngx.re.match(host, "^(?<bucket>[^.]+)\\.pmh\\.codes$")
+        local b = (m and m.bucket) or "www"
+
+        if #b < 3 or b:sub(1, 4) == "xn--" then
+          b = "a-" .. b
+        end
+
+        return b
       }
       
-      # check if it is minio api endpoint
-      if ($host !~* s3.pmh.codes) { 
-        set $test "${test}B"; 
-      }
-
-      # extract bucket name from host header
-      set_by_lua_block $bucket {
-        local host = ngx.req.get_headers()["host"]
-        local reg = "^(?<bucket>[^.]+).pmh.codes$"
-        local m = ngx.re.match(host, reg)
-
-        -- if there is no bucket name, use www as default
-        if m == nil or m['bucket'] == nil then
-          return "www"
-        end
-
-        -- bypass the rule that bucket name must be at least 3 characters and cannot start with "xn--"
-        -- by appending "a-" prefix to the bucket name
-        if string.len(m['bucket']) < 3 or m['bucket']:sub(1, 4) == "xn--" then
-          return "a-" .. m['bucket']
-        end
-
-        return m['bucket']
-      }
-
-      # when it is not minio api endpoint
-      if ($test = B) {
-        rewrite ^/(.*)$ /$bucket/$1 break;
-      }
-
-      # when it is root path and not minio api endpoint
-      if ($test = AB) {
-        rewrite ^/$ /$bucket/index.html break;
-        more_set_input_headers 'Host: $bucket.s3.pmh.codes';
-
-        # redirect error pages to main site
-        error_page 400 =302 https://pmh.codes;
-        error_page 401 =302 https://pmh.codes;
-        error_page 403 =302 https://pmh.codes;
-        error_page 404 =302 https://pmh.codes;
-      }
+      more_set_input_headers 'Host: $bucket.s3.pmh.codes';
+      rewrite ^/(.*)$ /$bucket/$1 break;
 spec:
   ingressClassName: nginx
   rules:
@@ -75,6 +44,65 @@ spec:
             name: minio-service
             port:
               number: 9000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-root-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_intercept_errors on;
+
+      # bucket from Host header
+      set_by_lua_block $bucket {
+        local host = ngx.req.get_headers()["host"] or ""
+        local m = ngx.re.match(host, "^(?<bucket>[^.]+)\\.pmh\\.codes$")
+        local b = (m and m.bucket) or "www"
+
+        if #b < 3 or b:sub(1, 4) == "xn--" then
+          b = "a-" .. b
+        end
+
+        return b
+      }
+
+      more_set_input_headers 'Host: $bucket.s3.pmh.codes';
+      rewrite ^ /$bucket/index.html break;
+
+      # redirect error pages to main site
+      error_page 403 =302 https://pmh.codes;
+      error_page 404 =302 https://pmh.codes;
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Exact
+        backend:
+          service:
+            name: minio-service
+            port:
+              number: 9000
+  - host: "*.pmh.codes"
+    http:
+      paths:
+      - path: /
+        pathType: Exact
+        backend:
+          service:
+            name: minio-service
+            port:
+              number: 9000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-api-ingress
+spec:
+  ingressClassName: nginx
+  rules:
   - host: "s3.pmh.codes"
     http:
       paths:
