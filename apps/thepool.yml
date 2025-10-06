@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: thepool
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/thepool.update-strategy: digest
+    argocd-image-updater.argoproj.io/image-list: thepool=ghcr.io/pmh-only/thepool:latest
+spec:
+  destination:
+    namespace: thepool
+    server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: Secret
+  project: default
+  source:
+    path: thepool
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
