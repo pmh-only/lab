@@ -50,10 +50,3 @@ spec:
               key: MINIO_SECRET_ACCESS_KEY
         - name: CRONJOB_POOL_SIZE_LIMIT_MB
           value: '51200'
-        volumeMounts:
-        - mountPath: /app/cache
-          name: persistent
-      volumes:
-      - name: persistent
-        persistentVolumeClaim:
-          claimName: thepool-pvc
