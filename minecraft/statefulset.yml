@@ -41,7 +41,7 @@ spec:
                     "stop"
       containers:
       - name: minecraft
-        image: ghcr.io/pmh-only/paper
+        image: ghcr.io/pmh-only/paper:nightly
         args:
           - -Xms6144M
           - -Xmx6144M
