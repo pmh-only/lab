@@ -50,3 +50,21 @@ spec:
               key: MINIO_SECRET_ACCESS_KEY
         - name: CRONJOB_POOL_SIZE_LIMIT_MB
           value: '51200'
+        - name: DISCORD_AUTH_ENABLED
+          value: 'true'
+        - name: DISCORD_CLIENT_ID
+          value: '1427556421276532776'
+        - name: DISCORD_TARGET_GUILD_ID
+          value: '541782241131495434'
+        - name: DISCORD_REDIRECT_URL
+          value: 'https://pool.pmh.codes/auth/callback'
+        - name: DISCORD_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: thepool-secret
+              key: DISCORD_CLIENT_SECRET
+        - name: DISCORD_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: thepool-secret
+              key: DISCORD_AUTH_TOKEN
