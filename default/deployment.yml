@@ -14,5 +14,8 @@ spec:
       containers:
       - name: default
         image: ghcr.io/pmh-only/default
+        env:
+          - name: THEME_NAME
+            value: pmh.codes
         ports:
         - containerPort: 3000
