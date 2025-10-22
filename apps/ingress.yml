@@ -18,7 +18,7 @@ spec:
           metrics:
             enabled: true
           config:
-            custom-http-errors: '502,503,504'
+            custom-http-errors: '503,504'
             hsts-preload: 'true'
             strict-validate-path-type: 'false'
             add-headers: ingress/custom-headers
