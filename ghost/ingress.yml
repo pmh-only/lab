@@ -4,7 +4,7 @@ metadata:
   name: ghost-ingress
   annotations:
     nginx.ingress.kubernetes.io/server-snippet: |
-      return 301 https://web.archive.org/web/20240224101806/https://pmh.codes/$request_uri;
+      return 301 https://web.archive.org/web/20240224101806/https://pmh.codes$request_uri;
 spec:
   ingressClassName: nginx
   rules:
