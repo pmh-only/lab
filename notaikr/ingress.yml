@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: notaikr-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: not.ai.kr
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: notaikr-service
+            port:
+              number: 8080
