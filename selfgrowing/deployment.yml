@@ -22,15 +22,9 @@ spec:
               name: selfgrowing-secrets
               key: DISCORD_TOKEN
         - name: DISCORD_GUILD_ID
-          valueFrom:
-            secretKeyRef:
-              name: selfgrowing-secrets
-              key: DISCORD_GUILD_ID
+          value: '541782241131495434'
         - name: DISCORD_CHANNEL_ID
-          valueFrom:
-            secretKeyRef:
-              name: selfgrowing-secrets
-              key: DISCORD_CHANNEL_ID
+          value: '989098254786527264'
         volumeMounts:
         - mountPath: /data
           name: persistent
