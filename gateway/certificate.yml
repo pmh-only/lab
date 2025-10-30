@@ -17,6 +17,8 @@ spec:
     - '*.host.pmh.so'
     - '*.mc.pmh.so'
     - '*.s3.pmh.so'
+
+    - not.ai.kr
   issuerRef:
     group: cert-manager.io
     kind: ClusterIssuer
