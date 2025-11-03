@@ -60,6 +60,12 @@ spec:
             secretKeyRef:
               name: trace-secrets
               key: BETTER_AUTH_SECRET
+
+        - name: MAPBOX_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: trace-secrets
+              key: MAPBOX_TOKEN
 ---
 apiVersion: apps/v1
 kind: Deployment
