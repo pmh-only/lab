@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tailscale
+  namespace: argocd
+spec:
+  destination:
+    namespace: tailscale
+    server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: Secret
+  project: default
+  source:
+    chart: tailscale
+    helm:
+      values: |-
+        oauth:
+          clientId: youshallnotpass
+          clientSecret: youshallnotpass
+    repoURL: https://charts.jetstack.io
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
