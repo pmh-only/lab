@@ -13,13 +13,13 @@ spec:
       kind: Secret
   project: default
   source:
-    chart: tailscale
+    chart: tailscale-operator
     helm:
       values: |-
         oauth:
           clientId: youshallnotpass
           clientSecret: youshallnotpass
-    repoURL: https://charts.jetstack.io
+    repoURL: https://pkgs.tailscale.com/helmcharts
     targetRevision: x
   syncPolicy:
     automated:
