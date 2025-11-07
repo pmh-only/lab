@@ -1,0 +1,12 @@
+apiVersion: tailscale.com/v1alpha1
+kind: Connector
+metadata:
+  name: cluster-connector
+  namespace: tailscale
+spec:
+  advertiseRoutes:
+    - 10.0.0.0/8
+    - 172.16.0.0/16
+    - 172.17.0.0/16
+  tags:
+    - tag:k8s
