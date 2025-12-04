@@ -12,3 +12,13 @@ spec:
       - 172.17.0.0/16
   tags:
     - tag:k8s
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    tailscale.com/tailnet-fqdn: pmhraspberry.taildd35b7.ts.net
+  name: pmhraspberry
+spec:
+  externalName: placeholder
+  type: ExternalName
