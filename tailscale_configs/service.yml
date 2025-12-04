@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    tailscale.com/tailnet-fqdn: pmhraspberry.taildd35b7.ts.net
+  name: pmhraspberry
+  namespace: tailscale
+spec:
+  externalName: placeholder
+  type: ExternalName
