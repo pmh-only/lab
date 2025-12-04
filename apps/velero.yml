@@ -33,6 +33,13 @@ spec:
                 s3ForcePathStyle: true
                 s3Url: http://pmhraspberry.tailscale.svc.cluster.local:9000
                 insecureSkipTLSVerify: true
+        initContainers:
+          - name: velero-plugin-for-aws
+            image: velero/velero-plugin-for-aws:latest
+            imagePullPolicy: IfNotPresent
+            volumeMounts:
+              - mountPath: /target
+                name: plugins
         schedules:
           backup:
             disabled: false
