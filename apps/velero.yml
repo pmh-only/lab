@@ -50,6 +50,9 @@ spec:
             template:
               ttl: "240h"
               storageLocation: default
+              defaultVolumesToFsBackup: true
+              uploaderConfig:
+                parallelFilesUpload: 16
     repoURL: https://vmware-tanzu.github.io/helm-charts
     targetRevision: x
   syncPolicy:
