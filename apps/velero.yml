@@ -1,0 +1,56 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: velero
+  namespace: argocd
+spec:
+  destination:
+    namespace: velero
+    server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: Secret
+  project: default
+  source:
+    chart: velero
+    helm:
+      values: |-
+        deployNodeAgent: true
+        snapshotsEnabled: false
+        configuration:
+          defaultVolumesToFsBackup: true
+          backupStorageLocation:
+            - name: default
+              provider: aws
+              bucket: velero
+              default: true
+              credential:
+                name: secret-name
+                key: key-in-secret
+              config:
+                region: us-east-1
+                s3ForcePathStyle: true
+                s3Url: http://pmhraspberry.tailscale.svc.cluster.local:9000
+                insecureSkipTLSVerify: true
+        schedules:
+          backup:
+            disabled: false
+            schedule: "0 0 * * *"
+            useOwnerReferencesInBackup: false
+            paused: false
+            skipImmediately: false
+            template:
+              ttl: "240h"
+              storageLocation: default
+    repoURL: https://vmware-tanzu.github.io/helm-charts
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
