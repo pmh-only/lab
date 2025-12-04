@@ -26,8 +26,8 @@ spec:
               bucket: velero
               default: true
               credential:
-                name: secret-name
-                key: key-in-secret
+                name: velero
+                key: rustfs
               config:
                 region: us-east-1
                 s3ForcePathStyle: true
