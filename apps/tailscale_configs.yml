@@ -11,6 +11,9 @@ spec:
     - jsonPointers:
         - /data
       kind: Secret
+    - jsonPointers:
+        - /spec/externalName
+      kind: Service
   project: default
   source:
     path: tailscale_configs
