@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kopia-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: backup.pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kopia-service
+            port:
+              number: 51515 
