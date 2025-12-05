@@ -28,6 +28,11 @@ spec:
               secretKeyRef:
                 name: kopia-secret
                 key: ADMIN_PASSWORD
+          - name: KOPIA_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: kopia-secret
+                key: REPOSITORY_PASSWORD
         volumeMounts:
         - mountPath: /app/config
           name: persistent
