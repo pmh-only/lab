@@ -21,20 +21,13 @@ spec:
           - --insecure
           - --address=0.0.0.0:51515
         env:
-          - name: USER
-            value: User
           - name: KOPIA_SERVER_USERNAME
-            value: admin
+            value: pmh_only@pmh.codes
           - name: KOPIA_SERVER_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: kopia-secret
                 key: ADMIN_PASSWORD
-          - name: KOPIA_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: kopia-secret
-                key: REPOSITORY_PASSWORD
         volumeMounts:
         - mountPath: /app/config
           name: persistent
