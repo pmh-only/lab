@@ -15,7 +15,7 @@ spec:
       containers:
       - name: kopia 
         image: ghcr.io/pmh-only/kopia:latest
-        command:
+        args:
           - server
           - start
           - --address=0.0.0.0:51515
