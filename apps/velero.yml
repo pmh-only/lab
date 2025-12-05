@@ -43,12 +43,12 @@ spec:
         schedules:
           backup:
             disabled: false
-            schedule: "0 0 * * *"
+            schedule: "0 */6 * * *"
             useOwnerReferencesInBackup: false
             paused: false
             skipImmediately: false
             template:
-              ttl: "240h"
+              ttl: "720h"
               storageLocation: default
               defaultVolumesToFsBackup: true
               uploaderConfig:
