@@ -11,6 +11,28 @@ spec:
       labels:
         app: mysql
     spec:
+      initContainers:
+        - name: backpack
+          restartPolicy: Always
+          image: ghcr.io/pmh-only/backpack-mysql2s3:latest
+          args:
+            - now
+          env:
+            - name: DATABASE_HOST
+              value: '127.0.0.1'
+            - name: DATABASE_PORT
+              value: '3306'
+            - name: DATABASE_USER
+              value: 'root'
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-root-password
+                  key: password
+            - name: S3_DUMP_URI
+              value: dbdump/mysql
+            - name: S3_ENDPOINT_URL
+              value: 'http://pmhraspberry.tailscale.svc.cluster.local:9000'
       containers:
       - name: mysql
         image: ghcr.io/pmh-only/mysql:8
