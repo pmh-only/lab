@@ -15,8 +15,6 @@ spec:
         - name: backpack
           restartPolicy: Always
           image: ghcr.io/pmh-only/backpack-mysql2s3:latest
-          args:
-            - now
           env:
             - name: DATABASE_HOST
               value: '127.0.0.1'
