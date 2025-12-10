@@ -16,6 +16,8 @@ spec:
           restartPolicy: Always
           image: ghcr.io/pmh-only/backpack-mysql2s3:latest
           env:
+            - name: TZ
+              value: Asia/Seoul
             - name: DATABASE_HOST
               value: '127.0.0.1'
             - name: DATABASE_PORT
