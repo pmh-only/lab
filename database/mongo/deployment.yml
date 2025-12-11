@@ -11,6 +11,40 @@ spec:
       labels:
         app: mongo
     spec:
+      initContainers:
+        - name: backpack
+          restartPolicy: Always
+          image: ghcr.io/pmh-only/backpack-mongo2s3:latest
+          env:
+            - name: TZ
+              value: Asia/Seoul
+            - name: DATABASE_HOST
+              value: '127.0.0.1'
+            - name: DATABASE_PORT
+              value: '27017'
+            - name: DATABASE_USER
+              value: 'backpack'
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backpack-secrets
+                  key: MONGO_BACKPACK_PASSWORD
+            - name: S3_DUMP_URI
+              value: dbdump/mysql
+            - name: S3_ENDPOINT_URL
+              value: 'http://pmhraspberry.tailscale.svc.cluster.local:9000'
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: backpack-secrets
+                  key: S3_ACCESS_TOKEN
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backpack-secrets
+                  key: S3_SECRET_TOKEN
+            - name: AWS_REGION
+              value: us-east-1
       containers:
       - name: mongo
         image: ghcr.io/pmh-only/mongo:latest
