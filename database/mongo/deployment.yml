@@ -30,7 +30,7 @@ spec:
                   name: backpack-secrets
                   key: MONGO_BACKPACK_PASSWORD
             - name: S3_DUMP_URI
-              value: dbdump/mysql
+              value: dbdump/mongo
             - name: S3_ENDPOINT_URL
               value: 'http://pmhraspberry.tailscale.svc.cluster.local:9000'
             - name: AWS_ACCESS_KEY_ID
