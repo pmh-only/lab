@@ -7,3 +7,4 @@ type: Opaque
 data:
   S3_ACCESS_TOKEN: eW91c2hhbGxub3RwYXNz # youshallnotpass
   S3_SECRET_TOKEN: eW91c2hhbGxub3RwYXNz # youshallnotpass
+  MONGO_BACKPACK_PASSWORD: eW91c2hhbGxub3RwYXNz # youshallnotpass
