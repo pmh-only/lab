@@ -30,7 +30,7 @@ spec:
                   name: clickhouse-root-password
                   key: password
             - name: S3_ENDPOINT_URL
-              value: 's3://pmhraspberry.tailscale.svc.cluster.local:9000/clickhouse'
+              value: 'http://pmhraspberry.tailscale.svc.cluster.local:9000/dbdump/clickhouse'
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
