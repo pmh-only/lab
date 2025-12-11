@@ -8,13 +8,19 @@ metadata:
       pgvecto-rs=ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0,
       redis=ghcr.io/pmh-only/redis:alpine,
       clickhouse=ghcr.io/pmh-only/clickhouse-server:rybbit,
-      backpack-mysql2s3=ghcr.io/pmh-only/backpack-mysql2s3:latest'
+      backpack-mysql2s3=ghcr.io/pmh-only/backpack-mysql2s3:latest
+      backpack-pgsql2s3=ghcr.io/pmh-only/backpack-pgsql2s3:latest
+      backpack-mongo2s3=ghcr.io/pmh-only/backpack-mongo2s3:latest
+      backpack-clickhouse2s3=ghcr.io/pmh-only/backpack-clickhouse2s3:latest'
     argocd-image-updater.argoproj.io/mongo.update-strategy: digest
     argocd-image-updater.argoproj.io/mysql.update-strategy: digest
     argocd-image-updater.argoproj.io/pgvecto-rs.update-strategy: digest
     argocd-image-updater.argoproj.io/redis.update-strategy: digest
     argocd-image-updater.argoproj.io/clickhouse.update-strategy: digest
     argocd-image-updater.argoproj.io/backpack-mysql2s3.update-strategy: digest
+    argocd-image-updater.argoproj.io/backpack-pgsql2s3.update-strategy: digest
+    argocd-image-updater.argoproj.io/backpack-mongo2s3.update-strategy: digest
+    argocd-image-updater.argoproj.io/backpack-clickhouse2s3.update-strategy: digest
   name: database
   namespace: argocd
 spec:
