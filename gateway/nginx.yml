@@ -100,7 +100,7 @@ data:
       }
 
       log_format log_stream
-        '$remote_addr $ga_xff [$time_local] $server_name $remote_user $ga_cache '
+        '$remote_addr $ga_xff [$time_local] $host $remote_user $ga_cache '
         '"$request" $status $body_bytes_sent '
         '"$http_referer" "$http_user_agent" '
         '$ga_ssl_proto $ga_ssl_cipher "$ga_mime" $request_time';
