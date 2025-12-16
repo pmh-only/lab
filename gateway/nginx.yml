@@ -74,11 +74,36 @@ data:
       proxy_request_buffering off;
       proxy_http_version 1.1;
 
-      log_format log_stream '$remote_addr - - [$time_local] '
-        '"$request_method $uri $server_protocol" '
-        '$status $body_bytes_sent '
+      map $http_x_forwarded_for $ga_xff {
+        default $http_x_forwarded_for;
+        ""      "-";
+      }
+
+      map $upstream_cache_status $ga_cache {
+        default $upstream_cache_status;
+        ""      "-";
+      }
+
+      map $ssl_protocol $ga_ssl_proto {
+        default $ssl_protocol;
+        ""      "-";
+      }
+
+      map $ssl_cipher $ga_ssl_cipher {
+        default $ssl_cipher;
+        ""      "-";
+      }
+
+      map $sent_http_content_type $ga_mime {
+        default $sent_http_content_type;
+        ""      "-";
+      }
+
+      log_format log_stream
+        '$remote_addr $ga_xff [$time_local] $server_name $remote_user $ga_cache '
+        '"$request" $status $body_bytes_sent '
         '"$http_referer" "$http_user_agent" '
-        '- $request_time - - - - - - - -';
+        '$ga_ssl_proto $ga_ssl_cipher "$ga_mime" $request_time';
 
       server {
         listen  80 default_server;
