@@ -13,7 +13,7 @@ data:
     [INPUT]
       Name                tail
       Tag                 kube.*
-      Path                /var/log/pods/ingress_*/controller/0.log
+      Path                /var/log/pods/gateway_*/nginx/0.log
       Parser              cri
       Skip_Long_Lines     On
       Refresh_Interval    5
