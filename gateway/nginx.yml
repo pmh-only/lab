@@ -80,6 +80,9 @@ data:
         listen  80 default_server;
         listen  [::]:80 default_server;
 
+        access_log /dev/stdout log_stream;
+        error_log  /dev/stderr notice;
+
         server_name _;
 
         location / {
@@ -92,14 +95,20 @@ data:
         listen [::]:443 ssl default_server;
         listen 443 quic reuseport;
         listen [::]:443 quic reuseport;
-        
+
         server_name _;
+
+        access_log /dev/stdout log_stream;
+        error_log  /dev/stderr notice;
+
         location / {
           proxy_pass https://ingress-ingress-nginx-controller.ingress.svc.cluster.local:443;
           proxy_ssl_verify off;
         }
 
         location /_gwhealthz {
+          access_log off;
+
           add_header Content-Type text/plain;
           return 200 "Nginx is running";
         }
