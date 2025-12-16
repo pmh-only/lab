@@ -74,7 +74,11 @@ data:
       proxy_request_buffering off;
       proxy_http_version 1.1;
 
-      log_format log_stream '[$remote_addr] [$time_local] $protocol $status $bytes_sent $bytes_received $session_time';
+      log_format log_stream '$remote_addr - - [$time_local] '
+        '"$request_method $uri $server_protocol" '
+        '$status $body_bytes_sent '
+        '"$http_referer" "$http_user_agent" '
+        '- $request_time - - - - - - - -';
 
       server {
         listen  80 default_server;
