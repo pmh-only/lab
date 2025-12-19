@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nameserver 
+spec:
+  selector:
+    matchLabels:
+      app: nameserver 
+  template:
+    metadata:
+      labels:
+        app: nameserver 
+    spec:
+      containers:
+      - name: nameserver 
+        image: ghcr.io/pmh-only/technitium:latest
+        securityContext:
+          sysctls:
+          - name: net.ipv4.ip_local_port_range
+            value: "1024 65535"
+        env:
+        - name: DNS_SERVER_DOMAIN
+          value: pmhdns
+        volumeMounts:
+        - name: nameserver
+          mountPath: /etc/dns
+      volumes:
+      - name: nameserver
+        persistentVolumeClaim:
+          claimName: nameserver-pvc

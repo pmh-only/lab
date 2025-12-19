@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nameserver-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: names.pmh.codes
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nameserver
+            port:
+              number: 5380
