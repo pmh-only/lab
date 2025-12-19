@@ -7,27 +7,34 @@ spec:
   selector:
     app: nameserver
   ports:
-    - protocol: TCP
+    - name: webconsole
+      protocol: TCP
       port: 5380
       targetPort: 5380
 
-    - protocol: TCP
+    - name: dnstcp
+      protocol: TCP
       port: 53
       targetPort: 53
-    - protocol: UDP
+    - name: dns
+      protocol: UDP
       port: 53
       targetPort: 53
 
-    - protocol: TCP
+    - name: dnsovertls
+      protocol: TCP
       port: 853
       targetPort: 853
-    - protocol: UDP
+    - name: dnsoverquic
+      protocol: UDP
       port: 853
       targetPort: 853
       
-    - protocol: TCP
+    - name: dnsoverhttps
+      protocol: TCP
       port: 443
       targetPort: 443
-    - protocol: UDP
+    - name: dnsoverhttp3
+      protocol: UDP
       port: 443
       targetPort: 443
