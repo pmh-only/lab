@@ -23,9 +23,8 @@ data:
       Format    template
       Template  {log}
   goaccess.conf: |
-    time-format %H:%M:%S
-    date-format %d/%b/%Y
-    log-format %h ~h [%d:%t %^] %v %e %C "%r" %s %b "%R" "%u" %K %k "%M" %T
+    datetime-format %d/%b/%Y:%H:%M:%S %z
+    log-format %h %^ [%x] %v %^ %^ "%r" %s %b "%R" "%u" %K %k "%M" %T
     
     real-time-html true
     ws-url wss://traffic.pmh.codes/ws
