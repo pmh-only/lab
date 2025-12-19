@@ -9,9 +9,32 @@ spec:
   ports:
     - name: webconsole
       protocol: TCP
-      port: 3000
-      targetPort: 3000
+      port: 5380
+      targetPort: 5380
+
+    - name: dnstcp
+      protocol: TCP
+      port: 53
+      targetPort: 53
     - name: dns
       protocol: UDP
       port: 53
       targetPort: 53
+
+    - name: dnsovertls
+      protocol: TCP
+      port: 853
+      targetPort: 853
+    - name: dnsoverquic
+      protocol: UDP
+      port: 853
+      targetPort: 853
+      
+    - name: dnsoverhttps
+      protocol: TCP
+      port: 443
+      targetPort: 443
+    - name: dnsoverhttp3
+      protocol: UDP
+      port: 443
+      targetPort: 443

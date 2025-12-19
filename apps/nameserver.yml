@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd-image-updater.argoproj.io/image-list: nameserver=ghcr.io/pmh-only/adguardhome:latest
+    argocd-image-updater.argoproj.io/image-list: nameserver=ghcr.io/pmh-only/technitium:latest
     argocd-image-updater.argoproj.io/nameserver.update-strategy: digest
   name: nameserver
   namespace: argocd
