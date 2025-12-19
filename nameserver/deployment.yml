@@ -11,13 +11,13 @@ spec:
       labels:
         app: nameserver 
     spec:
+      securityContext:
+        sysctls:
+        - name: net.ipv4.ip_local_port_range
+          value: "1024 65535"
       containers:
       - name: nameserver 
         image: ghcr.io/pmh-only/technitium:latest
-        securityContext:
-          sysctls:
-          - name: net.ipv4.ip_local_port_range
-            value: "1024 65535"
         env:
         - name: DNS_SERVER_DOMAIN
           value: pmhdns
