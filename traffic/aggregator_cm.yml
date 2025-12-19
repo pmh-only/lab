@@ -32,6 +32,7 @@ data:
     output /render/index.html
     port 443
 
+    num-tests 0
     ignore-panel REQUESTS_STATIC
     ignore-panel KEYPHRASES
     anonymize-ip true
