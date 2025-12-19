@@ -11,52 +11,7 @@ spec:
       protocol: TCP
       port: 3000
       targetPort: 3000
-
-    - name: dnstcp
-      protocol: TCP
-      port: 53
-      targetPort: 53
     - name: dns
       protocol: UDP
       port: 53
       targetPort: 53
-
-    - name: dnsovertls
-      protocol: TCP
-      port: 853
-      targetPort: 853
-
-    - name: dnsoverquic1
-      protocol: UDP
-      port: 784
-      targetPort: 784
-    - name: dnsoverquic2
-      protocol: UDP
-      port: 853
-      targetPort: 853
-    - name: dnsoverquic3
-      protocol: UDP
-      port: 8853
-      targetPort: 8853
-      
-    - name: dnsoverhttp
-      protocol: TCP
-      port: 80
-      targetPort: 80
-    - name: dnsoverhttps
-      protocol: TCP
-      port: 443
-      targetPort: 443
-    - name: dnsoverhttp3
-      protocol: UDP
-      port: 443
-      targetPort: 443
-
-    - name: dnscrypt
-      protocol: TCP
-      port: 5443
-      targetPort: 5443
-    - name: dnscryptudp
-      protocol: UDP
-      port: 5443
-      targetPort: 5443
