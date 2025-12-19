@@ -17,13 +17,14 @@ spec:
           value: "1024 65535"
       containers:
       - name: nameserver 
-        image: ghcr.io/pmh-only/technitium:latest
-        env:
-        - name: DNS_SERVER_DOMAIN
-          value: pmhdns
+        image: ghcr.io/pmh-only/adguardhome:latest
         volumeMounts:
         - name: nameserver
-          mountPath: /etc/dns
+          mountPath: /opt/adguardhome/work
+          subPath: work
+        - name: nameserver
+          mountPath: /opt/adguardhome/conf
+          subPath: conf
       volumes:
       - name: nameserver
         persistentVolumeClaim:
