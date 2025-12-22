@@ -3,6 +3,10 @@ kind: Ingress
 metadata:
   name: minio-ingress
   annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      if ($host ~* \.cdn\.pmh\.codes$) {
+        add_header Cache-Control "public, max-age=0, s-maxage=31536000, immutable" always;
+      }
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_intercept_errors on;
 
