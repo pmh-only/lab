@@ -3,6 +3,15 @@ kind: Ingress
 metadata:
   name: minio-ingress
   annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      map $host $cdn_cache_control {
+        default "";
+        ~*\.cdn\.pmh\.codes$ "public, max-age=0, s-maxage=31536000, immutable";
+      }
+
+      server {
+        add_header Cache-Control $cdn_cache_control always;
+      }
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_intercept_errors on;
 
@@ -14,10 +23,6 @@ metadata:
       # check if it is minio api endpoint
       if ($host !~* s3.pmh.codes) { 
         set $test "${test}B"; 
-      }
-
-      if ($host ~* .cdn.pmh.codes$) {
-        add_header Cache-Control "public, max-age=0, s-maxage=31536000, immutable" always;
       }
 
       # extract bucket name from host header
