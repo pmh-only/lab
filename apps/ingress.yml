@@ -29,6 +29,10 @@ spec:
             proxy-buffers-number: 4
             proxy-busy-buffers-size: 1024k
             use-forwarded-headers: 'true'
+            server-snippet: |
+              if ($host ~* \.cdn\.pmh\.codes$) {
+                add_header Cache-Control "public, max-age=0, s-maxage=31536000, immutable" always;
+              }
             location-snippet: |
               proxy_set_header Accept-Encoding "";
               sub_filter_last_modified on;
