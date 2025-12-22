@@ -105,6 +105,11 @@ data:
         '"$http_referer" "$http_user_agent" '
         '$ga_ssl_proto $ga_ssl_cipher "$ga_mime" $request_time';
 
+      map $host $cdn_cache_control {
+        default "";
+        ~*\.cdn\.pmh\.codes$ "public, max-age=0, s-maxage=31536000, immutable";
+      }
+
       server {
         listen  80 default_server;
         listen  [::]:80 default_server;
@@ -113,6 +118,8 @@ data:
         error_log  /dev/stderr notice;
 
         server_name _;
+        
+        add_header Cache-Control $cdn_cache_control always;
 
         location / {
           return 301 https://$host$request_uri;
@@ -126,6 +133,8 @@ data:
         listen [::]:443 quic reuseport;
 
         server_name _;
+        
+        add_header Cache-Control $cdn_cache_control always;
 
         access_log /dev/stdout log_stream;
         error_log  /dev/stderr notice;
