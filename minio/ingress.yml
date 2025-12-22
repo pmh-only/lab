@@ -4,13 +4,26 @@ metadata:
   name: minio-ingress
   annotations:
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_intercept_errors on;
-
-      # bucket from Host header
       set_by_lua_block $bucket {
         local host = ngx.req.get_headers()["host"] or ""
-        local m = ngx.re.match(host, "^(?<bucket>[^.]+)\\.pmh\\.codes$")
+
+        local m = ngx.re.match(
+          host,
+          "^(?<bucket>[^.]+)(?:\\.cdn)?\\.pmh\\.codes$",
+          "jo"
+        )
         local b = (m and m.bucket) or "www"
+
+        if ngx.re.find(b, "^(?:a-|c-)", "jo") then
+          ngx.status = ngx.HTTP_FORBIDDEN
+          ngx.header['content-type'] = 'text/plain'
+          ngx.say("Access to this subdomain has been prevented due to security issues. Wait, why are you here?")
+          return ngx.exit(ngx.HTTP_FORBIDDEN)
+        end
+
+        if ngx.re.find(host, "\\.cdn\\.pmh\\.codes$", "jo") then
+          b = "c-" .. b
+        end
 
         if #b < 3 or b:sub(1, 4) == "xn--" then
           b = "a-" .. b
@@ -18,7 +31,7 @@ metadata:
 
         return b
       }
-      
+
       more_set_input_headers 'Host: $bucket.s3.pmh.codes';
       rewrite ^/(.*)$ /$bucket/$1 break;
 spec:
