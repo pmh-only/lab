@@ -16,6 +16,10 @@ metadata:
         set $test "${test}B"; 
       }
 
+      if ($host ~* \.cdn\.pmh\.codes$) {
+        add_header Cache-Control "public, max-age=0, s-maxage=31536000, immutable" always;
+      }
+
       # extract bucket name from host header
       set_by_lua_block $bucket {
         local host = ngx.req.get_headers()["host"] or ""
