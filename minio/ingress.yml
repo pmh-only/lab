@@ -109,3 +109,13 @@ spec:
             name: minio-service
             port:
               number: 9000
+  - host: "*.cdn.pmh.codes"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: minio-service
+            port:
+              number: 9000
