@@ -15,6 +15,7 @@ spec:
     - '*.pmh.so'
     - '*.mc.pmh.so'
     - '*.s3.pmh.so'
+    - '*.here.pmh.so'
 
     - not.ai.kr
   issuerRef:

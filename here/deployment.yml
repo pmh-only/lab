@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: here 
+spec:
+  selector:
+    matchLabels:
+      app: here 
+  template:
+    metadata:
+      labels:
+        app: here 
+    spec:
+      containers:
+      - name: here 
+        image: ghcr.io/pmh-only/here:latest
+        env:
+          - name: SSH_LISTEN_ADDR
+            value: "22"
+          - name: DATA_PATH
+            value: "/data"
+          - name: HOST_PREFIX
+            value: "https://"
+          - name: HOST_SUFFIX
+            value: ".here.pmh.so"
+          - name: UNAUTHENTICATED_TIMEOUT
+            value: "5m"
+          - name: SSH_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: here-secret
+                key: SSH_PASSWORD
+        volumeMounts:
+        - mountPath: /data
+          name: persistent
+      volumes:
+      - name: persistent
+        persistentVolumeClaim:
+          claimName: here-pvc

@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: here-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "*.here.pmh.so"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: here-service
+            port:
+              number: 8080
