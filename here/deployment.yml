@@ -19,9 +19,9 @@ spec:
             value: ":22"
           - name: DATA_PATH
             value: "/data"
-          - name: HOST_PREFIX
+          - name: HTTP_HOST_PREFIX
             value: "https://"
-          - name: HOST_SUFFIX
+          - name: HTTP_HOST_SUFFIX
             value: ".here.pmh.so"
           - name: UNAUTHENTICATED_TIMEOUT
             value: "5m"
