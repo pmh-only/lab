@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: here-service
+spec:
+  selector:
+    app: here
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: here-ssh-service
+spec:
+  selector:
+    app: here
+  type: LoadBalancer
+  ports:
+  - name: here-ssh
+    protocol: TCP
+    port: 22
+    targetPort: 22
