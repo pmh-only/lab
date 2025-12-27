@@ -16,7 +16,7 @@ spec:
         image: ghcr.io/pmh-only/here:latest
         env:
           - name: SSH_LISTEN_ADDR
-            value: "22"
+            value: ":22"
           - name: DATA_PATH
             value: "/data"
           - name: HOST_PREFIX
