@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tilecache
+  name: tile-cache
 spec:
   selector:
     matchLabels:
-      app: tilecache
+      app: tile-cache
   template:
     metadata:
       labels:
-        app: tilecache
+        app: tile-cache
     spec:
       containers:
-        - name: tilecache
+        - name: tile-cache
           image: nginx:alpine
           command:
             - sh
@@ -47,10 +47,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: tilecache
+  name: tile-cache
 spec:
   selector:
-    app: tilecache
+    app: tile-cache
   type: ClusterIP
   ports:
     - protocol: TCP
