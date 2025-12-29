@@ -11,6 +11,7 @@ spec:
       labels:
         app: reitti
     spec:
+      enableServiceLinks: false
       containers:
         - name: reitti
           image: dedicatedcode/reitti:latest
