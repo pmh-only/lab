@@ -2,6 +2,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: authentik-ingress
+  nginx.ingress.kubernetes.io/configuration-snippet: |
+    sub_filter "</head>" "<script src=/media/custom.js></script></head>";
+    proxy_set_header Accept-Encoding "";
 spec:
   ingressClassName: nginx
   rules:
