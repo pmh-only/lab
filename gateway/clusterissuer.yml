@@ -8,15 +8,19 @@ spec:
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: letsencrypt-issuer-account-key
-    preferredChain: "ISRG Root X2"
+    profile: shortlived
+    preferredChain: "ISRG Root YE"
     solvers:
-    - dns01:
-        cloudflare:
-          apiTokenSecretRef:
-            name: cloudflare-api-token-secret
-            key: api-token
-      selector:
-        dnsZones:
-        - pmh.so
-        - pmh.codes
-        - not.ai.kr
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token-secret
+              key: api-token
+        selector:
+          dnsZones:
+            - pmh.so
+            - pmh.codes
+            - not.ai.kr
+      - http01:
+          ingress:
+            ingressClassName: nginx

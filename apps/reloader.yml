@@ -13,6 +13,10 @@ spec:
     helm:
       values: |-
         reloader:
+          reloadOnCreate: true
+          reloadOnDelete: true
+          syncAfterRestart: true
+          autoReloadAll: true
           ignoreNamespaces: tailscale
     repoURL: https://stakater.github.io/stakater-charts
     targetRevision: x

@@ -5,19 +5,23 @@ metadata:
   namespace: gateway
 spec:
   dnsNames:
-    - pmh.codes
     - pmh.so
+    - pmh.codes
 
-    - '*.pmh.codes'
-    - '*.mc.pmh.codes'
-    - '*.s3.pmh.codes'
+    - "*.pmh.codes"
+    - "*.mc.pmh.codes"
+    - "*.s3.pmh.codes"
 
-    - '*.pmh.so'
-    - '*.mc.pmh.so'
-    - '*.s3.pmh.so'
-    - '*.here.pmh.so'
+    - "*.pmh.so"
+    - "*.mc.pmh.so"
+    - "*.s3.pmh.so"
+    - "*.here.pmh.so"
 
     - not.ai.kr
+  ipAddresses:
+    - "158.179.174.47"
+    - "144.24.77.19"
+    - "140.245.78.145"
   issuerRef:
     group: cert-manager.io
     kind: ClusterIssuer
