@@ -19,6 +19,10 @@ spec:
         deployNodeAgent: true
         snapshotsEnabled: false
         configuration:
+          repositoryMaintenanceJob:
+            repositoryConfigData:
+              global:
+                keepLatestMaintenanceJobs: 0
           defaultVolumesToFsBackup: true
           backupStorageLocation:
             - name: default
