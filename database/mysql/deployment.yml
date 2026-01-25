@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: mysql
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: mysql
@@ -19,11 +20,11 @@ spec:
             - name: TZ
               value: Asia/Seoul
             - name: DATABASE_HOST
-              value: '127.0.0.1'
+              value: "127.0.0.1"
             - name: DATABASE_PORT
-              value: '3306'
+              value: "3306"
             - name: DATABASE_USER
-              value: 'root'
+              value: "root"
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -32,7 +33,7 @@ spec:
             - name: S3_DUMP_URI
               value: dbdump/mysql
             - name: S3_ENDPOINT_URL
-              value: 'http://pmhraspberry.tailscale.svc.cluster.local:9000'
+              value: "http://pmhraspberry.tailscale.svc.cluster.local:9000"
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -46,22 +47,22 @@ spec:
             - name: AWS_REGION
               value: us-east-1
       containers:
-      - name: mysql
-        image: ghcr.io/pmh-only/mysql:8
-        args:
-          - --mysql-native-password=ON
-        ports:
-        - containerPort: 3306
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-root-password
-              key: password
-        volumeMounts:
-        - mountPath: /var/lib/mysql
-          name: mysql-storage
+        - name: mysql
+          image: ghcr.io/pmh-only/mysql:8
+          args:
+            - --mysql-native-password=ON
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-root-password
+                  key: password
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-storage
       volumes:
-      - name: mysql-storage
-        persistentVolumeClaim:
-          claimName: mysql-pvc
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc

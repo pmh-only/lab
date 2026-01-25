@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: minio-explorer
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: minio-explorer
@@ -12,18 +13,18 @@ spec:
         app: minio-explorer
     spec:
       containers:
-      - name: minio-explorer
-        image: ghcr.io/pmh-only/filestash:latest
-        ports:
-        - containerPort: 8334
-          name: minio-explorer
-        volumeMounts:
         - name: minio-explorer
-          mountPath: /app/data/state/
+          image: ghcr.io/pmh-only/filestash:latest
+          ports:
+            - containerPort: 8334
+              name: minio-explorer
+          volumeMounts:
+            - name: minio-explorer
+              mountPath: /app/data/state/
       volumes:
-      - name: minio-explorer
-        persistentVolumeClaim:
-          claimName: minio-explorer-pvc
+        - name: minio-explorer
+          persistentVolumeClaim:
+            claimName: minio-explorer-pvc
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -46,10 +47,10 @@ spec:
     app: minio-explorer
   type: ClusterIP
   ports:
-  - name: minio-explorer
-    protocol: TCP
-    port: 8334
-    targetPort: 8334
+    - name: minio-explorer
+      protocol: TCP
+      port: 8334
+      targetPort: 8334
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -69,13 +70,13 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: explorer.s3.pmh.codes
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: minio-explorer
-            port:
-              number: 8334
+    - host: explorer.s3.pmh.codes
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio-explorer
+                port:
+                  number: 8334

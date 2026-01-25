@@ -1,70 +1,71 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: thepool 
+  name: thepool
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: thepool 
+      app: thepool
   template:
     metadata:
       labels:
-        app: thepool 
+        app: thepool
     spec:
       containers:
-      - name: thepool 
-        image: ghcr.io/pmh-only/thepool:latest
-        env:
-        - name: DATABASE_USER
-          value: thepool
-        - name: DATABASE_HOST
-          value: mysql-service.database.svc.cluster.local
-        - name: DATABASE_PORT
-          value: '3306'
-        - name: DATABASE_SCHEMA
-          value: thepool
-        - name: DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: thepool-secret
-              key: DATABASE_PASSWORD
-        - name: WEBSERVER_STATIC_ENDPOINT_PREFIX
-          value: https://s.pmh.codes
-        - name: WEBSERVER_SIZE_LIMIT_MB
-          value: '128'
-        - name: MINIO_ENDPOINT
-          value: minio-service.minio.svc.cluster.local:9000
-        - name: MINIO_ENDPOINT_SECURE
-          value: 'false'
-        - name: MINIO_BUCKET_NAME
-          value: 'a-s'
-        - name: MINIO_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: thepool-secret
-              key: MINIO_ACCESS_KEY_ID
-        - name: MINIO_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: thepool-secret
-              key: MINIO_SECRET_ACCESS_KEY
-        - name: CRONJOB_POOL_SIZE_LIMIT_MB
-          value: '51200'
-        - name: DISCORD_AUTH_ENABLED
-          value: 'true'
-        - name: DISCORD_CLIENT_ID
-          value: '1427556421276532776'
-        - name: DISCORD_TARGET_GUILD_ID
-          value: '541782241131495434'
-        - name: DISCORD_REDIRECT_URL
-          value: 'https://pool.pmh.codes/auth/callback'
-        - name: DISCORD_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: thepool-secret
-              key: DISCORD_CLIENT_SECRET
-        - name: DISCORD_AUTH_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: thepool-secret
-              key: DISCORD_AUTH_TOKEN
+        - name: thepool
+          image: ghcr.io/pmh-only/thepool:latest
+          env:
+            - name: DATABASE_USER
+              value: thepool
+            - name: DATABASE_HOST
+              value: mysql-service.database.svc.cluster.local
+            - name: DATABASE_PORT
+              value: "3306"
+            - name: DATABASE_SCHEMA
+              value: thepool
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: thepool-secret
+                  key: DATABASE_PASSWORD
+            - name: WEBSERVER_STATIC_ENDPOINT_PREFIX
+              value: https://s.pmh.codes
+            - name: WEBSERVER_SIZE_LIMIT_MB
+              value: "128"
+            - name: MINIO_ENDPOINT
+              value: minio-service.minio.svc.cluster.local:9000
+            - name: MINIO_ENDPOINT_SECURE
+              value: "false"
+            - name: MINIO_BUCKET_NAME
+              value: "a-s"
+            - name: MINIO_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: thepool-secret
+                  key: MINIO_ACCESS_KEY_ID
+            - name: MINIO_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: thepool-secret
+                  key: MINIO_SECRET_ACCESS_KEY
+            - name: CRONJOB_POOL_SIZE_LIMIT_MB
+              value: "51200"
+            - name: DISCORD_AUTH_ENABLED
+              value: "true"
+            - name: DISCORD_CLIENT_ID
+              value: "1427556421276532776"
+            - name: DISCORD_TARGET_GUILD_ID
+              value: "541782241131495434"
+            - name: DISCORD_REDIRECT_URL
+              value: "https://pool.pmh.codes/auth/callback"
+            - name: DISCORD_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: thepool-secret
+                  key: DISCORD_CLIENT_SECRET
+            - name: DISCORD_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: thepool-secret
+                  key: DISCORD_AUTH_TOKEN

@@ -1,17 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: visualized 
+  name: visualized
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: visualized 
+      app: visualized
   template:
     metadata:
       labels:
-        app: visualized 
+        app: visualized
     spec:
       serviceAccountName: visualized
       containers:
-      - name: visualized
-        image: ghcr.io/pmh-only/kube-universe:latest
+        - name: visualized
+          image: ghcr.io/pmh-only/kube-universe:latest

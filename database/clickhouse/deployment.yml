@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: clickhouse
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: clickhouse
@@ -19,18 +20,18 @@ spec:
             - name: TZ
               value: Asia/Seoul
             - name: DATABASE_HOST
-              value: '127.0.0.1'
+              value: "127.0.0.1"
             - name: DATABASE_PORT
-              value: '8123'
+              value: "8123"
             - name: DATABASE_USER
-              value: 'admin'
+              value: "admin"
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: clickhouse-root-password
                   key: password
             - name: S3_ENDPOINT_URL
-              value: 'http://pmhraspberry.tailscale.svc.cluster.local:9000/dbdump/clickhouse'
+              value: "http://pmhraspberry.tailscale.svc.cluster.local:9000/dbdump/clickhouse"
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -44,29 +45,29 @@ spec:
             - name: AWS_REGION
               value: us-east-1
       containers:
-      - name: clickhouse
-        image: ghcr.io/pmh-only/clickhouse-server:rybbit
-        ports:
-        - containerPort: 8123
-        env:
-        - name: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
-          value: "1"
-        - name: CLICKHOUSE_USER
-          value: admin
-        - name: CLICKHOUSE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: clickhouse-root-password
-              key: password
-        volumeMounts:
-        - mountPath: /var/lib/clickhouse
-          name: clickhouse-storage
-        - mountPath: /etc/clickhouse-server/config.d
-          name: clickhouse-config
+        - name: clickhouse
+          image: ghcr.io/pmh-only/clickhouse-server:rybbit
+          ports:
+            - containerPort: 8123
+          env:
+            - name: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
+              value: "1"
+            - name: CLICKHOUSE_USER
+              value: admin
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: clickhouse-root-password
+                  key: password
+          volumeMounts:
+            - mountPath: /var/lib/clickhouse
+              name: clickhouse-storage
+            - mountPath: /etc/clickhouse-server/config.d
+              name: clickhouse-config
       volumes:
-      - name: clickhouse-storage
-        persistentVolumeClaim:
-          claimName: clickhouse-pvc
-      - name: clickhouse-config
-        persistentVolumeClaim:
-          claimName: clickhouse-config-pvc
+        - name: clickhouse-storage
+          persistentVolumeClaim:
+            claimName: clickhouse-pvc
+        - name: clickhouse-config
+          persistentVolumeClaim:
+            claimName: clickhouse-config-pvc

@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: keysboard
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: keysboard
@@ -12,31 +13,31 @@ spec:
         app: keysboard
     spec:
       containers:
-      - name: keysboard
-        image: ghcr.io/pmh-only/keysboard
-        env:
-        - name: ORIGIN
-          value: https://keys.pmh.codes
-        - name: PROTOCOL_HEADER
-          value: X-Forwarded-Proto
-        - name: HOST_HEADER
-          value: X-Forwarded-Host
-        - name: ADDRESS_HEADER
-          value: X-Forwarded-For
-        - name: XFF_DEPTH
-          value: '2'
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: keysboard-secret
-              key: DATABASE_URL
-        - name: REDIS_URL
-          valueFrom:
-            secretKeyRef:
-              name: keysboard-secret
-              key: REDIS_URL
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: keysboard-secret
-              key: JWT_SECRET
+        - name: keysboard
+          image: ghcr.io/pmh-only/keysboard
+          env:
+            - name: ORIGIN
+              value: https://keys.pmh.codes
+            - name: PROTOCOL_HEADER
+              value: X-Forwarded-Proto
+            - name: HOST_HEADER
+              value: X-Forwarded-Host
+            - name: ADDRESS_HEADER
+              value: X-Forwarded-For
+            - name: XFF_DEPTH
+              value: "2"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: keysboard-secret
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: keysboard-secret
+                  key: REDIS_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keysboard-secret
+                  key: JWT_SECRET

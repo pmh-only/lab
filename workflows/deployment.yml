@@ -1,34 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: workflows 
+  name: workflows
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: workflows 
+      app: workflows
   template:
     metadata:
       labels:
-        app: workflows 
+        app: workflows
     spec:
       containers:
-      - name: workflows 
-        image: docker.n8n.io/n8nio/n8n:latest
-        env:
-          - name: GENERIC_TIMEZONE
-            value: "Asia/Seoul"
-          - name: TZ
-            value: "Asia/Seoul"
-          - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
-            value: "true"
-          - name: N8N_RUNNERS_ENABLED
-            value: "true"
-          - name: WEBHOOK_URL
-            value: "https://flows.pmh.codes"
-        volumeMounts:
-        - mountPath: /home/node/.n8n
-          name: persistent
+        - name: workflows
+          image: docker.n8n.io/n8nio/n8n:latest
+          env:
+            - name: GENERIC_TIMEZONE
+              value: "Asia/Seoul"
+            - name: TZ
+              value: "Asia/Seoul"
+            - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+              value: "true"
+            - name: N8N_RUNNERS_ENABLED
+              value: "true"
+            - name: WEBHOOK_URL
+              value: "https://flows.pmh.codes"
+          volumeMounts:
+            - mountPath: /home/node/.n8n
+              name: persistent
       volumes:
-      - name: persistent
-        persistentVolumeClaim:
-          claimName: workflows-pvc
+        - name: persistent
+          persistentVolumeClaim:
+            claimName: workflows-pvc

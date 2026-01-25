@@ -1,16 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chatsolution 
+  name: chatsolution
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: chatsolution 
+      app: chatsolution
   template:
     metadata:
       labels:
-        app: chatsolution 
+        app: chatsolution
     spec:
       containers:
-      - name: chatsolution 
-        image: ghcr.io/pmh-only/chatsolution:latest
+        - name: chatsolution
+          image: ghcr.io/pmh-only/chatsolution:latest

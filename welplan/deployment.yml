@@ -1,34 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: welplan 
+  name: welplan
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: welplan 
+      app: welplan
   template:
     metadata:
       labels:
-        app: welplan 
+        app: welplan
     spec:
       containers:
-      - name: welplan 
-        image: ghcr.io/pmh-only/welplan:latest
-        env:
-        - name: WELSTORY_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: welplan-secret
-              key: WELSTORY_USERNAME
-        - name: WELSTORY_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: welplan-secret
-              key: WELSTORY_PASSWORD
-        volumeMounts:
-        - mountPath: /app/cache
-          name: persistent
+        - name: welplan
+          image: ghcr.io/pmh-only/welplan:latest
+          env:
+            - name: WELSTORY_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: welplan-secret
+                  key: WELSTORY_USERNAME
+            - name: WELSTORY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: welplan-secret
+                  key: WELSTORY_PASSWORD
+          volumeMounts:
+            - mountPath: /app/cache
+              name: persistent
       volumes:
-      - name: persistent
-        persistentVolumeClaim:
-          claimName: welplan-pvc
+        - name: persistent
+          persistentVolumeClaim:
+            claimName: welplan-pvc

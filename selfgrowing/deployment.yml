@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: selfgrowing
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: selfgrowing
@@ -12,23 +13,23 @@ spec:
         app: selfgrowing
     spec:
       containers:
-      - name: selfgrowing
-        image: ghcr.io/pmh-only/selfgrowing:latest
-        imagePullPolicy: Always
-        env:
-        - name: DISCORD_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: selfgrowing-secrets
-              key: DISCORD_TOKEN
-        - name: DISCORD_GUILD_ID
-          value: '541782241131495434'
-        - name: DISCORD_CHANNEL_ID
-          value: '989098254786527264'
-        volumeMounts:
-        - mountPath: /data
-          name: persistent
+        - name: selfgrowing
+          image: ghcr.io/pmh-only/selfgrowing:latest
+          imagePullPolicy: Always
+          env:
+            - name: DISCORD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: selfgrowing-secrets
+                  key: DISCORD_TOKEN
+            - name: DISCORD_GUILD_ID
+              value: "541782241131495434"
+            - name: DISCORD_CHANNEL_ID
+              value: "989098254786527264"
+          volumeMounts:
+            - mountPath: /data
+              name: persistent
       volumes:
-      - name: persistent
-        persistentVolumeClaim:
-          claimName: selfgrowing-pvc
+        - name: persistent
+          persistentVolumeClaim:
+            claimName: selfgrowing-pvc

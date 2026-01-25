@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: gptforum
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: gptforum
@@ -16,31 +17,31 @@ spec:
           imagePullPolicy: Always
           image: ghcr.io/pmh-only/gptforum-migrator:next
           env:
-          - name: DATABASE_URL
-            valueFrom:
-              secretKeyRef:
-                name: gptforum-secrets
-                key: DATABASE_URL
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: gptforum-secrets
+                  key: DATABASE_URL
       containers:
-      - name: gptforum
-        image: ghcr.io/pmh-only/gptforum:next
-        env:
-        - name: DISCORD_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: gptforum-secrets
-              key: DISCORD_TOKEN
-        - name: DISCORD_CHANNEL
-          value: '1381075123594858527'
-        - name: DISCORD_QUOTA_DISPLAY_CHANNEL
-          value: '1167623544172183612'
-        - name: OPENAI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: gptforum-secrets
-              key: OPENAI_API_KEY
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: gptforum-secrets
-              key: DATABASE_URL
+        - name: gptforum
+          image: ghcr.io/pmh-only/gptforum:next
+          env:
+            - name: DISCORD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: gptforum-secrets
+                  key: DISCORD_TOKEN
+            - name: DISCORD_CHANNEL
+              value: "1381075123594858527"
+            - name: DISCORD_QUOTA_DISPLAY_CHANNEL
+              value: "1167623544172183612"
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gptforum-secrets
+                  key: OPENAI_API_KEY
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: gptforum-secrets
+                  key: DATABASE_URL

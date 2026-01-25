@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: trace
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: trace
@@ -12,66 +13,67 @@ spec:
         app: trace
     spec:
       containers:
-      - name: trace
-        image: ghcr.io/rybbit-io/rybbit-backend:latest
-        ports:
-        - containerPort: 3001
-        env:
-        - name: NODE_ENV
-          value: "production"
+        - name: trace
+          image: ghcr.io/rybbit-io/rybbit-backend:latest
+          ports:
+            - containerPort: 3001
+          env:
+            - name: NODE_ENV
+              value: "production"
 
-        - name: CLICKHOUSE_HOST
-          value: "http://clickhouse-service.database.svc.cluster.local:8123"
-        - name: CLICKHOUSE_DB
-          value: "traffic"
-        - name: CLICKHOUSE_USER
-          value: "traffic"
-        - name: CLICKHOUSE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: trace-secrets
-              key: CLICKHOUSE_PASSWORD
+            - name: CLICKHOUSE_HOST
+              value: "http://clickhouse-service.database.svc.cluster.local:8123"
+            - name: CLICKHOUSE_DB
+              value: "traffic"
+            - name: CLICKHOUSE_USER
+              value: "traffic"
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: trace-secrets
+                  key: CLICKHOUSE_PASSWORD
 
-        - name: POSTGRES_HOST
-          value: "pgsql-service.database.svc.cluster.local"
-        - name: POSTGRES_PORT
-          value: "5432"
-        - name: POSTGRES_DB
-          value: "traffic"
-        - name: POSTGRES_USER
-          value: "traffic"
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: trace-secrets
-              key: POSTGRES_PASSWORD
+            - name: POSTGRES_HOST
+              value: "pgsql-service.database.svc.cluster.local"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: "traffic"
+            - name: POSTGRES_USER
+              value: "traffic"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: trace-secrets
+                  key: POSTGRES_PASSWORD
 
-        - name: REDIS_HOST
-          value: redis-service.database.svc.cluster.local
-        - name: REDIS_PORT
-          value: '6379'
+            - name: REDIS_HOST
+              value: redis-service.database.svc.cluster.local
+            - name: REDIS_PORT
+              value: "6379"
 
-        - name: DISABLE_SIGNUP
-          value: "true"
-        - name: BASE_URL
-          value: "https://trace.pmh.codes"
-        - name: BETTER_AUTH_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: trace-secrets
-              key: BETTER_AUTH_SECRET
+            - name: DISABLE_SIGNUP
+              value: "true"
+            - name: BASE_URL
+              value: "https://trace.pmh.codes"
+            - name: BETTER_AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: trace-secrets
+                  key: BETTER_AUTH_SECRET
 
-        - name: MAPBOX_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: trace-secrets
-              key: MAPBOX_TOKEN
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: trace-secrets
+                  key: MAPBOX_TOKEN
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: trace-client
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: trace-client
@@ -81,14 +83,14 @@ spec:
         app: trace-client
     spec:
       containers:
-      - name: trace-client
-        image: ghcr.io/rybbit-io/rybbit-client:latest
-        ports:
-        - containerPort: 3002
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: NEXT_PUBLIC_BACKEND_URL
-          value: "https://trace.pmh.codes"
-        - name: NEXT_PUBLIC_DISABLE_SIGNUP
-          value: "false"
+        - name: trace-client
+          image: ghcr.io/rybbit-io/rybbit-client:latest
+          ports:
+            - containerPort: 3002
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: NEXT_PUBLIC_BACKEND_URL
+              value: "https://trace.pmh.codes"
+            - name: NEXT_PUBLIC_DISABLE_SIGNUP
+              value: "false"

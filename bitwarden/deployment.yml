@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: bitwarden
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: bitwarden
@@ -12,55 +13,55 @@ spec:
         app: bitwarden
     spec:
       containers:
-      - name: bitwarden
-        image: ghcr.io/dani-garcia/vaultwarden:latest
-        ports:
-        - containerPort: 80
-        env:
-        - name: SIGNUPS_ALLOWED
-          value: "false"
-        - name: INVITATIONS_ALLOWED
-          value: "false"
-        - name: PUSH_ENABLED
-          value: "true"
-        - name: DOMAIN
-          value: https://vault.pmh.codes
-        - name: SMTP_HOST
-          value: mail.mail.svc.cluster.local
-        - name: SMTP_FROM
-          value: pmh_only@pmh.codes
-        - name: SMTP_PORT
-          value: '1025'
-        - name: SMTP_SECURITY
-          value: starttls
-        - name: SMTP_USERNAME
-          value: pmh_only@pmh.codes
-        - name: SMTP_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: bitwarden-secrets
-              key: SMTP_PASSWORD
-        - name: SMTP_ACCEPT_INVALID_CERTS
-          value: 'true'
-        - name: ADMIN_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: bitwarden-secrets
-              key: ADMIN_TOKEN
-        - name: PUSH_INSTALLATION_ID
-          valueFrom:
-            secretKeyRef:
-              name: bitwarden-secrets
-              key: PUSH_INSTALLATION_ID
-        - name: PUSH_INSTALLATION_KEY
-          valueFrom:
-            secretKeyRef:
-              name: bitwarden-secrets
-              key: PUSH_INSTALLATION_KEY
-        volumeMounts:
-        - mountPath: /data
-          name: bitwarden-storage
+        - name: bitwarden
+          image: ghcr.io/dani-garcia/vaultwarden:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: SIGNUPS_ALLOWED
+              value: "false"
+            - name: INVITATIONS_ALLOWED
+              value: "false"
+            - name: PUSH_ENABLED
+              value: "true"
+            - name: DOMAIN
+              value: https://vault.pmh.codes
+            - name: SMTP_HOST
+              value: mail.mail.svc.cluster.local
+            - name: SMTP_FROM
+              value: pmh_only@pmh.codes
+            - name: SMTP_PORT
+              value: "1025"
+            - name: SMTP_SECURITY
+              value: starttls
+            - name: SMTP_USERNAME
+              value: pmh_only@pmh.codes
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bitwarden-secrets
+                  key: SMTP_PASSWORD
+            - name: SMTP_ACCEPT_INVALID_CERTS
+              value: "true"
+            - name: ADMIN_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: bitwarden-secrets
+                  key: ADMIN_TOKEN
+            - name: PUSH_INSTALLATION_ID
+              valueFrom:
+                secretKeyRef:
+                  name: bitwarden-secrets
+                  key: PUSH_INSTALLATION_ID
+            - name: PUSH_INSTALLATION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bitwarden-secrets
+                  key: PUSH_INSTALLATION_KEY
+          volumeMounts:
+            - mountPath: /data
+              name: bitwarden-storage
       volumes:
-      - name: bitwarden-storage
-        persistentVolumeClaim:
-          claimName: bitwarden-pvc
+        - name: bitwarden-storage
+          persistentVolumeClaim:
+            claimName: bitwarden-pvc

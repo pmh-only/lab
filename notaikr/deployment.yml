@@ -1,22 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: notaikr 
+  name: notaikr
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: notaikr 
+      app: notaikr
   template:
     metadata:
       labels:
-        app: notaikr 
+        app: notaikr
     spec:
       containers:
-      - name: notaikr 
-        image: ghcr.io/pmh-only/notaikr:latest
-        env:
-        - name: OPENAI_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: notaikr-secret
-              key: OPENAI_TOKEN
+        - name: notaikr
+          image: ghcr.io/pmh-only/notaikr:latest
+          env:
+            - name: OPENAI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: notaikr-secret
+                  key: OPENAI_TOKEN
