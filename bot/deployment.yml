@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: bot
+  template:
+    metadata:
+      labels:
+        app: bot
+    spec:
+      containers:
+        - name: bot
+          image: ghcr.io/pmh-only/bot
+          env:
+            - name: DISCORD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: bot-secrets
+                  key: DISCORD_TOKEN
