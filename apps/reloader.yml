@@ -18,6 +18,7 @@ spec:
           syncAfterRestart: true
           autoReloadAll: true
           ignoreNamespaces: tailscale
+          revisionHistoryLimit: 0
     repoURL: https://stakater.github.io/stakater-charts
     targetRevision: x
   syncPolicy:
