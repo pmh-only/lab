@@ -12,6 +12,7 @@ spec:
     chart: ingress-nginx
     helm:
       values: |-
+        revisionHistoryLimit: 0
         controller:
           service:
             type: ClusterIP

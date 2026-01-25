@@ -4,6 +4,7 @@ metadata:
   name: aggregator
   namespace: traffic
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: aggregator
@@ -15,7 +16,7 @@ spec:
       containers:
         - name: goaccess
           image: ghcr.io/pmh-only/goaccess:latest
-          args: 
+          args:
             - -p
             - /etc/conf/goaccess.conf
             - /logs/all.log
@@ -29,7 +30,7 @@ spec:
           ports:
             - name: ws
               containerPort: 443
-          
+
         - name: servehtml
           image: ghcr.io/pmh-only/busybox:latest
           command:
@@ -57,7 +58,7 @@ spec:
           env:
             - name: FLUENT_BIT_CONFIG
               value: /fluent-bit/etc/fluent-bit.conf
-              
+
       volumes:
         - name: ds-logs
           hostPath:
@@ -67,4 +68,3 @@ spec:
             name: aggregator-conf
         - name: ds-render
           emptyDir: {}
-            
