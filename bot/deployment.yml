@@ -16,6 +16,8 @@ spec:
         - name: bot
           image: ghcr.io/pmh-only/bot
           env:
+            - name: TZ
+              value: Asia/Seoul
             - name: DISCORD_TOKEN
               valueFrom:
                 secretKeyRef:
