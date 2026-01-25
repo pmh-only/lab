@@ -4,6 +4,7 @@ metadata:
   name: prometheus
   namespace: monitoring
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: prometheus
@@ -91,7 +92,7 @@ data:
 
         tls_config:
           ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    
+
         authorization:
           credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
 
@@ -200,14 +201,15 @@ kind: ClusterRole
 metadata:
   name: prometheus-role
 rules:
-- apiGroups: [""]
-  resources: ["pods", "nodes", "nodes/metrics", "pods/log", "services", "endpoints"]
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["networking.k8s.io"]
-  resources: ["ingresses"]
-  verbs: ["get", "list", "watch"]
-- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
-  verbs: ["get"]
+  - apiGroups: [""]
+    resources:
+      ["pods", "nodes", "nodes/metrics", "pods/log", "services", "endpoints"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch"]
+  - nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+    verbs: ["get"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

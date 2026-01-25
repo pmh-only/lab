@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: office
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: office
@@ -12,55 +13,55 @@ spec:
         app: office
     spec:
       containers:
-      - name: office
-        image: ghcr.io/pmh-only/onlyoffice:latest
-        env:
-        - name: DB_TYPE
-          value: mysql
-        - name: DB_HOST
-          value: mysql-service.database.svc.cluster.local
-        - name: DB_PORT
-          value: '3306'
-        - name: DB_NAME
-          value: 'onlyoffice'
-        - name: DB_USER
-          value: 'onlyoffice'
-        - name: REDIS_SERVER_HOST
-          value: redis-service.database.svc.cluster.local
-        - name: REDIS_SERVER_PORT
-          value: '6379'
-        - name: JWT_ENABLED
-          value: 'true'
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: office-secret
-              key: JWT_SECRET
-        - name: DB_PWD
-          valueFrom:
-            secretKeyRef:
-              name: office-secret
-              key: DB_PWD
-        volumeMounts:
-        - mountPath: /var/log/onlyoffice
-          name: office-storage
-          subPath: log
-        - mountPath: /var/www/onlyoffice/Data
-          name: office-storage
-          subPath: data
-        - mountPath: /var/lib/onlyoffice
-          name: office-storage
-          subPath: lib
-        - name: office-cm
-          mountPath: /etc/onlyoffice/documentserver/local-production-linux.json
-          subPath: local-production-linux.json
+        - name: office
+          image: ghcr.io/pmh-only/onlyoffice:latest
+          env:
+            - name: DB_TYPE
+              value: mysql
+            - name: DB_HOST
+              value: mysql-service.database.svc.cluster.local
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: "onlyoffice"
+            - name: DB_USER
+              value: "onlyoffice"
+            - name: REDIS_SERVER_HOST
+              value: redis-service.database.svc.cluster.local
+            - name: REDIS_SERVER_PORT
+              value: "6379"
+            - name: JWT_ENABLED
+              value: "true"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: office-secret
+                  key: JWT_SECRET
+            - name: DB_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: office-secret
+                  key: DB_PWD
+          volumeMounts:
+            - mountPath: /var/log/onlyoffice
+              name: office-storage
+              subPath: log
+            - mountPath: /var/www/onlyoffice/Data
+              name: office-storage
+              subPath: data
+            - mountPath: /var/lib/onlyoffice
+              name: office-storage
+              subPath: lib
+            - name: office-cm
+              mountPath: /etc/onlyoffice/documentserver/local-production-linux.json
+              subPath: local-production-linux.json
       volumes:
-      - name: office-storage
-        hostPath:
-          path: /mnt/data/office
-      - name: office-cm
-        configMap:
-          name: office-cm
-          items:
-          - key: local-production-linux.json
-            path: local-production-linux.json
+        - name: office-storage
+          hostPath:
+            path: /mnt/data/office
+        - name: office-cm
+          configMap:
+            name: office-cm
+            items:
+              - key: local-production-linux.json
+                path: local-production-linux.json

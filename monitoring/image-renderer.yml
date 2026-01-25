@@ -6,6 +6,7 @@ metadata:
   name: image-renderer
   namespace: monitoring
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: image-renderer
@@ -27,9 +28,9 @@ spec:
             - name: RENDERING_CLUSTERING_MODE
               value: browser
             - name: RENDERING_CLUSTERING_MAX_CONCURRENCY
-              value: '5'
+              value: "5"
             - name: RENDERING_CLUSTERING_TIMEOUT
-              value: '30'
+              value: "30"
           ports:
             - containerPort: 8081
               name: http-imgrender

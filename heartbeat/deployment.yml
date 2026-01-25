@@ -1,22 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: heartbeat 
+  name: heartbeat
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: heartbeat 
+      app: heartbeat
   template:
     metadata:
       labels:
-        app: heartbeat 
+        app: heartbeat
     spec:
       containers:
-      - name: heartbeat 
-        image: ghcr.io/pmh-only/heartbeat:latest
-        env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: heartbeat-secret
-              key: DATABASE_URL
+        - name: heartbeat
+          image: ghcr.io/pmh-only/heartbeat:latest
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: heartbeat-secret
+                  key: DATABASE_URL

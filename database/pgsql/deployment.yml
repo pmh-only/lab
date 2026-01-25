@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: pgsql
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: pgsql
@@ -19,11 +20,11 @@ spec:
             - name: TZ
               value: Asia/Seoul
             - name: DATABASE_HOST
-              value: '127.0.0.1'
+              value: "127.0.0.1"
             - name: DATABASE_PORT
-              value: '5432'
+              value: "5432"
             - name: DATABASE_USER
-              value: 'admin'
+              value: "admin"
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -32,7 +33,7 @@ spec:
             - name: S3_DUMP_URI
               value: dbdump/pgsql
             - name: S3_ENDPOINT_URL
-              value: 'http://pmhraspberry.tailscale.svc.cluster.local:9000'
+              value: "http://pmhraspberry.tailscale.svc.cluster.local:9000"
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -46,24 +47,24 @@ spec:
             - name: AWS_REGION
               value: us-east-1
       containers:
-      - name: pgsql
-        image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
-        ports:
-        - containerPort: 5432
-        env:
-        - name: POSTGRES_USER
-          value: admin
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: pgsql-root-password
-              key: password
-        - name: POSTGRES_INITDB_ARGS
-          value: --data-checksums
-        volumeMounts:
-        - mountPath: /var/lib/postgresql/data
-          name: pgsql-storage
+        - name: pgsql
+          image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: admin
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgsql-root-password
+                  key: password
+            - name: POSTGRES_INITDB_ARGS
+              value: --data-checksums
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: pgsql-storage
       volumes:
-      - name: pgsql-storage
-        persistentVolumeClaim:
-          claimName: pgsql-pvc
+        - name: pgsql-storage
+          persistentVolumeClaim:
+            claimName: pgsql-pvc

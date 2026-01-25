@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: default
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: default
@@ -12,10 +13,10 @@ spec:
         app: default
     spec:
       containers:
-      - name: default
-        image: ghcr.io/pmh-only/default
-        env:
-          - name: THEME_NAME
-            value: pmh.codes
-        ports:
-        - containerPort: 3000
+        - name: default
+          image: ghcr.io/pmh-only/default
+          env:
+            - name: THEME_NAME
+              value: pmh.codes
+          ports:
+            - containerPort: 3000

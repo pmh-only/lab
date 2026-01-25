@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: minio-console
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: minio-console
@@ -12,34 +13,34 @@ spec:
         app: minio-console
     spec:
       containers:
-      - name: minio
-        image: ghcr.io/georgmangold/console
-        ports:
-        - containerPort: 9090
-        env:
-        - name: CONSOLE_MINIO_SERVER
-          value: http://minio-service.minio.svc.cluster.local:9000
-        - name: MINIO_IDENTITY_OPENID_DISPLAY_NAME
-          value: "Login with pmh.codes"
-        - name: MINIO_IDENTITY_OPENID_CONFIG_URL
-          value: https://auth.pmh.codes/application/o/minio/.well-known/openid-configuration
-        - name: MINIO_IDENTITY_OPENID_CLIENT_ID
-          value: mZzRHolEG5DzATfrWgkBxK1VOjLKO2N7rqP2AnOY
-        - name: MINIO_IDENTITY_OPENID_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: minio-secrets
-              key: MINIO_IDENTITY_OPENID_CLIENT_SECRET
-        - name: MINIO_BROWSER_REDIRECT_URL
-          value: https://minio.pmh.codes
-        - name: MINIO_IDENTITY_OPENID_CLAIM_USERINFO
-          value: 'on'
-        - name: MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC
-          value: 'on'
-        - name: MINIO_IDENTITY_OPENID_SCOPES
-          value: "openid,profile,email"
-        - name: CONSOLE_IDP_END_SESSION_ENDPOINT
-          value: https://auth.pmh.codes/application/o/minio/end-session/
+        - name: minio
+          image: ghcr.io/georgmangold/console
+          ports:
+            - containerPort: 9090
+          env:
+            - name: CONSOLE_MINIO_SERVER
+              value: http://minio-service.minio.svc.cluster.local:9000
+            - name: MINIO_IDENTITY_OPENID_DISPLAY_NAME
+              value: "Login with pmh.codes"
+            - name: MINIO_IDENTITY_OPENID_CONFIG_URL
+              value: https://auth.pmh.codes/application/o/minio/.well-known/openid-configuration
+            - name: MINIO_IDENTITY_OPENID_CLIENT_ID
+              value: mZzRHolEG5DzATfrWgkBxK1VOjLKO2N7rqP2AnOY
+            - name: MINIO_IDENTITY_OPENID_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secrets
+                  key: MINIO_IDENTITY_OPENID_CLIENT_SECRET
+            - name: MINIO_BROWSER_REDIRECT_URL
+              value: https://minio.pmh.codes
+            - name: MINIO_IDENTITY_OPENID_CLAIM_USERINFO
+              value: "on"
+            - name: MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC
+              value: "on"
+            - name: MINIO_IDENTITY_OPENID_SCOPES
+              value: "openid,profile,email"
+            - name: CONSOLE_IDP_END_SESSION_ENDPOINT
+              value: https://auth.pmh.codes/application/o/minio/end-session/
 ---
 apiVersion: v1
 kind: Service
@@ -60,16 +61,16 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: console.s3.pmh.codes
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: minio-console-service
-            port:
-              number: 9090
+    - host: console.s3.pmh.codes
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio-console-service
+                port:
+                  number: 9090
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -81,4 +82,4 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: minio.pmh.codes
+    - host: minio.pmh.codes

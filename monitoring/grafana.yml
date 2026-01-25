@@ -19,6 +19,7 @@ metadata:
   name: grafana
   namespace: monitoring
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: grafana
@@ -90,7 +91,7 @@ data:
     org_name = Main Org.
     org_role = Viewer
     hide_version = true
-    
+
     [server]
     root_url = https://grafana.pmh.codes
 ---
@@ -115,13 +116,13 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: grafana.pmh.codes
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: grafana
-            port:
-              number: 3000
+    - host: grafana.pmh.codes
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 3000

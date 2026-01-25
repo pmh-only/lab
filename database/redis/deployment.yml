@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: redis
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: redis
@@ -12,5 +13,5 @@ spec:
         app: redis
     spec:
       containers:
-      - name: redis
-        image: ghcr.io/pmh-only/redis:alpine
+        - name: redis
+          image: ghcr.io/pmh-only/redis:alpine

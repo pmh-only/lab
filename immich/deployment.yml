@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: immich
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: immich
@@ -12,25 +13,25 @@ spec:
         app: immich
     spec:
       containers:
-      - name: immich
-        image: ghcr.io/immich-app/immich-server:release
-        ports:
-        - containerPort: 2283
-        env:
-          - name: DB_USERNAME
-            value: immich
-          - name: DB_HOSTNAME
-            value: pgsql-service.database.svc.cluster.local
-          - name: REDIS_HOSTNAME
-            value: redis-service.database.svc.cluster.local
-          - name: DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: DB_PASSWORD
-                name: immich-secret
-        volumeMounts:
-          - mountPath: /usr/src/app/upload
-            name: immich-pvc
+        - name: immich
+          image: ghcr.io/immich-app/immich-server:release
+          ports:
+            - containerPort: 2283
+          env:
+            - name: DB_USERNAME
+              value: immich
+            - name: DB_HOSTNAME
+              value: pgsql-service.database.svc.cluster.local
+            - name: REDIS_HOSTNAME
+              value: redis-service.database.svc.cluster.local
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PASSWORD
+                  name: immich-secret
+          volumeMounts:
+            - mountPath: /usr/src/app/upload
+              name: immich-pvc
       volumes:
         - name: immich-pvc
           hostPath:
@@ -41,6 +42,7 @@ kind: Deployment
 metadata:
   name: immich-ml
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: immich-ml
@@ -50,13 +52,13 @@ spec:
         app: immich-ml
     spec:
       containers:
-      - name: immich-ml
-        image: ghcr.io/immich-app/immich-machine-learning:release
-        ports:
-        - containerPort: 3003
-        volumeMounts:
-          - mountPath: /cache
-            name: immich-ml-pvc
+        - name: immich-ml
+          image: ghcr.io/immich-app/immich-machine-learning:release
+          ports:
+            - containerPort: 3003
+          volumeMounts:
+            - mountPath: /cache
+              name: immich-ml-pvc
       volumes:
         - name: immich-ml-pvc
           hostPath:

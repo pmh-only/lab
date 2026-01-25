@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: guessaiword
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: guessaiword
@@ -12,18 +13,18 @@ spec:
         app: guessaiword
     spec:
       containers:
-      - name: guessaiword
-        image: ghcr.io/pmh-only/guessaiword
-        ports:
-        - containerPort: 8080
-        volumeMounts:
-        - name: guessaiword-secret
-          mountPath: "/app/config"
-          readOnly: true
+        - name: guessaiword
+          image: ghcr.io/pmh-only/guessaiword
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: guessaiword-secret
+              mountPath: "/app/config"
+              readOnly: true
       volumes:
-      - name: guessaiword-secret
-        secret:
-          secretName: guessaiword-secret
-          items:
-          - key: application.properties
-            path: application.properties
+        - name: guessaiword-secret
+          secret:
+            secretName: guessaiword-secret
+            items:
+              - key: application.properties
+                path: application.properties

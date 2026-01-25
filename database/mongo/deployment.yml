@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: mongo
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: mongo
@@ -19,11 +20,11 @@ spec:
             - name: TZ
               value: Asia/Seoul
             - name: DATABASE_HOST
-              value: '127.0.0.1'
+              value: "127.0.0.1"
             - name: DATABASE_PORT
-              value: '27017'
+              value: "27017"
             - name: DATABASE_USER
-              value: 'backpack'
+              value: "backpack"
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -32,7 +33,7 @@ spec:
             - name: S3_DUMP_URI
               value: dbdump/mongo
             - name: S3_ENDPOINT_URL
-              value: 'http://pmhraspberry.tailscale.svc.cluster.local:9000'
+              value: "http://pmhraspberry.tailscale.svc.cluster.local:9000"
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -46,17 +47,17 @@ spec:
             - name: AWS_REGION
               value: us-east-1
       containers:
-      - name: mongo
-        image: ghcr.io/pmh-only/mongo:latest
-        ports:
-        - containerPort: 27017
-        volumeMounts:
-        - mountPath: /data/db
-          name: mongo-storage
-        resources:
-          limits:
-            memory: 1Gi
+        - name: mongo
+          image: ghcr.io/pmh-only/mongo:latest
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongo-storage
+          resources:
+            limits:
+              memory: 1Gi
       volumes:
-      - name: mongo-storage
-        persistentVolumeClaim:
-          claimName: mongo-pvc
+        - name: mongo-storage
+          persistentVolumeClaim:
+            claimName: mongo-pvc

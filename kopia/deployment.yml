@@ -1,58 +1,59 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kopia 
+  name: kopia
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: kopia 
+      app: kopia
   template:
     metadata:
       labels:
-        app: kopia 
+        app: kopia
     spec:
       hostname: pmhoci
       containers:
-      - name: kopia 
-        image: ghcr.io/pmh-only/kopia:latest
-        args:
-          - server
-          - start
-          - --insecure
-          - --address=0.0.0.0:51515
-        env:
-          - name: KOPIA_SERVER_USERNAME
-            value: pmh_only@pmh.codes
-          - name: KOPIA_SERVER_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: kopia-secret
-                key: ADMIN_PASSWORD
-          - name: KOPIA_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: kopia-secret
-                key: REPOSITORY_PASSWORD
-        volumeMounts:
-        - mountPath: /app/config
-          name: persistent
-          subPath: config
-        - mountPath: /app/cache
-          name: persistent
-          subPath: cache
-        - mountPath: /app/logs
-          name: persistent
-          subPath: logs
-        - mountPath: /tmp
-          name: persistent
-          subPath: tmp
-        - mountPath: /data
-          name: target
-          readOnly: true
+        - name: kopia
+          image: ghcr.io/pmh-only/kopia:latest
+          args:
+            - server
+            - start
+            - --insecure
+            - --address=0.0.0.0:51515
+          env:
+            - name: KOPIA_SERVER_USERNAME
+              value: pmh_only@pmh.codes
+            - name: KOPIA_SERVER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kopia-secret
+                  key: ADMIN_PASSWORD
+            - name: KOPIA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kopia-secret
+                  key: REPOSITORY_PASSWORD
+          volumeMounts:
+            - mountPath: /app/config
+              name: persistent
+              subPath: config
+            - mountPath: /app/cache
+              name: persistent
+              subPath: cache
+            - mountPath: /app/logs
+              name: persistent
+              subPath: logs
+            - mountPath: /tmp
+              name: persistent
+              subPath: tmp
+            - mountPath: /data
+              name: target
+              readOnly: true
       volumes:
-      - name: persistent
-        persistentVolumeClaim:
-          claimName: kopia-pvc
-      - name: target
-        hostPath:
-          path: /mnt/data/
+        - name: persistent
+          persistentVolumeClaim:
+            claimName: kopia-pvc
+        - name: target
+          hostPath:
+            path: /mnt/data/

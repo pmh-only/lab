@@ -3,6 +3,7 @@ kind: StatefulSet
 metadata:
   name: mail
 spec:
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: mail
@@ -16,23 +17,23 @@ spec:
       securityContext:
         fsGroup: 1000
       containers:
-      - name: mail
-        image: ghcr.io/pmh-only/protonmail-bridge:latest
-        ports:
-        - containerPort: 1143
-          name: imap
-        - containerPort: 1025
-          name: smtp
-        volumeMounts:
-        - name: data
-          mountPath: /data
+        - name: mail
+          image: ghcr.io/pmh-only/protonmail-bridge:latest
+          ports:
+            - containerPort: 1143
+              name: imap
+            - containerPort: 1025
+              name: smtp
+          volumeMounts:
+            - name: data
+              mountPath: /data
   volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      storageClassName: local-path
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 10Gi
+    - metadata:
+        name: data
+      spec:
+        storageClassName: local-path
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
