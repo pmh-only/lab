@@ -18,6 +18,8 @@ spec:
           env:
             - name: TZ
               value: Asia/Seoul
+            - name: DISCORD_PREFIX
+              value: '!'
             - name: DISCORD_TOKEN
               valueFrom:
                 secretKeyRef:
