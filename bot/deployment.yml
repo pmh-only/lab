@@ -19,9 +19,16 @@ spec:
             - name: TZ
               value: Asia/Seoul
             - name: DISCORD_PREFIX
-              value: '!'
+              value: "!"
             - name: DISCORD_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: bot-secrets
                   key: DISCORD_TOKEN
+          volumeMounts:
+            - mountPath: /app/data
+              name: persistent
+      volumes:
+        - name: persistent
+          persistentVolumeClaim:
+            claimName: bot-pvc
