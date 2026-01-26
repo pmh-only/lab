@@ -4,3 +4,4 @@ namespace: bot
 resources:
   - ./deployment.yml
   - ./secret.yml
+  - ./pvc.yml
