@@ -8,6 +8,8 @@ spec:
     - pmh.so
     - pmh.codes
 
+    - "*.this.is.just.a.normal.certificate.okay.pmh.so"
+
     - "*.pmh.codes"
     - "*.mc.pmh.codes"
     - "*.s3.pmh.codes"
