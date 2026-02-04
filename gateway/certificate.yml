@@ -8,7 +8,7 @@ spec:
     - pmh.so
     - pmh.codes
 
-    - "*.this.is.just.a.normal.certificate.okay.pmh.so"
+    - "*.ah.this.is.just.a.normal.certificate.okay.pmh.so"
 
     - "*.pmh.codes"
     - "*.mc.pmh.codes"
