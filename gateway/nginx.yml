@@ -198,11 +198,11 @@ spec:
         app: gateway-nginx
     spec:
       restartPolicy: Always
+      hostNetwork: true
       containers:
         - name: nginx
           image: ghcr.io/pmh-only/nginx:latest
           imagePullPolicy: Always
-          hostNetwork: true
           volumeMounts:
             - name: tls
               mountPath: /etc/nginx/tls
