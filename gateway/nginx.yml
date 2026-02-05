@@ -199,6 +199,7 @@ spec:
     spec:
       restartPolicy: Always
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: nginx
           image: ghcr.io/pmh-only/nginx:latest
