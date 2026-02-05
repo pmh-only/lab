@@ -10,14 +10,10 @@ spec:
 
     - "*.ah.this.is.just.a.normal.certificate.okay.pmh.so"
 
-    - "*.pmh.codes"
-    - "*.mc.pmh.codes"
-    - "*.s3.pmh.codes"
-
     - "*.pmh.so"
-    - "*.mc.pmh.so"
-    - "*.s3.pmh.so"
+    - "*.pmh.codes"
     - "*.here.pmh.so"
+    - "*.s3.pmh.codes"
 
     - not.ai.kr
   ipAddresses:
