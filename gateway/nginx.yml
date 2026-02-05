@@ -202,31 +202,7 @@ spec:
         - name: nginx
           image: ghcr.io/pmh-only/nginx:latest
           imagePullPolicy: Always
-          ports:
-            - name: ssh
-              containerPort: 22
-              hostPort: 22
-              protocol: TCP
-            - name: dns
-              containerPort: 53
-              hostPort: 53
-              protocol: UDP
-            - name: dnstcp
-              containerPort: 53
-              hostPort: 53
-              protocol: TCP
-            - name: http
-              containerPort: 80
-              hostPort: 80
-              protocol: TCP
-            - name: https
-              containerPort: 443
-              hostPort: 443
-              protocol: TCP
-            - name: http3
-              containerPort: 443
-              hostPort: 443
-              protocol: UDP
+          hostNetwork: true
           volumeMounts:
             - name: tls
               mountPath: /etc/nginx/tls
