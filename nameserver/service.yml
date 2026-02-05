@@ -17,6 +17,11 @@ spec:
       port: 53
       targetPort: 53
 
+    - name: dnstcp
+      protocol: TCP
+      port: 53
+      targetPort: 53
+
     - name: dnsproxy
       protocol: UDP
       port: 538
