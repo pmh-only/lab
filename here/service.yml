@@ -17,9 +17,8 @@ metadata:
 spec:
   selector:
     app: here
-  type: LoadBalancer
   ports:
-  - name: here-ssh
-    protocol: TCP
-    port: 22
-    targetPort: 22
+    - name: here-ssh
+      protocol: TCP
+      port: 22
+      targetPort: 22

@@ -152,6 +152,30 @@ data:
         }
       }
     }
+
+    stream {
+      log_format log_stream
+        '$remote_addr - [$time_local] - - - '
+        '"-" $status $bytes_sent '
+        '"-" "-" '
+        '- - "-" $session_time';
+
+      resolver kube-dns.kube-system.svc.cluster.local valid=30s;
+
+      access_log /dev/stdout log_stream;
+      error_log  /dev/stderr notice;
+
+      server {
+        listen 22;
+        proxy_pass here-ssh-service.here.svc.cluster.local:22;
+      }
+
+      server {
+        listen 53 udp;
+        proxy_protocol on;
+        proxy_pass nameserver.nameserver.svc.cluster.local:538;
+      }
+    }
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -173,6 +197,14 @@ spec:
           image: ghcr.io/pmh-only/nginx:latest
           imagePullPolicy: Always
           ports:
+            - name: ssh
+              containerPort: 22
+              hostPort: 22
+              protocol: TCP
+            - name: dns
+              containerPort: 53
+              hostPort: 53
+              protocol: UDP
             - name: http
               containerPort: 80
               hostPort: 80
