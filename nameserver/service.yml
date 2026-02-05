@@ -26,3 +26,8 @@ spec:
       protocol: UDP
       port: 538
       targetPort: 538
+
+    - name: dnsproxytcp
+      protocol: TCP
+      port: 538
+      targetPort: 538

@@ -171,6 +171,12 @@ data:
       }
 
       server {
+        listen 53 tcp;
+        proxy_protocol on;
+        proxy_pass nameserver.nameserver.svc.cluster.local:538;
+      }
+
+      server {
         listen 53 udp;
         proxy_protocol on;
         proxy_pass nameserver.nameserver.svc.cluster.local:538;
@@ -205,6 +211,10 @@ spec:
               containerPort: 53
               hostPort: 53
               protocol: UDP
+            - name: dnstcp
+              containerPort: 53
+              hostPort: 53
+              protocol: TCP
             - name: http
               containerPort: 80
               hostPort: 80
