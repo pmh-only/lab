@@ -11,7 +11,7 @@ spec:
   source:
     chart: cert-manager
     helm:
-      values: |-
+      valuesObject:
         crds:
           enabled: true
         global:

@@ -11,7 +11,7 @@ spec:
   source:
     chart: reloader
     helm:
-      values: |-
+      valuesObject:
         reloader:
           reloadOnCreate: true
           reloadOnDelete: true

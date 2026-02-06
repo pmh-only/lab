@@ -17,14 +17,14 @@ spec:
     repoURL: https://github.com/coder/code-server
     targetRevision: HEAD
     helm:
-      values: |-
+      valuesObject:
         ingress:
           enabled: true
           ingressClassName: nginx
           hosts:
-           - host: ide.pmh.codes
-             paths:
-               - /
+            - host: ide.pmh.codes
+              paths:
+                - /
           annotations:
             nginx.ingress.kubernetes.io/auth-url: |-
               http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx

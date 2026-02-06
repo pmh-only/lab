@@ -15,7 +15,7 @@ spec:
   source:
     chart: tailscale-operator
     helm:
-      values: |-
+      valuesObject:
         oauth:
           clientId: youshallnotpass
           clientSecret: youshallnotpass
