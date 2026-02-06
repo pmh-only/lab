@@ -15,7 +15,7 @@ spec:
   source:
     chart: velero
     helm:
-      values: |-
+      valuesObject:
         deployNodeAgent: true
         snapshotsEnabled: false
         configuration:

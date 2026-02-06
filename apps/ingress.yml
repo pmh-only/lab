@@ -11,7 +11,7 @@ spec:
   source:
     chart: ingress-nginx
     helm:
-      values: |-
+      valuesObject:
         revisionHistoryLimit: 0
         controller:
           service:
@@ -19,17 +19,17 @@ spec:
           metrics:
             enabled: true
           config:
-            custom-http-errors: '503,504'
-            hsts-preload: 'true'
-            strict-validate-path-type: 'false'
+            custom-http-errors: "503,504"
+            hsts-preload: "true"
+            strict-validate-path-type: "false"
             add-headers: ingress/custom-headers
-            allow-snippet-annotations: 'true'
+            allow-snippet-annotations: "true"
             annotations-risk-level: Critical
             proxy-body-size: 10g
             proxy-buffer-size: 1024k
             proxy-buffers-number: 4
             proxy-busy-buffers-size: 1024k
-            use-forwarded-headers: 'true'
+            use-forwarded-headers: "true"
             location-snippet: |
               proxy_set_header Accept-Encoding "";
               sub_filter_last_modified on;

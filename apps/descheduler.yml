@@ -11,9 +11,8 @@ spec:
   source:
     chart: descheduler
     helm:
-      parameters:
-        - name: kind
-          value: Deployment
+      valuesObject:
+        kind: Deployment
     repoURL: https://kubernetes-sigs.github.io/descheduler/
     targetRevision: x
   syncPolicy:
