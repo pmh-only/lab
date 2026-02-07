@@ -11,8 +11,13 @@ spec:
   hostnames:
     - not.ai.kr
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: notaikr-service
           port: 8080
+          weight: 1

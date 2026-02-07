@@ -11,8 +11,13 @@ spec:
   hostnames:
     - guess.pmh.codes
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: guessaiword-service
           port: 8080
+          weight: 1

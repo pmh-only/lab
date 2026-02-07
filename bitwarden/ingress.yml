@@ -11,8 +11,13 @@ spec:
   hostnames:
     - vault.pmh.codes
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: bitwarden-service
           port: 80
+          weight: 1

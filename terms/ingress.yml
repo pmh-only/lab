@@ -11,8 +11,13 @@ spec:
   hostnames:
     - terms.pmh.codes
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: terms
           port: 8080
+          weight: 1

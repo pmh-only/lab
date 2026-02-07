@@ -11,8 +11,13 @@ spec:
   hostnames:
     - ads.pmh.codes
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: pmhraspberry
           port: 1423
+          weight: 1

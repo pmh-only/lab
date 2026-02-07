@@ -11,8 +11,13 @@ spec:
   hostnames:
     - heart.pmh.codes
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: heartbeat-service
           port: 8080
+          weight: 1

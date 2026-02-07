@@ -11,8 +11,13 @@ spec:
   hostnames:
     - office.pmh.codes
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: office-service
           port: 80
+          weight: 1

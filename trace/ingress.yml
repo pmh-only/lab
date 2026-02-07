@@ -20,6 +20,7 @@ spec:
           kind: Service
           name: trace-service
           port: 3001
+          weight: 1
     - matches:
         - path:
             type: Exact
@@ -29,6 +30,7 @@ spec:
           kind: Service
           name: trace-service
           port: 3001
+          weight: 1
     - matches:
         - path:
             type: Exact
@@ -38,6 +40,7 @@ spec:
           kind: Service
           name: trace-service
           port: 3001
+          weight: 1
     - matches:
         - path:
             type: Exact
@@ -47,6 +50,7 @@ spec:
           kind: Service
           name: trace-service
           port: 3001
+          weight: 1
     - matches:
         - path:
             type: Exact
@@ -56,6 +60,7 @@ spec:
           kind: Service
           name: trace-service
           port: 3001
+          weight: 1
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -79,6 +84,7 @@ spec:
           kind: Service
           name: trace-service
           port: 3001
+          weight: 1
     - matches:
         - path:
             type: PathPrefix
@@ -88,6 +94,7 @@ spec:
           kind: Service
           name: trace-client-service
           port: 3002
+          weight: 1
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy

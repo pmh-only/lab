@@ -11,11 +11,16 @@ spec:
   hostnames:
     - auth.pmh.codes
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: authentik-service
           port: 9000
+          weight: 1
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyExtensionPolicy
