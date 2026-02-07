@@ -4,11 +4,15 @@ metadata:
   name: heartbeat-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - heart.pmh.codes
   rules:
     - backendRefs:
-        - name: heartbeat-service
+        - group: ""
+          kind: Service
+          name: heartbeat-service
           port: 8080

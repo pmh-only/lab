@@ -4,7 +4,9 @@ metadata:
   name: minecraft-redirect
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - maps.pmh.codes

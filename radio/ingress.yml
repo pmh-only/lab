@@ -4,11 +4,15 @@ metadata:
   name: radio-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - ads.pmh.codes
   rules:
     - backendRefs:
-        - name: pmhraspberry
+        - group: ""
+          kind: Service
+          name: pmhraspberry
           port: 1423

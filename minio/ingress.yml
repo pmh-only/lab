@@ -4,14 +4,18 @@ metadata:
   name: minio-s3-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - s3.pmh.codes
     - "*.s3.pmh.codes"
   rules:
     - backendRefs:
-        - name: minio-service
+        - group: ""
+          kind: Service
+          name: minio-service
           port: 9000
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -20,7 +24,9 @@ metadata:
   name: minio-bucket-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - pmh.codes
@@ -28,7 +34,9 @@ spec:
     - "*.cdn.pmh.codes"
   rules:
     - backendRefs:
-        - name: minio-service
+        - group: ""
+          kind: Service
+          name: minio-service
           port: 9000
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1

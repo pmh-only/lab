@@ -4,7 +4,9 @@ metadata:
   name: seafile-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - drive.pmh.codes
@@ -14,7 +16,9 @@ spec:
             type: PathPrefix
             value: /socket.io
       backendRefs:
-        - name: seafile-sdoc-service
+        - group: ""
+          kind: Service
+          name: seafile-sdoc-service
           port: 80
     - matches:
         - path:
@@ -27,7 +31,9 @@ spec:
               type: ReplacePrefixMatch
               replacePrefixMatch: /
       backendRefs:
-        - name: seafile-sdoc-service
+        - group: ""
+          kind: Service
+          name: seafile-sdoc-service
           port: 80
     - matches:
         - path:
@@ -40,14 +46,18 @@ spec:
               type: ReplacePrefixMatch
               replacePrefixMatch: /
       backendRefs:
-        - name: seafile-noti-service
+        - group: ""
+          kind: Service
+          name: seafile-noti-service
           port: 8083
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: seafile-service
+        - group: ""
+          kind: Service
+          name: seafile-service
           port: 80
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1

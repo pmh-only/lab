@@ -4,11 +4,15 @@ metadata:
   name: nameserver-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - names.pmh.codes
   rules:
     - backendRefs:
-        - name: nameserver
+        - group: ""
+          kind: Service
+          name: nameserver
           port: 5380

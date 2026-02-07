@@ -4,13 +4,17 @@ metadata:
   name: visualized-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - visualized.pmh.codes
   rules:
     - backendRefs:
-        - name: visualized-service
+        - group: ""
+          kind: Service
+          name: visualized-service
           port: 3000
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1

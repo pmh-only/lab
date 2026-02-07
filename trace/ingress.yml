@@ -4,7 +4,9 @@ metadata:
   name: trace-public-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - trace.pmh.codes
@@ -14,35 +16,45 @@ spec:
             type: Exact
             value: /api/script.js
       backendRefs:
-        - name: trace-service
+        - group: ""
+          kind: Service
+          name: trace-service
           port: 3001
     - matches:
         - path:
             type: Exact
             value: /api/replay.js
       backendRefs:
-        - name: trace-service
+        - group: ""
+          kind: Service
+          name: trace-service
           port: 3001
     - matches:
         - path:
             type: Exact
             value: /api/track
       backendRefs:
-        - name: trace-service
+        - group: ""
+          kind: Service
+          name: trace-service
           port: 3001
     - matches:
         - path:
             type: Exact
             value: /api/site/tracking-config/1
       backendRefs:
-        - name: trace-service
+        - group: ""
+          kind: Service
+          name: trace-service
           port: 3001
     - matches:
         - path:
             type: Exact
             value: /api/session-replay/record/1
       backendRefs:
-        - name: trace-service
+        - group: ""
+          kind: Service
+          name: trace-service
           port: 3001
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -51,7 +63,9 @@ metadata:
   name: trace-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - trace.pmh.codes
@@ -61,14 +75,18 @@ spec:
             type: PathPrefix
             value: /api/
       backendRefs:
-        - name: trace-service
+        - group: ""
+          kind: Service
+          name: trace-service
           port: 3001
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: trace-client-service
+        - group: ""
+          kind: Service
+          name: trace-client-service
           port: 3002
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
@@ -83,7 +101,9 @@ spec:
   extAuth:
     http:
       backendRefs:
-        - name: ak-outpost-authentik-embedded-outpost
+        - group: ""
+          kind: Service
+          name: ak-outpost-authentik-embedded-outpost
           namespace: authentik
           port: 9000
       headersToBackend:

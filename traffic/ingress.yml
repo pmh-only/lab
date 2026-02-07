@@ -4,7 +4,9 @@ metadata:
   name: traffic-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - traffic.pmh.codes
@@ -14,12 +16,16 @@ spec:
             type: Exact
             value: /
       backendRefs:
-        - name: aggregator
+        - group: ""
+          kind: Service
+          name: aggregator
           port: 80
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: aggregator
+        - group: ""
+          kind: Service
+          name: aggregator
           port: 443

@@ -4,11 +4,15 @@ metadata:
   name: here-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - "*.here.pmh.so"
   rules:
     - backendRefs:
-        - name: here-service
+        - group: ""
+          kind: Service
+          name: here-service
           port: 8080

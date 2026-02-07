@@ -115,11 +115,15 @@ metadata:
   namespace: monitoring
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - grafana.pmh.codes
   rules:
     - backendRefs:
-        - name: grafana
+        - group: ""
+          kind: Service
+          name: grafana
           port: 3000

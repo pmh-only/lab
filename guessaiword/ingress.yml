@@ -4,11 +4,15 @@ metadata:
   name: guessaiword-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - guess.pmh.codes
   rules:
     - backendRefs:
-        - name: guessaiword-service
+        - group: ""
+          kind: Service
+          name: guessaiword-service
           port: 8080
