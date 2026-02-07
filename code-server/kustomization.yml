@@ -3,3 +3,4 @@ kind: Kustomization
 namespace: code-server
 resources:
   - ./httproute.yml
+  - ./secrets.yml

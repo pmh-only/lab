@@ -33,9 +33,11 @@ spec:
       name: code-server-route
   oidc:
     provider:
-      issuer: "https://accounts.google.com"
-    clientID: "${CLIENT_ID}"
+      issuer: "https://auth.pmh.codes/application/o/code-server/"
+    clientID: "IJrzGJv8WH7qFNF0GCdNFWmalznzB6cXniM10061"
     clientSecret:
-      name: "my-app-client-secret"
-    redirectURL: "https://www.example.com:8443/myapp/oauth2/callback"
-    logoutPath: "/myapp/logout"
+      group: ""
+      kind: "Secret"
+      name: "code-server-auth-secret"
+    redirectURL: "https://ide.pmh.codes/oauth2/callback"
+    logoutPath: "/logout"
