@@ -14,7 +14,6 @@ spec:
         app.kubernetes.io/component: server
         app.kubernetes.io/name: authentik
     spec:
-      serviceAccountName: authentik
       containers:
         - name: authentik
           image: ghcr.io/goauthentik/server:latest
