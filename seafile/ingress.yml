@@ -15,8 +15,7 @@ spec:
             value: /socket.io
       backendRefs:
         - name: seafile-sdoc-service
-          port:
-            number: 80
+          port: 80
     - matches:
         - path:
             type: PathPrefix
@@ -29,8 +28,7 @@ spec:
               replacePrefixMatch: /
       backendRefs:
         - name: seafile-sdoc-service
-          port:
-            number: 80
+          port: 80
     - matches:
         - path:
             type: PathPrefix
@@ -43,16 +41,14 @@ spec:
               replacePrefixMatch: /
       backendRefs:
         - name: seafile-noti-service
-          port:
-            number: 8083
+          port: 8083
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
         - name: seafile-service
-          port:
-            number: 80
+          port: 80
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyExtensionPolicy

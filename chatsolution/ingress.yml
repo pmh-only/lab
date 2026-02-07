@@ -15,5 +15,4 @@ spec:
             value: /socket.io/
       backendRefs:
         - name: chatsolution-service
-          port:
-            number: 80
+          port: 80

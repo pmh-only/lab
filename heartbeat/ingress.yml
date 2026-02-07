@@ -11,5 +11,4 @@ spec:
   rules:
     - backendRefs:
         - name: heartbeat-service
-          port:
-            number: 8080
+          port: 8080

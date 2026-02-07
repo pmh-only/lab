@@ -11,5 +11,4 @@ spec:
   rules:
     - backendRefs:
         - name: bitwarden-service
-          port:
-            number: 80
+          port: 80

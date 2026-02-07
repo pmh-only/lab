@@ -11,8 +11,7 @@ spec:
   rules:
     - backendRefs:
         - name: roundcube
-          port:
-            number: 80
+          port: 80
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyExtensionPolicy

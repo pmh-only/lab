@@ -11,8 +11,7 @@ spec:
   rules:
     - backendRefs:
         - name: kopia-service
-          port:
-            number: 51515
+          port: 51515
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy

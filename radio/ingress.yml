@@ -11,5 +11,4 @@ spec:
   rules:
     - backendRefs:
         - name: pmhraspberry
-          port:
-            number: 1423
+          port: 1423
