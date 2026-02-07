@@ -67,6 +67,7 @@ data:
 
       proxy_set_header Connection "";
       proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Accept-Encoding "";
 
       proxy_read_timeout 86400;
       proxy_send_timeout 86400;
@@ -137,6 +138,11 @@ data:
 
         access_log /dev/stdout log_stream;
         error_log  /dev/stderr notice;
+
+        sub_filter_once on;
+        sub_filter_last_modified on;
+        sub_filter_types text/html;
+        sub_filter '<head>' '<head><script src="https://trace.pmh.codes/api/script.js" data-site-id="1" defer></script>';
 
         location / {
           set $envoy_gateway envoy-gateway-main.envoy-gateway-system.svc.cluster.local;
