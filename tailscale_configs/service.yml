@@ -8,12 +8,3 @@ metadata:
 spec:
   externalName: placeholder
   type: ExternalName
-  ports:
-    - name: radio
-      protocol: TCP
-      port: 1423
-      targetPort: 1423
-    - name: terms
-      protocol: TCP
-      port: 8080
-      targetPort: 8080
