@@ -34,7 +34,7 @@ spec:
   oidc:
     provider:
       issuer: "https://auth.pmh.codes/application/o/code-server/"
-      tokenEndpoint: "http://authentik-service.authentik.svc.cluster.local/application/o/token/"
+      tokenEndpoint: "http://authentik-service.authentik.svc.cluster.local:9000/application/o/token/"
     clientID: "IJrzGJv8WH7qFNF0GCdNFWmalznzB6cXniM10061"
     clientSecret:
       group: ""
