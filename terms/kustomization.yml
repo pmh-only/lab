@@ -3,4 +3,3 @@ kind: Kustomization
 namespace: terms
 resources:
   - ./ingress.yml
-  - ./service.yml

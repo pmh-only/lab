@@ -3,4 +3,3 @@ kind: Kustomization
 namespace: radio
 resources:
   - ./ingress.yml
-  - ./service.yml
