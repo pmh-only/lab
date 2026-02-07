@@ -37,6 +37,8 @@ spec:
         function envoy_on_response(response_handle)
           local ct = response_handle:headers():get("content-type") or ""
           if not string.find(ct, "text/html") then return end
+          local cl = tonumber(response_handle:headers():get("content-length") or "0")
+          if cl > 1048576 then return end
           local body = response_handle:body(true)
           if body == nil then return end
           local bytes = body:getBytes(0, body:length())
