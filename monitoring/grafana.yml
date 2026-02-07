@@ -45,7 +45,6 @@ spec:
             httpGet:
               path: /robots.txt
               port: 3000
-              weight: 1
               scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 30
