@@ -79,13 +79,11 @@ spec:
             bucket = "a-" .. bucket
           end
 
+          request_handle:headers():replace("host", bucket .. ".s3.pmh.codes")
+
           -- Root path: serve index.html
           if path == "/" then
-            request_handle:headers():replace(":path", "/" .. bucket .. "/index.html")
-            request_handle:headers():replace("host", bucket .. ".s3.pmh.codes")
-          else
-            -- Non-root: prepend bucket to path
-            request_handle:headers():replace(":path", "/" .. bucket .. path)
+            request_handle:headers():replace(":path", "/index.html")
           end
         end
 

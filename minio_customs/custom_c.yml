@@ -41,11 +41,9 @@ spec:
           if path == "/" then
             local mode = request_handle:headers():get("sec-fetch-mode") or ""
             if mode == "navigate" then
-              request_handle:headers():replace(":path", "/a-c/index.html")
+              request_handle:headers():replace(":path", "/index.html")
             else
-              request_handle:headers():replace(":path", "/a-c/loader.js")
+              request_handle:headers():replace(":path", "/loader.js")
             end
-          else
-            request_handle:headers():replace(":path", "/a-c" .. path)
           end
         end
