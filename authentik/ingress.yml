@@ -48,3 +48,17 @@ spec:
             response_handle:headers():remove("content-length")
           end
         end
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: authentik-reference-grant
+  namespace: authentik
+spec:
+  from:
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+  to:
+    - group: ""
+      kind: Service
+      name: ak-outpost-authentik-embedded-outpost
