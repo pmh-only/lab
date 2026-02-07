@@ -1,54 +1,51 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: minio-custom-c-root-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_set_input_headers 'Host: a-c.s3.pmh.codes';
-
-      if ($http_sec_fetch_mode = "navigate") {
-        set $is_manual_request "1";
-      }
-
-      if ($is_manual_request = "1") {
-        rewrite ^ /a-c/index.html break;
-      }
-
-      if ($is_manual_request != "1") {
-        rewrite ^ /a-c/loader.js break;
-      }
+  name: minio-custom-c-route
 spec:
-  ingressClassName: nginx
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
+      namespace: gateway
+  hostnames:
+    - c.pmh.codes
   rules:
-  - host: "c.pmh.codes"
-    http:
-      paths:
-      - path: /
-        pathType: Exact
-        backend:
-          service:
-            name: minio-service
-            port:
-              number: 9000
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: minio-service
+          port: 9000
+          weight: 1
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
 metadata:
-  name: minio-custom-c-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_set_input_headers 'Host: a-c.s3.pmh.codes';
-      rewrite ^/(.*)$ /a-c/$1 break;
+  name: minio-custom-c-lua
 spec:
-  ingressClassName: nginx
-  rules:
-  - host: "c.pmh.codes"
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: minio-service
-            port:
-              number: 9000
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: minio-custom-c-route
+  lua:
+    - type: Inline
+      inline: |
+        function envoy_on_request(request_handle)
+          local path = request_handle:headers():get(":path") or "/"
+          request_handle:headers():replace("host", "a-c.s3.pmh.codes")
+
+          if path == "/" then
+            local mode = request_handle:headers():get("sec-fetch-mode") or ""
+            if mode == "navigate" then
+              request_handle:headers():replace(":path", "/a-c/index.html")
+            else
+              request_handle:headers():replace(":path", "/a-c/loader.js")
+            end
+          else
+            request_handle:headers():replace(":path", "/a-c" .. path)
+          end
+        end
