@@ -139,7 +139,7 @@ data:
         error_log  /dev/stderr notice;
 
         location / {
-          set $envoy_gateway envoy-gateway-main.gateway.svc.cluster.local;
+          set $envoy_gateway envoy-gateway-main.envoy-gateway-system.svc.cluster.local;
           proxy_pass http://$envoy_gateway:80;
         }
 
