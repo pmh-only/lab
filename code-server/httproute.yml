@@ -39,6 +39,7 @@ spec:
           name: ak-outpost-authentik-embedded-outpost
           namespace: authentik
           port: 9000
+          weight: 1
       headersToBackend:
         - Cookie
         - X-Forwarded-Host
