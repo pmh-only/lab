@@ -53,11 +53,20 @@ apiVersion: gateway.networking.k8s.io/v1beta1
 kind: ReferenceGrant
 metadata:
   name: authentik-reference-grant
-  namespace: authentik
 spec:
   from:
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
+      namespace: code-server
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: kopia
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: minio
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: trace
   to:
     - group: ""
       kind: Service
