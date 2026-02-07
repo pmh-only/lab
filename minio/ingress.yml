@@ -1,121 +1,86 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: minio-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_intercept_errors on;
-
-      # check if it is root path
-      if ($uri ~ "^/$") { 
-        set $test A; 
-      }
-      
-      # check if it is minio api endpoint
-      if ($host !~* s3.pmh.codes) { 
-        set $test "${test}B"; 
-      }
-
-      # extract bucket name from host header
-      set_by_lua_block $bucket {
-        local host = ngx.req.get_headers()["host"] or ""
-
-        -- Match either:
-        --   <bucket>.pmh.codes
-        --   <bucket>.cdn.pmh.codes
-        -- and capture:
-        --   bucket, and whether ".cdn" was present
-        local reg = "^(?<bucket>[^.]+)(?<cdn>\\.cdn)?\\.pmh\\.codes$"
-        local m = ngx.re.match(host, reg, "jo")
-
-        -- if there is no bucket name, use www as default
-        if not m or not m["bucket"] then
-          return "www"
-        end
-
-        local b = m["bucket"]
-
-        -- If host is bucket.cdn.pmh.codes, map to c-bucket
-        if m["cdn"] then
-          return "c-" .. b
-        end
-
-        -- Existing bypass rule for bucket.pmh.codes:
-        -- - bucket name must be at least 3 chars
-        -- - cannot start with "xn--"
-        if #b < 3 or b:sub(1, 4) == "xn--" then
-          return "a-" .. b
-        end
-
-        return b
-      }
-
-      # when it is not minio api endpoint
-      if ($test = B) {
-        rewrite ^/(.*)$ /$bucket/$1 break;
-      }
-
-      # when it is root path and not minio api endpoint
-      if ($test = AB) {
-        rewrite ^/$ /$bucket/index.html break;
-        more_set_input_headers 'Host: $bucket.s3.pmh.codes';
-
-        # redirect error pages to main site
-        error_page 400 =302 https://pmh.codes;
-        error_page 401 =302 https://pmh.codes;
-        error_page 403 =302 https://pmh.codes;
-        error_page 404 =302 https://pmh.codes;
-      }
+  name: minio-s3-route
 spec:
-  ingressClassName: nginx
+  parentRefs:
+    - name: main
+      namespace: gateway
+  hostnames:
+    - s3.pmh.codes
+    - "*.s3.pmh.codes"
   rules:
-  - host: pmh.codes
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: minio-service
-            port:
-              number: 9000
-  - host: "*.pmh.codes"
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: minio-service
-            port:
-              number: 9000
-  - host: "s3.pmh.codes"
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: minio-service
-            port:
-              number: 9000
-  - host: "*.s3.pmh.codes"
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: minio-service
-            port:
-              number: 9000
-  - host: "*.cdn.pmh.codes"
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: minio-service
-            port:
-              number: 9000
+    - backendRefs:
+        - name: minio-service
+          port:
+            number: 9000
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: minio-bucket-route
+spec:
+  parentRefs:
+    - name: main
+      namespace: gateway
+  hostnames:
+    - pmh.codes
+    - "*.pmh.codes"
+    - "*.cdn.pmh.codes"
+  rules:
+    - backendRefs:
+        - name: minio-service
+          port:
+            number: 9000
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: minio-bucket-routing
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: minio-bucket-route
+  lua:
+    - type: Inline
+      inline: |
+        function envoy_on_request(request_handle)
+          local host = request_handle:headers():get(":authority") or ""
+          local path = request_handle:headers():get(":path") or "/"
+
+          -- Skip S3 API endpoints
+          if host:match("s3%.pmh%.codes$") then return end
+
+          -- Extract bucket from hostname
+          local bucket, cdn = host:match("^([^.]+)(%.cdn)?%.pmh%.codes$")
+
+          if not bucket then
+            bucket = "www"
+          elseif cdn then
+            bucket = "c-" .. bucket
+          elseif #bucket < 3 or bucket:sub(1, 4) == "xn--" then
+            bucket = "a-" .. bucket
+          end
+
+          -- Root path: serve index.html
+          if path == "/" then
+            request_handle:headers():replace(":path", "/" .. bucket .. "/index.html")
+            request_handle:headers():replace("host", bucket .. ".s3.pmh.codes")
+          else
+            -- Non-root: prepend bucket to path
+            request_handle:headers():replace(":path", "/" .. bucket .. path)
+          end
+        end
+
+        function envoy_on_response(response_handle)
+          local status = response_handle:headers():get(":status")
+          if status == "400" or status == "401" or status == "403" or status == "404" then
+            response_handle:headers():replace(":status", "302")
+            response_handle:headers():add("location", "https://pmh.codes")
+            local body = response_handle:body(true)
+            if body then
+              body:setBytes("")
+            end
+          end
+        end

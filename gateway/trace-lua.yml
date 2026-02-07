@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trace-lua
+  namespace: gateway
+data:
+  inject.lua: |
+    function envoy_on_response(response_handle)
+      local ct = response_handle:headers():get("content-type") or ""
+      if not string.find(ct, "text/html") then return end
+      local body = response_handle:body(true)
+      if body == nil then return end
+      local bytes = body:getBytes(0, body:length())
+      local tag = '<script src="https://trace.pmh.codes/api/script.js" data-site-id="1" defer></script>'
+      local new_bytes = string.gsub(bytes, "<head>", "<head>" .. tag, 1)
+      if new_bytes ~= bytes then
+        body:setBytes(new_bytes)
+        response_handle:headers():remove("content-length")
+      end
+    end

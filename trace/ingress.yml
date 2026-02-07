@@ -1,85 +1,123 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: trace-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/auth-url: |-
-      http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
-    nginx.ingress.kubernetes.io/auth-signin: |-
-      https://trace.pmh.codes/outpost.goauthentik.io/start?rd=$escaped_request_uri
-    nginx.ingress.kubernetes.io/auth-response-headers: |-
-      Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
-    nginx.ingress.kubernetes.io/auth-snippet: |-
-      proxy_set_header X-Forwarded-Host $http_host;
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_set_headers "Access-Control-Allow-Headers: signature";
-    nginx.ingress.kubernetes.io/server-snippet: |
-      location = / {
-        return 302 /1;
-      }
+  name: trace-public-route
 spec:
-  ingressClassName: nginx
+  parentRefs:
+    - name: main
+      namespace: gateway
+  hostnames:
+    - trace.pmh.codes
   rules:
-  - host: trace.pmh.codes
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: trace-client-service
-            port:
-              number: 3002
-      - path: /api/
-        pathType: Prefix
-        backend:
-          service:
-            name: trace-service
-            port:
-              number: 3001
+    - matches:
+        - path:
+            type: Exact
+            value: /api/script.js
+      backendRefs:
+        - name: trace-service
+          port:
+            number: 3001
+    - matches:
+        - path:
+            type: Exact
+            value: /api/replay.js
+      backendRefs:
+        - name: trace-service
+          port:
+            number: 3001
+    - matches:
+        - path:
+            type: Exact
+            value: /api/track
+      backendRefs:
+        - name: trace-service
+          port:
+            number: 3001
+    - matches:
+        - path:
+            type: Exact
+            value: /api/site/tracking-config/1
+      backendRefs:
+        - name: trace-service
+          port:
+            number: 3001
+    - matches:
+        - path:
+            type: Exact
+            value: /api/session-replay/record/1
+      backendRefs:
+        - name: trace-service
+          port:
+            number: 3001
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: trace-public-ingress
+  name: trace-route
 spec:
-  ingressClassName: nginx
+  parentRefs:
+    - name: main
+      namespace: gateway
+  hostnames:
+    - trace.pmh.codes
   rules:
-  - host: trace.pmh.codes
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/
+      backendRefs:
+        - name: trace-service
+          port:
+            number: 3001
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: trace-client-service
+          port:
+            number: 3002
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: trace-auth
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: trace-route
+  extAuth:
     http:
-      paths:
-      - path: /api/site/tracking-config/1
-        pathType: Exact
-        backend:
-          service:
-            name: trace-service
-            port:
-              number: 3001
-      - path: /api/session-replay/record/1
-        pathType: Exact
-        backend:
-          service:
-            name: trace-service
-            port:
-              number: 3001
-      - path: /api/script.js
-        pathType: Exact
-        backend:
-          service:
-            name: trace-service
-            port:
-              number: 3001
-      - path: /api/replay.js
-        pathType: Exact
-        backend:
-          service:
-            name: trace-service
-            port:
-              number: 3001
-      - path: /api/track
-        pathType: Exact
-        backend:
-          service:
-            name: trace-service
-            port:
-              number: 3001
+      backendRefs:
+        - name: ak-outpost-authentik-embedded-outpost
+          namespace: authentik
+          port: 9000
+      headersToBackend:
+        - Cookie
+        - X-Forwarded-Host
+        - X-Forwarded-Proto
+        - X-Forwarded-Uri
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: trace-lua
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: trace-route
+  lua:
+    - type: Inline
+      inline: |
+        function envoy_on_request(request_handle)
+          local path = request_handle:headers():get(":path")
+          if path == "/" then
+            request_handle:respond({[":status"] = "302", ["location"] = "/1"}, "")
+          end
+        end
+
+        function envoy_on_response(response_handle)
+          response_handle:headers():add("access-control-allow-headers", "signature")
+        end

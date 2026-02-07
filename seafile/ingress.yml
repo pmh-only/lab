@@ -1,75 +1,80 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: seafile-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/server-snippet: |
-      location = /accounts/login/ {
-        if ($arg_next = "/") {
-          return 302 /oauth/login/?next=/$is_args$args;
-        }
-        return 302 /oauth/login/$is_args$args;
-      }
+  name: seafile-route
 spec:
-  ingressClassName: nginx
+  parentRefs:
+    - name: main
+      namespace: gateway
+  hostnames:
+    - drive.pmh.codes
   rules:
-  - host: drive.pmh.codes
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: seafile-service
-            port:
-              number: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /socket.io
+      backendRefs:
+        - name: seafile-sdoc-service
+          port:
+            number: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /sdoc-server/
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: seafile-sdoc-service
+          port:
+            number: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /notification/
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: seafile-noti-service
+          port:
+            number: 8083
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: seafile-service
+          port:
+            number: 80
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
 metadata:
-  name: seafile-sdoc-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    nginx.ingress.kubernetes.io/use-regex: "true"
+  name: seafile-login-redirect
 spec:
-  ingressClassName: nginx
-  rules:
-  - host: drive.pmh.codes
-    http:
-        paths:
-          - path: /sdoc-server(/|$)(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: seafile-sdoc-service
-                port:
-                  number: 80
-          - path: /notification(/|$)(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: seafile-noti-service
-                port:
-                  number: 8083
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: seafile-sdoc-ws-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: drive.pmh.codes
-    http:
-        paths:
-          - path: /socket.io
-            pathType: Prefix
-            backend:
-              service:
-                name: seafile-sdoc-service
-                port:
-                  number: 80
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: seafile-route
+  lua:
+    - type: Inline
+      inline: |
+        function envoy_on_request(request_handle)
+          local path = request_handle:headers():get(":path") or ""
+          if path == "/accounts/login/" or path:match("^/accounts/login/%?") then
+            local args = path:match("%?(.+)$") or ""
+            local next_val = args:match("next=([^&]*)")
+            if next_val == "/" or next_val == "%%2F" then
+              request_handle:respond({[":status"] = "302", ["location"] = "/oauth/login/?next=/&" .. args}, "")
+            else
+              request_handle:respond({[":status"] = "302", ["location"] = "/oauth/login/?" .. args}, "")
+            end
+          end
+        end

@@ -1,28 +1,13 @@
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: visualized-route
-spec:
-  parentRefs:
-    - name: main
-      namespace: gateway
-  hostnames:
-    - visualized.pmh.codes
-  rules:
-    - backendRefs:
-        - name: visualized-service
-          port:
-            number: 3000
----
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyExtensionPolicy
 metadata:
-  name: visualized-trace
+  name: trace-injection
+  namespace: gateway
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
-      kind: HTTPRoute
-      name: visualized-route
+      kind: Gateway
+      name: main
   lua:
     - type: Inline
       inline: |
@@ -32,7 +17,7 @@ spec:
           local body = response_handle:body(true)
           if body == nil then return end
           local bytes = body:getBytes(0, body:length())
-          local tag = '<script src="https://trace.pmh.codes/api/script.js" data-site-id="1" data-track-errors="true" data-web-vitals="true" defer></script>'
+          local tag = '<script src="https://trace.pmh.codes/api/script.js" data-site-id="1" defer></script>'
           local new_bytes = string.gsub(bytes, "<head>", "<head>" .. tag, 1)
           if new_bytes ~= bytes then
             body:setBytes(new_bytes)

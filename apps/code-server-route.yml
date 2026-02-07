@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: code-server-route
+  namespace: argocd
+spec:
+  destination:
+    namespace: code-server
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: code-server
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
+      - PruneLast=true
