@@ -19,5 +19,6 @@ spec:
         - group: ""
           kind: Service
           name: pmhraspberry
+          namespace: tailscale
           port: 1423
           weight: 1

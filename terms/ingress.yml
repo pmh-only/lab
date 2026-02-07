@@ -19,5 +19,6 @@ spec:
         - group: ""
           kind: Service
           name: terms
+          namespace: tailscale
           port: 8080
           weight: 1
