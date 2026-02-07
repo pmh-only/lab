@@ -8,6 +8,10 @@ spec:
     namespace: code-server
     server: https://kubernetes.default.svc
   project: default
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: Secret
   source:
     path: code-server
     repoURL: git@github.com:pmh-only/lab.git
@@ -17,6 +21,7 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
+      - RespectIgnoreDifferences=true
       - ApplyOutOfSyncOnly=true
       - ServerSideApply=true
       - PruneLast=true
