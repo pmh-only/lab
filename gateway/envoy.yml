@@ -10,6 +10,7 @@ spec:
       envoyDeployment:
         replicas: 2
       envoyService:
+        name: envoy-gateway-main
         type: ClusterIP
 ---
 apiVersion: gateway.networking.k8s.io/v1
