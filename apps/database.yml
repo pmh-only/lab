@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd-image-updater.argoproj.io/image-list: '
+    argocd-image-updater.argoproj.io/image-list: "
       mongo=ghcr.io/pmh-only/mongo:latest,
       mysql=ghcr.io/pmh-only/mysql:8,
       pgvecto-rs=ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0,
@@ -11,7 +11,7 @@ metadata:
       backpack-mysql2s3=ghcr.io/pmh-only/backpack-mysql2s3:latest,
       backpack-pgsql2s3=ghcr.io/pmh-only/backpack-pgsql2s3:latest,
       backpack-mongo2s3=ghcr.io/pmh-only/backpack-mongo2s3:latest,
-      backpack-clickhouse2s3=ghcr.io/pmh-only/backpack-clickhouse2s3:latest'
+      backpack-clickhouse2s3=ghcr.io/pmh-only/backpack-clickhouse2s3:latest"
     argocd-image-updater.argoproj.io/mongo.update-strategy: digest
     argocd-image-updater.argoproj.io/mysql.update-strategy: digest
     argocd-image-updater.argoproj.io/pgvecto-rs.update-strategy: digest

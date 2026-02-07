@@ -1,17 +1,52 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: pmhso-default-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      if ($host = "pmh.so") {
-        return 301 $scheme://pmh.codes$request_uri;
-      }
-      if ($host ~* ^(?<subdomain>.+)\.pmh\.so$) {
-        return 301 $scheme://$subdomain.pmh.codes$request_uri;
-      }
+  name: pmhso-redirect
 spec:
-  ingressClassName: nginx
+  parentRefs:
+    - name: main
+      namespace: gateway
+  hostnames:
+    - pmh.so
   rules:
-  - host: pmh.so
-  - host: '*.pmh.so'
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            hostname: pmh.codes
+            statusCode: 301
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: pmhso-wildcard-redirect
+spec:
+  parentRefs:
+    - name: main
+      namespace: gateway
+  hostnames:
+    - "*.pmh.so"
+  rules:
+    - backendRefs: []
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: pmhso-wildcard-redirect-lua
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: pmhso-wildcard-redirect
+  lua:
+    - type: Inline
+      inline: |
+        function envoy_on_request(request_handle)
+          local host = request_handle:headers():get(":authority") or ""
+          local sub = string.match(host, "^(.+)%.pmh%.so$")
+          if sub then
+            request_handle:respond(
+              {[":status"] = "301", ["location"] = "https://" .. sub .. ".pmh.codes" .. request_handle:headers():get(":path")},
+              ""
+            )
+          end
+        end

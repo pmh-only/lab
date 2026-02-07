@@ -5,3 +5,7 @@ resources:
   - ./certificate.yml
   - ./clusterissuer.yml
   - ./nginx.yml
+  - ./envoy.yml
+  - ./trace-lua.yml
+  - ./backend-policy.yml
+  - ./trace-extension.yml

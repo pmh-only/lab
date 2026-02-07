@@ -67,7 +67,6 @@ data:
 
       proxy_set_header Connection "";
       proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Accept-Encoding "";
 
       proxy_read_timeout 86400;
       proxy_send_timeout 86400;
@@ -140,8 +139,8 @@ data:
         error_log  /dev/stderr notice;
 
         location / {
-          proxy_pass https://ingress-ingress-nginx-controller.ingress.svc.cluster.local:443;
-          proxy_ssl_verify off;
+          set $envoy_gateway envoy-gateway-main.gateway.svc.cluster.local;
+          proxy_pass http://$envoy_gateway:80;
         }
 
         location /_gwhealthz {

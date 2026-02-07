@@ -1,43 +1,52 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: spotify-api-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    nginx.ingress.kubernetes.io/use-regex: "true"
+  name: spotify-route
 spec:
-  ingressClassName: nginx
+  parentRefs:
+    - name: main
+      namespace: gateway
+  hostnames:
+    - spotify.pmh.codes
   rules:
-  - host: spotify.pmh.codes
-    http:
-      paths:
-        - path: /api(/|$)(.*)
-          pathType: Prefix
-          backend:
-            service:
-              name: spotify-api-service
-              port:
-                number: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: spotify-api-service
+          port:
+            number: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: spotify-web-service
+          port:
+            number: 3000
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
 metadata:
-  name: spotify-web-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      if ($arg_token = "") {
-        rewrite ^/$ /?token=7e349c70-567e-427f-9a62-6dc2c964589f redirect;
-      }
+  name: spotify-token-redirect
 spec:
-  ingressClassName: nginx
-  rules:
-  - host: spotify.pmh.codes
-    http:
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: spotify-web-service
-              port:
-                number: 3000
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: spotify-route
+  lua:
+    - type: Inline
+      inline: |
+        function envoy_on_request(request_handle)
+          local path = request_handle:headers():get(":path")
+          if path == "/" then
+            request_handle:respond({[":status"] = "302", ["location"] = "/?token=7e349c70-567e-427f-9a62-6dc2c964589f"}, "")
+          end
+        end

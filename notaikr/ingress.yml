@@ -1,17 +1,15 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: notaikr-ingress
+  name: notaikr-route
 spec:
-  ingressClassName: nginx
+  parentRefs:
+    - name: main
+      namespace: gateway
+  hostnames:
+    - not.ai.kr
   rules:
-  - host: not.ai.kr
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: notaikr-service
-            port:
-              number: 8080
+    - backendRefs:
+        - name: notaikr-service
+          port:
+            number: 8080

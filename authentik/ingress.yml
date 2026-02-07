@@ -1,21 +1,40 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: authentik-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      sub_filter "</head>" "<script src=/media/custom.js></script></head>";
-      proxy_set_header Accept-Encoding "";
+  name: authentik-route
 spec:
-  ingressClassName: nginx
+  parentRefs:
+    - name: main
+      namespace: gateway
+  hostnames:
+    - auth.pmh.codes
   rules:
-  - host: auth.pmh.codes
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: authentik-service
-            port:
-              number: 9000
+    - backendRefs:
+        - name: authentik-service
+          port:
+            number: 9000
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: authentik-custom-js
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: authentik-route
+  lua:
+    - type: Inline
+      inline: |
+        function envoy_on_response(response_handle)
+          local ct = response_handle:headers():get("content-type") or ""
+          if not string.find(ct, "text/html") then return end
+          local body = response_handle:body(true)
+          if body == nil then return end
+          local bytes = body:getBytes(0, body:length())
+          local new_bytes = string.gsub(bytes, "</head>", "<script src=/media/custom.js></script></head>", 1)
+          if new_bytes ~= bytes then
+            body:setBytes(new_bytes)
+            response_handle:headers():remove("content-length")
+          end
+        end

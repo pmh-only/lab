@@ -1,0 +1,64 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: gateway-proxy
+  namespace: gateway
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyDeployment:
+        replicas: 2
+      envoyService:
+        type: ClusterIP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  parametersRef:
+    group: gateway.envoyproxy.io
+    kind: EnvoyProxy
+    name: gateway-proxy
+    namespace: gateway
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: main
+  namespace: gateway
+spec:
+  gatewayClassName: envoy
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-authentik-ref
+  namespace: authentik
+spec:
+  from:
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: kopia
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: trace
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: minio
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: code-server
+  to:
+    - group: ""
+      kind: Service
+      name: ak-outpost-authentik-embedded-outpost

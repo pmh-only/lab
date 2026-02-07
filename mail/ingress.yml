@@ -1,22 +1,33 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: roundcube-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      if ($request_uri = "/") {
-        return 302 /?oidc=1;
-      }
+  name: mail-route
 spec:
-  ingressClassName: nginx
+  parentRefs:
+    - name: main
+      namespace: gateway
+  hostnames:
+    - mail.pmh.codes
   rules:
-  - host: mail.pmh.codes
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: roundcube
-            port:
-              number: 80
+    - backendRefs:
+        - name: roundcube
+          port:
+            number: 80
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: mail-oidc-redirect
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: mail-route
+  lua:
+    - type: Inline
+      inline: |
+        function envoy_on_request(request_handle)
+          if request_handle:headers():get(":path") == "/" then
+            request_handle:respond({[":status"] = "302", ["location"] = "/?oidc=1"}, "")
+          end
+        end

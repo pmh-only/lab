@@ -1,11 +1,32 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: ghost-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/server-snippet: |
-      return 301 https://web.archive.org/web/20240224101806/https://pmh.codes$request_uri;
+  name: ghost-redirect
 spec:
-  ingressClassName: nginx
+  parentRefs:
+    - name: main
+      namespace: gateway
+  hostnames:
+    - blog.pmh.codes
   rules:
-  - host: blog.pmh.codes
+    - backendRefs: []
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: ghost-redirect-lua
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: ghost-redirect
+  lua:
+    - type: Inline
+      inline: |
+        function envoy_on_request(request_handle)
+          local path = request_handle:headers():get(":path") or ""
+          request_handle:respond(
+            {[":status"] = "301", ["location"] = "https://web.archive.org/web/20240224101806/https://pmh.codes" .. path},
+            ""
+          )
+        end
