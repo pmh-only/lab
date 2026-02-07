@@ -16,9 +16,17 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - group: ""
-          kind: Service
-          name: terms
-          namespace: tailscale
-          port: 8080
+        - group: "gateway.envoyproxy.io"
+          kind: Backend
+          name: terms-service
           weight: 1
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: Backend
+metadata:
+  name: terms-service
+spec:
+  endpoints:
+    - fqdn:
+        hostname: pmhraspberry.tailscale.svc.cluster.local
+        port: 8080
