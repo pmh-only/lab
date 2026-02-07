@@ -79,6 +79,10 @@ data:
       proxy_request_buffering off;
       proxy_http_version 1.1;
 
+      proxy_buffer_size 1m;
+      proxy_buffers 8 1m;
+      proxy_busy_buffers_size 2m;
+
       map $http_x_forwarded_for $ga_xff {
         default $http_x_forwarded_for;
         ""      "-";
