@@ -11,3 +11,30 @@ spec:
   timeout:
     http:
       requestTimeout: "86400s"
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyPatchPolicy
+metadata:
+  name: authentik-redirect-headers
+  namespace: gateway
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: main
+  type: JSONPatch
+  jsonPatches:
+    - type: "type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz"
+      name: "envoy.filters.http.ext_authz"
+      operation:
+        op: add
+        path: "/allowed_upstream_headers/patterns/-"
+        value:
+          exact: "location"
+    - type: "type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz"
+      name: "envoy.filters.http.ext_authz"
+      operation:
+        op: add
+        path: "/allowed_upstream_headers/patterns/-"
+        value:
+          exact: "set-cookie"
