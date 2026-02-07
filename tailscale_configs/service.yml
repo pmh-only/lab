@@ -12,7 +12,7 @@ spec:
     - name: radio
       protocol: TCP
       port: 1423
-      targetPort: 142
+      targetPort: 1423
     - name: terms
       protocol: TCP
       port: 8080
