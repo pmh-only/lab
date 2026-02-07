@@ -9,9 +9,11 @@ spec:
   externalName: placeholder
   type: ExternalName
   ports:
-    - protocol: TCP
+    - name: radio
+      protocol: TCP
       port: 1423
       targetPort: 142
-    - protocol: TCP
+    - name: terms
+      protocol: TCP
       port: 8080
       targetPort: 8080
