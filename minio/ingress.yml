@@ -69,14 +69,19 @@ spec:
           if host:match("s3%.pmh%.codes$") then return end
 
           -- Extract bucket from hostname
-          local bucket, cdn = host:match("^([^.]+)(%.cdn)?%.pmh%.codes$")
-
-          if not bucket then
-            bucket = "www"
-          elseif cdn then
-            bucket = "c-" .. bucket
-          elseif #bucket < 3 or bucket:sub(1, 4) == "xn--" then
-            bucket = "a-" .. bucket
+          local bucket = nil
+          local cdn_sub = host:match("^([^.]+)%.cdn%.pmh%.codes$")
+          if cdn_sub then
+            bucket = "c-" .. cdn_sub
+          else
+            bucket = host:match("^([^.]+)%.pmh%.codes$")
+            if bucket then
+              if #bucket < 3 or bucket:sub(1, 4) == "xn--" then
+                bucket = "a-" .. bucket
+              end
+            else
+              bucket = "www"
+            end
           end
 
           request_handle:headers():replace("host", bucket .. ".s3.pmh.codes")
