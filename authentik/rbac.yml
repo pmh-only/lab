@@ -59,10 +59,9 @@ rules:
       - list
       - patch
   - apiGroups:
-      - extensions
-      - networking.k8s.io
+      - gateway.networking.k8s.io
     resources:
-      - ingresses
+      - httproutes
     verbs:
       - get
       - create
