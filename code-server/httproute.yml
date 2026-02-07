@@ -34,10 +34,9 @@ spec:
   oidc:
     provider:
       issuer: "https://auth.pmh.codes/application/o/code-server/"
+      tokenEndpoint: "http://authentik-service.authentik.svc.cluster.local/application/o/token/"
     clientID: "IJrzGJv8WH7qFNF0GCdNFWmalznzB6cXniM10061"
     clientSecret:
       group: ""
       kind: "Secret"
       name: "code-server-auth-secret"
-    redirectURL: "https://ide.pmh.codes/oauth2/callback"
-    logoutPath: "/logout"
