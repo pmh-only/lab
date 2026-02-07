@@ -4,11 +4,15 @@ metadata:
   name: immich-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - photos.pmh.codes
   rules:
     - backendRefs:
-        - name: immich-service
+        - group: ""
+          kind: Service
+          name: immich-service
           port: 2283

@@ -58,13 +58,17 @@ metadata:
   name: minio-explorer-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - explorer.s3.pmh.codes
   rules:
     - backendRefs:
-        - name: minio-explorer
+        - group: ""
+          kind: Service
+          name: minio-explorer
           port: 8334
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
@@ -79,7 +83,9 @@ spec:
   extAuth:
     http:
       backendRefs:
-        - name: ak-outpost-authentik-embedded-outpost
+        - group: ""
+          kind: Service
+          name: ak-outpost-authentik-embedded-outpost
           namespace: authentik
           port: 9000
       headersToBackend:

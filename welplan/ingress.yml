@@ -4,11 +4,15 @@ metadata:
   name: welplan-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - welplan.pmh.codes
   rules:
     - backendRefs:
-        - name: welplan-service
+        - group: ""
+          kind: Service
+          name: welplan-service
           port: 3000

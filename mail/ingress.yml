@@ -4,13 +4,17 @@ metadata:
   name: mail-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - mail.pmh.codes
   rules:
     - backendRefs:
-        - name: roundcube
+        - group: ""
+          kind: Service
+          name: roundcube
           port: 80
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1

@@ -4,13 +4,17 @@ metadata:
   name: authentik-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - auth.pmh.codes
   rules:
     - backendRefs:
-        - name: authentik-service
+        - group: ""
+          kind: Service
+          name: authentik-service
           port: 9000
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1

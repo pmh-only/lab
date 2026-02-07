@@ -4,11 +4,15 @@ metadata:
   name: notaikr-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - not.ai.kr
   rules:
     - backendRefs:
-        - name: notaikr-service
+        - group: ""
+          kind: Service
+          name: notaikr-service
           port: 8080

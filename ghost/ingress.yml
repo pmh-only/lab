@@ -4,7 +4,9 @@ metadata:
   name: ghost-redirect
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - blog.pmh.codes

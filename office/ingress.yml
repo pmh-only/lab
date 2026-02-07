@@ -4,11 +4,15 @@ metadata:
   name: office-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - office.pmh.codes
   rules:
     - backendRefs:
-        - name: office-service
+        - group: ""
+          kind: Service
+          name: office-service
           port: 80

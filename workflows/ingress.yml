@@ -4,11 +4,15 @@ metadata:
   name: workflows-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - flows.pmh.codes
   rules:
     - backendRefs:
-        - name: workflows-service
+        - group: ""
+          kind: Service
+          name: workflows-service
           port: 5678

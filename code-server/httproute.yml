@@ -4,13 +4,17 @@ metadata:
   name: code-server-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - ide.pmh.codes
   rules:
     - backendRefs:
-        - name: code-server
+        - group: ""
+          kind: Service
+          name: code-server
           port: 8080
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
@@ -25,7 +29,9 @@ spec:
   extAuth:
     http:
       backendRefs:
-        - name: ak-outpost-authentik-embedded-outpost
+        - group: ""
+          kind: Service
+          name: ak-outpost-authentik-embedded-outpost
           namespace: authentik
           port: 9000
       headersToBackend:

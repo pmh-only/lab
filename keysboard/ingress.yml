@@ -4,11 +4,15 @@ metadata:
   name: keysboard-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - keys.pmh.codes
   rules:
     - backendRefs:
-        - name: keysboard-service
+        - group: ""
+          kind: Service
+          name: keysboard-service
           port: 3000

@@ -4,7 +4,9 @@ metadata:
   name: chatsolution-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - c.pmh.codes
@@ -14,5 +16,7 @@ spec:
             type: PathPrefix
             value: /socket.io/
       backendRefs:
-        - name: chatsolution-service
+        - group: ""
+          kind: Service
+          name: chatsolution-service
           port: 80

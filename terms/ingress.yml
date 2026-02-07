@@ -4,11 +4,15 @@ metadata:
   name: terms-route
 spec:
   parentRefs:
-    - name: main
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
       namespace: gateway
   hostnames:
     - terms.pmh.codes
   rules:
     - backendRefs:
-        - name: terms
+        - group: ""
+          kind: Service
+          name: terms
           port: 8080
