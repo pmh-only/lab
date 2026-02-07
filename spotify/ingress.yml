@@ -21,16 +21,14 @@ spec:
               replacePrefixMatch: /
       backendRefs:
         - name: spotify-api-service
-          port:
-            number: 8080
+          port: 8080
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
         - name: spotify-web-service
-          port:
-            number: 3000
+          port: 3000
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyExtensionPolicy

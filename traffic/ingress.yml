@@ -15,13 +15,11 @@ spec:
             value: /
       backendRefs:
         - name: aggregator
-          port:
-            number: 80
+          port: 80
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
         - name: aggregator
-          port:
-            number: 443
+          port: 443

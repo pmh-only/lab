@@ -11,8 +11,7 @@ spec:
   rules:
     - backendRefs:
         - name: authentik-service
-          port:
-            number: 9000
+          port: 9000
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyExtensionPolicy

@@ -11,5 +11,4 @@ spec:
   rules:
     - backendRefs:
         - name: nameserver
-          port:
-            number: 5380
+          port: 5380

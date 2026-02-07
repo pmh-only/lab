@@ -65,8 +65,7 @@ spec:
   rules:
     - backendRefs:
         - name: minio-explorer
-          port:
-            number: 8334
+          port: 8334
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
