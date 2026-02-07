@@ -1,8 +1,0 @@
-{
-  "yaml.schemas": {
-    "kubernetes": [
-      "*.yml",
-      "*.yaml"
-    ]
-  }
-}
