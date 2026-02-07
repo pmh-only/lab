@@ -7,10 +7,10 @@ spec:
   from:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-      namespace: radio
+      namespace: radio-route
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-      namespace: terms
+      namespace: terms-route
   to:
     - group: ""
       kind: Service
