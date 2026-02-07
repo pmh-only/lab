@@ -58,7 +58,6 @@ spec:
             successThreshold: 1
             tcpSocket:
               port: 3000
-              weight: 1
             timeoutSeconds: 1
           resources:
             requests:

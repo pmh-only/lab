@@ -16,6 +16,10 @@ spec:
           requestRedirect:
             hostname: pmh.codes
             statusCode: 301
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -31,6 +35,10 @@ spec:
     - "*.pmh.so"
   rules:
     - backendRefs: []
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyExtensionPolicy
