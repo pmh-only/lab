@@ -11,8 +11,13 @@ spec:
   hostnames:
     - photos.pmh.codes
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: immich-service
           port: 2283
+          weight: 1

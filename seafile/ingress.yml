@@ -20,6 +20,7 @@ spec:
           kind: Service
           name: seafile-sdoc-service
           port: 80
+          weight: 1
     - matches:
         - path:
             type: PathPrefix
@@ -35,6 +36,7 @@ spec:
           kind: Service
           name: seafile-sdoc-service
           port: 80
+          weight: 1
     - matches:
         - path:
             type: PathPrefix
@@ -50,6 +52,7 @@ spec:
           kind: Service
           name: seafile-noti-service
           port: 8083
+          weight: 1
     - matches:
         - path:
             type: PathPrefix
@@ -59,6 +62,7 @@ spec:
           kind: Service
           name: seafile-service
           port: 80
+          weight: 1
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyExtensionPolicy

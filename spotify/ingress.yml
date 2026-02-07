@@ -26,6 +26,7 @@ spec:
           kind: Service
           name: spotify-api-service
           port: 8080
+          weight: 1
     - matches:
         - path:
             type: PathPrefix
@@ -35,6 +36,7 @@ spec:
           kind: Service
           name: spotify-web-service
           port: 3000
+          weight: 1
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyExtensionPolicy

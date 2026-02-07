@@ -20,3 +20,4 @@ spec:
           kind: Service
           name: chatsolution-service
           port: 80
+          weight: 1

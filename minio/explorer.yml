@@ -50,6 +50,7 @@ spec:
     - name: minio-explorer
       protocol: TCP
       port: 8334
+      weight: 1
       targetPort: 8334
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -65,11 +66,16 @@ spec:
   hostnames:
     - explorer.s3.pmh.codes
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: minio-explorer
           port: 8334
+          weight: 1
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy

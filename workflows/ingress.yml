@@ -11,8 +11,13 @@ spec:
   hostnames:
     - flows.pmh.codes
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: workflows-service
           port: 5678
+          weight: 1

@@ -11,8 +11,13 @@ spec:
   hostnames:
     - welplan.pmh.codes
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: welplan-service
           port: 3000
+          weight: 1

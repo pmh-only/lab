@@ -11,8 +11,13 @@ spec:
   hostnames:
     - names.pmh.codes
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: nameserver
           port: 5380
+          weight: 1

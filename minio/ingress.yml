@@ -12,11 +12,16 @@ spec:
     - s3.pmh.codes
     - "*.s3.pmh.codes"
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: minio-service
           port: 9000
+          weight: 1
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -33,11 +38,16 @@ spec:
     - "*.pmh.codes"
     - "*.cdn.pmh.codes"
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - group: ""
           kind: Service
           name: minio-service
           port: 9000
+          weight: 1
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyExtensionPolicy
