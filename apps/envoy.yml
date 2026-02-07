@@ -12,6 +12,12 @@ spec:
     path: .
     repoURL: oci://docker.io/envoyproxy/gateway-helm
     targetRevision: x
+    helm:
+      valuesObject:
+        config:
+          envoyGateway:
+            extensionApis:
+              enableBackend: true
   syncPolicy:
     automated:
       prune: true
