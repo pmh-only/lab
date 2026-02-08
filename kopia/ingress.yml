@@ -35,7 +35,7 @@ spec:
     provider:
       issuer: "https://auth.pmh.codes/application/o/kopia/"
       tokenEndpoint: "http://authentik-service.authentik.svc.cluster.local:9000/application/o/token/"
-    clientID: "UUCgl2BRWFeP4lOx7RUrXTTzJMA7xDkjI89xnIpc"
+    clientID: "mtDShvttXj4pxfNLgTle6zhyH32rbWHGTOQ354Fk"
     clientSecret:
       group: ""
       kind: "Secret"

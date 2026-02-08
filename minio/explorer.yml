@@ -85,20 +85,12 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: minio-explorer-route
-  extAuth:
-    http:
-      backendRefs:
-        - group: ""
-          kind: Service
-          name: ak-outpost-authentik-embedded-outpost
-          namespace: authentik
-          weight: 1
-          port: 9000
-      headersToBackend:
-        - Set-Cookie
-        - X-authentik-username
-        - X-authentik-groups
-        - X-authentik-email
-        - X-authentik-name
-        - X-authentik-uid
-      path: /outpost.goauthentik.io/auth/envoy
+  oidc:
+    provider:
+      issuer: "https://auth.pmh.codes/application/o/minio-explorer/"
+      tokenEndpoint: "http://authentik-service.authentik.svc.cluster.local:9000/application/o/token/"
+    clientID: "5FipD1kaVq4DG9R2VIaO0XMWqDwQcsRbY5HHtseh"
+    clientSecret:
+      group: ""
+      kind: "Secret"
+      name: "minio-explorer-auth-secret"
