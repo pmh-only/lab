@@ -93,4 +93,4 @@ spec:
     clientSecret:
       group: ""
       kind: "Secret"
-      name: "minio-explorer-auth-secret"
+      name: "minio-explorer-auth-secrets"
