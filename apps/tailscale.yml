@@ -8,6 +8,10 @@ spec:
     namespace: tailscale
     server: https://kubernetes.default.svc
   project: default
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: Secret
   source:
     chart: tailscale-operator
     helm:
@@ -25,3 +29,4 @@ spec:
       - PruneLast=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
