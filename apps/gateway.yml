@@ -10,10 +10,6 @@ spec:
   destination:
     namespace: gateway
     server: https://kubernetes.default.svc
-  ignoreDifferences:
-    - jsonPointers:
-        - /data
-      kind: Secret
   project: default
   source:
     path: gateway
@@ -24,7 +20,6 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - RespectIgnoreDifferences=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
       - ServerSideApply=true

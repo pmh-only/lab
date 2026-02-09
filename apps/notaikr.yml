@@ -10,10 +10,6 @@ spec:
   destination:
     namespace: notaikr
     server: https://kubernetes.default.svc
-  ignoreDifferences:
-    - jsonPointers:
-        - /data
-      kind: Secret
   project: default
   source:
     path: notaikr
@@ -24,7 +20,6 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - RespectIgnoreDifferences=true
       - PruneLast=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
