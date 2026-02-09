@@ -7,10 +7,6 @@ spec:
   destination:
     namespace: terms
     server: https://kubernetes.default.svc
-  ignoreDifferences:
-    - jsonPointers:
-        - /data
-      kind: Secret
   project: default
   source:
     path: terms
@@ -21,7 +17,6 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - RespectIgnoreDifferences=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
       - ServerSideApply=true
