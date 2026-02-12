@@ -68,3 +68,78 @@ spec:
       - ApplyOutOfSyncOnly=true
       - RespectIgnoreDifferences=true
       - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: velero-ui
+  namespace: argocd
+spec:
+  destination:
+    namespace: velero
+    server: https://kubernetes.default.svc
+  ignoreDifferences:
+    - jsonPointers:
+        - /data
+      kind: Secret
+  project: default
+  source:
+    chart: velero-ui
+    helm:
+      valuesObject:
+        env:
+          - name: BASIC_AUTH_ENABLED
+            value: "false"
+          - name: OAUTH_AUTH_ENABLED
+            value: "true"
+          - name: OAUTH_NAME
+            value: pmh.codes
+          - name: OAUTH_AUTHORIZATION_URL
+            value: https://auth.pmh.codes/application/o/authorize/
+          - name: OAUTH_USER_INFO_URL
+            value: http://authentik-service.authentik.svc.cluster.local:9000/application/o/userinfo/
+          - name: OAUTH_TOKEN_URL
+            value: http://authentik-service.authentik.svc.cluster.local:9000/application/o/token/
+          - name: OAUTH_CLIENT_ID
+            value: jiqFkzGXFxXeRcYUJNRkPnwvh6acq0a0kCwAy0R9
+          - name: OAUTH_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: velero-ui-secrets
+                key: OAUTH_CLIENT_SECRET
+          - name: OAUTH_REDIRECT_URI
+            value: https://velero.pmh.codes/login
+    repoURL: https://helm.otwld.com
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - RespectIgnoreDifferences=true
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: velero-ui-configs
+  namespace: argocd
+spec:
+  destination:
+    namespace: velero
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: velero-ui_configs
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
