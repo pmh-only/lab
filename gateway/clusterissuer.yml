@@ -12,6 +12,15 @@ spec:
     preferredChain: "ISRG Root YE"
     solvers:
       - dns01:
+          webhook:
+            groupName: acme.xver.cloud
+            solverName: technitium
+            config:
+              serverUrl: http://nameserver.nameserver.svc.cluster.local:5380
+              authTokenSecretRef:
+                key: api-token
+                name: technitium-api-token
+      - dns01:
           cloudflare:
             apiTokenSecretRef:
               name: cloudflare-api-token-secret
