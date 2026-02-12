@@ -24,6 +24,7 @@ spec:
           dnsZones:
             - pmh.so
             - pmh.codes
+
       - dns01:
           cloudflare:
             apiTokenSecretRef:
@@ -32,6 +33,11 @@ spec:
         selector:
           dnsZones:
             - not.ai.kr
+
       - http01:
-          ingress:
-            ingressClassName: nginx
+          gatewayHTTPRoute:
+            parentRefs:
+              - group: gateway.networking.k8s.io
+                kind: Gateway
+                name: main
+                namespace: gateway
