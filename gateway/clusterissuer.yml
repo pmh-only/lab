@@ -20,6 +20,10 @@ spec:
               authTokenSecretRef:
                 key: api-token
                 name: technitium-api-token
+        selector:
+          dnsZones:
+            - pmh.so
+            - pmh.codes
       - dns01:
           cloudflare:
             apiTokenSecretRef:
@@ -27,8 +31,6 @@ spec:
               key: api-token
         selector:
           dnsZones:
-            - pmh.so
-            - pmh.codes
             - not.ai.kr
       - http01:
           ingress:
