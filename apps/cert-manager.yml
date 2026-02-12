@@ -20,6 +20,9 @@ spec:
           apiVersion: controller.config.cert-manager.io/v1alpha1
           kind: ControllerConfiguration
           enableGatewayAPI: true
+        extraArgs:
+          - --dns01-recursive-nameservers-only
+          - --dns01-recursive-nameservers=1.1.1.1:53,1.0.0.1:53
     repoURL: https://charts.jetstack.io
     targetRevision: x
   syncPolicy:
