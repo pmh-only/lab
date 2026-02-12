@@ -16,6 +16,10 @@ spec:
           enabled: true
         global:
           revisionHistoryLimit: 0
+      config:
+        apiVersion: controller.config.cert-manager.io/v1alpha1
+        kind: ControllerConfiguration
+        enableGatewayAPI: true
     repoURL: https://charts.jetstack.io
     targetRevision: x
   syncPolicy:
