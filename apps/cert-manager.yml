@@ -41,10 +41,8 @@ spec:
     chart: cert-manager-technitium-webhook
     helm:
       valuesObject:
-        crds:
-          enabled: true
-        global:
-          revisionHistoryLimit: 0
+        image:
+          repository: ghcr.io/pmh-only/cert-manager-technitium-webhook
     repoURL: https://kittizz.github.io/cert-manager-technitium-webhook
     targetRevision: x
   syncPolicy:
