@@ -81,7 +81,6 @@ spec:
       labels:
         app: authentik-worker
     spec:
-      serviceAccountName: authentik
       containers:
         - name: authentik
           image: ghcr.io/goauthentik/server:latest
