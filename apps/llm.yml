@@ -57,6 +57,72 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  name: litellm
+  namespace: argocd
+spec:
+  destination:
+    namespace: llm
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: .
+    repoURL: oci://docker.litellm.ai/berriai/litellm-helm
+    targetRevision: x
+    helm:
+      valuesObject:
+        fullnameOverride: litellm
+        replicaCount: 1
+        db:
+          useExisting: true
+          deployStandalone: false
+          endpoint: pgsql-service.database.svc.cluster.local:5432
+          database: litellm
+          url: postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
+          secret:
+            name: llm-database-secret
+            usernameKey: username
+            passwordKey: password
+        envVars:
+          REDIS_HOST: redis-service.database.svc.cluster.local
+          REDIS_PORT: "6379"
+        extraResources:
+          - apiVersion: gateway.networking.k8s.io/v1
+            kind: HTTPRoute
+            metadata:
+              name: litellm
+              namespace: llm
+            spec:
+              parentRefs:
+                - group: gateway.networking.k8s.io
+                  kind: Gateway
+                  name: main
+                  namespace: gateway
+              hostnames:
+                - litellm.pmh.codes
+              rules:
+                - matches:
+                    - path:
+                        type: PathPrefix
+                        value: /
+                  backendRefs:
+                    - group: ""
+                      kind: Service
+                      name: litellm
+                      port: 4000
+                      weight: 1
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - PruneLast=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   name: llm-configs
   namespace: argocd
 spec:
