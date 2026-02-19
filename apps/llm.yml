@@ -1,0 +1,68 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openwebui
+  namespace: argocd
+spec:
+  destination:
+    namespace: llm
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: open-webui
+    helm:
+      valuesObject:
+        tika:
+          enabled: false
+
+        route:
+          enabled: true
+          hostnames:
+            - llm.pmh.codes
+          parentRefs:
+            - name: main
+              namespace: gateway
+        sso:
+          enabled: true
+          enableSignup: true
+          mergeAccountsByEmail: true
+          oidc:
+            enabled: true
+            clientId: ky8d6aG1hsmUjINd5nlrVGmMwLsIBJBZQbA6U96u
+            clientExistingSecret: open-webui-secret
+            clientExistingSecretKey: oidc-secret
+            providerUrl: https://auth.pmh.codes/application/o/llm/.well-known/openid-configuration
+            providerName: pmh.codes
+    repoURL: https://open-webui.github.io/helm-charts
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: llm-configs
+  namespace: argocd
+spec:
+  destination:
+    namespace: llm
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: llm_configs
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
