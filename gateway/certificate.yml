@@ -14,6 +14,7 @@ spec:
     - "*.pmh.codes"
     - "*.here.pmh.so"
     - "*.s3.pmh.codes"
+    - "*.llm.pmh.codes"
 
     - not.ai.kr
   ipAddresses:
