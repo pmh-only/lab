@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: office
-          image: ghcr.io/pmh-only/onlyoffice:latest
+          image: ghcr.io/pmh-only/onlyoffice:latest-linux-arm64
           env:
             - name: DB_TYPE
               value: mysql
