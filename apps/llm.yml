@@ -33,7 +33,7 @@ spec:
           oidc:
             enabled: true
             clientId: ky8d6aG1hsmUjINd5nlrVGmMwLsIBJBZQbA6U96u
-            clientExistingSecret: open-webui-secret
+            clientExistingSecret: openwebui-secret
             clientExistingSecretKey: oidc-secret
             providerUrl: https://auth.pmh.codes/application/o/llm/.well-known/openid-configuration
             providerName: pmh.codes
