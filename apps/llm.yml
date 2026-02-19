@@ -87,6 +87,16 @@ spec:
         envVars:
           REDIS_HOST: redis-service.database.svc.cluster.local
           REDIS_PORT: "6379"
+          STORE_MODEL_IN_DB: "True"
+        proxy_config:
+          model_list:
+            - model_name: fake-openai-endpoint
+              litellm_params:
+                model: openai/fake
+                api_key: fake-key
+                api_base: https://exampleopenaiendpoint-production.up.railway.app/
+          general_settings:
+            master_key: os.environ/PROXY_MASTER_KEY
         extraResources:
           - apiVersion: gateway.networking.k8s.io/v1
             kind: HTTPRoute
