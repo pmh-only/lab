@@ -16,6 +16,12 @@ spec:
         replicaCount: 1
         revisionHistoryLimit: 0
 
+        ollama:
+          enabled: false
+
+        pipelines:
+          enabled: false
+
         tika:
           enabled: true
 
