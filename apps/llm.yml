@@ -12,8 +12,12 @@ spec:
     chart: open-webui
     helm:
       valuesObject:
+        fullnameOverride: openwebui
+        replicaCount: 1
+        revisionHistoryLimit: 0
+
         tika:
-          enabled: false
+          enabled: true
 
         route:
           enabled: true
