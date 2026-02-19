@@ -89,12 +89,7 @@ spec:
           REDIS_PORT: "6379"
           STORE_MODEL_IN_DB: "True"
         proxy_config:
-          model_list:
-            - model_name: fake-openai-endpoint
-              litellm_params:
-                model: openai/fake
-                api_key: fake-key
-                api_base: https://exampleopenaiendpoint-production.up.railway.app/
+          model_list: []
           general_settings:
             master_key: os.environ/PROXY_MASTER_KEY
         extraResources:
