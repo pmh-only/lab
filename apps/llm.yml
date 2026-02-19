@@ -70,6 +70,8 @@ spec:
     targetRevision: x
     helm:
       valuesObject:
+        image:
+          tag: main-stable
         fullnameOverride: litellm
         replicaCount: 1
         db:
