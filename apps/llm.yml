@@ -89,7 +89,12 @@ spec:
           REDIS_PORT: "6379"
           STORE_MODEL_IN_DB: "True"
         proxy_config:
-          model_list: []
+          model_list:
+            - model_name: chatgpt/gpt-5.2
+              model_info:
+                mode: responses
+              litellm_params:
+                model: chatgpt/gpt-5.2
           general_settings:
             master_key: os.environ/PROXY_MASTER_KEY
         extraResources:
