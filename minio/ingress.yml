@@ -90,8 +90,8 @@ spec:
               return request_handle:httpCall(
                 "s3-probe-cluster",
                 {
-                  [":method"]  = "HEAD",
-                  [":path"]    = target_path,
+                  [":method"]    = "HEAD",
+                  [":path"]      = target_path,
                   [":authority"] = target_host,
                 },
                 "",
@@ -127,7 +127,7 @@ spec:
               return
             end
 
-            -- S3 healthy, route normally
+            request_handle:streamInfo():dynamicMetadata():set("lua", "pmh_codes_request", "true")
             request_handle:headers():replace("host", target_host)
             request_handle:headers():replace(":path", target_path)
             return
@@ -141,6 +141,11 @@ spec:
           local status = response_handle:headers():get(":status")
 
           if status == "400" or status == "401" or status == "403" or status == "404" then
+            local meta = response_handle:streamInfo():dynamicMetadata():get("lua")
+            if meta and meta["pmh_codes_request"] == "true" then
+              return
+            end
+
             response_handle:headers():replace(":status", "302")
             response_handle:headers():add("location", "https://pmh.codes")
             local body = response_handle:body(true)
