@@ -111,8 +111,8 @@ spec:
                   {
                     [":method"]    = method,
                     [":path"]      = path,
-                    [":authority"] = "go.go-service.svc.cluster.local",
-                    ["host"]       = "go.go-service.svc.cluster.local",
+                    [":authority"] = "go-service.go.svc.cluster.local",
+                    ["host"]       = "go-service.go.svc.cluster.local",
                   },
                   "",
                   5000
