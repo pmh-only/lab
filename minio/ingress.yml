@@ -100,37 +100,32 @@ spec:
               )
             end)
 
-            local s3_status = (probe_ok and probe_headers) and probe_headers[":status"] or "500"
-
-            if s3_status:match("^[45]") then
-              local method = request_handle:headers():get(":method") or "GET"
-              local fb_ok, fb_headers, fb_body = pcall(function()
-                return request_handle:httpCall(
-                  "go-go-cluster",
-                  {
-                    [":method"]    = method,
-                    [":path"]      = path,
-                    [":authority"] = "go-service.go.svc.cluster.local",
-                    ["host"]       = "go-service.go.svc.cluster.local",
-                  },
-                  "",
-                  5000
-                )
-              end)
-
-              if fb_ok and fb_headers then
-                request_handle:respond(fb_headers, fb_body or "")
-              else
-                request_handle:respond(
-                  {[":status"] = "502", ["content-type"] = "text/plain"},
-                  "Bad Gateway"
-                )
-              end
-              return
+            local s3_status = "pcall-failed"
+            local error_msg = "none"
+            if probe_ok and probe_headers then
+              s3_status = probe_headers[":status"] or "no-status"
+            elseif not probe_ok then
+              -- probe_headers contains the error message when pcall fails
+              error_msg = tostring(probe_headers)
+              s3_status = "pcall-error"
             end
 
-            request_handle:headers():replace("host", target_host)
-            request_handle:headers():replace(":path", target_path)
+            -- Always return debug info
+            request_handle:respond(
+              {
+                [":status"]              = "200",
+                ["content-type"]         = "text/plain",
+                ["x-debug-probe-ok"]     = tostring(probe_ok),
+                ["x-debug-s3-status"]    = s3_status,
+                ["x-debug-error"]        = error_msg,
+                ["x-debug-target-host"]  = target_host,
+                ["x-debug-target-path"]  = target_path,
+              },
+              "probe_ok=" .. tostring(probe_ok) ..
+              "\ns3_status=" .. s3_status ..
+              "\nerror=" .. error_msg ..
+              "\ntarget=" .. target_host .. target_path
+            )
             return
           end
 
@@ -140,7 +135,6 @@ spec:
 
         function envoy_on_response(response_handle)
           local status = response_handle:headers():get(":status")
-
           if status == "400" or status == "401" or status == "403" or status == "404" then
             response_handle:headers():replace(":status", "302")
             response_handle:headers():add("location", "https://pmh.codes")
