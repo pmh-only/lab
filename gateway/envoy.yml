@@ -82,5 +82,5 @@ spec:
                   - endpoint:
                       address:
                         socket_address:
-                          address: go.go-service.svc.cluster.local
+                          address: go-service.go.svc.cluster.local
                           port_value: 80
