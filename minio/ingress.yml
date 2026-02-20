@@ -68,7 +68,6 @@ spec:
           -- Skip S3 API endpoints
           if host:match("s3%.pmh%.codes$") then return end
 
-          -- Extract bucket from hostname
           local bucket = nil
           local cdn_sub = host:match("^([^.]+)%.cdn%.pmh%.codes$")
           if cdn_sub then
@@ -84,22 +83,66 @@ spec:
             end
           end
 
-          request_handle:headers():replace("host", bucket .. ".s3.pmh.codes")
+          local target_path = path == "/" and "/index.html" or path
+          local target_host = bucket .. ".s3.pmh.codes"
 
-          -- Root path: serve index.html
-          if path == "/" then
-            request_handle:headers():replace(":path", "/index.html")
+          if host == "pmh.codes" or host == "www.pmh.codes" then
+            local probe_ok, probe_headers = pcall(function()
+              return request_handle:httpCall(
+                "httproute/minio/minio-bucket-route/rule/0",
+                {
+                  [":method"]    = "HEAD",
+                  [":path"]      = target_path,
+                  [":authority"] = target_host,
+                  ["host"]       = target_host,
+                },
+                "",
+                3000
+              )
+            end)
+
+            local s3_status = (probe_ok and probe_headers) and probe_headers[":status"] or "500"
+
+            if s3_status:match("^[45]") then
+              local method = request_handle:headers():get(":method") or "GET"
+              local fb_ok, fb_headers, fb_body = pcall(function()
+                return request_handle:httpCall(
+                  "go-go-cluster",
+                  {
+                    [":method"]    = method,
+                    [":path"]      = path,
+                    [":authority"] = "go.go-service.svc.cluster.local",
+                    ["host"]       = "go.go-service.svc.cluster.local",
+                  },
+                  "",
+                  5000
+                )
+              end)
+
+              if fb_ok and fb_headers then
+                request_handle:respond(fb_headers, fb_body or "")
+              else
+                request_handle:respond(
+                  {[":status"] = "502", ["content-type"] = "text/plain"},
+                  "Bad Gateway"
+                )
+              end
+              return
+            end
           end
+
+          -- Normal S3 routing for all other hosts
+          request_handle:headers():replace("host", target_host)
+          request_handle:headers():replace(":path", target_path)
         end
 
         function envoy_on_response(response_handle)
           local status = response_handle:headers():get(":status")
+
           if status == "400" or status == "401" or status == "403" or status == "404" then
             response_handle:headers():replace(":status", "302")
             response_handle:headers():add("location", "https://pmh.codes")
             local body = response_handle:body(true)
-            if body then
-              body:setBytes("")
-            end
+            if body then body:setBytes("") end
           end
         end
