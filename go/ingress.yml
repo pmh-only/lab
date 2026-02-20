@@ -21,3 +21,34 @@ spec:
           name: go-service
           port: 80
           weight: 1
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyPatchPolicy
+metadata:
+  name: add-gogo-cluster
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: main
+    namespace: gateway
+  type: JSONPatch
+  jsonPatches:
+    - type: "type.googleapis.com/envoy.config.cluster.v3.Cluster"
+      name: "go-go-cluster"
+      operation:
+        op: add
+        path: ""
+        value:
+          name: "go-go-cluster"
+          type: STRICT_DNS
+          connect_timeout: 5s
+          load_assignment:
+            cluster_name: "go-go-cluster"
+            endpoints:
+              - lb_endpoints:
+                  - endpoint:
+                      address:
+                        socket_address:
+                          address: go.go-service.svc.cluster.local
+                          port_value: 80
