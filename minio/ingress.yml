@@ -88,7 +88,7 @@ spec:
           if host == "pmh.codes" or host == "www.pmh.codes" then
             local probe_ok, probe_headers = pcall(function()
               return request_handle:httpCall(
-                "httproute/minio/minio-bucket-route/rule/0",
+                "s3-probe-cluster",
                 {
                   [":method"]    = "HEAD",
                   [":path"]      = target_path,
@@ -103,7 +103,6 @@ spec:
             local s3_status = (probe_ok and probe_headers) and probe_headers[":status"] or "500"
 
             if s3_status:match("^[45]") then
-              -- S3 failed, fallback to go-service
               local method = request_handle:headers():get(":method") or "GET"
               local fb_ok, fb_headers, fb_body = pcall(function()
                 return request_handle:httpCall(
@@ -129,6 +128,10 @@ spec:
               end
               return
             end
+
+            request_handle:headers():replace("host", target_host)
+            request_handle:headers():replace(":path", target_path)
+            return
           end
 
           request_handle:headers():replace("host", target_host)
