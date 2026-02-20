@@ -84,3 +84,13 @@ spec:
                         socket_address:
                           address: go-service.go.svc.cluster.local
                           port_value: 80
+    - type: "type.googleapis.com/envoy.config.cluster.v3.Cluster"
+      name: "httproute/minio/minio-bucket-route/rule/0"
+      operation:
+        op: add
+        path: "/typed_extension_protocol_options"
+        value:
+          envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+            "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+            explicit_http_config:
+              http_protocol_options: {}
