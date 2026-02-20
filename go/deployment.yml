@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: go
+  template:
+    metadata:
+      labels:
+        app: go
+    spec:
+      containers:
+        - name: go
+          image: ghcr.io/pmh-only/go:latest
+          volumeMounts:
+            - mountPath: /data
+              name: persistent
+      volumes:
+        - name: persistent
+          persistentVolumeClaim:
+            claimName: go-pvc

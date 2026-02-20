@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: go=ghcr.io/pmh-only/go:latest
+    argocd-image-updater.argoproj.io/go.update-strategy: digest
+  name: go
+  namespace: argocd
+spec:
+  destination:
+    namespace: go
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: go
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - PruneLast=true
