@@ -21,3 +21,22 @@ spec:
           name: go-service
           port: 80
           weight: 1
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: go-auth
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: go-route
+  oidc:
+    provider:
+      issuer: "https://auth.pmh.codes/application/o/go/"
+      tokenEndpoint: "http://authentik-service.authentik.svc.cluster.local:9000/application/o/token/"
+    clientID: "erwP1MS4wHuI8jSFfGdjSOTtPUHxUmhgZvziFX9s"
+    clientSecret:
+      group: ""
+      kind: "Secret"
+      name: "go-auth-secrets"
