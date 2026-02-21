@@ -109,7 +109,7 @@ spec:
                   {
                     [":method"]    = method,
                     [":path"]      = path,
-                    [":authority"] = "go-service.go.svc.cluster.local",
+                    [":authority"] = host,
                   },
                   "",
                   5000
