@@ -36,7 +36,6 @@ spec:
   hostnames:
     - pmh.codes
     - "*.pmh.codes"
-    - "*.cdn.pmh.codes"
   rules:
     - matches:
         - path:
@@ -68,18 +67,13 @@ spec:
           if host:match("s3%.pmh%.codes$") then return end
 
           local bucket = nil
-          local cdn_sub = host:match("^([^.]+)%.cdn%.pmh%.codes$")
-          if cdn_sub then
-            bucket = "c-" .. cdn_sub
-          else
-            bucket = host:match("^([^.]+)%.pmh%.codes$")
-            if bucket then
-              if #bucket < 3 or bucket:sub(1, 4) == "xn--" then
-                bucket = "a-" .. bucket
-              end
-            else
-              bucket = "www"
+          bucket = host:match("^([^.]+)%.pmh%.codes$")
+          if bucket then
+            if #bucket < 3 or bucket:sub(1, 4) == "xn--" then
+              bucket = "a-" .. bucket
             end
+          else
+            bucket = "www"
           end
 
           local target_path = path == "/" and "/index.html" or path
