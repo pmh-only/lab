@@ -49,30 +49,7 @@ data:
           size: 1GB
 
     scrape_configs:
-      - job_name: "ingress"
-
-        kubernetes_sd_configs:
-          - role: pod
-            namespaces:
-              names: ["ingress"]
-            selectors:
-              - role: pod
-                label: "app.kubernetes.io/name = ingress-nginx"
-
-        relabel_configs:
-          - source_labels: [__meta_kubernetes_pod_container_port_number]
-            regex: "10254"
-            action: keep
-
-      - job_name: "minecraft"
-
-        kubernetes_sd_configs:
-          - role: pod
-            namespaces:
-              names: ["minecraft"]
-                
       - job_name: "ne"
-
         kubernetes_sd_configs:
           - role: pod
             namespaces:
@@ -83,7 +60,6 @@ data:
                 label: "app = ne"
 
       - job_name: "ksm"
-
         kubernetes_sd_configs:
           - role: pod
             namespaces:
@@ -94,18 +70,13 @@ data:
                 label: "app = ksm"
 
       - job_name: "kubernetes-apiservers"
-
         kubernetes_sd_configs:
           - role: endpoints
-
         scheme: https
-
         tls_config:
           ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-
         authorization:
           credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
         relabel_configs:
           - source_labels:
               [
@@ -118,16 +89,12 @@ data:
 
       - job_name: "kubernetes-nodes"
         scheme: https
-
         tls_config:
           ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-
         authorization:
           credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
         kubernetes_sd_configs:
           - role: node
-
         relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
@@ -135,59 +102,15 @@ data:
       - job_name: "kubernetes-cadvisor"
         scheme: https
         metrics_path: /metrics/cadvisor
-
         tls_config:
           ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-
         authorization:
           credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
         kubernetes_sd_configs:
           - role: node
-
         relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
-
-      - job_name: "minio-cluster"
-        metrics_path: /minio/v2/metrics/cluster
-        kubernetes_sd_configs:
-          - role: pod
-            namespaces:
-              names: ["minio"]
-            selectors:
-              - role: pod
-                label: "app = minio"
-
-      - job_name: "minio-node"
-        metrics_path: /minio/v2/metrics/node
-        kubernetes_sd_configs:
-          - role: pod
-            namespaces:
-              names: ["minio"]
-            selectors:
-              - role: pod
-                label: "app = minio"
-
-      - job_name: "minio-server"
-        metrics_path: /minio/v2/metrics/bucket
-        kubernetes_sd_configs:
-          - role: pod
-            namespaces:
-              names: ["minio"]
-            selectors:
-              - role: pod
-                label: "app = minio"
-
-      - job_name: "minio-resource"
-        metrics_path: /minio/v2/metrics/resource
-        kubernetes_sd_configs:
-          - role: pod
-            namespaces:
-              names: ["minio"]
-            selectors:
-              - role: pod
-                label: "app = minio"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
