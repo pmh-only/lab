@@ -94,6 +94,7 @@ spec:
           REDIS_HOST: redis-service.database.svc.cluster.local
           REDIS_PORT: "6379"
           STORE_MODEL_IN_DB: "True"
+          AUTO_REDIRECT_UI_LOGIN_TO_SSO: "true"
         proxy_config:
           model_list: []
           general_settings:
