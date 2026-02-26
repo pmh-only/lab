@@ -21,3 +21,22 @@ spec:
           name: pdf
           port: 8080
           weight: 1
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: pdf-auth
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: pdf-route
+  oidc:
+    provider:
+      issuer: "https://auth.pmh.codes/application/o/pdf/"
+      tokenEndpoint: "http://authentik-service.authentik.svc.cluster.local:9000/application/o/token/"
+    clientID: "Wesp1sln4SvvYxrMihkyVctV1ALKzWurjHUGdBm8"
+    clientSecret:
+      group: ""
+      kind: "Secret"
+      name: "pdf-auth-secrets"
