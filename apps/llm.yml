@@ -17,10 +17,10 @@ spec:
         revisionHistoryLimit: 0
 
         ollama:
-          enabled: false
+          enabled: true
 
         pipelines:
-          enabled: false
+          enabled: true
 
         tika:
           enabled: true
