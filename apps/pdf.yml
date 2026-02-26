@@ -52,7 +52,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: tailscale
+    namespace: pdf
     server: https://kubernetes.default.svc
   project: default
   source:
