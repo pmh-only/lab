@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pdf
+  namespace: argocd
+spec:
+  destination:
+    namespace: pdf
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: stirling-pdf-chart
+    helm:
+      valuesObject:
+        fullnameOverride: pdf
+        persistence:
+          enabled: true
+    repoURL: https://stirling-tools.github.io/Stirling-PDF-chart
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pdf-configs
+  namespace: argocd
+spec:
+  destination:
+    namespace: tailscale
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: pdf_configs
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
