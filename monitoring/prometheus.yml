@@ -46,7 +46,7 @@ data:
     storage:
       tsdb:
         retention:
-          size: 1GB
+          time: 1y
 
     scrape_configs:
       - job_name: "ne"
