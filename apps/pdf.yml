@@ -23,13 +23,13 @@ spec:
               mountPath: /usr/share/tessdata
               subPath: tessdata
             - name: storage-volume
-              mountPath: /usr/share/configs
+              mountPath: /configs
               subPath: configs
             - name: storage-volume
-              mountPath: /usr/share/logs
+              mountPath: /logs
               subPath: logs
             - name: storage-volume
-              mountPath: /usr/share/pipeline
+              mountPath: /pipeline
               subPath: pipeline
         probes:
           liveness:
