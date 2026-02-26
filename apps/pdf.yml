@@ -31,6 +31,9 @@ spec:
             - name: storage-volume
               mountPath: /usr/share/pipeline
               subPath: pipeline
+        probes:
+          liveness:
+            initialDelaySeconds: 30
     repoURL: https://stirling-tools.github.io/Stirling-PDF-chart
     targetRevision: x
   syncPolicy:
