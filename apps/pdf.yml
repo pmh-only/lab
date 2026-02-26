@@ -13,8 +13,24 @@ spec:
     helm:
       valuesObject:
         fullnameOverride: pdf
+        image:
+          tag: latest-fat
         persistence:
           enabled: true
+        deployment:
+          extraVolumeMounts:
+            - name: storage-volume
+              mountPath: /usr/share/tessdata
+              subPath: tessdata
+            - name: storage-volume
+              mountPath: /usr/share/configs
+              subPath: configs
+            - name: storage-volume
+              mountPath: /usr/share/logs
+              subPath: logs
+            - name: storage-volume
+              mountPath: /usr/share/pipeline
+              subPath: pipeline
     repoURL: https://stirling-tools.github.io/Stirling-PDF-chart
     targetRevision: x
   syncPolicy:
