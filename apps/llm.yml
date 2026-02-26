@@ -38,7 +38,7 @@ spec:
           mergeAccountsByEmail: true
           oidc:
             enabled: true
-            clientId: ky8d6aG1hsmUjINd5nlrVGmMwLsIBJBZQbA6U96u
+            clientId: siL4lKaTsziiruYsMXMkGEayy8oigyabofqUVPEU
             clientExistingSecret: openwebui-secret
             clientExistingSecretKey: oidc-secret
             providerUrl: https://auth.pmh.codes/application/o/llm/.well-known/openid-configuration
