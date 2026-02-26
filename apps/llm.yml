@@ -25,6 +25,11 @@ spec:
         tika:
           enabled: true
 
+        websocket:
+          url: "redis://redis-service.database.svc.cluster.local:6379/openwebui"
+          redis:
+            enabled: false
+
         route:
           enabled: true
           hostnames:
@@ -32,6 +37,7 @@ spec:
           parentRefs:
             - name: main
               namespace: gateway
+
         sso:
           enabled: true
           enableSignup: true
