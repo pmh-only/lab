@@ -8,3 +8,14 @@ metadata:
 spec:
   externalName: placeholder
   type: ExternalName
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    tailscale.com/tailnet-fqdn: pmhwindows.taildd35b7.ts.net
+  name: pmhwindows
+  namespace: tailscale
+spec:
+  externalName: placeholder
+  type: ExternalName
