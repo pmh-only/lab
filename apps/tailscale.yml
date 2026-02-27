@@ -14,11 +14,6 @@ spec:
       kind: Secret
   source:
     chart: tailscale-operator
-    helm:
-      valuesObject:
-        oauth:
-          clientId: youshallnotpass
-          clientSecret: youshallnotpass
     repoURL: https://pkgs.tailscale.com/helmcharts
     targetRevision: x
   syncPolicy:
