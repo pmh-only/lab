@@ -57,6 +57,9 @@ spec:
               defaultVolumesToFsBackup: true
               uploaderConfig:
                 parallelFilesUpload: 16
+        kubectl:
+          image:
+            repository: public.ecr.aws/bitnami/kubectl
     repoURL: https://vmware-tanzu.github.io/helm-charts
     targetRevision: x
   syncPolicy:
