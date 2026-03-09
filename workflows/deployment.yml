@@ -26,6 +26,8 @@ spec:
               value: "true"
             - name: WEBHOOK_URL
               value: "https://flows.pmh.codes"
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: "0"
           volumeMounts:
             - mountPath: /home/node/.n8n
               name: persistent
