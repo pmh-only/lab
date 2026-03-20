@@ -7,3 +7,4 @@ resources:
   - ./nginx.yml
   - ./envoy.yml
   - ./backend-policy.yml
+  - ./waf.yml
