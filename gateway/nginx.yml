@@ -162,9 +162,8 @@ data:
         server_name _;
 
         add_header Alt-Svc 'h3=":443"; ma=86400' always;
-        modsecurity_rules 'SecRuleRemoveById 920280';
-        modsecurity_rules 'SecRuleUpdateTargetById 942290 "!REQUEST_COOKIES_NAMES:/^ph_phc_/"';\
-        modsecurity_rules 'SecAction "id:9200200,phase:1,nolog,pass,t:none,setvar:tx.allowed_methods=GET HEAD POST OPTIONS PUT PATCH DELETE PROPFIND PROPPATCH MKCOL COPY MOVE LOCK UNLOCK"';
+        
+        include /usr/local/openresty/nginx/conf/modsecurity.conf;
 
         access_log /dev/stdout log_stream;
         error_log  /dev/stderr notice;
@@ -258,6 +257,9 @@ spec:
             - name: nginx-config
               mountPath: /usr/local/openresty/nginx/conf/nginx.conf
               subPath: nginx.conf
+            - name: nginx-waf-config
+              mountPath: /usr/local/openresty/nginx/conf/modsecurity.conf
+              subPath: modsecurity.conf
           readinessProbe:
             httpGet:
               scheme: HTTPS
@@ -280,3 +282,6 @@ spec:
         - name: nginx-config
           configMap:
             name: gateway-nginx-config
+        - name: nginx-waf-config
+          configMap:
+            name: gateway-nginx-waf-config
