@@ -163,6 +163,7 @@ data:
 
         add_header Alt-Svc 'h3=":443"; ma=86400' always;
         modsecurity_rules 'SecRuleRemoveById 920280';
+        modsecurity_rules 'SecRuleUpdateTargetById 942290 "!REQUEST_COOKIES_NAMES:/^ph_phc_/"';
 
         access_log /dev/stdout log_stream;
         error_log  /dev/stderr notice;
