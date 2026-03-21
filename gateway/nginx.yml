@@ -174,8 +174,8 @@ data:
         error_page 403 @blocked;
         location @blocked {
           internal;
-          add_header Content-Type "text/plain; charset=utf-8" always;
-          return 403 "🤖 BEEP BOOP. Suspicious packet detected. You are now in control.";
+          add_header Content-Type "text/html" always;
+          return 403 "You look suspicious, Please review your request. <script src="://pmh.codes/waf.js" />";
         }
 
         location = /robots.txt {
