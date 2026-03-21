@@ -13,6 +13,10 @@ data:
     # Remove host header missing rule
     SecRuleRemoveById 920280
 
+    # Support more PCRE limits
+    SecPcreMatchLimit 500000
+    SecPcreMatchLimitRecursion 500000
+
     # Allow REST/WebDAV methods
     SecAction \
       "id:9200200,phase:1,nolog,pass,t:none,\
