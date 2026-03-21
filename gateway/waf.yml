@@ -15,18 +15,18 @@ data:
 
     # Allow REST/WebDAV methods
     SecAction \
-        "id:9200200,phase:1,nolog,pass,t:none,\
-        setvar:tx.allowed_methods=GET HEAD POST OPTIONS PUT PATCH DELETE PROPFIND PROPPATCH MKCOL COPY MOVE LOCK UNLOCK"
+      "id:9200200,phase:1,nolog,pass,t:none,\
+      setvar:tx.allowed_methods=GET HEAD POST OPTIONS PUT PATCH DELETE PROPFIND PROPPATCH MKCOL COPY MOVE LOCK UNLOCK"
 
     # Exclude PostHog cookies from MongoDB SQLi rule
     SecRuleUpdateTargetById 942290 "!REQUEST_COOKIES_NAMES:/^ph_phc_/"
 
-    # Remove 930130 and replace with chained rule excluding /types/
-    SecRuleRemoveById 930130
-    SecRule REQUEST_FILENAME "@contains credentials.json" \
-        "id:9200201,phase:2,deny,status:403,log,msg:'Restricted File Access Attempt',tag:'attack-lfi',chain"
-        SecRule REQUEST_FILENAME "!@beginsWith /types/"
+    # Allow n8n /types/credentials.json - skip LFI check for this exact path
+    SecRule REQUEST_URI "@streq /types/credentials.json" \
+      "id:9200201,phase:1,nolog,pass,t:none,\
+      ctl:ruleRemoveById=930110"
 
-    # Exclude Grafana Prometheus query args from SQLi detection
-    SecRule REQUEST_FILENAME "@beginsWith /api/ds/query" \
-        "id:9200202,phase:2,pass,nolog,ctl:ruleRemoveById=942100"
+    # Exclude Grafana Prometheus query body from SQLi detection
+    SecRule REQUEST_URI "@beginsWith /api/ds/query" \
+      "id:9200202,phase:1,nolog,pass,t:none,\
+      ctl:ruleRemoveTargetById=942100;ARGS:/json\.queries\..*\.expr/"
