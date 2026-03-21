@@ -258,8 +258,11 @@ spec:
               mountPath: /usr/local/openresty/nginx/conf/nginx.conf
               subPath: nginx.conf
             - name: nginx-waf-config
-              mountPath: /usr/local/openresty/nginx/conf/modsecurity.conf
-              subPath: modsecurity.conf
+              mountPath: /etc/modsecurity/includes.conf
+              subPath: includes.conf
+            - name: nginx-waf-config
+              mountPath: /etc/modsecurity/custom-rules.conf
+              subPath: custom-rules.conf
           readinessProbe:
             httpGet:
               scheme: HTTPS
