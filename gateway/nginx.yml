@@ -174,8 +174,8 @@ data:
         error_page 403 @blocked;
         location @blocked {
           internal;
-          add_header Content-Type text/plain always;
-          return 403 "BEEP BOOP. Suspicious packet detected. I've alerted absolutely no one but you're still not getting in.";
+          add_header Content-Type "text/plain; charset=utf-8" always;
+          return 403 "🤖 BEEP BOOP. Suspicious packet detected. You are now in control.";
         }
 
         location = /robots.txt {
