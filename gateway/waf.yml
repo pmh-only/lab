@@ -22,11 +22,9 @@ data:
     SecRuleUpdateTargetById 942290 "!REQUEST_COOKIES_NAMES:/^ph_phc_/"
 
     # Allow n8n /types/credentials.json - skip LFI check for this exact path
-    SecRule REQUEST_URI "@streq /types/credentials.json" \
-      "id:9200201,phase:1,nolog,pass,t:none,\
-      ctl:ruleRemoveById=930130"
+    SecRuleUpdateTargetById 930130 "!REQUEST_FILENAME:/^\/types\/credentials\.json$/"
 
     # Exclude Grafana Prometheus query body from SQLi detection
     SecRule REQUEST_URI "@beginsWith /api/ds/query" \
-      "id:9200202,phase:1,nolog,pass,t:none,\
+      "id:9200201,phase:1,nolog,pass,t:none,\
       ctl:ruleRemoveById=942100"
