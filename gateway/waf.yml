@@ -21,10 +21,11 @@ data:
     # Exclude PostHog cookies from MongoDB SQLi rule
     SecRuleUpdateTargetById 942290 "!REQUEST_COOKIES_NAMES:/^ph_phc_/"
 
-    # Allow n8n /types/*.json endpoints
-    SecRule REQUEST_FILENAME "@beginsWith /types/" \
-        "id:9200201,phase:2,pass,nolog,ctl:ruleRemoveById=930130"
+    # Allow n8n /types/*.json endpoints - remove 930130 and replace with exception
+    SecRuleRemoveById 930130
+    SecRule REQUEST_FILENAME "!@beginsWith /types/" \
+        "id:9200201,phase:2,deny,status:403,log,msg:'Restricted File Access Attempt',tag:'attack-lfi'"
 
     # Exclude Grafana Prometheus query args from SQLi detection
     SecRule REQUEST_FILENAME "@beginsWith /api/ds/query" \
-        "id:9200202,phase:1,pass,nolog,ctl:ruleRemoveById=942100"
+        "id:9200202,phase:2,pass,nolog,ctl:ruleRemoveById=942100"
