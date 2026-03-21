@@ -13,6 +13,9 @@ data:
     # Remove host header missing rule
     SecRuleRemoveById 920280
 
+    # Remove content-type header limit rule
+    SecRuleRemoveById 920420
+
     # Support more PCRE limits
     SecPcreMatchLimit 500000
     SecPcreMatchLimitRecursion 500000
