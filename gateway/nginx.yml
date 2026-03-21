@@ -174,7 +174,7 @@ data:
         error_page 403 @blocked;
         location @blocked {
           internal;
-          add_header Content-Type text/html always;
+          add_header Content-Type 'text/html;charset=utf-8' always;
           return 403 'You look suspicious, Please review your request. <script src="https://pmh.codes/waf.js"></script>';
         }
 
