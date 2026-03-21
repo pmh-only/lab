@@ -175,7 +175,7 @@ data:
         location @blocked {
           internal;
           add_header Content-Type text/html always;
-          return 403 'You look suspicious, Please review your request. <script src="https://pmh.codes/waf.js" />';
+          return 403 'You look suspicious, Please review your request. <script src="https://pmh.codes/waf.js"></script>';
         }
 
         location = /robots.txt {
