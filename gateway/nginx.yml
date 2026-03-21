@@ -163,8 +163,6 @@ data:
 
         add_header Alt-Svc 'h3=":443"; ma=86400' always;
         
-        include /usr/local/openresty/nginx/conf/modsecurity.conf;
-
         access_log /dev/stdout log_stream;
         error_log  /dev/stderr notice;
 
