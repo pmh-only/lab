@@ -31,3 +31,17 @@ spec:
   usages:
     - digital signature
     - key encipherment
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: gateway-ech-secrets
+  namespace: gateway
+spec:
+  template:
+    type: Opaque
+    metadata:
+      name: gateway-ech-secrets
+      namespace: gateway
+  encryptedData:
+    server.ech.pem: AgAcouW9DSbKpPzsgnxZlEOk47f1NZmvrOp1J1lJ5AytoZ71SE7QOjy7qRwWngDsQHsflWJX+I/tBWVffJrYEEsOWA2zg6nx4TZzDUntwH/tfnoz/YZcgrdkQA4VORhN2T3XPkbSa0GJMwANWn6iPbfx+R0lPDrQgEf5mX1Mm8Sbj7oYNEnqYOoMW+AuR2GH8QsbjZ05XL3gNtUEGXF5sKunrd0SCWV8pJHUMKNnA3cjFZAA5/ue/hu/ODULUsrx08tkArHCepBhovNnQri8Ez8o9lkxLn/S+2ZHVRwmEDOZyKtNuaZ3cZ2L2089sbeXZ65trXSdiGnewacZaLziujOnZyKG6U71EhBzd+Ws1my3lUS+h+/bHygHcsPdEr0BJgYL2gPSt+QD+rOP6CM7ZGNjWBqJtED2E3kXQMLp6Auwji68YDQxwiC1BhZFTjk1vpjJ3/ZxAfT+8WGCvKRFbTFBj7oC4RzG3BVnRw2WeGD7Ss7yjndfqqUa8njvkPVerfOTonB5N3B/TbG21T6+P0t5O+7jfXZhxYhMOkcZUVJIo5sNs+VEBitNp2t9mw8S1/v//GNiWMbXboAY3g3BCZLNcTJmYtSe6z946WuSR8mm18D/zyjPcMinzRP+Fo6Iy+aBgO2YrUEfzi2J9JIuAwJnJjhj1xMpvAYfb7l3c0hcJDIApcC/Bmp36anlRxilzNjoTnPwuHIzGS40Ne7qjdxuXc9kfqM22tqZqAWBIQ7G3EWhGlCozkHCkPGQsTb3gXV5Lsm2u2r6/wyFFU1dIeCTPReOA/wIVK1YPbK/RDt6nSzaNVhhE4ODrhNts8y9jgCxJ7CTcTP/Pw4eWCIdcpb5mQ36MGXpa5v235whGdl6OJ6Yn12xCq6yAxbNd/ddM6dtbMJdAHn+rJiahMGUy7SIUMx8Ryk6GU7JS1D2cMf97erFMU0DrfHEmAL+/OCItM3go+SoARdjnGh/zXw4O1B3AsFVfv4/QxL0TNxyxrmQrOlHWi7eglMveONMVShEhmCjFIlay/xNjbKUNIuaUJs=
