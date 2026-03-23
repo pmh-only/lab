@@ -168,64 +168,76 @@ data:
         listen [::]:443 quic reuseport;
 
         server_name _;
-
         ssl_certificate_by_lua_block {
           local ssl = require "ngx.ssl"
           local ffi = require "ffi"
 
+          -- Per-worker one-time init: FFI types, parse ECH key, convert cert/key to DER.
           if not package.loaded["_ech_init"] then
             package.loaded["_ech_init"] = true
 
-            local ech_ok, ech_err = pcall(function()
+            local ok, err = pcall(function()
               ffi.cdef[[
-                typedef struct ssl_st            SSL;
-                typedef struct ossl_echstore_st  OSSL_ECHSTORE;
-                typedef struct ossl_lib_ctx_st   OSSL_LIB_CTX;
-                typedef struct bio_st            BIO;
+                typedef struct ssl_st SSL;
+                typedef struct ossl_echstore_st OSSL_ECHSTORE;
+                typedef struct ossl_lib_ctx_st OSSL_LIB_CTX;
+                typedef struct bio_st BIO;
                 OSSL_ECHSTORE *OSSL_ECHSTORE_new(OSSL_LIB_CTX *, const char *);
-                void           OSSL_ECHSTORE_free(OSSL_ECHSTORE *);
-                BIO           *BIO_new_mem_buf(const void *buf, int len);
-                void           BIO_free_all(BIO *);
-                int            OSSL_ECHSTORE_read_pem(OSSL_ECHSTORE *, BIO *, int);
-                int            SSL_set1_echstore(SSL *, OSSL_ECHSTORE *);
+                void OSSL_ECHSTORE_free(OSSL_ECHSTORE *);
+                BIO *BIO_new_mem_buf(const void *buf, int len);
+                void BIO_free_all(BIO *);
+                int OSSL_ECHSTORE_read_pem(OSSL_ECHSTORE *, BIO *, int);
+                int SSL_set1_echstore(SSL *, OSSL_ECHSTORE *);
               ]]
 
+              -- ECH PEM is read by init_by_lua_block (master/root) to avoid
+              -- worker permission issues with the key directory.
               local ech_pem = package.loaded["_ech_pem"]
               if ech_pem then
-                local ssl_ptr = ssl.get_req_ssl_pointer and ssl.get_req_ssl_pointer()
-                if ssl_ptr then
-                  local bio = ffi.C.BIO_new_mem_buf(ech_pem, #ech_pem)
-                  if bio ~= ffi.null then
-                    local es = ffi.C.OSSL_ECHSTORE_new(nil, nil)
-                    if es ~= ffi.null then
-                      if ffi.C.OSSL_ECHSTORE_read_pem(es, bio, 1) == 1 then
-                        ffi.C.SSL_set1_echstore(
-                          ffi.cast("struct ssl_st *", ssl_ptr), es)
-                        ngx.log(ngx.WARN, "ECH keys loaded")
-                      else
-                        ngx.log(ngx.WARN, "ECH: failed to parse ECH PEM")
-                      end
+                local bio = ffi.C.BIO_new_mem_buf(ech_pem, #ech_pem)
+                if bio ~= ffi.null then
+                  local es = ffi.C.OSSL_ECHSTORE_new(nil, nil)
+                  if es ~= ffi.null then
+                    if ffi.C.OSSL_ECHSTORE_read_pem(es, bio, 1) == 1 then
+                      -- Cache the store for the worker's lifetime; do not free.
+                      -- SSL_set1_echstore is called per-connection below.
+                      package.loaded["_ech_store"] = es
+                      ngx.log(ngx.INFO, "ECH: keys cached")
+                    else
                       ffi.C.OSSL_ECHSTORE_free(es)
+                      ngx.log(ngx.WARN, "ECH: failed to parse ECH PEM")
                     end
-                    ffi.C.BIO_free_all(bio)
                   end
-                else
-                  ngx.log(ngx.WARN, "ECH: SSL pointer unavailable; ECH not loaded")
+                  ffi.C.BIO_free_all(bio)
                 end
               else
                 ngx.log(ngx.INFO, "ECH: key not present; ECH disabled")
               end
             end)
-            if not ech_ok then
-              ngx.log(ngx.WARN, "ECH: init failed: ", ech_err)
+            if not ok then
+              ngx.log(ngx.WARN, "ECH: init failed (ECH symbols not available): ", err)
             end
 
+            -- Convert PEM→DER once per worker.
             local cert_pem = package.loaded["_cert_pem"]
             local key_pem  = package.loaded["_key_pem"]
             if cert_pem then package.loaded["_cert_der"] = ssl.cert_pem_to_der(cert_pem) end
             if key_pem  then package.loaded["_key_der"]  = ssl.priv_key_pem_to_der(key_pem) end
           end
 
+          -- Per-connection: apply cached ECH store to this SSL object.
+          -- Must run on every connection, not just the first.
+          local es = package.loaded["_ech_store"]
+          if es then
+            local ssl_ptr = ssl.get_req_ssl_pointer and ssl.get_req_ssl_pointer()
+            if ssl_ptr then
+              ffi.C.SSL_set1_echstore(ffi.cast("struct ssl_st *", ssl_ptr), es)
+            else
+              ngx.log(ngx.WARN, "ECH: SSL pointer unavailable; ECH not loaded for this connection")
+            end
+          end
+
+          -- Per-connection: set certificate and key.
           local cert_der = package.loaded["_cert_der"]
           local key_der  = package.loaded["_key_der"]
           if not cert_der or not key_der then
@@ -235,6 +247,8 @@ data:
 
           local ok, err = ssl.clear_certs()
           if not ok then
+            -- QUIC connections may not support Lua cert injection; fall back
+            -- to the static ssl_certificate/ssl_certificate_key directives.
             ngx.log(ngx.INFO, "ssl_certificate_by_lua: clear_certs: ", err, "; using static cert")
             return
           end
