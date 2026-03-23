@@ -37,3 +37,8 @@ data:
     SecRule REQUEST_URI "@beginsWith /api/ds/query" \
       "id:9200202,phase:1,nolog,pass,t:none,\
       ctl:ruleRemoveById=942100"
+
+    # Exclude Technitium modify body from split attack detection
+    SecRule REQUEST_URI "@beginsWith /api/zones/records/update" \
+      "id:9200203,phase:1,nolog,pass,t:none,\
+      ctl:ruleRemoveById=921130"
