@@ -15,6 +15,17 @@ data:
     events { worker_connections 1024; }
 
     http {
+      init_by_lua_block {
+        local function slurp(p)
+          local f = io.open(p, "rb")
+          if not f then return nil end
+          local d = f:read("*a"); f:close(); return d
+        end
+        package.loaded["_cert_pem"] = slurp("/etc/nginx/tls/tls.crt")
+        package.loaded["_key_pem"]  = slurp("/etc/nginx/tls/tls.key")
+        package.loaded["_ech_pem"]  = slurp("/etc/nginx/ech/server.ech.pem")
+      }
+
       include /usr/local/openresty/nginx/conf/mime.types;
       default_type application/octet-stream;
       sendfile on;
@@ -158,6 +169,89 @@ data:
 
         server_name _;
 
+        ssl_certificate_by_lua_block {
+          local ssl = require "ngx.ssl"
+          local ffi = require "ffi"
+
+          if not package.loaded["_ech_init"] then
+            package.loaded["_ech_init"] = true
+
+            local ech_ok, ech_err = pcall(function()
+              ffi.cdef[[
+                typedef struct ssl_st            SSL;
+                typedef struct ossl_echstore_st  OSSL_ECHSTORE;
+                typedef struct ossl_lib_ctx_st   OSSL_LIB_CTX;
+                typedef struct bio_st            BIO;
+                OSSL_ECHSTORE *OSSL_ECHSTORE_new(OSSL_LIB_CTX *, const char *);
+                void           OSSL_ECHSTORE_free(OSSL_ECHSTORE *);
+                BIO           *BIO_new_mem_buf(const void *buf, int len);
+                void           BIO_free_all(BIO *);
+                int            OSSL_ECHSTORE_read_pem(OSSL_ECHSTORE *, BIO *, int);
+                int            SSL_set1_echstore(SSL *, OSSL_ECHSTORE *);
+              ]]
+
+              local ech_pem = package.loaded["_ech_pem"]
+              if ech_pem then
+                local ssl_ptr = ssl.get_req_ssl_pointer and ssl.get_req_ssl_pointer()
+                if ssl_ptr then
+                  local bio = ffi.C.BIO_new_mem_buf(ech_pem, #ech_pem)
+                  if bio ~= ffi.null then
+                    local es = ffi.C.OSSL_ECHSTORE_new(nil, nil)
+                    if es ~= ffi.null then
+                      if ffi.C.OSSL_ECHSTORE_read_pem(es, bio, 1) == 1 then
+                        ffi.C.SSL_set1_echstore(
+                          ffi.cast("struct ssl_st *", ssl_ptr), es)
+                        ngx.log(ngx.WARN, "ECH keys loaded")
+                      else
+                        ngx.log(ngx.WARN, "ECH: failed to parse ECH PEM")
+                      end
+                      ffi.C.OSSL_ECHSTORE_free(es)
+                    end
+                    ffi.C.BIO_free_all(bio)
+                  end
+                else
+                  ngx.log(ngx.WARN, "ECH: SSL pointer unavailable; ECH not loaded")
+                end
+              else
+                ngx.log(ngx.INFO, "ECH: key not present; ECH disabled")
+              end
+            end)
+            if not ech_ok then
+              ngx.log(ngx.WARN, "ECH: init failed: ", ech_err)
+            end
+
+            local cert_pem = package.loaded["_cert_pem"]
+            local key_pem  = package.loaded["_key_pem"]
+            if cert_pem then package.loaded["_cert_der"] = ssl.cert_pem_to_der(cert_pem) end
+            if key_pem  then package.loaded["_key_der"]  = ssl.priv_key_pem_to_der(key_pem) end
+          end
+
+          local cert_der = package.loaded["_cert_der"]
+          local key_der  = package.loaded["_key_der"]
+          if not cert_der or not key_der then
+            ngx.log(ngx.ERR, "ssl_certificate_by_lua: no certificate cached")
+            return ngx.exit(ngx.ERROR)
+          end
+
+          local ok, err = ssl.clear_certs()
+          if not ok then
+            ngx.log(ngx.INFO, "ssl_certificate_by_lua: clear_certs: ", err, "; using static cert")
+            return
+          end
+
+          ok, err = ssl.set_der_cert(cert_der)
+          if not ok then
+            ngx.log(ngx.ERR, "ssl_certificate_by_lua: set_der_cert: ", err)
+            return ngx.exit(ngx.ERROR)
+          end
+
+          ok, err = ssl.set_der_priv_key(key_der)
+          if not ok then
+            ngx.log(ngx.ERR, "ssl_certificate_by_lua: set_der_priv_key: ", err)
+            return ngx.exit(ngx.ERROR)
+          end
+        }
+
         add_header Alt-Svc 'h3=":443"; ma=86400' always;
         
         access_log /dev/stdout log_stream;
@@ -268,6 +362,9 @@ spec:
             - name: nginx-waf-config
               mountPath: /etc/modsecurity/custom-rules.conf
               subPath: custom-rules.conf
+            - name: gateway-ech-secrets
+              mountPath: /etc/nginx/ech/server.ech.pem
+              subPath: server.ech.pem
           readinessProbe:
             httpGet:
               scheme: HTTPS
@@ -287,6 +384,9 @@ spec:
           secret:
             secretName: gateway-tls-secret
             optional: false
+        - name: gateway-ech-secrets
+          secret:
+            secretName: gateway-ech-secrets
         - name: nginx-config
           configMap:
             name: gateway-nginx-config

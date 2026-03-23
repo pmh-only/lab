@@ -31,3 +31,17 @@ spec:
   usages:
     - digital signature
     - key encipherment
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: gateway-ech-secrets
+  namespace: gateway
+spec:
+  template:
+    type: Opaque
+    metadata:
+      name: gateway-ech-secrets
+      namespace: gateway
+  encryptedData:
+    server.ech.pem: REDACTED
