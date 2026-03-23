@@ -10,10 +10,6 @@ data:
     Include /etc/modsecurity/crs/rules/*.conf
     Include /etc/modsecurity/custom-rules.conf
   custom-rules.conf: |
-    # Don't inspect when request body is big
-    SecRequestBodyLimit 1048576
-    SecRequestBodyLimitAction ProcessPartial
-
     # Remove host header missing rule
     SecRuleRemoveById 920280
 
