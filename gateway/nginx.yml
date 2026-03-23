@@ -51,7 +51,6 @@ data:
       http2 on;
 
       http3 on;
-      quic_retry on;
 
       gzip on;
       gzip_comp_level 5;
