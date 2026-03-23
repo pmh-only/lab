@@ -156,7 +156,7 @@ data:
         listen [::]:443 quic reuseport;
 
         server_name _;
-        ssl_ech_file /etc/nginx/ech/server.ech.pem;
+        # ssl_ech_file /etc/nginx/ech/server.ech.pem;
 
         add_header Alt-Svc 'h3=":443"; ma=86400' always;
 
