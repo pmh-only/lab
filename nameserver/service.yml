@@ -31,3 +31,7 @@ spec:
       protocol: TCP
       port: 538
       targetPort: 538
+
+    - name: doh
+      protocol: TCP
+      port: 80
