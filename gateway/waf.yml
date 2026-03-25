@@ -7,8 +7,8 @@ data:
   includes.conf: |
     Include /etc/modsecurity/modsecurity.conf
     Include /etc/modsecurity/crs/crs-setup.conf
-    Include /etc/modsecurity/crs/rules/*.conf
     Include /etc/modsecurity/custom-rules.conf
+    Include /etc/modsecurity/crs/rules/*.conf
   custom-rules.conf: |
     # Remove host header missing rule
     SecRuleRemoveById 920280
