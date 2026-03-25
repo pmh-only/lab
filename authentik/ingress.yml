@@ -21,30 +21,3 @@ spec:
           name: authentik-service
           port: 9000
           weight: 1
----
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: EnvoyExtensionPolicy
-metadata:
-  name: authentik-custom-js
-spec:
-  targetRefs:
-    - group: gateway.networking.k8s.io
-      kind: HTTPRoute
-      name: authentik-route
-  lua:
-    - type: Inline
-      inline: |
-        function envoy_on_response(response_handle)
-          local ct = response_handle:headers():get("content-type") or ""
-          if not string.find(ct, "text/html") then return end
-          local cl = tonumber(response_handle:headers():get("content-length") or "0")
-          if cl > 1048576 then return end
-          local body = response_handle:body(true)
-          if body == nil then return end
-          local bytes = body:getBytes(0, body:length())
-          local new_bytes = string.gsub(bytes, "</head>", "<script src=/media/custom.js></script></head>", 1)
-          if new_bytes ~= bytes then
-            body:setBytes(new_bytes)
-            response_handle:headers():remove("content-length")
-          end
-        end
