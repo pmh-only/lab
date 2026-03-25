@@ -502,3 +502,22 @@ spec:
         - name: nginx-waf-config
           configMap:
             name: gateway-nginx-waf-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-nginx
+spec:
+  clusterIP: 172.17.0.30
+  selector:
+    app: gateway-nginx
+  ports:
+    - name: http
+      protocol: TCP
+      port: 443
+      targetPort: 443
+
+    - name: http3
+      protocol: UDP
+      port: 443
+      targetPort: 443
