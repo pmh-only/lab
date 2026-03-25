@@ -354,14 +354,6 @@ data:
                     end)
                 end
             end
-
-            local cert_der = package.loaded["_cert_der"]
-            local key_der  = package.loaded["_key_der"]
-            if not cert_der or not key_der then return ngx.exit(ngx.ERROR) end
-            local ok, err = ssl.clear_certs()
-            if not ok then return end
-            ssl.set_der_cert(cert_der)
-            ssl.set_der_priv_key(key_der)
         }
 
         add_header Alt-Svc 'h3=":443"; ma=86400' always;
