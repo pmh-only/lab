@@ -52,5 +52,8 @@ data:
     SecRule REQUEST_URI "@beginsWith /seafhttp/" \
         "id:200010,phase:1,nolog,pass,\
         ctl:ruleRemoveById=920450,\
-        ctl:ruleRemoveById=920600,\
-        msg:'CRS exclusions for Seafile upload paths'"
+        ctl:ruleRemoveById=920600"
+
+    # Disable ModSecurity for gateway health check endpoint
+    SecRule REQUEST_URI "@beginsWith /_gwhealthz" \
+        "id:200011,phase:1,allow,nolog"
