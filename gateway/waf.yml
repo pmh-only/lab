@@ -17,7 +17,6 @@ data:
     SecRuleRemoveById 920420
 
     # Support more Body limits
-    SecArgumentsLimit 5000
     SecPcreMatchLimit 500000
     SecPcreMatchLimitRecursion 500000
     SecRequestBodyNoFilesLimit 1073741824
@@ -44,3 +43,14 @@ data:
     SecRule REQUEST_URI "@beginsWith /api/zones/records/update" \
       "id:9200203,phase:1,nolog,pass,t:none,\
       ctl:ruleRemoveById=921130"
+
+    # Bypass large argument count check for session replay endpoint
+    SecRule REQUEST_URI "@beginsWith /api/session-replay/" \
+      "id:200009,phase:1,ctl:ruleRemoveById=200007,nolog"
+
+    # Seafile upload: allow Content-Range header and non-standard Accept header
+    SecRule REQUEST_URI "@beginsWith /seafhttp/" \
+        "id:200010,phase:1,nolog,pass,\
+        ctl:ruleRemoveById=920450,\
+        ctl:ruleRemoveById=920600,\
+        msg:'CRS exclusions for Seafile upload paths'"
