@@ -139,6 +139,14 @@ data:
         '"$http_referer" "$http_user_agent" '
         '$ga_ssl_proto $ga_ssl_cipher "$ga_mime" $request_time';
 
+      add_header Alt-Svc 'h3=":443"; ma=86400' always;
+      add_header Strict-Transport-Security 'max-age=63072000; includeSubDomains; preload' always;
+      add_header X-Frame-Options 'SAMEORIGIN' always;
+      add_header X-Content-Type-Options 'nosniff' always;
+      add_header Referrer-Policy 'same-origin' always;
+      add_header Permissions-Policy 'geolocation=(), microphone=()' always;
+      add_header Content-Security-Policy "reflected-xss 'none'" always;
+
       server {
         listen  80 default_server;
         listen  [::]:80 default_server;
@@ -160,8 +168,6 @@ data:
         listen [::]:443 quic reuseport;
 
         server_name _;
-
-        add_header Alt-Svc 'h3=":443"; ma=86400' always;
 
         access_log /dev/stdout log_stream;
         error_log  /dev/stderr notice;
