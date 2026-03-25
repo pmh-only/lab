@@ -144,7 +144,7 @@ data:
       add_header X-Content-Type-Options 'nosniff' always;
       add_header Referrer-Policy 'same-origin' always;
       add_header Permissions-Policy 'geolocation=(), microphone=()' always;
-      add_header Content-Security-Policy "reflected-xss 'none'" always;
+      add_header Content-Security-Policy "manifest-src 'self'" always;
 
       server {
         listen  80 default_server;
@@ -167,7 +167,7 @@ data:
         listen [::]:443 quic reuseport;
 
         server_name _;
-        
+
         proxy_hide_header Strict-Transport-Security;
         add_header Strict-Transport-Security 'max-age=63072000; includeSubDomains; preload' always;
 
