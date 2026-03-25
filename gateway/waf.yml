@@ -17,6 +17,7 @@ data:
     SecRuleRemoveById 920420
 
     # Support more Body limits
+    SecArgumentsLimit 5000
     SecPcreMatchLimit 500000
     SecPcreMatchLimitRecursion 500000
     SecRequestBodyNoFilesLimit 1073741824
