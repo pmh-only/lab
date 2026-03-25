@@ -16,9 +16,10 @@ data:
     # Remove content-type header limit rule
     SecRuleRemoveById 920420
 
-    # Support more PCRE limits
+    # Support more Body limits
     SecPcreMatchLimit 500000
     SecPcreMatchLimitRecursion 500000
+    SecRequestBodyNoFilesLimit 1073741824
 
     # Allow REST/WebDAV methods
     SecAction \
@@ -31,7 +32,7 @@ data:
     # Allow n8n /types/credentials.json - skip LFI check for this exact path
     SecRule REQUEST_URI "@streq /types/credentials.json" \
       "id:9200201,phase:1,nolog,pass,t:none,\
-      ctl:ruleEngine=Off"
+      ctl:ruleRemoveById=930110;930120"
 
     # Exclude Grafana Prometheus query body from SQLi detection
     SecRule REQUEST_URI "@beginsWith /api/ds/query" \
