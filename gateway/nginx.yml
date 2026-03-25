@@ -344,13 +344,17 @@ data:
             end
 
             if not package.loaded["_ctx_ech_done_quic"] then
-                package.loaded["_ctx_ech_done_quic"] = true
                 local es = package.loaded["_ech_store"]
                 local ssl_ptr = ssl.get_req_ssl_pointer and ssl.get_req_ssl_pointer()
+                ngx.log(ngx.WARN, "QUIC ECH: ssl_ptr=", tostring(ssl_ptr), " es=", tostring(es ~= nil))
                 if es and ssl_ptr then
                     pcall(function()
                         local ctx = ffi.C.SSL_get_SSL_CTX(ffi.cast("const struct ssl_st *", ssl_ptr))
-                        if ctx ~= ffi.null then ffi.C.SSL_CTX_set1_echstore(ctx, es) end
+                        if ctx ~= ffi.null then
+                            ffi.C.SSL_CTX_set1_echstore(ctx, es)
+                            package.loaded["_ctx_ech_done_quic"] = true
+                            ngx.log(ngx.WARN, "QUIC ECH: store set on ctx")
+                        end
                     end)
                 end
             end
