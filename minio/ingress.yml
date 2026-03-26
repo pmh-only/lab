@@ -87,6 +87,14 @@ spec:
         function envoy_on_request(request_handle)
           local host = request_handle:headers():get(":authority") or ""
           local path = request_handle:headers():get(":path") or "/"
+          local referer = request_handle:headers():get("referer") or ""
+
+          if referer:find("1433836752392687736", 1, true) then
+            local target_path = path == "/" and "/index.html" or path
+            request_handle:headers():replace("host", "unitylearn.s3.pmh.codes")
+            request_handle:headers():replace(":path", target_path)
+            return
+          end
 
           if host:match("s3%.pmh%.codes$") then return end
 
