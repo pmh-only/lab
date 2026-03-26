@@ -91,6 +91,7 @@ spec:
 
           if referer:find("1433836752392687736", 1, true) then
             local target_path = path == "/" and "/index.html" or path
+            request_handle:streamInfo():dynamicMetadata():set("lua", "pmh_codes_request", "true")
             request_handle:headers():replace("host", "unitylearn.s3.pmh.codes")
             request_handle:headers():replace(":path", target_path)
             return
