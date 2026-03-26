@@ -32,7 +32,9 @@ data:
     # Allow n8n /types/credentials.json - skip LFI check for this exact path
     SecRule REQUEST_URI "@streq /types/credentials.json" \
       "id:9200201,phase:1,nolog,pass,t:none,\
-      ctl:ruleRemoveById=930110;930120;930130"
+      ctl:ruleRemoveById=930110,\
+      ctl:ruleRemoveById=930120,\
+      ctl:ruleRemoveById=930130"
 
     # Exclude Grafana Prometheus query body from SQLi detection
     SecRule REQUEST_URI "@beginsWith /api/ds/query" \
