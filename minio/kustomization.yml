@@ -6,4 +6,3 @@ resources:
   - ./ingress.yml
   - ./explorer.yml
   - ./minio.yml
-  - ./console.yml
