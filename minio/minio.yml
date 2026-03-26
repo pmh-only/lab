@@ -49,6 +49,7 @@ kind: Service
 metadata:
   name: minio-service
 spec:
+  clusterIP: 172.17.0.30
   selector:
     app: minio
   ports:
