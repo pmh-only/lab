@@ -58,7 +58,7 @@ data:
     while true; do
       TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
       IPS=$(curl -sf --cacert "$CACERT" -H "Authorization: Bearer $TOKEN" "$API" \
-        | grep -o '"podIP":"[^"]*"' | grep -o '[0-9.]*' || true)
+        | grep -o '"podIP": *"[^"]*"' | grep -o '[0-9.]*' || true)
 
       iptables -F "$CHAIN"
 
