@@ -34,7 +34,7 @@ metadata:
 data:
   enforce.sh: |
     #!/bin/sh
-    apk add --no-cache iptables curl --quiet 2>/dev/null
+    apk add --no-cache iptables curl
 
     CHAIN="RUN-NETPOL"
     BLOCKED="10.0.0.0/8 172.16.0.0/12"
@@ -43,15 +43,15 @@ data:
 
     cleanup() {
       echo "cleaning up iptables rules"
-      iptables-legacy -F "$CHAIN" 2>/dev/null || true
-      iptables-legacy -D FORWARD -j "$CHAIN" 2>/dev/null || true
+      iptables -F "$CHAIN" 2>/dev/null || true
+      iptables -D FORWARD -j "$CHAIN" 2>/dev/null || true
       exit 0
     }
     trap cleanup TERM INT
 
-    iptables-legacy -N "$CHAIN" 2>/dev/null || true
-    iptables-legacy -C FORWARD -j "$CHAIN" 2>/dev/null || \
-      iptables-legacy -I FORWARD 1 -j "$CHAIN"
+    iptables -N "$CHAIN" 2>/dev/null || true
+    iptables -C FORWARD -j "$CHAIN" 2>/dev/null || \
+      iptables -I FORWARD 1 -j "$CHAIN"
 
     echo "run-netpol started on $NODE_NAME"
 
@@ -60,11 +60,11 @@ data:
       IPS=$(curl -sf --cacert "$CACERT" -H "Authorization: Bearer $TOKEN" "$API" \
         | grep -o '"podIP":"[^"]*"' | grep -o '[0-9.]*' || true)
 
-      iptables-legacy -F "$CHAIN"
+      iptables -F "$CHAIN"
 
       for IP in $IPS; do
         for CIDR in $BLOCKED; do
-          iptables-legacy -A "$CHAIN" -s "$IP" -d "$CIDR" -j DROP
+          iptables -A "$CHAIN" -s "$IP" -d "$CIDR" -j DROP
         done
       done
 
