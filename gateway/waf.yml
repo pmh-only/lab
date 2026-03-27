@@ -68,3 +68,7 @@ data:
     SecRule REQUEST_URI "@beginsWith /application/o/" \
         "id:1002,phase:2,pass,nolog,\
         ctl:ruleRemoveTargetById=934110;ARGS:redirect_uri"
+
+    SecRule REQUEST_URI "@beginsWith /if/flow/" \
+        "id:1003,phase:2,pass,nolog,\
+        ctl:ruleRemoveTargetById=934110;ARGS:redirect_uri"
