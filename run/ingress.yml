@@ -5,8 +5,8 @@ metadata:
   namespace: run
 spec:
   parentRefs:
-    - name: envoy-gateway
-      namespace: envoy-gateway
+    - name: main
+      namespace: gateway
   hostnames:
     - run.pmh.codes
   rules:
