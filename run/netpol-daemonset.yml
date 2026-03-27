@@ -38,7 +38,7 @@ data:
 
     CHAIN="RUN-NETPOL"
     BLOCKED="10.0.0.0/8 172.16.0.0/12"
-    API="https://kubernetes.default.svc/api/v1/namespaces/run/pods?labelSelector=app%3Drun"
+    API="https://${KUBERNETES_SERVICE_HOST}/api/v1/namespaces/run/pods?labelSelector=app%3Drun"
     CACERT="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 
     cleanup() {
