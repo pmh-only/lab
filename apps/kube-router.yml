@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-router
+  namespace: argocd
+spec:
+  destination:
+    namespace: kube-system
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kube-router
+    helm:
+      valuesObject:
+        kubeRouter:
+          router:
+            enabled: false
+            enableCni: false
+          firewall:
+            enabled: true
+          serviceProxy:
+            enabled: false
+    repoURL: https://charts.enix.io
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
