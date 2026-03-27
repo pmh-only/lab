@@ -8,7 +8,7 @@ data:
   BASE_URL: "https://run.pmh.codes"
   OIDC_ISSUER_URL: "https://auth.pmh.codes/application/o/run/"
   POD_NAMESPACE: "run"
-  POD_IMAGE: "ubuntu:22.04"
+  POD_IMAGE: "ghcr.io/pmh-only/ubuntu-systemd:22.04"
   POD_SHELL: "/bin/bash"
   POD_CPU_LIMIT: "500m"
   POD_MEMORY_LIMIT: "256Mi"
