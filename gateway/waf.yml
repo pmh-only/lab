@@ -64,3 +64,7 @@ data:
     SecRule REQUEST_URI "@beginsWith /api/v3/core/transactional/applications/" \
         "id:1001,phase:2,pass,nolog,\
         ctl:ruleRemoveTargetById=934110;ARGS:json.provider.redirect_uris.array_0.url"
+
+    SecRule REQUEST_URI "@beginsWith /application/o/" \
+        "id:1002,phase:2,pass,nolog,\
+        ctl:ruleRemoveTargetById=934110;ARGS:redirect_uri"
