@@ -6,5 +6,6 @@ resources:
   - configmap.yml
   - secret.yml
   - networkpolicy.yml
+  - netpol-daemonset.yml
   - deployment.yml
   - ingress.yml
