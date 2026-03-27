@@ -26,6 +26,12 @@ spec:
           metricsPort: 20244
         image:
           tag: v2.8.0
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 20244
+          initialDelaySeconds: 5
+          periodSeconds: 3
     repoURL: https://charts.enix.io
     targetRevision: x
   ignoreDifferences:
