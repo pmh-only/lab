@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: run-config
+  namespace: run
+data:
+  PORT: "8080"
+  BASE_URL: "https://run.pmh.codes"
+  OIDC_ISSUER_URL: "https://auth.pmh.codes/application/o/run/"
+  POD_NAMESPACE: "run"
+  POD_IMAGE: "alpine:3.21"
+  POD_SHELL: "/bin/sh"
+  POD_CPU_LIMIT: "500m"
+  POD_MEMORY_LIMIT: "256Mi"
