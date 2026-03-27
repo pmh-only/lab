@@ -23,6 +23,9 @@ spec:
           apiServer: "https://10.0.0.10:6443"
           kubeconfig:
             enabled: false
+          metricsPort: 20244
+        image:
+          tag: v2.8.0
     repoURL: https://charts.enix.io
     targetRevision: x
   syncPolicy:
