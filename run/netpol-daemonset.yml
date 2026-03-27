@@ -34,24 +34,38 @@ metadata:
 data:
   enforce.sh: |
     #!/bin/sh
-    apk add --no-cache iptables curl
+    apk add --no-cache nftables curl
 
     CHAIN="RUN-NETPOL"
-    BLOCKED="10.0.0.0/8 172.16.0.0/12"
+    SET="RUN-NETPOL-IPS"
     API="https://${KUBERNETES_SERVICE_HOST}/api/v1/namespaces/run/pods?labelSelector=app%3Drun"
     CACERT="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 
     cleanup() {
-      echo "cleaning up iptables rules"
-      iptables -t mangle -F "$CHAIN" 2>/dev/null || true
-      iptables -t mangle -D FORWARD -j "$CHAIN" 2>/dev/null || true
+      echo "cleaning up nft rules"
+      HANDLE=$(nft -a list chain ip mangle FORWARD 2>/dev/null \
+        | grep "jump $CHAIN" | grep -o 'handle [0-9]*' | awk '{print $2}')
+      [ -n "$HANDLE" ] && nft delete rule ip mangle FORWARD handle "$HANDLE" 2>/dev/null || true
+      nft flush chain ip mangle "$CHAIN" 2>/dev/null || true
+      nft delete chain ip mangle "$CHAIN" 2>/dev/null || true
+      nft flush set ip mangle "$SET" 2>/dev/null || true
+      nft delete set ip mangle "$SET" 2>/dev/null || true
       exit 0
     }
     trap cleanup TERM INT
 
-    iptables -t mangle -N "$CHAIN" 2>/dev/null || true
-    iptables -t mangle -C FORWARD -j "$CHAIN" 2>/dev/null || \
-      iptables -t mangle -I FORWARD 1 -j "$CHAIN"
+    # Create set and chain if they don't exist
+    nft add set ip mangle "$SET" '{ type ipv4_addr; }' 2>/dev/null || true
+    nft add chain ip mangle "$CHAIN" 2>/dev/null || true
+
+    # Add static DROP rules referencing the set (only once)
+    nft flush chain ip mangle "$CHAIN"
+    nft add rule ip mangle "$CHAIN" "ip saddr @${SET} ip daddr 10.0.0.0/8 drop"
+    nft add rule ip mangle "$CHAIN" "ip saddr @${SET} ip daddr 172.16.0.0/12 drop"
+
+    # Hook chain into mangle FORWARD if not already present
+    nft list chain ip mangle FORWARD 2>/dev/null | grep -q "$CHAIN" || \
+      nft insert rule ip mangle FORWARD "jump $CHAIN"
 
     echo "run-netpol started on $NODE_NAME"
 
@@ -60,13 +74,13 @@ data:
       IPS=$(curl -sf --cacert "$CACERT" -H "Authorization: Bearer $TOKEN" "$API" \
         | grep -o '"podIP": *"[^"]*"' | grep -o '[0-9.]*' || true)
 
-      iptables -t mangle -F "$CHAIN"
-
-      for IP in $IPS; do
-        for CIDR in $BLOCKED; do
-          iptables -t mangle -A "$CHAIN" -s "$IP" -d "$CIDR" -j DROP
+      # Update set atomically in a single nft transaction — no flush window
+      {
+        echo "flush set ip mangle $SET"
+        for IP in $IPS; do
+          echo "add element ip mangle $SET { $IP }"
         done
-      done
+      } | nft -f -
 
       sleep 5
     done
