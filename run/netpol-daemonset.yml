@@ -43,15 +43,15 @@ data:
 
     cleanup() {
       echo "cleaning up iptables rules"
-      iptables -F "$CHAIN" 2>/dev/null || true
-      iptables -D FORWARD -j "$CHAIN" 2>/dev/null || true
+      iptables -t mangle -F "$CHAIN" 2>/dev/null || true
+      iptables -t mangle -D FORWARD -j "$CHAIN" 2>/dev/null || true
       exit 0
     }
     trap cleanup TERM INT
 
-    iptables -N "$CHAIN" 2>/dev/null || true
-    iptables -C FORWARD -j "$CHAIN" 2>/dev/null || \
-      iptables -I FORWARD 1 -j "$CHAIN"
+    iptables -t mangle -N "$CHAIN" 2>/dev/null || true
+    iptables -t mangle -C FORWARD -j "$CHAIN" 2>/dev/null || \
+      iptables -t mangle -I FORWARD 1 -j "$CHAIN"
 
     echo "run-netpol started on $NODE_NAME"
 
@@ -60,11 +60,11 @@ data:
       IPS=$(curl -sf --cacert "$CACERT" -H "Authorization: Bearer $TOKEN" "$API" \
         | grep -o '"podIP": *"[^"]*"' | grep -o '[0-9.]*' || true)
 
-      iptables -F "$CHAIN"
+      iptables -t mangle -F "$CHAIN"
 
       for IP in $IPS; do
         for CIDR in $BLOCKED; do
-          iptables -A "$CHAIN" -s "$IP" -d "$CIDR" -j DROP
+          iptables -t mangle -A "$CHAIN" -s "$IP" -d "$CIDR" -j DROP
         done
       done
 
