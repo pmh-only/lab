@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: run
+  namespace: run
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: run-app
+  template:
+    metadata:
+      labels:
+        app: run-app
+    spec:
+      serviceAccountName: run-app
+      containers:
+        - name: run
+          image: ghcr.io/pmh-only/run:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: run-config
+            - secretRef:
+                name: run-secrets
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: run
+  namespace: run
+spec:
+  selector:
+    app: run-app
+  ports:
+    - port: 8080
+      targetPort: 8080
