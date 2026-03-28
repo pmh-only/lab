@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: run-apparmor-profile
+  namespace: run
+data:
+  run-user: |
+    #include <tunables/global>
+
+    profile run-user flags=(attach_disconnected,mediate_deleted) {
+      #include <abstractions/base>
+
+      # Allow all file access within the container
+      / r,
+      /** rwlkix,
+
+      # Allow network
+      network,
+
+      # Allow all capabilities granted by k8s (SYS_ADMIN, NET_ADMIN, SYS_PTRACE)
+      capability sys_admin,
+      capability net_admin,
+      capability sys_ptrace,
+      capability setuid,
+      capability setgid,
+      capability chown,
+      capability dac_override,
+      capability dac_read_search,
+      capability fowner,
+      capability fsetid,
+      capability kill,
+      capability mknod,
+      capability net_bind_service,
+      capability setfcap,
+      capability setpcap,
+      capability sys_chroot,
+      capability sys_resource,
+      capability audit_write,
+      capability ipc_lock,
+      capability sys_boot,
+
+      # Allow mounts needed by systemd
+      mount fstype=tmpfs,
+      mount fstype=proc,
+      mount fstype=sysfs,
+      mount fstype=devtmpfs,
+      mount fstype=devpts,
+      mount fstype=cgroup,
+      mount fstype=cgroup2,
+      mount fstype=mqueue,
+      mount fstype=hugetlbfs,
+      mount fstype=securityfs,
+      mount fstype=debugfs,
+      mount fstype=tracefs,
+      mount fstype=bpf,
+      mount fstype=pstore,
+      mount fstype=efivarfs,
+      mount options=(rw,bind),
+      mount options=(rw,rbind),
+      mount options=(rw,remount),
+      mount options=(ro,remount),
+      mount options=(rw,remount,bind),
+      mount options=(ro,remount,bind),
+      mount options=(rw,nosuid,nodev,noexec,remount),
+      mount options=(rw,nosuid,nodev,noexec,remount,relatime),
+      mount options=(ro,nosuid,nodev,noexec,remount),
+      mount options=(ro,nosuid,nodev,noexec,remount,relatime),
+      umount,
+
+      # Allow signals and ptrace
+      signal,
+      ptrace,
+
+      # Allow unix sockets
+      unix,
+
+      # Deny direct host device access
+      deny /dev/sd* rwklx,
+      deny /dev/nvme* rwklx,
+      deny /dev/vd* rwklx,
+      deny /dev/hd* rwklx,
+    }
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: run-apparmor
+  namespace: run
+spec:
+  selector:
+    matchLabels:
+      app: run-apparmor
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: run-apparmor
+    spec:
+      hostPID: true
+      tolerations:
+        - operator: Exists
+          effect: NoSchedule
+      initContainers:
+        - name: install
+          image: alpine:3.21
+          command:
+            - /bin/sh
+            - -c
+            - |
+              cp /profiles/run-user /host/etc/apparmor.d/run-user
+              nsenter -m -u -i -n -p -t 1 -- apparmor_parser -r /etc/apparmor.d/run-user
+              echo "AppArmor profile run-user loaded"
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: profiles
+              mountPath: /profiles
+            - name: host-root
+              mountPath: /host
+      containers:
+        - name: reloader
+          image: alpine:3.21
+          command:
+            - /bin/sh
+            - -c
+            - |
+              while true; do
+                sleep 3600
+                cp /profiles/run-user /host/etc/apparmor.d/run-user
+                nsenter -m -u -i -n -p -t 1 -- apparmor_parser -r /etc/apparmor.d/run-user
+                echo "AppArmor profile run-user reloaded"
+              done
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: profiles
+              mountPath: /profiles
+            - name: host-root
+              mountPath: /host
+      volumes:
+        - name: profiles
+          configMap:
+            name: run-apparmor-profile
+        - name: host-root
+          hostPath:
+            path: /
