@@ -7,6 +7,7 @@ resources:
   - configmap.yml
   - secret.yml
   - networkpolicy.yml
+  - apparmor-daemonset.yml
   - netpol-daemonset.yml
   - deployment.yml
   - ingress.yml
