@@ -17,27 +17,20 @@ data:
       # Allow network
       network,
 
-      # Allow all capabilities granted by k8s (SYS_ADMIN, NET_ADMIN, SYS_PTRACE)
+      # Allow capabilities granted by k8s
       capability sys_admin,
       capability net_admin,
-      capability sys_ptrace,
+      capability sys_resource,
       capability setuid,
       capability setgid,
+      capability kill,
       capability chown,
       capability dac_override,
-      capability dac_read_search,
       capability fowner,
       capability fsetid,
-      capability kill,
       capability mknod,
       capability net_bind_service,
-      capability setfcap,
-      capability setpcap,
-      capability sys_chroot,
-      capability sys_resource,
       capability audit_write,
-      capability ipc_lock,
-      capability sys_boot,
 
       # Allow mounts needed by systemd
       mount fstype=tmpfs,
@@ -67,9 +60,8 @@ data:
       mount options=(ro,nosuid,nodev,noexec,remount,relatime),
       umount,
 
-      # Allow signals and ptrace
+      # Allow signals and unix sockets
       signal,
-      ptrace,
 
       # Allow unix sockets
       unix,
