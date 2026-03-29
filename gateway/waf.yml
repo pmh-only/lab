@@ -19,7 +19,11 @@ data:
     # Support more Body limits
     SecPcreMatchLimit 500000
     SecPcreMatchLimitRecursion 500000
+
+    SecRequestBodyLimit 1073741824
+    SecRequestBodyInMemoryLimit 1048576
     SecRequestBodyNoFilesLimit 1073741824
+    SecRequestBodyLimitAction ProcessPartial
 
     # Allow REST/WebDAV methods
     SecAction \
