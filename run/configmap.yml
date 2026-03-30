@@ -11,5 +11,5 @@ data:
   POD_IMAGE: "ghcr.io/pmh-only/ubuntu-systemd:24.04"
   POD_SHELL: "/bin/bash"
   POD_CPU_LIMIT: "500m"
-  POD_MEMORY_LIMIT: "256Mi"
-  POD_STORAGE_SIZE: "10Gi"
+  POD_MEMORY_LIMIT: "1Gi"
+  POD_STORAGE_SIZE: "5Gi"
