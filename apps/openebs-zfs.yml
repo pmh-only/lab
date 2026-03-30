@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openebs-zfs
+  namespace: argocd
+spec:
+  destination:
+    namespace: openebs
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: zfs-localpv
+    repoURL: https://openebs.github.io/zfs-localpv
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
