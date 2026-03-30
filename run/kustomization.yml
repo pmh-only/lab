@@ -11,3 +11,7 @@ resources:
   - netpol-daemonset.yml
   - deployment.yml
   - ingress.yml
+
+images:
+  - name: ghcr.io/pmh-only/run
+    newTag: latest@sha256:7a97fa9e76bf07268c400ff301565712a2143658bba5c1ee52a976144f6e96b4
