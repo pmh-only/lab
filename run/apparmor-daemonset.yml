@@ -58,6 +58,13 @@ data:
       mount options=(rw,nosuid,nodev,noexec,remount,relatime),
       mount options=(ro,nosuid,nodev,noexec,remount),
       mount options=(ro,nosuid,nodev,noexec,remount,relatime),
+      # Allow mount propagation changes (needed by systemd 255 generator sandboxing)
+      mount options=(slave),
+      mount options=(rslave),
+      mount options=(private),
+      mount options=(rprivate),
+      mount options=(shared),
+      mount options=(rshared),
       umount,
 
       # Allow signals and unix sockets
