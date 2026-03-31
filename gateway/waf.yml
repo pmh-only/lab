@@ -81,3 +81,12 @@ data:
     SecRule REQUEST_URI "@beginsWith /rest/dynamic-node-parameters/" \
         "id:1004,phase:1,pass,nolog,\
         ctl:ruleRemoveById=930120"
+
+    # Allow AWS S3 client headers through for the S3 vhost (path-style and virtual-hosted-style)
+    SecRule REQUEST_HEADERS:Host "@rx ^(.+\.)?s3\.pmh\.codes$" \
+        "id:1000,\
+        phase:1,\
+        pass,\
+        nolog,\
+        ctl:ruleRemoveById=920450,\
+        ctl:ruleRemoveById=920640"
