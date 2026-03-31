@@ -12,6 +12,8 @@ data:
   custom-rules.conf: |
     # Remove host header missing rule
     SecRuleRemoveById 920280
+    SecRuleRemoveById 920640
+    SecRuleUpdateTargetById 920450 "!REQUEST_HEADERS:Expect"
 
     # Remove content-type header limit rule
     SecRuleRemoveById 920420
