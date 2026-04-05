@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: txt
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/txt.update-strategy: digest
+    argocd-image-updater.argoproj.io/image-list: txt=ghcr.io/pmh-only/txt:latest
+spec:
+  destination:
+    namespace: txt
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: txt
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
