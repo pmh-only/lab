@@ -66,9 +66,9 @@ data:
         "id:200011,phase:1,allow,nolog"
 
     # Authentik update application redirect's url
-    SecRule REQUEST_URI "@beginsWith /api/v3/core/transactional/applications/" \
+    SecRule REQUEST_URI "@beginsWith /api/v3/" \
         "id:1001,phase:2,pass,nolog,\
-        ctl:ruleRemoveTargetById=934110;ARGS:json.provider.redirect_uris.array_0.url"
+        ctl:ruleRemoveTargetById=934110"
 
     SecRule REQUEST_URI "@beginsWith /application/o/" \
         "id:1002,phase:2,pass,nolog,\
