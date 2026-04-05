@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: txt
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: txt
+  template:
+    metadata:
+      labels:
+        app: txt
+    spec:
+      containers:
+        - name: txt
+          image: ghcr.io/pmh-only/txt:latest
+          env:
+            - name: DATABASE_URL
+              value: /data/local.db
+            - name: PUBLIC_OAUTH_START
+              value: https://auth.pmh.codes/application/o/authorize/?response_type=code&client_id=pGuBmdMZgJbRNQZaOgrgxj6m8ni632KgsG0Q1NPq&redirect_uri=https://txt.pmh.codes/auth&scope=openid
+            - name: TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: txt-secret
+                  key: TOKEN_SECRET
+            - name: OAUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: txt-secret
+                  key: OAUTH_SECRET
+          volumeMounts:
+            - mountPath: /data/
+              name: persistent
+      volumes:
+        - name: persistent
+          persistentVolumeClaim:
+            claimName: txt-pvc
