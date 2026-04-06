@@ -279,12 +279,6 @@ spec:
             - name: nginx-config
               mountPath: /usr/local/openresty/nginx/conf/nginx.conf
               subPath: nginx.conf
-            - name: nginx-waf-config
-              mountPath: /etc/modsecurity/includes.conf
-              subPath: includes.conf
-            - name: nginx-waf-config
-              mountPath: /etc/modsecurity/custom-rules.conf
-              subPath: custom-rules.conf
             - name: gateway-ech-secrets
               mountPath: /etc/nginx/ech/server.ech.pem
               subPath: server.ech.pem
@@ -313,9 +307,6 @@ spec:
         - name: nginx-config
           configMap:
             name: gateway-nginx-config
-        - name: nginx-waf-config
-          configMap:
-            name: gateway-nginx-waf-config
 ---
 apiVersion: v1
 kind: Service
