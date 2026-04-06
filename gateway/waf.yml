@@ -94,5 +94,4 @@ data:
     # Allow creating new post
     SecRule REQUEST_URI "@rx ^/posts/(?:new|.+/edit)$" \
         "id:1081,phase:1,pass,nolog,\
-        ctl:ruleRemoveTargetById=934100;ARGS:content,\
-        ctl:ruleRemoveTargetById=941390;ARGS:content"
+        ctl:ruleRemoveTargetById=941100-941999;ARGS:content"
