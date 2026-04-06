@@ -190,9 +190,17 @@ data:
         }
 
         location = /robots.txt {
-          set $envoy_gateway envoy-gateway-main.envoy-gateway-system.svc.cluster.local;
-          proxy_pass http://$envoy_gateway:80/robots.txt;
-          proxy_set_header Host pmh.codes;
+            set $envoy_gateway envoy-gateway-main.envoy-gateway-system.svc.cluster.local;
+            proxy_pass http://$envoy_gateway:80/robots.txt;
+            proxy_set_header Host $host;
+            proxy_intercept_errors on;
+            error_page 404 502 503 = @robots_fallback;
+        }
+
+        location @robots_fallback {
+            set $envoy_gateway envoy-gateway-main.envoy-gateway-system.svc.cluster.local;
+            proxy_pass http://$envoy_gateway:80/robots.txt;
+            proxy_set_header Host pmh.codes;
         }
 
         location = /sitemap.xml {
