@@ -96,3 +96,9 @@ data:
       "id:1005,phase:1,pass,nolog, \
       ctl:ruleRemoveTargetById=934100;ARGS:content, \
       ctl:ruleRemoveTargetById=941390;ARGS:content"
+
+    # and.. Edit
+    SecRule REQUEST_URI "@streq /posts/edit" \
+      "id:1005,phase:1,pass,nolog, \
+      ctl:ruleRemoveTargetById=934100;ARGS:content, \
+      ctl:ruleRemoveTargetById=941390;ARGS:content"
