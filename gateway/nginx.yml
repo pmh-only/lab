@@ -178,17 +178,6 @@ data:
         sub_filter_types text/html;
         sub_filter '<head>' '<head><script src="https://trace.pmh.codes/api/script.js" data-site-id="1" defer></script>';
 
-        modsecurity on;
-        modsecurity_rules_file /etc/modsecurity/includes.conf;
-        modsecurity_rules 'SecRuleRemoveById 920280';
-
-        error_page 403 @blocked;
-        location @blocked {
-          internal;
-          add_header Content-Type 'text/html;charset=utf-8' always;
-          return 403 'You look suspicious, Please review your request. <script src="https://pmh.codes/waf.js"></script>';
-        }
-
         location = /robots.txt {
             set $envoy_gateway envoy-gateway-main.envoy-gateway-system.svc.cluster.local;
             proxy_pass http://$envoy_gateway:80/robots.txt;
