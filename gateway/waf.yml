@@ -92,13 +92,7 @@ data:
         ctl:ruleRemoveById=920640"
 
     # Allow creating new post
-    SecRule REQUEST_URI "@streq /posts/new" \
-      "id:1005,phase:1,pass,nolog, \
-      ctl:ruleRemoveTargetById=934100;ARGS:content, \
-      ctl:ruleRemoveTargetById=941390;ARGS:content"
-
-    # and.. Edit
-    SecRule REQUEST_URI "@streq /posts/edit" \
-      "id:1006,phase:1,pass,nolog, \
-      ctl:ruleRemoveTargetById=934100;ARGS:content, \
-      ctl:ruleRemoveTargetById=941390;ARGS:content"
+    SecRule REQUEST_URI "@rx ^/posts/(?:new|.+/edit)$" \
+        "id:1081,phase:1,pass,nolog,\
+        ctl:ruleRemoveTargetById=934100;ARGS:content,\
+        ctl:ruleRemoveTargetById=941390;ARGS:content"
