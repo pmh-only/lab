@@ -194,7 +194,7 @@ data:
             proxy_pass http://$envoy_gateway:80/robots.txt;
             proxy_set_header Host $host;
             proxy_intercept_errors on;
-            error_page 404 502 503 = @robots_fallback;
+            error_page 403 404 502 503 = @robots_fallback;
         }
 
         location @robots_fallback {
