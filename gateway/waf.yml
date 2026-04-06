@@ -93,6 +93,6 @@ data:
 
     # Allow creating new post
     SecRule REQUEST_URI "@streq /posts/new" \
-      "id:1001,phase:1,pass,nolog, \
+      "id:1005,phase:1,pass,nolog, \
       ctl:ruleRemoveTargetById=934100;ARGS:content, \
       ctl:ruleRemoveTargetById=941390;ARGS:content"
