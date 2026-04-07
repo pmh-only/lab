@@ -132,6 +132,11 @@ data:
         ""      "-";
       }
 
+      map $request_uri $tracking_script {
+        ~*amp    "";
+        default  '<script src="https://trace.pmh.codes/api/script.js" data-site-id="1" defer></script>';
+      }
+
       log_format log_stream
         '$remote_addr $ga_xff [$time_local] $host $remote_user $ga_cache '
         '"$request" $status $body_bytes_sent '
@@ -172,11 +177,6 @@ data:
 
         access_log /dev/stdout log_stream;
         error_log  /dev/stderr notice;
-
-        map $request_uri $tracking_script {
-          ~*amp    "";
-          default  '<script src="https://trace.pmh.codes/api/script.js" data-site-id="1" defer></script>';
-        }
 
         sub_filter_once on;
         sub_filter_last_modified on;
