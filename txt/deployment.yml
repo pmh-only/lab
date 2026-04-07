@@ -30,6 +30,11 @@ spec:
                 secretKeyRef:
                   name: txt-secret
                   key: OAUTH_SECRET
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: txt-secret
+                  key: OPENAI_API_KEY
           volumeMounts:
             - mountPath: /data/
               name: persistent
