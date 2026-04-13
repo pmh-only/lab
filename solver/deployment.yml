@@ -42,6 +42,11 @@ spec:
                   key: IMAP_PASS
             - name: KV_STORE_PATH
               value: /data/kv.json
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: solver-secret
+                  key: OPENAI_API_KEY
           volumeMounts:
             - mountPath: /data
               name: solver-pvc
