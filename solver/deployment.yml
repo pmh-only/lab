@@ -16,6 +16,8 @@ spec:
         - name: solver
           image: ghcr.io/pmh-only/solver:latest
           env:
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: '0'
             - name: DISCORD_CLIENT_ID
               value: '1490891535347089488'
             - name: DISCORD_TOKEN
