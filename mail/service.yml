@@ -7,24 +7,24 @@ spec:
     app: mail
   type: ClusterIP
   ports:
-  - name: imap
-    protocol: TCP
-    port: 1143
-    targetPort: 1143
-  - name: smtp
-    protocol: TCP
-    port: 1025
-    targetPort: 1025
+    - name: imap
+      protocol: TCP
+      port: 1143
+      targetPort: 1143
+    - name: smtp
+      protocol: TCP
+      port: 1025
+      targetPort: 1025
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: roundcube
+  name: mailui
 spec:
   selector:
-    app: roundcube
+    app: mailui
   type: ClusterIP
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
