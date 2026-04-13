@@ -20,7 +20,7 @@ spec:
               value: /data/local.db
             - name: ORIGIN
               value: https://mail.pmh.codes
-            - name:
+            - name: BETTER_AUTH_SECRET
               valueFrom:
                 secretKeyRef:
                   name: mailui-secret
