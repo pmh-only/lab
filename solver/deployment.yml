@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solver
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: solver
+  template:
+    metadata:
+      labels:
+        app: solver
+    spec:
+      containers:
+        - name: solver
+          image: ghcr.io/pmh-only/solver:latest
+          env:
+            - name: DISCORD_CLIENT_ID
+              value: '1490891535347089488'
+            - name: DISCORD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: solver-secret
+                  key: DISCORD_TOKEN
+            - name: IMAP_HOST
+              value: mail.mail.svc.cluster.local
+            - name: IMAP_PORT
+              value: '1143'
+            - name: IMAP_SECURE
+              value: 'false'
+            - name: IMAP_USER
+              value: pmh_only@pmh.codes
+            - name: IMAP_MAILBOX
+              value: INBOX
+            - name: IMAP_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: solver-secret
+                  key: IMAP_PASS
+            - name: KV_STORE_PATH
+              value: /data/kv.json
+          volumeMounts:
+            - mountPath: /data
+              name: solver-pvc
+      volumes:
+        - name: solver-pvc
+          persistentVolumeClaim:
+            claimName: solver-pvc
