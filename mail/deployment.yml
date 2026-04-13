@@ -20,6 +20,11 @@ spec:
               value: /data/local.db
             - name: ORIGIN
               value: https://mail.pmh.codes
+            - name:
+              valueFrom:
+                secretKeyRef:
+                  name: mailui-secret
+                  key: BETTER_AUTH_SECRET
           volumeMounts:
             - mountPath: /data
               name: mailui-pvc
