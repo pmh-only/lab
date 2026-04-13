@@ -7,3 +7,4 @@ resources:
   - ./service.yml
   - ./pvc.yml
   - ./ingress.yml
+  - ./secret.yml
