@@ -18,6 +18,8 @@ spec:
           env:
             - name: DATABASE_URL
               value: /data/local.db
+            - name: ORIGIN
+              value: https://mail.pmh.codes
           volumeMounts:
             - mountPath: /data
               name: mailui-pvc
