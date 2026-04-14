@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meta
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: meta
+  template:
+    metadata:
+      labels:
+        app: meta
+    spec:
+      containers:
+        - name: meta
+          image: ghcr.io/pmh-only/discord-query:latest
+          env:
+            - name: DISCORD_DB_PATH
+              value: /data/discord.duckdb
+          volumeMounts:
+            - mountPath: /data
+              name: meta-pvc
+      volumes:
+        - name: meta-pvc
+          persistentVolumeClaim:
+            claimName: meta-pvc

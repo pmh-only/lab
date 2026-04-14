@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: meta=ghcr.io/pmh-only/discord-query:latest
+    argocd-image-updater.argoproj.io/meta.update-strategy: digest
+  name: meta
+  namespace: argocd
+spec:
+  destination:
+    namespace: meta
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: meta
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
