@@ -3,6 +3,11 @@ kind: Application
 metadata:
   name: pdf
   namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: stirling=docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest-fat
+    argocd-image-updater.argoproj.io/stirling.update-strategy: digest
+    argocd-image-updater.argoproj.io/stirling.helm.image-name: image.name
+    argocd-image-updater.argoproj.io/stirling.helm.image-tag: image.tag
 spec:
   destination:
     namespace: pdf
@@ -14,7 +19,6 @@ spec:
       valuesObject:
         fullnameOverride: pdf
         image:
-          tag: latest-fat
         persistence:
           enabled: true
         deployment:
