@@ -46,7 +46,7 @@ data:
       ssl_session_tickets off;
       ssl_early_data on;
 
-      ssl_ech_file /etc/nginx/ech/server.ech.pem;
+      #ssl_ech_file /etc/nginx/ech/server.ech.pem;
 
       resolver kube-dns.kube-system.svc.cluster.local valid=30s;
 
