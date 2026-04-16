@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: welplan
-          image: ghcr.io/pmh-only/welplan:latest
+          image: ghcr.io/pmh-only/welplan2:latest
           env:
             - name: WELSTORY_USERNAME
               valueFrom:
@@ -26,8 +26,10 @@ spec:
                 secretKeyRef:
                   name: welplan-secret
                   key: WELSTORY_PASSWORD
+            - name: DB_PATH
+              value: /data/cache.db
           volumeMounts:
-            - mountPath: /app/cache
+            - mountPath: /data
               name: persistent
       volumes:
         - name: persistent
