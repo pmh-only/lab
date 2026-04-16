@@ -143,13 +143,6 @@ data:
         '"$http_referer" "$http_user_agent" '
         '$ga_ssl_proto $ga_ssl_cipher "$ga_mime" $request_time';
 
-      add_header Alt-Svc 'h3=":443"; ma=86400' always;
-      add_header X-Frame-Options 'SAMEORIGIN' always;
-      add_header X-Content-Type-Options 'nosniff' always;
-      add_header Referrer-Policy 'same-origin' always;
-      add_header Permissions-Policy 'geolocation=(), microphone=()' always;
-      add_header Content-Security-Policy "manifest-src 'self'" always;
-
       server {
         listen  80 default_server;
         listen  [::]:80 default_server;
@@ -158,6 +151,16 @@ data:
         error_log  /dev/stderr notice;
 
         server_name _;
+
+        proxy_hide_header Strict-Transport-Security;
+
+        add_header Alt-Svc 'h3=":443"; ma=86400' always;
+        add_header X-Frame-Options 'SAMEORIGIN' always;
+        add_header X-Content-Type-Options 'nosniff' always;
+        add_header Referrer-Policy 'same-origin' always;
+        add_header Permissions-Policy 'geolocation=(), microphone=()' always;
+        add_header Content-Security-Policy "manifest-src 'self'" always;
+        add_header Strict-Transport-Security 'max-age=63072000; includeSubDomains; preload' always;
 
         location / {
           return 301 https://$host$request_uri;
@@ -173,6 +176,13 @@ data:
         server_name _;
 
         proxy_hide_header Strict-Transport-Security;
+
+        add_header Alt-Svc 'h3=":443"; ma=86400' always;
+        add_header X-Frame-Options 'SAMEORIGIN' always;
+        add_header X-Content-Type-Options 'nosniff' always;
+        add_header Referrer-Policy 'same-origin' always;
+        add_header Permissions-Policy 'geolocation=(), microphone=()' always;
+        add_header Content-Security-Policy "manifest-src 'self'" always;
         add_header Strict-Transport-Security 'max-age=63072000; includeSubDomains; preload' always;
 
         access_log /dev/stdout log_stream;
