@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/welplan.update-strategy: digest
-    argocd-image-updater.argoproj.io/image-list: welplan=ghcr.io/pmh-only/welplan:latest
+    argocd-image-updater.argoproj.io/image-list: welplan=ghcr.io/pmh-only/welplan2:latest
 spec:
   destination:
     namespace: welplan
