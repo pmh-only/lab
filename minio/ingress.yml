@@ -179,3 +179,23 @@ spec:
             if body then body:setBytes("") end
           end
         end
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: minio-console-login-redirect
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: minio-console-route
+  lua:
+    - type: Inline
+      inline: |
+        function envoy_on_request(request_handle)
+          local path = request_handle:headers():get(":path") or ""
+          if path == "/rustfs/console/auth/login/" or path:match("^/rustfs/console/auth/login/%?") then
+            local args = path:match("%?(.+)$") or ""
+            request_handle:respond({[":status"] = "302", ["location"] = "/rustfs/admin/v3/oidc/authorize/pmh_codes?" .. args}, "")
+          end
+        end
