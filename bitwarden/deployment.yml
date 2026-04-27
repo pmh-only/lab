@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: bitwarden
+      annotations:
+        backup.velero.io/backup-volumes-excludes: bitwarden-storage
     spec:
       containers:
         - name: bitwarden
