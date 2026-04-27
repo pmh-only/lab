@@ -23,7 +23,7 @@ spec:
             repositoryConfigData:
               global:
                 keepLatestMaintenanceJobs: 0
-          podVolumeOperationTimeout: 2h
+          fsBackupTimeout: 2h
           defaultVolumesToFsBackup: true
           backupStorageLocation:
             - name: default
