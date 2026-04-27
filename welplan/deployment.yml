@@ -16,6 +16,8 @@ spec:
         - name: welplan
           image: ghcr.io/pmh-only/welplan2:latest
           env:
+            - name: WELPLAN_VERBOSE_LOGS
+              value: '1'
             - name: WELSTORY_USERNAME
               valueFrom:
                 secretKeyRef:
