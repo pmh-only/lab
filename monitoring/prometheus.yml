@@ -12,6 +12,8 @@ spec:
     metadata:
       labels:
         app: prometheus
+      annotations:
+        backup.velero.io/backup-volumes-excludes: prometheus-pvc
     spec:
       serviceAccountName: prometheus-sa
       containers:
@@ -46,7 +48,7 @@ data:
     storage:
       tsdb:
         retention:
-          time: 1y
+          time: 90d
 
     scrape_configs:
       - job_name: "ne"
