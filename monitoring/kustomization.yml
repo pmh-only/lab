@@ -7,3 +7,4 @@ resources:
   - ./ksm.yml
   - ./ne.yml
   - ./prometheus.yml
+  - ./secret.yml
