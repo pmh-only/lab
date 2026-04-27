@@ -58,6 +58,14 @@ spec:
               defaultVolumesToFsBackup: true
               uploaderConfig:
                 parallelFilesUpload: 16
+              excludedResources:
+                - podvolumebackups.velero.io
+                - podvolumerestores.velero.io
+                - backups.velero.io
+                - restores.velero.io
+                - downloadrequests.velero.io
+                - deletebackuprequests.velero.io
+                - serverstatusrequests.velero.io
         kubectl:
           image:
             repository: jfcoz/kubectl-deb12-basic
