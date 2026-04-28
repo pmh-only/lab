@@ -17,7 +17,10 @@ spec:
           image: ghcr.io/pmh-only/mail:latest
           env:
             - name: DATABASE_URL
-              value: /data/local.db
+              valueFrom:
+                secretKeyRef:
+                  name: mailui-secret
+                  key: DATABASE_URL 
             - name: ORIGIN
               value: https://mail.pmh.codes
             - name: BETTER_AUTH_SECRET
@@ -25,10 +28,3 @@ spec:
                 secretKeyRef:
                   name: mailui-secret
                   key: BETTER_AUTH_SECRET
-          volumeMounts:
-            - mountPath: /data
-              name: mailui-pvc
-      volumes:
-        - name: mailui-pvc
-          persistentVolumeClaim:
-            claimName: mailui-pvc
