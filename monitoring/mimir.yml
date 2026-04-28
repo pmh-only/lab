@@ -9,9 +9,6 @@ data:
     target: all
 
     multitenancy_enabled: false
-    distributor:
-      ingestion_rate_limit: 50000
-      ingestion_burst_size: 500000
 
     server:
       http_listen_port: 9009
@@ -39,6 +36,7 @@ data:
       compactor_blocks_retention_period: 90d
 
     ingester:
+      max_global_series_per_user: 0
       ring:
         replication_factor: 1
 
