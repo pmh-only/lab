@@ -22,7 +22,7 @@ data:
           endpoint: s3.pmh.codes
           region: us-east-1
           bucket_name: mimir
-          insecure: true
+          insecure: false
           bucket_lookup_type: path
 
     blocks_storage:
