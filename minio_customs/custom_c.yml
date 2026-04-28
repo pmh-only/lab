@@ -39,7 +39,7 @@ spec:
           request_handle:headers():replace("host", "a-c.s3.pmh.codes")
 
           if path == "/" then
-            local mode = request_handle:headers():get("sec-fetch-dest") or ""
+            local mode = request_handle:headers():get("sec-fetch-mode") or ""
             if mode == "navigate" then
               request_handle:headers():replace(":path", "/index.html")
             else
