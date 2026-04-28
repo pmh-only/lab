@@ -73,6 +73,8 @@ spec:
             - name: grafana-config
               mountPath: /etc/grafana/grafana.ini
               subPath: grafana.ini
+            - name: grafana-datasources
+              mountPath: /etc/grafana/provisioning/datasources
       volumes:
         - name: grafana-pvc
           persistentVolumeClaim:
@@ -80,6 +82,9 @@ spec:
         - name: grafana-config
           configMap:
             name: grafana-config
+        - name: grafana-datasources
+          configMap:
+            name: grafana-datasources
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -99,6 +104,21 @@ data:
 
     [server]
     root_url = https://grafana.pmh.codes
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: monitoring
+data:
+  mimir.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Mimir
+        type: prometheus
+        url: http://mimir:9009/prometheus
+        jsonData:
+          timeInterval: 60s
 ---
 apiVersion: v1
 kind: Service

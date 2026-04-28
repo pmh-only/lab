@@ -5,6 +5,8 @@ resources:
   - ./grafana.yml
   - ./image-renderer.yml
   - ./ksm.yml
+  - ./mimir-secrets.yml
+  - ./mimir.yml
   - ./ne.yml
   - ./prometheus.yml
   - ./secret.yml
