@@ -34,9 +34,9 @@ spec:
             - name: WEBSERVER_SIZE_LIMIT_MB
               value: "128"
             - name: MINIO_ENDPOINT
-              value: minio-service.minio.svc.cluster.local:9000
+              value: s3.pmh.codes
             - name: MINIO_ENDPOINT_SECURE
-              value: "false"
+              value: "true"
             - name: MINIO_BUCKET_NAME
               value: "a-s"
             - name: MINIO_ACCESS_KEY_ID
