@@ -34,9 +34,9 @@ data:
 
     limits:
       compactor_blocks_retention_period: 90d
+      max_global_series_per_user: 0
 
     ingester:
-      max_global_series_per_user: 0
       ring:
         replication_factor: 1
 
