@@ -30,7 +30,7 @@ spec:
             - name: prometheus-pvc
               mountPath: /prometheus
         - name: thanos-sidecar
-          image: quay.io/thanos/thanos:latest
+          image: quay.io/thanos/thanos:main-2026-04-22-a1c5191
           args:
             - sidecar
             - --http-address=0.0.0.0:10902
