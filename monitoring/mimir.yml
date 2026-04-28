@@ -9,6 +9,9 @@ data:
     target: all
 
     multitenancy_enabled: false
+    distributor:
+      ingestion_rate_limit: 50000
+      ingestion_burst_size: 500000
 
     server:
       http_listen_port: 9009
