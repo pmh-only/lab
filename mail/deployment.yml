@@ -20,11 +20,57 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: mailui-secret
-                  key: DATABASE_URL 
+                  key: DATABASE_URL
+ 
             - name: ORIGIN
               value: https://mail.pmh.codes
+
             - name: BETTER_AUTH_SECRET
               valueFrom:
                 secretKeyRef:
                   name: mailui-secret
                   key: BETTER_AUTH_SECRET
+
+            - name: IMAP_HOST
+              value: mail.mail.svc.cluster.local
+            - name: IMAP_PORT
+              value: '1143'
+            - name: IMAP_SECURE
+              value: 'false'
+            - name: IMAP_USER
+              value: pmh_only@pmh.codes
+            - name: IMAP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mailui-secret
+                  key: MAIL_PASSWORD
+            - name: IMAP_MAILBOX
+              value: INBOX
+            - name: IMAP_POLL_SECONDS
+              value: '5'
+
+            - name: SMTP_HOST
+              value: mail.mail.svc.cluster.local
+            - name: SMTP_PORT
+              value: '1025'
+            - name: SMTP_SECURE
+              value: 'false'
+            - name: SMTP_USER
+              value: pmh_only@pmh.codes
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mailui-secret
+                  key: MAIL_PASSWORD
+            - name: SMTP_FROM
+              value: 'Minhyeok Park <pmh_only@pmh.codes>'
+
+            - name: OIDC_DISCOVERY_URL
+              value: 'https://auth.pmh.codes/application/o/mail/.well-known/openid-configuration'
+            - name: OIDC_CLIENT_ID
+              value: BVarhyU4Ms0AHzKa4sDtxvvUu5Cc8z4toYpc7pDP
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: mailui-secret
+                  key: OIDC_CLIENT_SECRET
