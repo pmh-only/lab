@@ -12,8 +12,6 @@ spec:
     metadata:
       labels:
         app: prometheus
-      annotations:
-        backup.velero.io/backup-volumes-excludes: prometheus-pvc
     spec:
       serviceAccountName: prometheus-sa
       containers:
