@@ -37,8 +37,8 @@ spec:
             - query
             - --http-address=0.0.0.0:9090
             - --grpc-address=0.0.0.0:10901
-            - --store=prometheus:10901
-            - --store=thanos-store:10901
+            - --endpoint=prometheus:10901
+            - --endpoint=thanos-store:10901
             - --query.auto-downsampling
           ports:
             - containerPort: 9090
