@@ -35,6 +35,8 @@ data:
     limits:
       compactor_blocks_retention_period: 90d
       max_global_series_per_user: 0
+      ingestion_rate: 10000000
+      ingestion_burst_size: 10000000
 
     ingester:
       ring:
