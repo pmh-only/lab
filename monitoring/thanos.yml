@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: thanos-query
-          image: quay.io/thanos/thanos:latest
+          image: quay.io/thanos/thanos:main-2026-04-22-a1c5191
           args:
             - query
             - --http-address=0.0.0.0:9090
@@ -94,7 +94,7 @@ spec:
     spec:
       containers:
         - name: thanos-store
-          image: quay.io/thanos/thanos:latest
+          image: quay.io/thanos/thanos:main-2026-04-22-a1c5191
           args:
             - store
             - --http-address=0.0.0.0:10902
@@ -182,7 +182,7 @@ spec:
     spec:
       containers:
         - name: thanos-compactor
-          image: quay.io/thanos/thanos:latest
+          image: quay.io/thanos/thanos:main-2026-04-22-a1c5191
           args:
             - compact
             - --wait
