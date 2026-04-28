@@ -22,6 +22,7 @@ data:
           endpoint: minio-service.minio.svc.cluster.local:9000
           bucket_name: mimir
           insecure: true
+          force_path_style: true
 
     blocks_storage:
       tsdb:
