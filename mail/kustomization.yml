@@ -5,6 +5,5 @@ resources:
   - ./statefulset.yml
   - ./deployment.yml
   - ./service.yml
-  - ./pvc.yml
   - ./ingress.yml
   - ./secret.yml
