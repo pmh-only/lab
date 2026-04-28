@@ -14,6 +14,15 @@ spec:
         app: prometheus
     spec:
       serviceAccountName: prometheus-sa
+      initContainers:
+        - name: fix-permissions
+          image: busybox:latest
+          command: ["sh", "-c", "rm -rf /prometheus/thanos && chown -R 65534:65534 /prometheus"]
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: prometheus-pvc
+              mountPath: /prometheus
       containers:
         - name: prometheus
           image: quay.io/prometheus/prometheus:latest
