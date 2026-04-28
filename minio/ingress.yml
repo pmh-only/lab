@@ -72,6 +72,34 @@ spec:
           port: 9001
           weight: 1
 ---
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: BackendTLSPolicy
+metadata:
+  name: minio-backend-tls
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: minio-service
+      sectionName: "443"
+  validation:
+    wellKnownCACertificates: "System"
+    hostname: s3.pmh.codes
+---
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: BackendTLSPolicy
+metadata:
+  name: minio-console-backend-tls
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: minio-service
+      sectionName: "9001"
+  validation:
+    wellKnownCACertificates: "System"
+    hostname: s3.pmh.codes
+---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyExtensionPolicy
 metadata:
