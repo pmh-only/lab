@@ -23,7 +23,7 @@ spec:
             repositoryConfigData:
               global:
                 keepLatestMaintenanceJobs: 0
-          fsBackupTimeout: 2h
+          fsBackupTimeout: 12h
           defaultVolumesToFsBackup: true
           backupStorageLocation:
             - name: default
@@ -48,7 +48,7 @@ spec:
         schedules:
           backup:
             disabled: false
-            schedule: "0 */6 * * *"
+            schedule: "0 0 * * *"
             useOwnerReferencesInBackup: false
             paused: false
             skipImmediately: false
