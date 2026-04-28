@@ -101,4 +101,9 @@ spec:
                       address:
                         socket_address:
                           address: minio-service.minio.svc.cluster.local
-                          port_value: 9000
+                          port_value: 443
+          transport_socket:
+            name: envoy.transport_sockets.tls
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+              sni: s3.pmh.codes
