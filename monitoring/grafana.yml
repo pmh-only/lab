@@ -113,12 +113,19 @@ metadata:
 data:
   thanos.yaml: |
     apiVersion: 1
+
+    prune: true
     datasources:
       - name: Thanos
         type: prometheus
         url: http://thanos-query:9090
+        isDefault: true
         jsonData:
-          timeInterval: 60s
+          timeInterval: 15s
+
+    deleteDatasources:
+      - name: Mimir
+        orgId: 1
 ---
 apiVersion: v1
 kind: Service
