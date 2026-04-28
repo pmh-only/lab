@@ -19,7 +19,7 @@ data:
       storage:
         backend: s3
         s3:
-          endpoint: minio-service.minio.svc.cluster.local:9000
+          endpoint: pmhraspberry.tailscale.svc.cluster.local:9000
           bucket_name: mimir
           insecure: true
           bucket_lookup_type: path
