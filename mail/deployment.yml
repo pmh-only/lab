@@ -74,3 +74,9 @@ spec:
                 secretKeyRef:
                   name: mailui-secret
                   key: OIDC_CLIENT_SECRET
+
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mailui-secret
+                  key: OPENAI_API_KEY
