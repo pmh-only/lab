@@ -17,12 +17,49 @@ spec:
       containers:
         - name: prometheus
           image: quay.io/prometheus/prometheus:latest
+          args:
+            - --config.file=/etc/prometheus/prometheus.yml
+            - --storage.tsdb.path=/prometheus
+            - --storage.tsdb.min-block-duration=2h
+            - --storage.tsdb.max-block-duration=2h
+            - --web.enable-lifecycle
           volumeMounts:
             - name: prometheus-config
               mountPath: /etc/prometheus/prometheus.yml
               subPath: prometheus.yml
             - name: prometheus-pvc
               mountPath: /prometheus
+        - name: thanos-sidecar
+          image: quay.io/thanos/thanos:latest
+          args:
+            - sidecar
+            - --http-address=0.0.0.0:10902
+            - --grpc-address=0.0.0.0:10901
+            - --prometheus.url=http://localhost:9090
+            - --tsdb.path=/prometheus
+            - --objstore.config-file=/etc/thanos/objstore.yml
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: thanos-secrets
+                  key: access_key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: thanos-secrets
+                  key: secret_key
+          ports:
+            - containerPort: 10901
+              name: grpc
+            - containerPort: 10902
+              name: http
+          volumeMounts:
+            - name: prometheus-pvc
+              mountPath: /prometheus
+            - name: objstore-config
+              mountPath: /etc/thanos/objstore.yml
+              subPath: objstore.yml
       volumes:
         - name: prometheus-config
           configMap:
@@ -30,6 +67,9 @@ spec:
         - name: prometheus-pvc
           persistentVolumeClaim:
             claimName: prometheus-pvc
+        - name: objstore-config
+          configMap:
+            name: thanos-objstore-config
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -47,9 +87,6 @@ data:
       tsdb:
         retention:
           time: 7d
-
-    remote_write:
-      - url: http://mimir:9009/api/v1/push
 
     scrape_configs:
       - job_name: "ne"
@@ -135,6 +172,9 @@ metadata:
 spec:
   ports:
     - port: 9090
+      name: http
+    - port: 10901
+      name: grpc
   selector:
     app: prometheus
 ---
