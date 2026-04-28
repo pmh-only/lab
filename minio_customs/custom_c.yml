@@ -47,3 +47,7 @@ spec:
             end
           end
         end
+
+        function envoy_on_response(response_handle)
+          response_handle:headers():replace("cache-control", "no-store")
+        end
