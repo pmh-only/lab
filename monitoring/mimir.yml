@@ -19,7 +19,7 @@ data:
       storage:
         backend: s3
         s3:
-          endpoint: minio-service.minio.svc.cluster.local:9000
+          endpoint: s3.pmh.codes
           region: us-east-1
           bucket_name: mimir
           insecure: true
