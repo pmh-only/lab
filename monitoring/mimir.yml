@@ -57,8 +57,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: mimir-pvc
   namespace: monitoring
-  annotations:
-    backup.velero.io/backup-volumes-excludes: mimir-data
 spec:
   accessModes:
     - ReadWriteOnce
