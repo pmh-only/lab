@@ -111,12 +111,12 @@ metadata:
   name: grafana-datasources
   namespace: monitoring
 data:
-  mimir.yaml: |
+  thanos.yaml: |
     apiVersion: 1
     datasources:
-      - name: Mimir
+      - name: Thanos
         type: prometheus
-        url: http://mimir:9009/prometheus
+        url: http://thanos-query:9090
         jsonData:
           timeInterval: 60s
 ---

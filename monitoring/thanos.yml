@@ -1,0 +1,221 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: thanos-objstore-config
+  namespace: monitoring
+data:
+  objstore.yml: |
+    type: S3
+    config:
+      bucket: thanos
+      endpoint: s3.pmh.codes
+      region: us-east-1
+      insecure: false
+      http_config:
+        insecure_skip_verify: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thanos-query
+  namespace: monitoring
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: thanos-query
+  template:
+    metadata:
+      labels:
+        app: thanos-query
+    spec:
+      containers:
+        - name: thanos-query
+          image: quay.io/thanos/thanos:latest
+          args:
+            - query
+            - --http-address=0.0.0.0:9090
+            - --grpc-address=0.0.0.0:10901
+            - --store=prometheus:10901
+            - --store=thanos-store:10901
+            - --query.auto-downsampling
+          ports:
+            - containerPort: 9090
+              name: http
+            - containerPort: 10901
+              name: grpc
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9090
+            initialDelaySeconds: 10
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-query
+  namespace: monitoring
+spec:
+  ports:
+    - port: 9090
+      targetPort: http
+      name: http
+  selector:
+    app: thanos-query
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: thanos-store-pvc
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thanos-store
+  namespace: monitoring
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: thanos-store
+  template:
+    metadata:
+      labels:
+        app: thanos-store
+    spec:
+      containers:
+        - name: thanos-store
+          image: quay.io/thanos/thanos:latest
+          args:
+            - store
+            - --http-address=0.0.0.0:10902
+            - --grpc-address=0.0.0.0:10901
+            - --data-dir=/data
+            - --objstore.config-file=/etc/thanos/objstore.yml
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: thanos-secrets
+                  key: access_key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: thanos-secrets
+                  key: secret_key
+          ports:
+            - containerPort: 10902
+              name: http
+            - containerPort: 10901
+              name: grpc
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 10902
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: objstore-config
+              mountPath: /etc/thanos/objstore.yml
+              subPath: objstore.yml
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: thanos-store-pvc
+        - name: objstore-config
+          configMap:
+            name: thanos-objstore-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: thanos-store
+  namespace: monitoring
+spec:
+  ports:
+    - port: 10901
+      targetPort: grpc
+      name: grpc
+    - port: 10902
+      targetPort: http
+      name: http
+  selector:
+    app: thanos-store
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: thanos-compactor-pvc
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thanos-compactor
+  namespace: monitoring
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: thanos-compactor
+  template:
+    metadata:
+      labels:
+        app: thanos-compactor
+    spec:
+      containers:
+        - name: thanos-compactor
+          image: quay.io/thanos/thanos:latest
+          args:
+            - compact
+            - --wait
+            - --http-address=0.0.0.0:10902
+            - --data-dir=/data
+            - --objstore.config-file=/etc/thanos/objstore.yml
+            - --retention.resolution-raw=30d
+            - --retention.resolution-5m=90d
+            - --retention.resolution-1h=365d
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: thanos-secrets
+                  key: access_key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: thanos-secrets
+                  key: secret_key
+          ports:
+            - containerPort: 10902
+              name: http
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: objstore-config
+              mountPath: /etc/thanos/objstore.yml
+              subPath: objstore.yml
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: thanos-compactor-pvc
+        - name: objstore-config
+          configMap:
+            name: thanos-objstore-config
