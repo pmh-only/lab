@@ -82,6 +82,9 @@ data:
       scrape_interval: 15s
       evaluation_interval: 15s
       keep_dropped_targets: 100
+      external_labels:
+        cluster: lab
+        replica: "0"
 
     storage:
       tsdb:
