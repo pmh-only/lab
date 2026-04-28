@@ -81,7 +81,7 @@ spec:
     - group: ""
       kind: Service
       name: minio-service
-      sectionName: "443"
+      sectionName: "s3"
   validation:
     wellKnownCACertificates: "System"
     hostname: s3.pmh.codes
@@ -95,7 +95,7 @@ spec:
     - group: ""
       kind: Service
       name: minio-service
-      sectionName: "9001"
+      sectionName: "console"
   validation:
     wellKnownCACertificates: "System"
     hostname: s3.pmh.codes
