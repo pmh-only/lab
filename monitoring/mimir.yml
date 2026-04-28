@@ -29,7 +29,9 @@ data:
 
     compactor:
       data_dir: /data/compactor
-      blocks_retention_period: 90d
+
+    limits:
+      compactor_blocks_retention_period: 90d
 
     ingester:
       ring:
