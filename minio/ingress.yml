@@ -63,28 +63,8 @@ spec:
   rules:
     - matches:
         - path:
-            type: Exact
+            type: PathPrefix
             value: /
-      backendRefs:
-        - group: ""
-          kind: Service
-          name: minio-service
-          port: 9001
-          weight: 1
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /rustfs/console/
-      backendRefs:
-        - group: ""
-          kind: Service
-          name: minio-service
-          port: 9001
-          weight: 1
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /rustfs/admin/
       backendRefs:
         - group: ""
           kind: Service
@@ -233,10 +213,6 @@ spec:
       inline: |
         function envoy_on_request(request_handle)
           local path = request_handle:headers():get(":path") or ""
-          if path == "/" then
-            request_handle:respond({[":status"] = "302", ["location"] = "/rustfs/console/"}, "")
-            return
-          end
           if path == "/rustfs/console/auth/login/" or path:match("^/rustfs/console/auth/login/%?") then
             local args = path:match("%?(.+)$") or ""
             request_handle:respond({[":status"] = "302", ["location"] = "/rustfs/admin/v3/oidc/authorize/pmh_codes?" .. args}, "")
