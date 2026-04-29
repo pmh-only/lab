@@ -80,3 +80,24 @@ spec:
                 secretKeyRef:
                   name: mailui-secret
                   key: OPENAI_API_KEY
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maildemo
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: maildemo
+  template:
+    metadata:
+      labels:
+        app: maildemo
+    spec:
+      containers:
+        - name: maildemo
+          image: ghcr.io/pmh-only/mail:latest
+          env:
+            - name: DEMO_MODE
+              value: '1'
