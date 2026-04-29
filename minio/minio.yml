@@ -26,6 +26,8 @@ spec:
               value: 0.0.0.0:9001
             - name: RUSTFS_SERVER_DOMAINS
               value: s3.pmh.codes
+            - name: RUSTFS_DRIVE_ACTIVE_MONITORING
+              value: "false"
             - name: RUSTFS_TLS_PATH
               value: /tls
             - name: RUSTFS_ACCESS_KEY
