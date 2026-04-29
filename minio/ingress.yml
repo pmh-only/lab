@@ -59,7 +59,7 @@ spec:
       name: main
       namespace: gateway
   hostnames:
-    - console.s3.pmh.codes
+    - rustfs.pmh.codes
   rules:
     - matches:
         - path:
