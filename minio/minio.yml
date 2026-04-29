@@ -15,6 +15,16 @@ spec:
       containers:
         - name: minio
           image: ghcr.io/pmh-only/rustfs:latest
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -kfH
+                - "Host: hello.s3.pmh.codes"
+                - https://localhost:9000/index.html
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 1
           env:
             - name: RUSTFS_VOLUMES
               value: /data
