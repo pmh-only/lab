@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd-image-updater.argoproj.io/image-list: nginx=ghcr.io/ammnt/nginx:latest
+    argocd-image-updater.argoproj.io/image-list: nginx=ghcr.io/pmh-only/sweetnginx:latest
     argocd-image-updater.argoproj.io/nginx.update-strategy: digest
   name: gateway
   namespace: argocd
