@@ -285,14 +285,14 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: nginx
-          image: ghcr.io/pmh-only/nginx:latest
+          image: ghcr.io/pmh-only/sweetnginx:latest
           imagePullPolicy: Always
           volumeMounts:
             - name: tls
               mountPath: /etc/nginx/tls
               readOnly: true
             - name: nginx-config
-              mountPath: /etc/nginx/nginx.conf
+              mountPath: /usr/local/openresty/nginx/conf/nginx.conf
               subPath: nginx.conf
             - name: gateway-ech-secrets
               mountPath: /etc/nginx/ech/server.ech.pem
