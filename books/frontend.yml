@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: books-frontend
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: books-frontend
+  template:
+    metadata:
+      labels:
+        app: books-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/documentlane/books-frontend:latest
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "3001"
+            - name: HOSTNAME
+              value: 0.0.0.0
+            - name: BACKEND_ORIGIN
+              value: http://books-backend:3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: books-frontend
+spec:
+  selector:
+    app: books-frontend
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 3001
+      targetPort: 3001
