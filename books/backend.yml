@@ -70,7 +70,7 @@ spec:
                   name: books-secret
                   key: S3_SECRET_ACCESS_KEY
             - name: S3_ENDPOINT
-              value: https://minio-service.minio.svc.cluster.local
+              value: https://s3.pmh.codes
             - name: NODE_TLS_REJECT_UNAUTHORIZED
               value: '0'
             - name: S3_FORCE_PATH_STYLE
