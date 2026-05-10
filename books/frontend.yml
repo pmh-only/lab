@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/documentlane/books-frontend:latest
+          image: ghcr.io/documentlane/doclane-frontend:latest
           env:
             - name: NODE_ENV
               value: production
