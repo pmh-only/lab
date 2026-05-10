@@ -5,6 +5,5 @@ resources:
   - ./backend.yml
   - ./frontend.yml
   - ./worker.yml
-  - ./service.yml
   - ./ingress.yml
   - ./secret.yml
