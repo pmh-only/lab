@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: books-worker
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: books-worker
+  template:
+    metadata:
+      labels:
+        app: books-worker
+    spec:
+      resources:
+        limits:
+          cpu: '2'
+      containers:
+        - name: worker
+          image: ghcr.io/documentlane/doclane-worker:latest
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: REDIS_HOST
+              value: redis-service.database.svc.cluster.local
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DB
+              value: "0"
+            - name: S3_REGION
+              value: us-east-1
+            - name: S3_BUCKET
+              value: books
+            - name: S3_ACCESS_KEY_ID
+              value: AhKvqfoDMTEf3UcBB4cA
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: books-secret
+                  key: S3_SECRET_ACCESS_KEY
+            - name: S3_ENDPOINT
+              value: https://minio-service.minio.svc.cluster.local
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: '0'
+            - name: S3_FORCE_PATH_STYLE
+              value: "true"
+            - name: PDF_LINEARIZATION_REQUIRED
+              value: "true"
+            - name: PDF_RASTERIZATION_PDFTOPPM_PATH
+              value: "pdftoppm"
+            - name: PDF_METADATA_PDFINFO_PATH
+              value: "pdfinfo"
+            - name: PDF_METADATA_PDFTOTEXT_PATH
+              value: "pdftotext"
+            - name: PDF_OCR_ENABLED
+              value: "true"
+            - name: PDF_OCR_LANGUAGE
+              value: "eng"
+            - name: PDF_OCR_TARGET_WIDTH
+              value: "1800"

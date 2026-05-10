@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: books-frontend=ghcr.io/documentlane/doclane-frontend:latest,books-backend=ghcr.io/documentlane/doclane-backend:latest,books-worker=ghcr.io/documentlane/doclane-worker:latest
+    argocd-image-updater.argoproj.io/books-frontend.update-strategy: digest
+    argocd-image-updater.argoproj.io/books-backend.update-strategy: digest
+    argocd-image-updater.argoproj.io/books-worker.update-strategy: digest
+  name: books
+  namespace: argocd
+spec:
+  destination:
+    namespace: books
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: books
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
