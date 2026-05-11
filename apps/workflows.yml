@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
   annotations:
     argocd-image-updater.argoproj.io/workflows.update-strategy: digest
-    argocd-image-updater.argoproj.io/image-list: workflows=docker.n8n.io/n8nio/n8n:2.11.0
+    argocd-image-updater.argoproj.io/image-list: workflows=ghcr.io/n8n-io/n8n:latest
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
