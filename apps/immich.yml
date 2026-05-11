@@ -7,6 +7,8 @@ metadata:
     argocd-image-updater.argoproj.io/immich-server.update-strategy: digest
   name: immich
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: immich

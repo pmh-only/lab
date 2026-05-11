@@ -6,6 +6,8 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: ghost=ghcr.io/pmh-only/ghost:alpine
   name: ghost
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: ghost

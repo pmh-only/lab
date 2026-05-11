@@ -6,6 +6,8 @@ metadata:
     argocd-image-updater.argoproj.io/here.update-strategy: digest
   name: here
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: here

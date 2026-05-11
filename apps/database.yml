@@ -23,6 +23,8 @@ metadata:
     argocd-image-updater.argoproj.io/backpack-clickhouse2s3.update-strategy: digest
   name: database
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: database

@@ -6,6 +6,8 @@ metadata:
   annotations:
     argocd-image-updater.argoproj.io/chatsolution.update-strategy: digest
     argocd-image-updater.argoproj.io/image-list: chatsolution=gchcr.io/pmh-only/chatsolution:latest
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: chatsolution

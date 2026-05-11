@@ -6,6 +6,8 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: gptforum=ghcr.io/pmh-only/gptforum:next
   name: gptforum
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: gptforum

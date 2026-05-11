@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: tailscale
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: tailscale
@@ -31,6 +33,8 @@ kind: Application
 metadata:
   name: tailscale-configs
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: tailscale

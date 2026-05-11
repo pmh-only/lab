@@ -6,6 +6,8 @@ metadata:
   annotations:
     argocd-image-updater.argoproj.io/kopia.update-strategy: digest
     argocd-image-updater.argoproj.io/image-list: kopia=ghcr.io/pmh-only/kopia:latest
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: kopia

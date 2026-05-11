@@ -6,6 +6,8 @@ metadata:
     argocd-image-updater.argoproj.io/nginx.update-strategy: digest
   name: gateway
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: gateway

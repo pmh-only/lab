@@ -6,6 +6,8 @@ metadata:
     argocd-image-updater.argoproj.io/vaultwarden.update-strategy: digest
   name: bitwarden
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: bitwarden

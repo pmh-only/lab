@@ -12,6 +12,8 @@ metadata:
     argocd-image-updater.argoproj.io/prometheus.update-strategy: digest
   name: monitoring
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: monitoring

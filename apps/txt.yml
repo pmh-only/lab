@@ -6,6 +6,8 @@ metadata:
   annotations:
     argocd-image-updater.argoproj.io/txt.update-strategy: digest
     argocd-image-updater.argoproj.io/image-list: txt=ghcr.io/pmh-only/txt:latest
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: txt

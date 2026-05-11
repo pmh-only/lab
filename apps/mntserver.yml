@@ -6,6 +6,8 @@ metadata:
     argocd-image-updater.argoproj.io/mntserver.update-strategy: digest
   name: mntserver
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: mntserver
