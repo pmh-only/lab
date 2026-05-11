@@ -1,0 +1,24 @@
+name: Render README.md
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'apps/**'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: node docs/render.mjs
+      - uses: actions-js/push@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          message: "ci: rerender README.md by apps list changes [skip ci]"
