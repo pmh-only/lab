@@ -7,6 +7,8 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: visualized=ghcr.io/pmh-only/kube-universe:latest
   name: visualized
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: visualized

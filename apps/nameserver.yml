@@ -6,6 +6,8 @@ metadata:
     argocd-image-updater.argoproj.io/nameserver.update-strategy: digest
   name: nameserver
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: nameserver

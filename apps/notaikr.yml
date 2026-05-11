@@ -6,6 +6,8 @@ metadata:
   annotations:
     argocd-image-updater.argoproj.io/notaikr.update-strategy: digest
     argocd-image-updater.argoproj.io/image-list: notaikr=ghcr.io/pmh-only/notaikr:latest
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: notaikr

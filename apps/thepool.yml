@@ -6,6 +6,8 @@ metadata:
   annotations:
     argocd-image-updater.argoproj.io/thepool.update-strategy: digest
     argocd-image-updater.argoproj.io/image-list: thepool=ghcr.io/pmh-only/thepool:latest
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: thepool

@@ -7,6 +7,8 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: heartbeat=ghcr.io/pmh-only/heartbeat:latest,heartbeat-migrator=ghcr.io/pmh-only/heartbeat-migrator:latest
   name: heartbeat
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: heartbeat

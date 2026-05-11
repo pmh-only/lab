@@ -6,6 +6,8 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: indexgen=ghcr.io/pmh-only/indexgen:latest
   name: indexgen
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: indexgen

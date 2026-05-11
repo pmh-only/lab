@@ -7,6 +7,8 @@ metadata:
     argocd-image-updater.argoproj.io/protonmail-bridge.update-strategy: digest
   name: mail
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: mail

@@ -6,6 +6,8 @@ metadata:
     argocd-image-updater.argoproj.io/go.update-strategy: digest
   name: go
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: go

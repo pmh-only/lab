@@ -56,6 +56,8 @@ kind: Application
 metadata:
   name: pdf-configs
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: pdf
