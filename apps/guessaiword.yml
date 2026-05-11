@@ -6,6 +6,8 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: guessaiword=ghcr.io/pmh-only/guessaiword:next
   name: guessaiword
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: guessaiword

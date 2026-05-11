@@ -8,6 +8,8 @@ metadata:
     argocd-image-updater.argoproj.io/books-worker.update-strategy: digest
   name: books
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: books

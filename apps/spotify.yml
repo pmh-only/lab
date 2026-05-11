@@ -7,6 +7,8 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: spotify_api=ghcr.io/yooooomi/your_spotify_server:latest,spotify_web=ghcr.io/yooooomi/your_spotify_client:latest
   name: spotify
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: spotify

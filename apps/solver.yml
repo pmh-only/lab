@@ -6,6 +6,8 @@ metadata:
     argocd-image-updater.argoproj.io/solver.update-strategy: digest
   name: solver
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: solver

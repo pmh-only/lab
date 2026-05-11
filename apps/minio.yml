@@ -7,6 +7,8 @@ metadata:
     argocd-image-updater.argoproj.io/explorer.update-strategy: digest
   name: minio
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: minio
@@ -30,6 +32,8 @@ kind: Application
 metadata:
   name: minio-customs
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: minio

@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: code-server
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: code-server
@@ -34,6 +36,8 @@ kind: Application
 metadata:
   name: code-server-route
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: code-server
