@@ -18,7 +18,6 @@ data:
       types_hash_max_size 2048;
 
       server_tokens off;
-      more_clear_headers Server;
 
       access_log off;
       error_log /dev/stderr warn;
