@@ -261,7 +261,7 @@ This repository defines many components of Kubernetes cluster such as:
     
     
 
-## Acknowledgements
+## Rights
 &copy; 2024-2026. Minhyeok Park <pmh_only@pmh.codes>. MIT Licensed.
 
 This repository contains some of contents from previous repository: [pmh-only/composes](https://github.com/pmh-only/composes).
