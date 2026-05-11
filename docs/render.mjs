@@ -23,9 +23,9 @@ await fs.writeFile(docsPath, docs
 
 <table>
   ${appNames.map((v, i) => `
-  ${i % 6 === 0 ? '<tr>' : ''}
-  <td><img src="https://argo.pmh.codes/api/badge?name=${v}&revision=false&showAppName=false" width="100px" /><br /><code>${v}</code></td>
-  ${i % 6 === 5 ? '</tr>' : ''}
+  ${i % 4 === 0 ? '<tr>' : ''}
+  <td><img src="https://argo.pmh.codes/api/badge?name=${v}&revision=false&showAppName=true" width="200px" height="40px" /><br /></td>
+  ${i % 4 === 3 ? '</tr>' : ''}
   `).join('')}
 </table>
 
