@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: workflows
-          image: docker.n8n.io/n8nio/n8n:2.11.0
+          image: ghcr.io/n8n-io/n8n:latest
           env:
             - name: GENERIC_TIMEZONE
               value: "Asia/Seoul"
