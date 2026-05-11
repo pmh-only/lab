@@ -186,6 +186,8 @@ data:
         sub_filter_last_modified on;
         sub_filter '<head>' '<head>$tracking_script';
 
+        add_header X-Tracking-Script "$tracking_script" always;
+
         location = /robots.txt {
             set $envoy_gateway envoy-gateway-main.envoy-gateway-system.svc.cluster.local;
             proxy_pass http://$envoy_gateway:80/robots.txt;
