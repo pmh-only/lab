@@ -184,7 +184,6 @@ data:
 
         sub_filter_once on;
         sub_filter_last_modified on;
-        sub_filter_types text/html;
         sub_filter '<head>' '<head>$tracking_script';
 
         location = /robots.txt {
@@ -277,6 +276,10 @@ spec:
       restartPolicy: Always
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
+      securityContext:
+        sysctls:
+          - name: net.ipv4.ip_unprivileged_port_start
+            value: "80"
       containers:
         - name: nginx
           image: ghcr.io/pmh-only/nginx:latest
