@@ -128,7 +128,8 @@ spec:
             bucket = "www"
           end
 
-          local target_path = path == "/" and "/index.html" or path
+          local clean_path = path:match("^([^?]*)") or "/"
+          local target_path = (clean_path == "" or clean_path == "/") and "/index.html" or clean_path
           local target_host = bucket .. ".s3.pmh.codes"
 
           if host == "pmh.codes" or host == "www.pmh.codes" then
