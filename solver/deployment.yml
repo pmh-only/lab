@@ -42,6 +42,11 @@ spec:
                   key: IMAP_PASS
             - name: KV_STORE_PATH
               value: /data/kv.json
+            - name: FIRECRAWL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: solver-secret
+                  key: FIRECRAWL_API_KEY
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
