@@ -84,6 +84,64 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: mailui-worker
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: mailui-worker
+  template:
+    metadata:
+      labels:
+        app: mailui-worker
+    spec:
+      containers:
+        - name: mailui-worker
+          image: ghcr.io/pmh-only/mail-worker:latest
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: mailui-secret
+                  key: DATABASE_URL
+
+            - name: IMAP_HOST
+              value: mail.mail.svc.cluster.local
+            - name: IMAP_PORT
+              value: '1143'
+            - name: IMAP_SECURE
+              value: 'false'
+            - name: IMAP_USER
+              value: pmh_only@pmh.codes
+            - name: IMAP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mailui-secret
+                  key: MAIL_PASSWORD
+            - name: IMAP_MAILBOX
+              value: INBOX
+            - name: IMAP_POLL_SECONDS
+              value: '5'
+
+            - name: SMTP_HOST
+              value: mail.mail.svc.cluster.local
+            - name: SMTP_PORT
+              value: '1025'
+            - name: SMTP_SECURE
+              value: 'false'
+            - name: SMTP_USER
+              value: pmh_only@pmh.codes
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mailui-secret
+                  key: MAIL_PASSWORD
+            - name: SMTP_FROM
+              value: 'Minhyeok Park <pmh_only@pmh.codes>'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: maildemo
 spec:
   revisionHistoryLimit: 0
