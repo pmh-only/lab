@@ -6,7 +6,13 @@ metadata:
 data:
   nginx.conf: |
     worker_processes auto;
-    events { worker_connections 1024; }
+    worker_rlimit_nofile 65535;
+
+    events {
+      worker_connections 4096;
+      multi_accept on;
+      use epoll;
+    }
 
     http {
       include /etc/nginx/mime.types;
@@ -278,6 +284,12 @@ spec:
       restartPolicy: Always
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
+      initContainers:
+        - name: set-limits
+          image: busybox
+          command: ["sh", "-c", "ulimit -n 65535"]
+          securityContext:
+            privileged: true
       containers:
         - name: nginx
           image: ghcr.io/pmh-only/nginx:latest
