@@ -264,6 +264,8 @@ data:
         listen 53 udp;
         proxy_protocol on;
         proxy_pass nameserver.nameserver.svc.cluster.local:538;
+        proxy_timeout 1s;
+        proxy_responses 1;
       }
     }
 ---
