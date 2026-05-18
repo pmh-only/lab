@@ -23,7 +23,7 @@ This repository defines many components of Kubernetes cluster such as:
 * Observabilities (Grafana, Prometheus, Thanos)
 * Public Gateway / Internal Connector of my Tailscale Network
 * Encrypted Secrets (SealedSecret)
-* Volumn and Cluster Backup Schedule (Velero, Kopia)
+* Volume and Cluster Backup Schedule (Velero, Kopia)
 * and Actual Service Components.
 
 ## Sync Status
