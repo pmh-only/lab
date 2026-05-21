@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: speed
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: speed
+  template:
+    metadata:
+      labels:
+        app: speed
+    spec:
+      containers:
+        - name: speed
+          image: ghcr.io/librespeed/speedtest:latest-alpine
+          env:
+            - name: MODE
+              value: standalone
+            - name: TELEMETRY
+              value: 'true'
+            - name: USE_NEW_DESIGN
+              value: 'true'
+            - name: DB_TYPE
+              value: sqlite
+            - name: GDPR_EMAIL
+              value: pmh_only@pmh.codes
+            - name: DISTANCE
+              value: km
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: speed-secret
+                  key: PASSWORD
+            - name: IPINFO_APIKEY
+              valueFrom:
+                secretKeyRef:
+                  name: speed-secret
+                  key: IPINFO_APIKEY
+          volumeMounts:
+            - mountPath: /database
+              name: speed-pvc
+      volumes:
+        - name: speed-pvc
+          persistentVolumeClaim:
+            claimName: speed-pvc
+
