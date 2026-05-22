@@ -22,3 +22,17 @@ spec:
       - PruneLast=true
       - CreateNamespace=true
       - ApplyOutOfSyncOnly=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: speed
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: speed
+      images:
+        - alias: speed
+          imageName: ghcr.io/librespeed/speedtest:latest-alpine
+          commonUpdateSettings:
+            updateStrategy: digest

@@ -23,3 +23,17 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
       - PruneLast=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: go
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: go
+      images:
+        - alias: go
+          imageName: ghcr.io/pmh-only/go:latest
+          commonUpdateSettings:
+            updateStrategy: digest

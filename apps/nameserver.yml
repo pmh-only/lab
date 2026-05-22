@@ -23,3 +23,17 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
       - PruneLast=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: nameserver
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: nameserver
+      images:
+        - alias: nameserver
+          imageName: ghcr.io/pmh-only/technitium:latest
+          commonUpdateSettings:
+            updateStrategy: digest

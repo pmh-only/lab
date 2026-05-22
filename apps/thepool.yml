@@ -22,3 +22,17 @@ spec:
       - PruneLast=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: thepool
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: thepool
+      images:
+        - alias: thepool
+          imageName: ghcr.io/pmh-only/thepool:latest
+          commonUpdateSettings:
+            updateStrategy: digest
