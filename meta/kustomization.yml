@@ -7,3 +7,13 @@ resources:
   - ./pvc.yml
   - ./ingress.yml
   - ./secret.yml
+  - ./images.yml
+patches:
+  - patch: |
+      apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+      kind: ImageUpdater
+      metadata:
+        name: meta
+        namespace: argocd
+    target:
+      kind: ImageUpdater

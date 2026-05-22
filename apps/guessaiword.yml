@@ -1,9 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/guessaiword.update-strategy: digest
-    argocd-image-updater.argoproj.io/image-list: guessaiword=ghcr.io/pmh-only/guessaiword:next
   name: guessaiword
   namespace: argocd
   finalizers:

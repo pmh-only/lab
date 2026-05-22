@@ -1,9 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: mntserver=ghcr.io/pmh-only/mntserver:latest
-    argocd-image-updater.argoproj.io/mntserver.update-strategy: digest
   name: mntserver
   namespace: argocd
   finalizers:

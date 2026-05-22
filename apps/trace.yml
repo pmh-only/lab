@@ -1,10 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: rybbit-backend=ghcr.io/rybbit-io/rybbit-backend:latest,rybbit-client=ghcr.io/rybbit-io/rybbit-client:latest
-    argocd-image-updater.argoproj.io/rybbit-backend.update-strategy: digest
-    argocd-image-updater.argoproj.io/rybbit-client.update-strategy: digest
   name: trace
   namespace: argocd
   finalizers:

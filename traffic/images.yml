@@ -1,0 +1,21 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: traffic
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: traffic
+      images:
+        - alias: goaccess
+          imageName: ghcr.io/pmh-only/goaccess:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: fluentbit
+          imageName: cr.fluentbit.io/fluent/fluent-bit:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: busybox
+          imageName: ghcr.io/pmh-only/busybox:latest
+          commonUpdateSettings:
+            updateStrategy: digest

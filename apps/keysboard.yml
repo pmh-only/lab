@@ -1,9 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: keysboard=ghcr.io/pmh-only/keysboard:latest
-    argocd-image-updater.argoproj.io/keysboard.update-strategy: digest
   name: keysboard
   namespace: argocd
   finalizers:

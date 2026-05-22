@@ -1,9 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: solver=ghcr.io/pmh-only/solver:latest
-    argocd-image-updater.argoproj.io/solver.update-strategy: digest
   name: solver
   namespace: argocd
   finalizers:

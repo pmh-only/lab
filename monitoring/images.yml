@@ -1,0 +1,34 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: monitoring
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: monitoring
+      images:
+        - alias: grafana
+          imageName: ghcr.io/pmh-only/grafana:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: grafana-image-renderer
+          imageName: ghcr.io/pmh-only/grafana-image-renderer:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: node-exporter
+          imageName: quay.io/prometheus/node-exporter:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: prometheus
+          imageName: quay.io/prometheus/prometheus:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: kube-state-metrics
+          imageName: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.13.0
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: thanos
+          imageName: quay.io/thanos/thanos:main-2026-04-22-a1c5191
+          commonUpdateSettings:
+            updateStrategy: name
+            allowTags: "regexp:^main-.*"

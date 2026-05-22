@@ -1,9 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: meta=ghcr.io/pmh-only/discord-query:latest
-    argocd-image-updater.argoproj.io/meta.update-strategy: digest
   name: meta
   namespace: argocd
   finalizers:

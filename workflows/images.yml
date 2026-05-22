@@ -1,0 +1,13 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: workflows
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: workflows
+      images:
+        - alias: workflows
+          imageName: ghcr.io/n8n-io/n8n:latest
+          commonUpdateSettings:
+            updateStrategy: digest

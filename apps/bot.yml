@@ -1,9 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: bot=ghcr.io/pmh-only/bot:latest
-    argocd-image-updater.argoproj.io/bot.update-strategy: digest
   name: bot
   namespace: argocd
   finalizers:

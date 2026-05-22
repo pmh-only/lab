@@ -1,10 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: immich-server=ghcr.io/immich-app/immich-server:release,immich-machine-learning=ghcr.io/immich-app/immich-machine-learning:release
-    argocd-image-updater.argoproj.io/immich-machine-learning.update-strategy: digest
-    argocd-image-updater.argoproj.io/immich-server.update-strategy: digest
   name: immich
   namespace: argocd
   finalizers:
