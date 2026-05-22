@@ -22,3 +22,17 @@ spec:
       - PruneLast=true
       - CreateNamespace=true
       - ApplyOutOfSyncOnly=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: guessaiword
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: guessaiword
+      images:
+        - alias: guessaiword
+          imageName: ghcr.io/pmh-only/guessaiword:next
+          commonUpdateSettings:
+            updateStrategy: digest

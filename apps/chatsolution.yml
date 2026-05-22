@@ -22,3 +22,17 @@ spec:
       - PruneLast=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: chatsolution
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: chatsolution
+      images:
+        - alias: chatsolution
+          imageName: gchcr.io/pmh-only/chatsolution:latest
+          commonUpdateSettings:
+            updateStrategy: digest

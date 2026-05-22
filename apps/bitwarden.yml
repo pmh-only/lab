@@ -23,3 +23,17 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
       - PruneLast=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: bitwarden
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: bitwarden
+      images:
+        - alias: vaultwarden
+          imageName: ghcr.io/dani-garcia/vaultwarden:latest
+          commonUpdateSettings:
+            updateStrategy: digest
