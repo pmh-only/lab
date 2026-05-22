@@ -12,4 +12,3 @@ resources:
   - netpol-daemonset.yml
   - deployment.yml
   - ingress.yml
-  - ./images.yml
