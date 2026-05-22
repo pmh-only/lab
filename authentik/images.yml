@@ -11,4 +11,4 @@ spec:
           imageName: ghcr.io/goauthentik/server
           commonUpdateSettings:
             updateStrategy: semver
-            allowTags: "regexp:^\d+\.\d+\.\d+$"
+            allowTags: regexp:^\d+\.\d+\.\d+$
