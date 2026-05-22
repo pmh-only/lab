@@ -22,3 +22,17 @@ spec:
       - PruneLast=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: ghost
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: ghost
+      images:
+        - alias: ghost
+          imageName: ghcr.io/pmh-only/ghost:alpine
+          commonUpdateSettings:
+            updateStrategy: digest

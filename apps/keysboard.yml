@@ -22,3 +22,17 @@ spec:
       - PruneLast=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: keysboard
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: keysboard
+      images:
+        - alias: keysboard
+          imageName: ghcr.io/pmh-only/keysboard:latest
+          commonUpdateSettings:
+            updateStrategy: digest

@@ -22,3 +22,17 @@ spec:
       - PruneLast=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: run
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: run
+      images:
+        - alias: run
+          imageName: ghcr.io/pmh-only/run:latest
+          commonUpdateSettings:
+            updateStrategy: digest

@@ -22,3 +22,17 @@ spec:
       - PruneLast=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: bot
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: bot
+      images:
+        - alias: bot
+          imageName: ghcr.io/pmh-only/bot:latest
+          commonUpdateSettings:
+            updateStrategy: digest

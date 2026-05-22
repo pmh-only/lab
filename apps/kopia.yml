@@ -22,3 +22,17 @@ spec:
       - PruneLast=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: kopia
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: kopia
+      images:
+        - alias: kopia
+          imageName: ghcr.io/pmh-only/kopia:latest
+          commonUpdateSettings:
+            updateStrategy: digest

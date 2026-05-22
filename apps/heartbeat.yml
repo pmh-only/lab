@@ -23,3 +23,21 @@ spec:
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
       - ServerSideApply=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: heartbeat
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: heartbeat
+      images:
+        - alias: heartbeat
+          imageName: ghcr.io/pmh-only/heartbeat:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: heartbeat-migrator
+          imageName: ghcr.io/pmh-only/heartbeat-migrator:latest
+          commonUpdateSettings:
+            updateStrategy: digest
