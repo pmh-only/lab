@@ -1,9 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: here=ghcr.io/pmh-only/here:latest
-    argocd-image-updater.argoproj.io/here.update-strategy: digest
   name: here
   namespace: argocd
   finalizers:

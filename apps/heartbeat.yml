@@ -1,10 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/heartbeat-migrator.update-strategy: digest
-    argocd-image-updater.argoproj.io/heartbeat.update-strategy: digest
-    argocd-image-updater.argoproj.io/image-list: heartbeat=ghcr.io/pmh-only/heartbeat:latest,heartbeat-migrator=ghcr.io/pmh-only/heartbeat-migrator:latest
   name: heartbeat
   namespace: argocd
   finalizers:

@@ -1,9 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: vaultwarden=ghcr.io/dani-garcia/vaultwarden:latest
-    argocd-image-updater.argoproj.io/vaultwarden.update-strategy: digest
   name: bitwarden
   namespace: argocd
   finalizers:

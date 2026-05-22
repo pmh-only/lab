@@ -1,0 +1,13 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: mntserver
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: mntserver
+      images:
+        - alias: mntserver
+          imageName: ghcr.io/pmh-only/mntserver:latest
+          commonUpdateSettings:
+            updateStrategy: digest

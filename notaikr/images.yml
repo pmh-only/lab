@@ -1,0 +1,13 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: notaikr
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: notaikr
+      images:
+        - alias: notaikr
+          imageName: ghcr.io/pmh-only/notaikr:latest
+          commonUpdateSettings:
+            updateStrategy: digest

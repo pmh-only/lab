@@ -3,9 +3,6 @@ kind: Application
 metadata:
   name: kopia
   namespace: argocd
-  annotations:
-    argocd-image-updater.argoproj.io/kopia.update-strategy: digest
-    argocd-image-updater.argoproj.io/image-list: kopia=ghcr.io/pmh-only/kopia:latest
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:

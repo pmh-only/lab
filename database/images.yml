@@ -1,0 +1,45 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: database
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: database
+      images:
+        - alias: mongo
+          imageName: ghcr.io/pmh-only/mongo:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: mysql
+          imageName: ghcr.io/pmh-only/mysql:8
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: pgvecto-rs
+          imageName: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: redis
+          imageName: ghcr.io/pmh-only/redis:alpine
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: clickhouse
+          imageName: ghcr.io/pmh-only/clickhouse-server:rybbit
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: backpack-mysql2s3
+          imageName: ghcr.io/pmh-only/backpack-mysql2s3:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: backpack-pgsql2s3
+          imageName: ghcr.io/pmh-only/backpack-pgsql2s3:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: backpack-mongo2s3
+          imageName: ghcr.io/pmh-only/backpack-mongo2s3:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: backpack-clickhouse2s3
+          imageName: ghcr.io/pmh-only/backpack-clickhouse2s3:latest
+          commonUpdateSettings:
+            updateStrategy: digest

@@ -1,0 +1,13 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: visualized
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: visualized
+      images:
+        - alias: visualized
+          imageName: ghcr.io/pmh-only/kube-universe:latest
+          commonUpdateSettings:
+            updateStrategy: digest

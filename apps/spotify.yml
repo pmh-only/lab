@@ -1,10 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/spotify_api.update-strategy: digest
-    argocd-image-updater.argoproj.io/spotify_web.update-strategy: digest
-    argocd-image-updater.argoproj.io/image-list: spotify_api=ghcr.io/yooooomi/your_spotify_server:latest,spotify_web=ghcr.io/yooooomi/your_spotify_client:latest
   name: spotify
   namespace: argocd
   finalizers:

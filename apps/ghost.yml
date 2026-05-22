@@ -1,9 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/ghost.update-strategy: digest
-    argocd-image-updater.argoproj.io/image-list: ghost=ghcr.io/pmh-only/ghost:alpine
   name: ghost
   namespace: argocd
   finalizers:
