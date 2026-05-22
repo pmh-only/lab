@@ -1,11 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/goaccess.update-strategy: digest
-    argocd-image-updater.argoproj.io/fluentbit.update-strategy: digest
-    argocd-image-updater.argoproj.io/busybox.update-strategy: digest
-    argocd-image-updater.argoproj.io/image-list: goaccess=ghcr.io/pmh-only/goaccess:latest,fluentbit=cr.fluentbit.io/fluent/fluent-bit:latest,busybox=ghcr.io/pmh-only/busybox:latest
   name: traffic
   namespace: argocd
   finalizers:

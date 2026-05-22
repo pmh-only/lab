@@ -1,0 +1,13 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: meta
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: meta
+      images:
+        - alias: meta
+          imageName: ghcr.io/pmh-only/discord-query:latest
+          commonUpdateSettings:
+            updateStrategy: digest

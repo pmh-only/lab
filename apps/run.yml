@@ -1,9 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: run=ghcr.io/pmh-only/run:latest
-    argocd-image-updater.argoproj.io/run.update-strategy: digest
   name: run
   namespace: argocd
   finalizers:

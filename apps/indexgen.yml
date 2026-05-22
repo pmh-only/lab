@@ -1,9 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/indexgen.update-strategy: digest
-    argocd-image-updater.argoproj.io/image-list: indexgen=ghcr.io/pmh-only/indexgen:latest
   name: indexgen
   namespace: argocd
   finalizers:

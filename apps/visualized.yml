@@ -1,10 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  annotations:
-    argocd-image-updater.argoproj.io/visualized-migrator.update-strategy: digest
-    argocd-image-updater.argoproj.io/visualized.update-strategy: digest
-    argocd-image-updater.argoproj.io/image-list: visualized=ghcr.io/pmh-only/kube-universe:latest
   name: visualized
   namespace: argocd
   finalizers:

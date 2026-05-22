@@ -1,0 +1,13 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: welplan
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: welplan
+      images:
+        - alias: welplan
+          imageName: ghcr.io/pmh-only/welplan2:latest
+          commonUpdateSettings:
+            updateStrategy: digest

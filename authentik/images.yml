@@ -1,0 +1,14 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: authentik
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: authentik
+      images:
+        - alias: authentik
+          imageName: ghcr.io/goauthentik/server
+          commonUpdateSettings:
+            updateStrategy: semver
+            allowTags: "regexp:^\d+\.\d+\.\d+$"

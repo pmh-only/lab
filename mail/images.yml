@@ -1,0 +1,21 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: mail
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: mail
+      images:
+        - alias: mail
+          imageName: ghcr.io/pmh-only/mail:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: mail-worker
+          imageName: ghcr.io/pmh-only/mail-worker:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: protonmail-bridge
+          imageName: ghcr.io/pmh-only/protonmail-bridge:latest
+          commonUpdateSettings:
+            updateStrategy: digest

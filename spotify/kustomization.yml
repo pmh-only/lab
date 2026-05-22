@@ -6,3 +6,13 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./ingress.yml
+  - ./images.yml
+patches:
+  - patch: |
+      apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+      kind: ImageUpdater
+      metadata:
+        name: spotify
+        namespace: argocd
+    target:
+      kind: ImageUpdater
