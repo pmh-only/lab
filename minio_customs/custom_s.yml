@@ -9,7 +9,7 @@ spec:
       name: main
       namespace: gateway
   hostnames:
-    - s.pmh.codes
+    - a-s.s3.pmh.codes
   rules:
     - matches:
         - path:
@@ -34,15 +34,6 @@ spec:
   lua:
     - type: Inline
       inline: |
-        function envoy_on_request(request_handle)
-          local path = request_handle:headers():get(":path") or "/"
-          request_handle:headers():replace("host", "a-s.s3.pmh.codes")
-
-          if path == "/" then
-            request_handle:headers():replace(":path", "/index.html")
-          end
-        end
-
         function envoy_on_response(response_handle)
           response_handle:headers():remove("access-control-allow-origin")
           response_handle:headers():add("access-control-allow-origin", "*")

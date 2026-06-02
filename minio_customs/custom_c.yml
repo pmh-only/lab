@@ -9,7 +9,7 @@ spec:
       name: main
       namespace: gateway
   hostnames:
-    - c.pmh.codes
+    - a-c.s3.pmh.codes
   rules:
     - matches:
         - path:
@@ -36,13 +36,10 @@ spec:
       inline: |
         function envoy_on_request(request_handle)
           local path = request_handle:headers():get(":path") or "/"
-          request_handle:headers():replace("host", "a-c.s3.pmh.codes")
 
-          if path == "/" then
+          if path == "/index.html" then
             local mode = request_handle:headers():get("sec-fetch-mode") or ""
-            if mode == "navigate" then
-              request_handle:headers():replace(":path", "/index.html")
-            else
+            if mode ~= "navigate" then
               request_handle:headers():replace(":path", "/loader.js")
             end
           end
