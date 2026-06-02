@@ -3,3 +3,4 @@ kind: Kustomization
 namespace: minio
 resources:
   - ./custom_c.yml
+  - ./custom_s.yml
