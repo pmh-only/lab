@@ -36,11 +36,6 @@ spec:
       inline: |
         function envoy_on_response(response_handle)
           response_handle:headers():remove("access-control-allow-origin")
-          response_handle:headers():remove("access-control-allow-headers")
-          response_handle:headers():remove("access-control-allow-methods")
-
           response_handle:headers():add("access-control-allow-origin", "*")
-          response_handle:headers():add("access-control-allow-headers", "authorization, content-type, x-amz-content-sha256, x-amz-date, x-amz-security-token, x-amz-user-agent")
-          response_handle:headers():add("access-control-allow-methods", "GET, HEAD, OPTIONS")
         end
 
