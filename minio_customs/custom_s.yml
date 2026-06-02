@@ -38,3 +38,6 @@ spec:
           response_handle:headers():remove("access-control-allow-origin")
           response_handle:headers():add("access-control-allow-origin", "*")
         end
+
+        response_handle:headers():add("access-control-allow-headers", "authorization, content-type, x-amz-content-sha256, x-amz-date, x-amz-security-token, x-amz-user-agent")
+        response_handle:headers():add("access-control-allow-methods", "GET, HEAD, OPTIONS")
