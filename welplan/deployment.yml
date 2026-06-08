@@ -38,6 +38,8 @@ spec:
               value: welplan
             - name: PGUSER
               value: welplan
+            - name: PGPASSWORD
+              value: ''
           volumeMounts:
             - mountPath: /data
               name: persistent
