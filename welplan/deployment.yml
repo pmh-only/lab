@@ -30,6 +30,14 @@ spec:
                   key: WELSTORY_PASSWORD
             - name: DB_PATH
               value: /data/cache.db
+            - name: PGHOST
+              value: localhost
+            - name: PGPORT
+              value: '5432'
+            - name: PGDATABASE
+              value: welplan
+            - name: PGUSER
+              value: welplan
           volumeMounts:
             - mountPath: /data
               name: persistent
