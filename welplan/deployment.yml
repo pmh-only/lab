@@ -58,6 +58,8 @@ spec:
                 secretKeyRef:
                   name: welplan-secret
                   key: ADMIN_OIDC_CLIENT_SECRET
+            - name: REDIS_URL
+              value: redis-service.database.svc.cluster.local
           volumeMounts:
             - mountPath: /data
               name: persistent
