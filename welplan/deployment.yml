@@ -43,6 +43,19 @@ spec:
                 secretKeyRef:
                   name: welplan-secret
                   key: PGPASSWORD
+            - name: ADMIN_OIDC_DISCOVERY_URL
+              value: https://auth.pmh.codes/application/o/welplan/.well-known/openid-configuration
+            - name: ADMIN_OIDC_SCOPES
+              value: openid profile email
+            - name: ADMIN_OIDC_ISSUER_URL
+              value: https://auth.pmh.codes/application/o/welplan/
+            - name: ADMIN_OIDC_CLIENT_ID
+              value: oFx8CL9kOoONKQW7hzMem9c4IN2dYkJ1alN1ihHK
+            - name: ADMIN_OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: welplan-secret
+                  key: ADMIN_OIDC_CLIENT_SECRET
           volumeMounts:
             - mountPath: /data
               name: persistent
