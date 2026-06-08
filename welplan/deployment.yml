@@ -39,7 +39,10 @@ spec:
             - name: PGUSER
               value: welplan
             - name: PGPASSWORD
-              value: ''
+              valueFrom:
+                secretKeyRef:
+                  name: welplan-secret
+                  key: PGPASSWORD
           volumeMounts:
             - mountPath: /data
               name: persistent
