@@ -37,3 +37,7 @@ spec:
           imageName: ghcr.io/dani-garcia/vaultwarden:latest
           commonUpdateSettings:
             updateStrategy: digest
+        - alias: backpack-bitwarden2s3
+          imageName: ghcr.io/pmh-only/backpack-bitwarden2s3:latest
+          commonUpdateSettings:
+            updateStrategy: digest
