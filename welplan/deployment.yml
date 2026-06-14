@@ -30,8 +30,6 @@ spec:
                 secretKeyRef:
                   name: welplan-secret
                   key: WELSTORY_PASSWORD
-            - name: DB_PATH
-              value: /data/cache.db
             - name: PGHOST
               value: pgsql-service.database.svc.cluster.local
             - name: PGPORT
@@ -60,10 +58,12 @@ spec:
                   key: ADMIN_OIDC_CLIENT_SECRET
             - name: REDIS_URL
               value: redis://redis-service.database.svc.cluster.local:6379
-          volumeMounts:
-            - mountPath: /data
-              name: persistent
-      volumes:
-        - name: persistent
-          persistentVolumeClaim:
-            claimName: welplan-pvc
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - pmhoci2
