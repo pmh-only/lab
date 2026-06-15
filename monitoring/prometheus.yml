@@ -171,6 +171,7 @@ data:
         static_configs:
           - targets:
             - pmhraspberry.tailscale.svc.cluster.local:9273
+            - pmhraspberry.tailscale.svc.cluster.local:9274
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
