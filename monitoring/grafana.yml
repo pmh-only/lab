@@ -63,10 +63,6 @@ spec:
             tcpSocket:
               port: 3000
             timeoutSeconds: 1
-          resources:
-            requests:
-              cpu: 250m
-              memory: 750Mi
           volumeMounts:
             - mountPath: /var/lib/grafana
               name: grafana-pvc
