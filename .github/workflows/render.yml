@@ -2,8 +2,6 @@ name: Render README.md
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'apps/**'
 
 permissions:
   contents: write

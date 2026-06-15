@@ -2,17 +2,13 @@ import fs from 'node:fs/promises'
 import process from 'node:process'
 import path from 'node:path'
 
-const cwd = process.cwd()
-const appPath = path.join(cwd, 'apps')
-const appNames = await fs
-  .readdir(appPath, { withFileTypes: true })
-  .then((v) => Promise.all(v
-    .filter((v) => v.isFile() && [".yaml", ".yml"].includes(path.extname(v.name)))
-    .map((v) => fs.readFile(path.join(appPath, v.name), 'utf-8'))))
-  .then((v) => v
-    .flatMap((v) => [...v.matchAll(/^\s*name:\s+(\S+)\n[^\n]*?^\s*namespace:/gm)]
-    .map((v) => v[1])))
+const apiURL = 'https://argo.pmh.codes/api/v1/applications?fields=items.metadata.name'
 
+const appNames = await fetch(apiURL)
+  .then((res) => res.json())
+  .then((res) => res.items.map((v) => v.metadata.name))
+  
+const cwd = process.cwd()
 const docsPath = path.join(cwd, 'README.md')
 const docs = await fs.readFile(docsPath, 'utf-8')
 
