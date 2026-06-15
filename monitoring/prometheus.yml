@@ -166,6 +166,11 @@ data:
         relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
+
+      - job_name: "ultrafeeder"
+        static_configs:
+          - targets:
+            - pmhraspberry.tailscale.svc.cluster.local:9273
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
