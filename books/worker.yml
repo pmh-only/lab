@@ -12,9 +12,6 @@ spec:
       labels:
         app: books-worker
     spec:
-      resources:
-        limits:
-          cpu: '2'
       containers:
         - name: worker
           image: ghcr.io/documentlane/doclane-worker:latest

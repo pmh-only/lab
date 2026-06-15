@@ -54,9 +54,6 @@ spec:
           volumeMounts:
             - mountPath: /data/db
               name: mongo-storage
-          resources:
-            limits:
-              memory: 1Gi
       volumes:
         - name: mongo-storage
           persistentVolumeClaim:
