@@ -19,3 +19,14 @@ metadata:
 spec:
   externalName: placeholder
   type: ExternalName
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    tailscale.com/tailnet-fqdn: pmhmc.taildd35b7.ts.net
+  name: pmhmc
+  namespace: tailscale
+spec:
+  externalName: placeholder
+  type: ExternalName
