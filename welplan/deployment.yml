@@ -58,6 +58,11 @@ spec:
                   key: ADMIN_OIDC_CLIENT_SECRET
             - name: REDIS_URL
               value: redis://redis-service.database.svc.cluster.local:6379
+            - name: INDEXNOW_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: welplan-secret
+                  key: INDEXNOW_KEY
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
