@@ -98,11 +98,6 @@ data:
         cluster: lab
         replica: "0"
 
-    storage:
-      tsdb:
-        retention:
-          time: 7d
-
     scrape_configs:
       - job_name: "ne"
         kubernetes_sd_configs:
