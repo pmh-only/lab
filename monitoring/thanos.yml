@@ -192,6 +192,7 @@ spec:
             - --retention.resolution-raw=7d
             - --retention.resolution-5m=30d
             - --retention.resolution-1h=0d
+            - --delete-delay=0s
           env:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
