@@ -189,9 +189,9 @@ spec:
             - --http-address=0.0.0.0:10902
             - --data-dir=/data
             - --objstore.config-file=/etc/thanos/objstore.yml
-            - --retention.resolution-raw=30d
-            - --retention.resolution-5m=90d
-            - --retention.resolution-1h=365d
+            - --retention.resolution-raw=7d
+            - --retention.resolution-5m=30d
+            - --retention.resolution-1h=0d
           env:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
