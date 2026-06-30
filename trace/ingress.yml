@@ -31,3 +31,26 @@ spec:
           name: trace-client-service
           port: 3002
           weight: 1
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: trace-lua
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: trace-route
+  lua:
+    - type: Inline
+      inline: |
+        function envoy_on_request(request_handle)
+          local path = request_handle:headers():get(":path")
+          if path == "/" then
+            request_handle:respond({[":status"] = "302", ["location"] = "/2/main"}, "")
+          end
+        end
+
+        function envoy_on_response(response_handle)
+          response_handle:headers():add("access-control-allow-headers", "signature")
+        end
