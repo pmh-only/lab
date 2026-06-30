@@ -134,9 +134,14 @@ data:
         ""      "-";
       }
 
-      map $request_uri $tracking_script {
-        ~*amp    "";
-        default  '<script src="https://trace.pmh.codes/api/script.js" data-site-id="1" defer></script>';
+      map $host $tracking_site_id {
+        default              "1";
+        welplan.pmh.codes    "2";
+      }
+
+      map $tracking_site_id $tracking_script {
+        ""       "";
+        default  '<script src="https://trace.pmh.codes/api/script.js" data-site-id="$tracking_site_id" defer></script>';
       }
 
       log_format log_stream
