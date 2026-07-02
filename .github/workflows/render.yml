@@ -21,6 +21,7 @@ jobs:
         with:
           node-version: 24
       - run: node docs/render.mjs
+      - run: sleep 300
       - uses: actions-js/push@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

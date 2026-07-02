@@ -40,4 +40,4 @@ spec:
                   name: onebus-secret
                   key: ONEBUS_DATABASE_URL
             - name: ONEBUS_WORKER_COUNT
-              value: 3
+              value: '3'
