@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: onebus-service
+spec:
+  selector:
+    app: onebus
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: onebus-worker
+spec:
+  clusterIP: None
+  selector:
+    app: onebus-worker
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

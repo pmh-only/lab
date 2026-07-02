@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onebus
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: onebus
+  template:
+    metadata:
+      labels:
+        app: onebus
+    spec:
+      containers:
+        - name: onebus
+          image: ghcr.io/pmh-only/onebus:latest
+          env:
+            - name: ONEBUS_MAIN_CUST_ID
+              value: CI130708000013
+            - name: ONEBUS_MODE
+              value: server
+            - name: ONEBUS_REDIS_ADDR
+              value: redis://redis-service.database.svc.cluster.local:6379
+            - name: ONEBUS_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: onebus-secret
+                  key: ONEBUS_DATABASE_URL
