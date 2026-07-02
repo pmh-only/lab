@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: onebus-worker
+spec:
+  serviceName: onebus-worker
+  revisionHistoryLimit: 0
+  replicas: 3
+  selector:
+    matchLabels:
+      app: onebus-worker
+  template:
+    metadata:
+      labels:
+        app: onebus-worker
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - onebus-worker
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: onebus-worker
+          image: ghcr.io/pmh-only/onebus:latest
+          env:
+            - name: ONEBUS_MAIN_CUST_ID
+              value: CI130708000013
+            - name: ONEBUS_MODE
+              value: worker
+            - name: ONEBUS_REDIS_ADDR
+              value: redis://redis-service.database.svc.cluster.local:6379
+            - name: ONEBUS_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: onebus-secret
+                  key: ONEBUS_DATABASE_URL
+            - name: ONEBUS_WORKER_COUNT
+              value: 3

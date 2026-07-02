@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: onebus
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: onebus
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: onebus
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: onebus
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: onebus
+      images:
+        - alias: onebus
+          imageName: ghcr.io/pmh-only/onebus:latest
+          commonUpdateSettings:
+            updateStrategy: digest
