@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stmt
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: stmt
+  template:
+    metadata:
+      labels:
+        app: stmt
+    spec:
+      containers:
+        - name: stmt
+          image: ghcr.io/pmh-only/stmt:latest
+          env:
+            - name: OIDC_DISCOVERY_URL
+              value: https://auth.pmh.codes/application/o/stmt/.well-known/openid-configuration
+            - name: OIDC_CLIENT_ID
+              value: 6DgXGTRW2Q9J09niYQIKkKoZT7PPSuuGKH7tBb7d
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: stmt-secret
+                  key: OIDC_CLIENT_SECRET
+          volumeMounts:
+            - mountPath: /data
+              name: stmt-pvc
+      volumes:
+        - name: stmt-pvc
+          persistentVolumeClaim:
+            claimName: stmt-pvc
+

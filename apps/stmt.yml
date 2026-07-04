@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: stmt
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: stmt
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: stmt
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: stmt
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: stmt
+      images:
+        - alias: stmt
+          imageName: ghcr.io/pmh-only/stmt:latest
+          commonUpdateSettings:
+            updateStrategy: digest
