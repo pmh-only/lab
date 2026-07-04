@@ -16,6 +16,12 @@ spec:
         - name: stmt
           image: ghcr.io/pmh-only/stmt:latest
           env:
+            - name: NODE_ENV
+              value: production
+            - name: PROTOCOL_HEADER
+              value: x-forwarded-proto
+            - name: HOST_HEADER
+              value: x-forwarded-host
             - name: ORIGIN
               value: https://stmt.pmh.codes
             - name: OIDC_DISCOVERY_URL
