@@ -167,8 +167,8 @@ data:
         add_header Referrer-Policy 'strict-origin' always;
         add_header Permissions-Policy 'geolocation=(), microphone=()' always;
         add_header Reporting-Endpoints 'default="https://163.245.199.122/r"' always;
-        add_header NEL '{"report_to":"default","max_age":31536000,"failure_fraction":1.0}' always;
         add_header Report-To '{"group":"default","max_age":31536000,"endpoints":[{"url":"https://163.245.199.122/r"}]}' always;
+        add_header NEL '{"report_to":"default","max_age":31536000,"failure_fraction":1.0,"success_fraction":1.0,"include_subdomain":true}' always;
         add_header Content-Security-Policy "manifest-src 'self'; frame-ancestors 'self' https://pmh.codes https://*.pmh.codes; report-uri https://163.245.199.122/r; report-to default" always;
         add_header Strict-Transport-Security 'max-age=63072000; includeSubDomains; preload' always;
 
@@ -193,8 +193,8 @@ data:
         add_header Referrer-Policy 'strict-origin' always;
         add_header Permissions-Policy 'geolocation=(), microphone=()' always;
         add_header Reporting-Endpoints 'default="https://163.245.199.122/r"' always;
-        add_header NEL '{"report_to":"default","max_age":31536000,"failure_fraction":1.0}' always;
         add_header Report-To '{"group":"default","max_age":31536000,"endpoints":[{"url":"https://163.245.199.122/r"}]}' always;
+        add_header NEL '{"report_to":"default","max_age":31536000,"failure_fraction":1.0,"success_fraction":1.0,"include_subdomain":true}' always;
         add_header Content-Security-Policy "manifest-src 'self'; frame-ancestors 'self' https://pmh.codes https://*.pmh.codes; report-uri https://163.245.199.122/r; report-to default" always;
         add_header Strict-Transport-Security 'max-age=63072000; includeSubDomains; preload' always;
 
