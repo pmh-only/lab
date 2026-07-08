@@ -30,14 +30,3 @@ metadata:
 spec:
   externalName: placeholder
   type: ExternalName
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    tailscale.com/tailnet-fqdn: pmhexpr.taildd35b7.ts.net
-  name: pmhexpr
-  namespace: tailscale
-spec:
-  externalName: placeholder
-  type: ExternalName
