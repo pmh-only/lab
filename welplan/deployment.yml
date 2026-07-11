@@ -72,3 +72,4 @@ spec:
                     operator: NotIn
                     values:
                       - pmhoci2
+                      - pmhoci
