@@ -63,6 +63,11 @@ spec:
                 secretKeyRef:
                   name: welplan-secret
                   key: INDEXNOW_KEY
+            - name: WEBSHARE_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: welplan-secret
+                  key: WEBSHARE_API_TOKEN
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
