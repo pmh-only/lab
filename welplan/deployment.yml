@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: welplan
-          image: ghcr.io/pmh-only/welplan2:latest@sha256:18fce213beb1983c95962a9d32ef6b2ef0bce02e8071eaaaa5ad167e0d08bcc4
+          image: ghcr.io/pmh-only/welplan2:latest
           env:
             - name: ORIGIN
               value: https://welplan.pmh.codes
@@ -68,13 +68,3 @@ spec:
                 secretKeyRef:
                   name: welplan-secret
                   key: WEBSHARE_API_TOKEN
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: NotIn
-                    values:
-                      - pmhoci2
-                      - pmhoci
