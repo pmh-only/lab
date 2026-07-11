@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: welplan
-          image: ghcr.io/pmh-only/welplan2:latest
+          image: ghcr.io/pmh-only/welplan2:latest@sha256:18fce213beb1983c95962a9d32ef6b2ef0bce02e8071eaaaa5ad167e0d08bcc4
           env:
             - name: ORIGIN
               value: https://welplan.pmh.codes
