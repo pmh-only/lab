@@ -52,6 +52,13 @@ spec:
                 secretKeyRef:
                   name: solver-secret
                   key: OPENAI_API_KEY
+            - name: OPENAI_ADMIN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: solver-secret
+                  key: OPENAI_ADMIN_KEY
+            - name: OPENAI_USAGE_USER_IDS
+              value: '527746745073926145,1394480368878485616'
           volumeMounts:
             - mountPath: /data
               name: solver-pvc
