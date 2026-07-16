@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bro-service
+spec:
+  selector:
+    app: bro
+  ports:
+    - name: opencode
+      protocol: TCP
+      port: 4096
+      targetPort: 4096
+    - name: codeserver
+      protocol: TCP
+      port: 8080
+      targetPort: 8080

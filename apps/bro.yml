@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bro
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: bro
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: bro
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: bro
+  namespace: argocd
+spec:
+  applicationRefs:
+    - namePattern: bro
+      images:
+        - alias: bro
+          imageName: ghcr.io/pmh-only/bro:latest
+          commonUpdateSettings:
+            updateStrategy: digest
