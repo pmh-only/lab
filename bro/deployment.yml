@@ -28,6 +28,10 @@ spec:
               value: '600000'
             - name: 'OPENCODE_PUBLIC_URL'
               value: 'https://opencode.pmh.codes'
+            - name: OPENCODE_MODEL
+              value: openai/gpt-5.6-sol
+            - name: OPENCODE_REASONING_EFFORT
+              value: xhigh
             - name: DISCORD_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -53,4 +57,3 @@ spec:
             claimName: bro-pvc
         - name: docker-sock
           emptyDir: {}
-
