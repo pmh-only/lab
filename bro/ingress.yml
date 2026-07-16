@@ -1,0 +1,85 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: bro-codeserver-route
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
+      namespace: gateway
+  hostnames:
+    - ide.pmh.codes
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: bro-service
+          port: 8080
+          weight: 1
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: bro-opencode-route
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
+      namespace: gateway
+  hostnames:
+    - opencode.pmh.codes
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: bro-service
+          port: 4096
+          weight: 1
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: bro-codeserver-auth
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: bro-codeserver-route
+  oidc:
+    provider:
+      issuer: "https://auth.pmh.codes/application/o/codeserver/"
+      tokenEndpoint: "http://authentik-service.authentik.svc.cluster.local:9000/application/o/token/"
+    clientID: "IJrzGJv8WH7qFNF0GCdNFWmalznzB6cXniM10061"
+    clientSecret:
+      group: ""
+      kind: "Secret"
+      name: "bro-codeserver-auth-secret"
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: bro-opencode-auth
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: bro-opencode-route
+  oidc:
+    provider:
+      issuer: "https://auth.pmh.codes/application/o/opencode/"
+      tokenEndpoint: "http://authentik-service.authentik.svc.cluster.local:9000/application/o/token/"
+    clientID: "3e7QIGKcd7mKtiRdg1uawrdOeAuEdxFHXsXSkiVp"
+    clientSecret:
+      group: ""
+      kind: "Secret"
+      name: "bro-opencode-auth-secret"

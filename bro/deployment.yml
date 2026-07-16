@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bro
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: bro
+  template:
+    metadata:
+      labels:
+        app: bro
+    spec:
+      containers:
+        - name: bro
+          image: ghcr.io/pmh-only/bro:latest
+          env:
+            - name: DISCORD_ALLOWED_ROLE_IDS
+              value: '1005814699209785446'
+            - name: PROJECTS_FILE
+              value: /home/opencode/data/projects.json
+            - name: PROJECTS_ROOT
+              value: /home/opencode/workspace
+            - name: OPENCODE_TASK_TIMEOUT_MS
+              value: '3600000'
+            - name: OPENCODE_ROUTING_TIMEOUT_MS
+              value: '600000'
+            - name: DISCORD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: bro-secret
+                  key: DISCORD_TOKEN
+          volumeMounts:
+            - mountPath: /home/opencode
+              name: bro-pvc
+            - name: docker-sock
+              mountPath: /var/run
+        - name: dind
+          image: docker:29-dind
+          securityContext:
+            privileged: true
+          args:
+            - --host=unix:///var/run/docker.sock
+          volumeMounts:
+            - name: docker-sock
+              mountPath: /var/run
+      volumes:
+        - name: bro-pvc
+          persistentVolumeClaim:
+            claimName: bro-pvc
+        - name: docker-sock
+          emptyDir: {}
+
