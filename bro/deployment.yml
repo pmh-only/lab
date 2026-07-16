@@ -26,6 +26,8 @@ spec:
               value: '3600000'
             - name: OPENCODE_ROUTING_TIMEOUT_MS
               value: '600000'
+            - name: 'OPENCODE_PUBLIC_URL'
+              value: 'https://opencode.pmh.codes'
             - name: DISCORD_TOKEN
               valueFrom:
                 secretKeyRef:
