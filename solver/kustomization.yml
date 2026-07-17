@@ -3,5 +3,7 @@ kind: Kustomization
 namespace: solver
 resources:
   - ./deployment.yml
+  - ./service.yml
   - ./pvc.yml
+  - ./ingress.yml
   - ./secret.yml
