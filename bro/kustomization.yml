@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: bro
 resources:
   - ./secret.yml
+  - ./rbac.yml
   - ./deployment.yml
   - ./service.yml
   - ./pvc.yml

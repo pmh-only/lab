@@ -12,6 +12,7 @@ spec:
       labels:
         app: bro
     spec:
+      serviceAccountName: bro
       containers:
         - name: bro
           image: ghcr.io/pmh-only/bro:latest
