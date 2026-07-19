@@ -26,11 +26,11 @@ spec:
                   name: solver-secret
                   key: DISCORD_TOKEN
             - name: IMAP_HOST
-              value: mail.mail.svc.cluster.local
+              value: imap.purelymail.com
             - name: IMAP_PORT
-              value: '1143'
+              value: '993'
             - name: IMAP_SECURE
-              value: 'false'
+              value: 'true'
             - name: IMAP_USER
               value: pmh_only@pmh.codes
             - name: IMAP_MAILBOX
