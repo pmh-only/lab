@@ -66,28 +66,6 @@ spec:
               value: "true"
             - name: DOMAIN
               value: https://vault.pmh.codes
-            - name: SMTP_HOST
-              value: mail.mail.svc.cluster.local
-            - name: SMTP_FROM
-              value: pmh_only@pmh.codes
-            - name: SMTP_PORT
-              value: "1025"
-            - name: SMTP_SECURITY
-              value: starttls
-            - name: SMTP_USERNAME
-              value: pmh_only@pmh.codes
-            - name: SMTP_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: bitwarden-secrets
-                  key: SMTP_PASSWORD
-            - name: SMTP_ACCEPT_INVALID_CERTS
-              value: "true"
-            - name: ADMIN_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: bitwarden-secrets
-                  key: ADMIN_TOKEN
             - name: PUSH_INSTALLATION_ID
               valueFrom:
                 secretKeyRef:
