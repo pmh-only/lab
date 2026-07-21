@@ -31,11 +31,6 @@ spec:
                   name: mailui-secret
                   key: BETTER_AUTH_SECRET
 
-            - name: OPENAI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: mailui-secret
-                  key: OPENAI_API_KEY
 ---
 apiVersion: apps/v1
 kind: Deployment
