@@ -31,6 +31,12 @@ spec:
                   name: mailui-secret
                   key: BETTER_AUTH_SECRET
 
+            - name: MAIL_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mailui-secret
+                  key: MAIL_SECRET_KEY
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -55,6 +61,11 @@ spec:
                 secretKeyRef:
                   name: mailui-secret
                   key: DATABASE_URL
+            - name: MAIL_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mailui-secret
+                  key: MAIL_SECRET_KEY
 ---
 apiVersion: apps/v1
 kind: Deployment
