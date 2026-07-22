@@ -24,7 +24,7 @@ spec:
             - name: PROJECTS_ROOT
               value: /home/opencode/workspace
             - name: OPENCODE_TASK_TIMEOUT_MS
-              value: '3600000'
+              value: '7200000'
             - name: OPENCODE_ROUTING_TIMEOUT_MS
               value: '600000'
             - name: 'OPENCODE_PUBLIC_URL'
