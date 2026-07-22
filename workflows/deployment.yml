@@ -31,7 +31,12 @@ spec:
           volumeMounts:
             - mountPath: /home/node/.n8n
               name: persistent
+            - mountPath: /hooks
+              name: hooks
       volumes:
         - name: persistent
           persistentVolumeClaim:
             claimName: workflows-pvc
+        - name: hooks
+          persistentVolumeClaim:
+            claimName: workflows-hooks-pvc
