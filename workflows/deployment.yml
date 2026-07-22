@@ -28,6 +28,23 @@ spec:
               value: "https://flows.pmh.codes"
             - name: NODE_TLS_REJECT_UNAUTHORIZED
               value: "0"
+            - name: EXTERNAL_HOOK_FILES
+              value: "/hooks/hooks.js"
+            - name: OIDC_ISSUER_URL
+              value: "https://auth.pmh.codes/application/o/n8n/"
+            - name: OIDC_CLIENT_ID
+              value: "jE6CG9DLrBD8CzK1NLekJhx6JGV9NSqGU5MmvDst"
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: workflows-secret
+                  key: OIDC_CLIENT_SECRET
+            - name: OIDC_REDIRECT_URI
+              value: "https://flows.pmh.codes/auth/oidc/callback"
+            - name: N8N_ADDITIONAL_NON_UI_ROUTES
+              value: "auth"
+            - name: EXTERNAL_FRONTEND_HOOKS_URLS
+              value: "/assets/oidc-frontend-hook.js"
           volumeMounts:
             - mountPath: /home/node/.n8n
               name: persistent
