@@ -36,6 +36,13 @@ spec:
                 secretKeyRef:
                   name: mailui-secret
                   key: MAIL_SECRET_KEY
+          volumeMounts:
+            - mountPath: /app/data
+              name: mailui-pvc
+      volumes:
+        - name: mailui-pvc
+          persistentVolumeClaim:
+            claimName: mailui-pvc
 
 ---
 apiVersion: apps/v1
