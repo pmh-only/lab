@@ -24,3 +24,6 @@ images:
   - name: ghcr.io/pmh-only/clickhouse-server
     newTag: rybbit
     digest: sha256:9b02d0299f4ca98dd64a28594c2e9ee4a107b5d7431ee67f9f6375cd84fc04a9
+  - name: ghcr.io/pmh-only/redis
+    newTag: alpine
+    digest: sha256:042266b1a5ceb2306c7524fc9e19d75359ad5644e2e5688f9e31317f2cf241ba
