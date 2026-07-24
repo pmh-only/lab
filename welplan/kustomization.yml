@@ -6,3 +6,7 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/pmh-only/welplan2
+    newTag: latest
+    digest: sha256:3a74ada138f4a901e91afc61ac9b65c7d4f8c42364816dedcfea91ddbc0c4476
