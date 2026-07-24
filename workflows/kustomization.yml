@@ -7,3 +7,7 @@ resources:
   - ./ingress.yml
   - ./pvc.yml
   - ./secret.yml
+images:
+  - name: ghcr.io/n8n-io/n8n
+    newTag: latest
+    digest: sha256:3c07c723326dd72e46a6969181c66a75260b7a204b9b77ba1ece6d594489c684
