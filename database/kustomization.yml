@@ -27,3 +27,6 @@ images:
   - name: ghcr.io/pmh-only/redis
     newTag: alpine
     digest: sha256:042266b1a5ceb2306c7524fc9e19d75359ad5644e2e5688f9e31317f2cf241ba
+  - name: ghcr.io/pmh-only/mongo
+    newTag: latest
+    digest: sha256:04f0f1d5268d9e6872b64793d4d3463cdcfbeaf6bcf17dd73f25541a533a5845
