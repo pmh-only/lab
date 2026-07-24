@@ -7,3 +7,7 @@ resources:
   - ./ingress.yml
   - ./pvc.yml
   - ./secret.yml
+images:
+  - name: ghcr.io/pmh-only/kopia
+    newTag: latest
+    digest: sha256:e190a22ef85f3d8446b22e6f49be5b38e72c3750b784245684c75ed9e87f63b3
