@@ -8,3 +8,7 @@ resources:
   - ./collector_cm.yml
   - ./collector.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/pmh-only/goaccess
+    newTag: latest
+    digest: sha256:9cbed3530f198a56cf255b1278ff3e254a2ab34509940b916c9af20f13a3e6a6
