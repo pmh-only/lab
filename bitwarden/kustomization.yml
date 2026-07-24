@@ -10,7 +10,7 @@ resources:
 images:
   - name: ghcr.io/dani-garcia/vaultwarden
     newTag: latest
-    digest: sha256:d626d04934cd1192ad8ced1adb975099fca78cec33ab467d2d3c923cde7f3b0c
+    digest: sha256:e6443e3d5ed8fcee2204b89ec778d7f24d0173bcc42d1ea34f990304f5f63f51
   - name: ghcr.io/pmh-only/backpack-bitwarden2s3
     newTag: latest
     digest: sha256:1ec43bd11a022884222c6ca0708ef82c05186144ca211e791bf4dd1d6a7b0cc2
