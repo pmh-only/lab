@@ -30,6 +30,8 @@ metadata:
   name: authentik
   namespace: argocd
 spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
   applicationRefs:
     - namePattern: authentik
       images:
