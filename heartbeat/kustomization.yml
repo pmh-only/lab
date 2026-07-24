@@ -6,3 +6,7 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/pmh-only/heartbeat
+    newTag: latest
+    digest: sha256:8d2e38c4c3df2026ceadb027dbb349572a6d59d3505951269a25a7c920a9897a
