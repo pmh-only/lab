@@ -7,3 +7,7 @@ resources:
   - ./ingress.yml
   - ./pvc.yml
   - ./secret.yml
+images:
+  - name: ghcr.io/pmh-only/here
+    newTag: latest
+    digest: sha256:754e71685e716254c1df1cf0e58b6e3c6e1263220291d0d250c4c3bcd3821641
