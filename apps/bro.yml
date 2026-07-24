@@ -29,6 +29,12 @@ metadata:
   name: bro
   namespace: argocd
 spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: "main"
+      writeBackTarget: "kustomization"
   applicationRefs:
     - namePattern: bro
       images:
