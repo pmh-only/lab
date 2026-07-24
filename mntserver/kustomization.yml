@@ -4,3 +4,7 @@ namespace: mntserver
 resources:
   - ./deployment.yml
   - ./secret.yml
+images:
+  - name: ghcr.io/pmh-only/mntserver
+    newTag: latest
+    digest: sha256:856e6ca5d36dbd5fe31fd99d3a6e8a44a521f1fda23401bd1c4740226bbe3e88
