@@ -7,3 +7,10 @@ resources:
   - ./ingress.yml
   - ./pvc.yml
   - ./secret.yml
+images:
+  - name: ghcr.io/pmh-only/mail
+    newTag: latest
+    digest: sha256:b37f2fb7936e1422c7a15be6a0b527c351a4d469788a6a137ca3c1bee8ff3bd1
+  - name: ghcr.io/pmh-only/mail-worker
+    newTag: latest
+    digest: sha256:2dd032eb680eabfb7a9a220311d2f7d07adb6e809d6f82ba64f41204c14e4bde
