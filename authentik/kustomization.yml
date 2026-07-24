@@ -7,3 +7,6 @@ resources:
   - ./secret.yml
   - ./service.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/goauthentik/server
+    newTag: 2026.5.6
