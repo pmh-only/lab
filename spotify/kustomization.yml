@@ -6,3 +6,10 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/yooooomi/your_spotify_server
+    newTag: latest
+    digest: sha256:624ea009f2ef9d877989bee9c7913ac66840449f566517871696c31a8ea13ddf
+  - name: ghcr.io/yooooomi/your_spotify_client
+    newTag: latest
+    digest: sha256:e4da90a0634c7862f9f4e893026ee8cd91380234fa2125b88b26c6fb9da3d47e
