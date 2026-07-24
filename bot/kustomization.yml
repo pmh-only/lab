@@ -5,3 +5,7 @@ resources:
   - ./deployment.yml
   - ./secret.yml
   - ./pvc.yml
+images:
+  - name: ghcr.io/pmh-only/bot
+    newTag: latest
+    digest: sha256:f7d3af0003d3492e0012ae0db393fc40feadd7034261d9e77f48a04abb871019
