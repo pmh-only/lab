@@ -6,3 +6,7 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/pmh-only/keysboard
+    newTag: latest
+    digest: sha256:43f236c0f6bacf51cd7b5726fa062766cd0f5245927d87772da0570a827ffb1b
