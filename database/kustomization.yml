@@ -33,3 +33,18 @@ images:
   - name: ghcr.io/pmh-only/mysql
     newTag: "8"
     digest: sha256:83fdb6364293713cdb0c3a4b802ef6741142a04a33185d70ed478f24b6cf88ac
+  - name: ghcr.io/immich-app/postgres
+    newTag: 14-vectorchord0.4.3-pgvectors0.2.0
+    digest: sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
+  - name: ghcr.io/pmh-only/backpack-mysql2s3
+    newTag: latest
+    digest: sha256:fc4b02e57a8849967ddae35b3329b6d540ed144c83aea00c01e5dc860ac29582
+  - name: ghcr.io/pmh-only/backpack-pgsql2s3
+    newTag: latest
+    digest: sha256:907d8a4180e0be87d01c20640b70e688f937dab3ba18b33f76602f3900001f32
+  - name: ghcr.io/pmh-only/backpack-mongo2s3
+    newTag: latest
+    digest: sha256:abca64f5084b873d7752485bc32a694ce4bc6e4ce42088cb52164924ef3c8779
+  - name: ghcr.io/pmh-only/backpack-clickhouse2s3
+    newTag: latest
+    digest: sha256:3a9989a87e30e5007389c40613bf3b10e8335ad8bbae3fc70b19a8abd508a538
