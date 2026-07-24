@@ -62,7 +62,20 @@ spec:
           volumeMounts:
             - mountPath: /data
               name: solver-pvc
+            - name: docker-sock
+              mountPath: /var/run
+        - name: dind
+          image: docker:29-dind
+          securityContext:
+            privileged: true
+          args:
+            - --host=unix:///var/run/docker.sock
+          volumeMounts:
+            - name: docker-sock
+              mountPath: /var/run
       volumes:
         - name: solver-pvc
           persistentVolumeClaim:
             claimName: solver-pvc
+        - name: docker-sock
+          emptyDir: {}
