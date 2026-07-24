@@ -20,3 +20,7 @@ resources:
   - ./mongo/service.yml
   - ./redis/deployment.yml
   - ./redis/service.yml
+images:
+  - name: ghcr.io/pmh-only/clickhouse-server
+    newTag: rybbit
+    digest: sha256:9b02d0299f4ca98dd64a28594c2e9ee4a107b5d7431ee67f9f6375cd84fc04a9
