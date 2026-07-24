@@ -12,3 +12,9 @@ images:
   - name: ghcr.io/pmh-only/goaccess
     newTag: latest
     digest: sha256:9cbed3530f198a56cf255b1278ff3e254a2ab34509940b916c9af20f13a3e6a6
+  - name: cr.fluentbit.io/fluent/fluent-bit
+    newTag: latest
+    digest: sha256:ccda4cbd0f87be1e04cc1d5425bc84a6669051d4ac93a6b7a053c3ba9832aa14
+  - name: ghcr.io/pmh-only/busybox
+    newTag: latest
+    digest: sha256:021649f278c706d6183fe8f80702a59257445e03a9b35ac495bb02803edff6f2
