@@ -6,3 +6,7 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/pmh-only/thepool
+    newTag: latest
+    digest: sha256:8c05cc757a208fb2dda28fd1922801df519dc4d4822a53a4497069ac846ebdde
