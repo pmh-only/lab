@@ -6,3 +6,7 @@ resources:
   - ./service.yml
   - ./ingress.yml
   - ./rbac.yml
+images:
+  - name: ghcr.io/pmh-only/kube-universe
+    newTag: latest
+    digest: sha256:23f44c7410c330413be10042d2719b16a90980939681a35153509ef92f589fb8
