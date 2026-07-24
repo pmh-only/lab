@@ -10,3 +10,7 @@ resources:
   - ./ne.yml
   - ./prometheus.yml
   - ./secret.yml
+images:
+  - name: ghcr.io/pmh-only/grafana-image-renderer
+    newTag: latest
+    digest: sha256:7f776ebb20f82b9cd5940238da596da8caf26baf9025c2e0a991d23dd803a0e6
