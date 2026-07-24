@@ -6,3 +6,10 @@ resources:
   - ./secret.yml
   - ./service.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/rybbit-io/rybbit-backend
+    newTag: latest
+    digest: sha256:284469b79c7b19fe934be3926eea3764fa5f2f8281ea66af20cd2e8cc19f3993
+  - name: ghcr.io/rybbit-io/rybbit-client
+    newTag: latest
+    digest: sha256:cc53d6768c46075984d92937b28a82acd78bf84b40eed602a201fd1ebc89fc1a
