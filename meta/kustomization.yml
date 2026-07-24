@@ -7,3 +7,7 @@ resources:
   - ./pvc.yml
   - ./ingress.yml
   - ./secret.yml
+images:
+  - name: ghcr.io/pmh-only/discord-query
+    newTag: latest
+    digest: sha256:4c51cce3bfe9c15a5759d9efc9a07ba5c21c6a3bea2903a89cd2829ecc94d02c
