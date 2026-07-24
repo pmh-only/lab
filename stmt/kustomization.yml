@@ -7,3 +7,7 @@ resources:
   - ./service.yml
   - ./pvc.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/pmh-only/stmt
+    newTag: latest
+    digest: sha256:1d995ee2b7468a68ae03d9ab21e2931573c73e2087b2a043c32af5caf440fe49
