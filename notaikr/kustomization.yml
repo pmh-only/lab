@@ -6,3 +6,7 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/pmh-only/notaikr
+    newTag: latest
+    digest: sha256:56cce429f55b8411903fbcd803c3ef2b4a115161aa766d535dd53ad02f52c967
