@@ -6,3 +6,7 @@ resources:
   - ./ingress.yml
   - ./certificate.yml
   - ./minio.yml
+images:
+  - name: ghcr.io/pmh-only/rustfs
+    newTag: latest
+    digest: sha256:66529d107c791b95f9cd390840a76192684b6152e5236da3315edf57fe1a200e
