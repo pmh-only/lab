@@ -14,3 +14,17 @@ images:
   - name: ghcr.io/pmh-only/grafana-image-renderer
     newTag: latest
     digest: sha256:7f776ebb20f82b9cd5940238da596da8caf26baf9025c2e0a991d23dd803a0e6
+  - name: ghcr.io/pmh-only/grafana
+    newTag: latest
+    digest: sha256:0071f6e27d92938dd9ab1236bd09347a795a38686f01551c7caa494ee1e010c6
+  - name: quay.io/prometheus/node-exporter
+    newTag: latest
+    digest: sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
+  - name: quay.io/prometheus/prometheus
+    newTag: latest
+    digest: sha256:3c42b892cf723fa54d2f262c37a0e1f80aa8c8ddb1da7b9b0df9455a35a7f893
+  - name: registry.k8s.io/kube-state-metrics/kube-state-metrics
+    newTag: v2.13.0
+    digest: sha256:639a1e2da549210adddc0391ff91e270e83f7873014aec53258462812f741e6f
+  - name: quay.io/thanos/thanos
+    newTag: main-2026-07-23-7b17f42
