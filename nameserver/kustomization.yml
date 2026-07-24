@@ -6,3 +6,7 @@ resources:
   - ./service.yml
   - ./ingress.yml
   - ./pvc.yml
+images:
+  - name: ghcr.io/pmh-only/technitium
+    newTag: latest
+    digest: sha256:4b7fecb6a3f63dd9cca445957d55dfa21432b8aad3efcbd47278ed1beba3c566
