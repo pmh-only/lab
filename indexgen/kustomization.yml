@@ -4,3 +4,7 @@ namespace: indexgen
 resources:
   - ./deployment.yml
   - ./secret.yml
+images:
+  - name: ghcr.io/pmh-only/indexgen
+    newTag: latest
+    digest: sha256:dd05602280e4c806cfc84e7f28acbd0d3bae6cefc048f301aaa7b5e77303e300
