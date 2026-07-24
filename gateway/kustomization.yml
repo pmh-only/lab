@@ -7,3 +7,7 @@ resources:
   - ./nginx.yml
   - ./envoy.yml
   - ./backend-policy.yml
+images:
+  - name: ghcr.io/pmh-only/nginx
+    newTag: latest
+    digest: sha256:a9a90dbaf163b10d4f7298a950cabc61114b80b371c9fc02894afe951be8696e
