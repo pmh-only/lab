@@ -34,6 +34,13 @@ spec:
                 secretKeyRef:
                   name: spotify-secret
                   key: MONGO_ENDPOINT
+          volumeMounts:
+            - mountPath: /home/node
+              name: spotify-pvc
+      volumes:
+        - name: spotify-pvc
+          persistentVolumeClaim:
+            claimName: spotify-pvc
 ---
 apiVersion: apps/v1
 kind: Deployment
