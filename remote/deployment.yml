@@ -34,6 +34,8 @@ spec:
         - name: remote-guacamole
           image: ghcr.io/pmh-only/guacamole:1.6.0
           env:
+            - name: WEBAPP_CONTEXT
+              value: ROOT
             - name: GUACD_HOSTNAME
               value: remote-guacd.remote.svc.cluster.local
             - name: REMOTE_IP_VALVE_ENABLED
