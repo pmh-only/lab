@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: remote-guacd
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: remote-guacd
+  template:
+    metadata:
+      labels:
+        app: remote-guacd
+    spec:
+      containers:
+        - name: remote-guacd
+          image: ghcr.io/pmh-only/guacd:1.6.0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: remote-guacamole
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: remote-guacamole
+  template:
+    metadata:
+      labels:
+        app: remote-guacamole
+    spec:
+      containers:
+        - name: remote-guacamole
+          image: ghcr.io/pmh-only/guacamole:1.6.0
+          env:
+            - name: GUACD_HOSTNAME
+              value: remote-guacd.remote.svc.cluster.local
+            - name: REMOTE_IP_VALVE_ENABLED
+              value: 'true'
+            - name: POSTGRESQL_HOSTNAME
+              value: pgsql-service.svc.cluster.local
+            - name: POSTGRESQL_DATABASE
+              value: guacamole
+            - name: POSTGRESQL_USERNAME
+              value: guacamole
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: remote-secret
+                  key: POSTGRESQL_PASSWORD
