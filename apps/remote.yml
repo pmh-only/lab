@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: remote
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: remote
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: remote
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: remote
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: "main"
+      writeBackTarget: "kustomization"
+  applicationRefs:
+    - namePattern: guacd
+      images:
+        - alias: guacd
+          imageName: ghcr.io/pmh-only/guacd:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+    - namePattern: guacamole
+      images:
+        - alias: guacamole
+          imageName: ghcr.io/pmh-only/guacamole:latest
+          commonUpdateSettings:
+            updateStrategy: digest
