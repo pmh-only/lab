@@ -39,7 +39,7 @@ spec:
             - name: REMOTE_IP_VALVE_ENABLED
               value: 'true'
             - name: POSTGRESQL_HOSTNAME
-              value: pgsql-service.svc.cluster.local
+              value: pgsql-service.database.svc.cluster.local
             - name: POSTGRESQL_DATABASE
               value: guacamole
             - name: POSTGRESQL_USERNAME
