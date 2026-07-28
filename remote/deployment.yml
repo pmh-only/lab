@@ -46,6 +46,18 @@ spec:
               value: guacamole
             - name: POSTGRESQL_USERNAME
               value: guacamole
+            - name: OPENID_ENABLED
+              value: 'true'
+            - name: OPENID_AUTHORIZATION_ENDPOINT
+              value: 'https://auth.pmh.codes/application/o/authorize/'
+            - name: OPENID_JWKS_ENDPOINT
+              value: 'https://auth.pmh.codes/application/o/remote/jwks/'
+            - name: OPENID_ISSUER
+              value: 'https://auth.pmh.codes/application/o/remote/'
+            - name: OPENID_CLIENT_ID
+              value: 'hrvPK2hBd17Ha9oPrCxbt0zg6tVpwHwAcVAz9Bii'
+            - name: OPENID_REDIRECT_URI
+              value: 'https://remote.pmh.codes'
             - name: POSTGRESQL_PASSWORD
               valueFrom:
                 secretKeyRef:
