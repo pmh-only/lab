@@ -9,4 +9,4 @@ resources:
 images:
   - name: ghcr.io/pmh-only/welplan2
     newTag: latest
-    digest: sha256:d3fb7131d4162853dabd69c6665fe967af505fe30c3b1f17d2676d7dc3af100f
+    digest: sha256:f0bbf477c72a4c6664f3de67c8616f6d8c110b6abda65b328ef170d45af2d526
