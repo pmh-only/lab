@@ -9,7 +9,7 @@ spec:
       name: main
       namespace: gateway
   hostnames:
-    - rdp.pmh.codes
+    - remote.pmh.codes
   rules:
     - matches:
         - path:
