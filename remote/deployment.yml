@@ -59,7 +59,7 @@ spec:
             - name: OPENID_REDIRECT_URI
               value: 'https://remote.pmh.codes'
             - name: EXTENSION_PRIORITY
-              value: '*, openid'
+              value: openid, *
             - name: POSTGRESQL_PASSWORD
               valueFrom:
                 secretKeyRef:
