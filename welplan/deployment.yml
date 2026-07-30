@@ -68,3 +68,12 @@ spec:
                 secretKeyRef:
                   name: welplan-secret
                   key: WEBSHARE_API_TOKEN
+            - name: SLACK_CLIENT_ID
+              value: '8648598228979.11708798725345'
+            - name: SLACK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: welplan-secret
+                  key: SLACK_CLIENT_SECRET
+            - name: SLACK_OAUTH_REDIRECT_URI
+              value: 'https://welplan.pmh.codes/webhooks/slack/callback'
