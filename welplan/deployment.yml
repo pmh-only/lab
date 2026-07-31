@@ -77,3 +77,5 @@ spec:
                   key: SLACK_CLIENT_SECRET
             - name: SLACK_OAUTH_REDIRECT_URI
               value: 'https://welplan.pmh.codes/webhooks/slack/callback'
+            - name: WEBMCP_ORIGIN_TRIAL_TOKEN
+              value: A6/Axgvdo4JzpN3qUny6WokBmq6xZhunaef2P105er8RjS3vr9iKad8fF/eYkx0NYWV4W0eC1KoSEEu21ddcqQ4AAABweyJvcmlnaW4iOiJodHRwczovL3BtaC5jb2Rlczo0NDMiLCJmZWF0dXJlIjoiV2ViTUNQIiwiZXhwaXJ5IjoxNzk0ODczNjAwLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ==
