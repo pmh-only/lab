@@ -216,6 +216,9 @@ spec:
           local path = request_handle:headers():get(":path") or ""
           if path == "/rustfs/console/auth/login/" or path:match("^/rustfs/console/auth/login/%?") then
             local args = path:match("%?(.+)$") or ""
+            if ("&" .. args .. "&"):find("&local=1&", 1, true) then
+              return
+            end
             request_handle:respond({[":status"] = "302", ["location"] = "/rustfs/admin/v3/oidc/authorize/pmh_codes?" .. args}, "")
           end
         end
