@@ -13,4 +13,4 @@ resources:
 images:
   - name: ghcr.io/pmh-only/bro
     newTag: latest
-    digest: sha256:dcef1c3c80f35ae870dbf69b055fd0f2bcc129b6172ffb45d2c6ddd65d15838d
+    digest: sha256:f93409be48d9a10a94083ec4d2a3339719c2c4fdfdfca6a78cb8da4d4810d774
