@@ -10,4 +10,4 @@ resources:
 images:
   - name: ghcr.io/pmh-only/solver
     newTag: latest
-    digest: sha256:994fe0995cc5c046b3dd93276cd1b34dc4cf4dcb8039dc05a59735ead49954cb
+    digest: sha256:82e69524c67989e9fe7b3d75c9921c0e2a61151d24fe9545558b6cf3dce14a2a
