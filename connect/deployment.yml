@@ -23,7 +23,7 @@ spec:
             - name: OIDC_CLIENT_ID
               value: wA1ypwpdd0ilNF9jNJSahpQeWAyViZ0ucbhx9aPm
             - name: OIDC_REDIRECT_URL
-              value: https://connect.pmh.codes/api/collect
+              value: https://connect.pmh.codes/oidc/callback
             - name: COLLECT_TOKEN
               valueFrom:
                 secretKeyRef:
