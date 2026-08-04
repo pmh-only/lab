@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: connect
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: connect
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: connect
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - PruneLast=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: connect
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: "main"
+      writeBackTarget: "kustomization"
+  applicationRefs:
+    - namePattern: connect
+      images:
+        - alias: connect
+          imageName: ghcr.io/pmh-only/connect:latest
+          commonUpdateSettings:
+            updateStrategy: digest
