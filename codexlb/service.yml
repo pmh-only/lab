@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: codexlb-service
+spec:
+  selector:
+    app: codexlb
+  ports:
+    - protocol: TCP
+      port: 2455
+      targetPort: 2455
