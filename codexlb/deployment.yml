@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codexlb
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: codexlb
+  template:
+    metadata:
+      labels:
+        app: codexlb
+    spec:
+      containers:
+        - name: codexlb
+          image: ghcr.io/soju06/codex-lb:latest
+          ports:
+            - containerPort: 2455
+          volumeMounts:
+            - mountPath: /var/lib/codex-lb
+              name: codexlb-pvc
+      volumes:
+        - name: codexlb-pvc
+          persistentVolumeClaim:
+            claimName: codexlb-pvc
