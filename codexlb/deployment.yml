@@ -17,6 +17,9 @@ spec:
           image: ghcr.io/soju06/codex-lb:latest
           ports:
             - containerPort: 2455
+          env:
+            - name: CODEX_LB_DATA_DIR
+              value: /var/lib/codex-lb
           volumeMounts:
             - mountPath: /var/lib/codex-lb
               name: codexlb-pvc
