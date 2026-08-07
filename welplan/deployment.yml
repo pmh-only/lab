@@ -15,6 +15,10 @@ spec:
       containers:
         - name: welplan
           image: ghcr.io/pmh-only/welplan2:latest
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
           env:
             - name: ORIGIN
               value: https://welplan.pmh.codes
