@@ -10,4 +10,4 @@ resources:
 images:
   - name: ghcr.io/pmh-only/nginx
     newTag: latest
-    digest: sha256:a9a90dbaf163b10d4f7298a950cabc61114b80b371c9fc02894afe951be8696e
+    digest: sha256:84377a6376428a2b39d8484d8e843e38fb42eef465d71c8f94c55a96d9a51808
