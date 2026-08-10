@@ -13,4 +13,4 @@ images:
     digest: sha256:8a5483e12f0f8c197a1bd2294a4f2fc141fc71c2cd2ba87f6b7fcf151335de85
   - name: ghcr.io/pmh-only/mail-worker
     newTag: latest
-    digest: sha256:266cd86b730133a615f483e1532dbed2dd3b29312a01425d754f39c7a81a5e39
+    digest: sha256:e8373c86916635507e9ad9e7fea256dcbc61ca7d19eb3bddef67acb99cea7328
