@@ -72,6 +72,11 @@ spec:
                 secretKeyRef:
                   name: welplan-secret
                   key: WEBSHARE_API_TOKEN
+            - name: REVIEW_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: welplan-secret
+                  key: REVIEW_JWT_SECRET
             - name: SLACK_CLIENT_ID
               value: '8648598228979.11708798725345'
             - name: SLACK_CLIENT_SECRET
