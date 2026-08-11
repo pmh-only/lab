@@ -27,4 +27,4 @@ images:
     newTag: v2.13.0
     digest: sha256:639a1e2da549210adddc0391ff91e270e83f7873014aec53258462812f741e6f
   - name: quay.io/thanos/thanos
-    newTag: main-2026-08-10-32b924f
+    newTag: main-2026-08-11-2273d9f
