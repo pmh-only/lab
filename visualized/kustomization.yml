@@ -9,4 +9,4 @@ resources:
 images:
   - name: ghcr.io/pmh-only/kube-universe
     newTag: latest
-    digest: sha256:8bcb94d9606f2bf0d5f44f33dd052da3a04c49fa15df2537b9e9b21f27c39051
+    digest: sha256:571bcfd53c4f0145b6c5958d28a1ea2a8e25d6229825709fc98f4f5946f82378
