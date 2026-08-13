@@ -167,6 +167,11 @@ data:
           - targets:
             - pmhraspberry.tailscale.svc.cluster.local:9273
             - pmhraspberry.tailscale.svc.cluster.local:9274
+
+      - job_name: "scd41"
+        static_configs:
+          - targets:
+            - pmhraspberry.tailscale.svc.cluster.local:9811
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
