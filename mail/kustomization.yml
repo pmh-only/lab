@@ -10,7 +10,7 @@ resources:
 images:
   - name: ghcr.io/pmh-only/mail
     newTag: latest
-    digest: sha256:7f57ebc959580081cf7d77d355a3f0b0eeae8e9a7dcec610d1c5a81a4fd906a0
+    digest: sha256:231914107aa54511364d1f1a5ad7b447a3f6fd2426f56cdfc44e2f98af78b43d
   - name: ghcr.io/pmh-only/mail-worker
     newTag: latest
     digest: sha256:1f328d72445b32c6b7b195759c275b7b80a99120ea21d840b7bc7b707eee9abd
