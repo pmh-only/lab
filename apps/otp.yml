@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otp
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: otp
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: otp-inbox
+    helm:
+      valuesObject:
+        bitwarden:
+          enabled: true
+          server: https://vault.pmh.codes
+
+        sealedSecret:
+          enabled: true
+          encryptedData:
+            CONNECT_ROSTACK_TOKEN: REDACTED
+            MAIL_ROSTACK_TOKEN: REDACTED
+            BW_CLIENTID: REDACTED
+            BW_CLIENTSECRET: REDACTED
+
+        gatewayApi:
+          enabled: true
+          parentRefs:
+            - name: main
+              namespace: gateway
+          hostnames:
+            - otp.pmh.codes
+
+        config:
+          connectDiscoveryUrl: http://connect-service.connect.svc.cluster.local:8080/.well-known/rostack
+          mailDiscoveryUrl: http://mailui.mail.svc.cluster.local:3000/.well-known/rostack
+
+    repoURL: https://pmh-only.github.io/otp
+    targetRevision: x
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
