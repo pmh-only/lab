@@ -103,6 +103,9 @@ data:
 
     [panels]
     disable_sanitize_html = true
+
+    [unified_alerting.screenshots]
+    capture = true
 ---
 apiVersion: v1
 kind: ConfigMap
