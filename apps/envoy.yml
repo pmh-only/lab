@@ -20,6 +20,7 @@ spec:
           envoyGateway:
             extensionApis:
               enableBackend: true
+              enableLua: true
               enableEnvoyPatchPolicy: true
   syncPolicy:
     automated:

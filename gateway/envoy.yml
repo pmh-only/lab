@@ -4,8 +4,6 @@ metadata:
   name: gateway-proxy
   namespace: gateway
 spec:
-  extensionApis:
-    enableLua: true
   provider:
     type: Kubernetes
     kubernetes:
