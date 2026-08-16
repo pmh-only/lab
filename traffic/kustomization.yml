@@ -14,7 +14,7 @@ images:
     digest: sha256:f1b4724bda9ec5d7900b4b60dc3d6daeb2ba7d64912100fec5a46dc801d7bec2
   - name: cr.fluentbit.io/fluent/fluent-bit
     newTag: latest
-    digest: sha256:bf09d620b6b45c080b4da86ac5d98fd3739c1213a148f93dec884fdcc64084cb
+    digest: sha256:a941bdd5ca552b2c6597fc7b3bccf2e61d30873939bab5700963de0e94ac6169
   - name: ghcr.io/pmh-only/busybox
     newTag: latest
     digest: sha256:97434c3687effe0181b10bcfea51dec1a72c2ecec18068adf296c197787a2e81
