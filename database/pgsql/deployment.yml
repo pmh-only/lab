@@ -60,7 +60,7 @@ spec:
                   name: pgsql-root-password
                   key: password
           volumeMounts:
-            - mountPath: /var/lib/postgresql/data
+            - mountPath: /var/lib/postgresql
               name: pgsql-storage
       volumes:
         - name: pgsql-storage
