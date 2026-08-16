@@ -7,6 +7,10 @@ resources:
   - ./mysql/deployment.yml
   - ./mysql/secret.yml
   - ./mysql/service.yml
+  - ./pgsql/pvc.yml
+  - ./pgsql/deployment.yml
+  - ./pgsql/secret.yml
+  - ./pgsql/service.yml
   - ./clickhouse/pvc.yml
   - ./clickhouse/deployment.yml
   - ./clickhouse/secret.yml
