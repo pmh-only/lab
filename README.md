@@ -248,14 +248,18 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   
+  <td><img src="https://argo.pmh.codes/api/badge?name=track&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=traffic&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=velero&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=velero&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=velero-ui&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
@@ -265,13 +269,13 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   <td><img src="https://argo.pmh.codes/api/badge?name=visualized&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=welplan&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=welplan&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=workflows&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
