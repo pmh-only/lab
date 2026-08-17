@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite it using the metadata below."
+type: software
+title: "pmh-only/lab"
+abstract: "Kubernetes resource manifests for a homelab GitOps environment powered by Argo CD."
+authors:
+  - family-names: "Park"
+    given-names: "Minhyeok"
+repository-code: "https://github.com/pmh-only/lab"
+url: "https://github.com/pmh-only/lab"
+license: MIT
