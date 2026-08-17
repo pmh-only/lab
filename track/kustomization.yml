@@ -7,3 +7,13 @@ resources:
   - ./service.yml
   - ./pvc.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/pmh-only/dawarich
+    newTag: latest
+    digest: sha256:c85fab4769b53c722f702469371de340ddb377eebc7fecc267004666a73f9b22
+  - name: ghcr.io/pmh-only/postgis
+    newTag: 17-3.5-alpine
+    digest: sha256:9f6674861b9a22d4b390298fd1654b9ebf35a9848c2c39d5680ef7ea8558cd7d
+  - name: ghcr.io/pmh-only/redis
+    newTag: alpine
+    digest: sha256:7ba9595f24de98306bc9c2d15a5087a2a05517b57cf9a2f5d533254c7237d067
