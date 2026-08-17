@@ -28,7 +28,7 @@ spec:
             - name: RAILS_ENV
               value: production
             - name: REDIS_URL
-              value: redis://track-redis-service.track.svc.cluster:6379
+              value: redis://track-redis-service.track.svc.cluster.local:6379
             - name: DATABASE_HOST
               value: track-postgis-service.track.svc.cluster.local
             - name: DATABASE_PORT
@@ -40,6 +40,8 @@ spec:
                 secretKeyRef:
                   name: track-secret
                   key: DATABASE_PASSWORD
+            - name: DATABASE_URL
+              value: postgis://postgres:$(DATABASE_PASSWORD)@track-postgis-service.track.svc.cluster.local:5432/dawarich
             - name: DATABASE_NAME
               value: 'dawarich'
             - name: APPLICATION_HOSTS
@@ -106,7 +108,7 @@ spec:
             - name: RAILS_ENV
               value: production
             - name: REDIS_URL
-              value: redis://track-redis-service.track.svc.cluster:6379
+              value: redis://track-redis-service.track.svc.cluster.local:6379
             - name: DATABASE_HOST
               value: track-postgis-service.track.svc.cluster.local
             - name: DATABASE_PORT
@@ -118,6 +120,8 @@ spec:
                 secretKeyRef:
                   name: track-secret
                   key: DATABASE_PASSWORD
+            - name: DATABASE_URL
+              value: postgis://postgres:$(DATABASE_PASSWORD)@track-postgis-service.track.svc.cluster.local:5432/dawarich
             - name: DATABASE_NAME
               value: 'dawarich'
             - name: APPLICATION_HOSTS
