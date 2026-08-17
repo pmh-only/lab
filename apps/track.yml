@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: track
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: track
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: track
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - PruneLast=true
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: track
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: "main"
+      writeBackTarget: "kustomization"
+  applicationRefs:
+    - namePattern: track
+      images:
+        - alias: dawarich
+          imageName: ghcr.io/pmh-only/dawarich:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: postgis
+          imageName: ghcr.io/pmh-only/postgis:17-3.5-alpine
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: redis
+          imageName: ghcr.io/pmh-only/redis:alpine
+          commonUpdateSettings:
+            updateStrategy: digest
