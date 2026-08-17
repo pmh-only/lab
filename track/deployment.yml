@@ -65,6 +65,26 @@ spec:
               value: 'true'
             - name: WEB_CONCURRENCY
               value: '-1'
+            - name: PHOTON_API_HOST
+              value: app.chibigeo.com
+            - name: PHOTON_API_USE_HTTPS
+              value: 'true'
+            - name: PHOTON_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: track-secret
+                  key: PHOTON_API_KEY
+            - name: OIDC_CLIENT_ID
+              value: z7QIEBurowgWfYPDxOLRa7Nx8kJdHGirkCtOlwM4
+            - name: OIDC_ISSUER
+              value: https://auth.pmh.codes/application/o/track/
+            - name: OIDC_REDIRECT_URI
+              value: https://track.pmh.codes/users/auth/openid_connect/callback
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: track-secret
+                  key: OIDC_CLIENT_SECRET
           volumeMounts:
             - mountPath: /var/app/public
               name: track-pvc
@@ -143,6 +163,26 @@ spec:
               value: 'true'
             - name: STORE_GEODATA
               value: 'true'
+            - name: PHOTON_API_HOST
+              value: app.chibigeo.com
+            - name: PHOTON_API_USE_HTTPS
+              value: 'true'
+            - name: PHOTON_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: track-secret
+                  key: PHOTON_API_KEY
+            - name: OIDC_CLIENT_ID
+              value: z7QIEBurowgWfYPDxOLRa7Nx8kJdHGirkCtOlwM4
+            - name: OIDC_ISSUER
+              value: https://auth.pmh.codes/application/o/track/
+            - name: OIDC_REDIRECT_URI
+              value: https://track.pmh.codes/users/auth/openid_connect/callback
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: track-secret
+                  key: OIDC_CLIENT_SECRET
           volumeMounts:
             - mountPath: /var/app/public
               name: track-pvc
