@@ -1,0 +1,222 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: track
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: track
+  template:
+    metadata:
+      labels:
+        app: track
+    spec:
+      containers:
+        - name: track
+          image: ghcr.io/pmh-only/dawarich:latest
+          command:
+            - web-entrypoint.sh
+          args:
+            - bin/rails
+            - server
+            - '-p'
+            - '3000'
+            - '-b'
+            - '::'
+          env:
+            - name: RAILS_ENV
+              value: production
+            - name: REDIS_URL
+              value: redis://track-redis-service.track.svc.cluster:6379
+            - name: DATABASE_HOST
+              value: track-postgis-service.track.svc.cluster.local
+            - name: DATABASE_PORT
+              value: '5432'
+            - name: DATABASE_USERNAME
+              value: postgres
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: track-secret
+                  key: DATABASE_PASSWORD
+            - name: DATABASE_NAME
+              value: 'dawarich'
+            - name: APPLICATION_HOSTS
+              value: track.pmh.codes
+            - name: TIME_ZONE
+              value: Asia/Seoul
+            - name: APPLICATION_PROTOCOL
+              value: https
+            - name: PROMETHEUS_EXPORTER_ENABLED
+              value: 'false'
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: track-secret
+                  key: SECRET_KEY_BASE
+            - name: RAILS_LOG_TO_STDOUT
+              value: 'true'
+            - name: SELF_HOSTED
+              value: 'true'
+            - name: STORE_GEODATA
+              value: 'true'
+            - name: WEB_CONCURRENCY
+              value: '-1'
+          volumeMounts:
+            - mountPath: /var/app/public
+              name: track-pvc
+              subPath: public
+            - mountPath: /var/app/tmp/imports/watched
+              name: track-pvc
+              subPath: watched
+            - mountPath: /var/app/storage
+              name: track-pvc
+              subPath: storage
+            - mountPath: /dawarich_db_data
+              name: track-pvc
+              subPath: dawarich_db_data
+      volumes:
+        - name: track-pvc
+          persistentVolumeClaim:
+            claimName: track-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: track-sidekiq
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: track-sidekiq
+  template:
+    metadata:
+      labels:
+        app: track-sidekiq
+    spec:
+      containers:
+        - name: track-sidekiq
+          image: ghcr.io/pmh-only/dawarich:latest
+          command:
+            - sidekiq-entrypoint.sh
+          args:
+            - sidekiq
+          env:
+            - name: RAILS_ENV
+              value: production
+            - name: REDIS_URL
+              value: redis://track-redis-service.track.svc.cluster:6379
+            - name: DATABASE_HOST
+              value: track-postgis-service.track.svc.cluster.local
+            - name: DATABASE_PORT
+              value: '5432'
+            - name: DATABASE_USERNAME
+              value: postgres
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: track-secret
+                  key: DATABASE_PASSWORD
+            - name: DATABASE_NAME
+              value: 'dawarich'
+            - name: APPLICATION_HOSTS
+              value: track.pmh.codes
+            - name: BACKGROUND_PROCESSING_CONCURRENCY
+              value: '3'
+            - name: APPLICATION_PROTOCOL
+              value: https
+            - name: PROMETHEUS_EXPORTER_ENABLED
+              value: 'false'
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: track-secret
+                  key: SECRET_KEY_BASE
+            - name: RAILS_LOG_TO_STDOUT
+              value: 'true'
+            - name: SELF_HOSTED
+              value: 'true'
+            - name: STORE_GEODATA
+              value: 'true'
+          volumeMounts:
+            - mountPath: /var/app/public
+              name: track-pvc
+              subPath: public
+            - mountPath: /var/app/tmp/imports/watched
+              name: track-pvc
+              subPath: watched
+            - mountPath: /var/app/storage
+              name: track-pvc
+              subPath: storage
+      volumes:
+        - name: track-pvc
+          persistentVolumeClaim:
+            claimName: track-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: track-postgis
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: track-postgis
+  template:
+    metadata:
+      labels:
+        app: track-postgis
+    spec:
+      containers:
+        - name: track-postgis
+          image: ghcr.io/pmh-only/postgis:17-3.5-alpine
+          env:
+            - name: DATABASE_USERNAME
+              value: postgres
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: track-secret
+                  key: DATABASE_PASSWORD
+            - name: POSTGRES_DB
+              value: 'dawarich'
+          volumeMounts:
+            - mountPath: /var/shared
+              name: track-pvc
+              subPath: shared
+            - mountPath: /var/lib/postgresql/data
+              name: track-pvc
+              subPath: dawarich_db_data
+      volumes:
+        - name: track-pvc
+          persistentVolumeClaim:
+            claimName: track-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: track-redis
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: track-redis
+  template:
+    metadata:
+      labels:
+        app: track-redis
+    spec:
+      containers:
+        - name: track-redis
+          image: ghcr.io/pmh-only/redis:alpine
+          args:
+            - redis-server --save 900 1 --save 300 10 --appendonly no
+          volumeMounts:
+            - mountPath: /data
+              name: track-pvc
+              subPath: shared
+      volumes:
+        - name: track-pvc
+          persistentVolumeClaim:
+            claimName: track-pvc
