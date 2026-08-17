@@ -172,9 +172,9 @@ spec:
         - name: track-postgis
           image: ghcr.io/pmh-only/postgis:17-3.5-alpine
           env:
-            - name: DATABASE_USERNAME
+            - name: POSTGRES_USERNAME
               value: postgres
-            - name: DATABASE_PASSWORD
+            - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: track-secret
@@ -211,7 +211,15 @@ spec:
         - name: track-redis
           image: ghcr.io/pmh-only/redis:alpine
           args:
-            - redis-server --save 900 1 --save 300 10 --appendonly no
+            - redis-server
+            - --save
+            - '900'
+            - '1'
+            - --save
+            - '300'
+            - '10'
+            - --appendonly
+            - 'no'
           volumeMounts:
             - mountPath: /data
               name: track-pvc
