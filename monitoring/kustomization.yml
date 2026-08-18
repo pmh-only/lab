@@ -16,7 +16,7 @@ images:
     digest: sha256:e925ba95a07372527cd79827381f83f3fe7895511ee46508e35fd9400b56a369
   - name: ghcr.io/pmh-only/grafana
     newTag: latest
-    digest: sha256:3e90cf8f01959cdbdd1a2b0243b0bcd5dfd3eb2a296b236ad90af92e9ac894c4
+    digest: sha256:98fff32d911af402c05738441c555eef9ebecd1c45f238b75f444f9a2d5e6f55
   - name: quay.io/prometheus/node-exporter
     newTag: latest
     digest: sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
