@@ -22,7 +22,7 @@ images:
     digest: sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
   - name: quay.io/prometheus/prometheus
     newTag: latest
-    digest: sha256:508729e0e2d18e11fd742a5a5ca70e557b940a93948c3c95fd0123a6fd538b69
+    digest: sha256:5ce7540c3c00ef4ab0c9d2c995c6a5b9c421f44b4a115d97a2c7af3b1c21cbb0
   - name: registry.k8s.io/kube-state-metrics/kube-state-metrics
     newTag: v2.13.0
     digest: sha256:639a1e2da549210adddc0391ff91e270e83f7873014aec53258462812f741e6f
