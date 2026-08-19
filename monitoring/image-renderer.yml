@@ -21,6 +21,8 @@ spec:
           env:
             - name: HTTP_HOST
               value: 0.0.0.0
+            - name: TZ
+              value: Asia/Seoul
             - name: BROWSER_TZ
               value: Asia/Seoul
             - name: RENDERING_MODE
