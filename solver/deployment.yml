@@ -12,6 +12,7 @@ spec:
       labels:
         app: solver
     spec:
+      ServiceAccountName: solver
       containers:
         - name: solver
           image: ghcr.io/pmh-only/solver:latest
