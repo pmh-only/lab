@@ -18,6 +18,10 @@ spec:
           enabled: true
           server: https://vault.pmh.codes
 
+        passkey:
+          enabled: true
+          storageClass: local-path
+
         sealedSecret:
           enabled: true
           encryptedData:
@@ -25,6 +29,7 @@ spec:
             MAIL_ROSTACK_TOKEN: "AgA5Bs8rJh8lAUyXAfU9sSGdF9IhzmPiuLO0RxEHC3wPHxza+iIjRZQVexXhEvCjJGDDKoEhqh0PXXU3UuBTuetDo/kS5V/B63zZIVEP9nXc9r7YsR+4TX+PujR4dAEfDLeNwBLkj2K7URnt7E879TxCvNHam2owvFwR8rxufuU7p7Z8E+mvPlvmd+B9YOPwdOvnYF7KB7FI91OYAdl5HEWWogcG0Qx12T04VBnkRalAfQtazLFIA9qyYCmUquQ8UAMfgd+cTV1zznBXl7RYcpRIjbYjpUleMpOLwHCLRzdHyfWbBu0nZum4RyAd66+LT4MVF847lSpEJ7S6rCRxR2u/vYleUknYQX1nuQgQ5rY2g/cuxizGDs9NYS2lmRwejNYFfRK4W6DcWagPTl8atevDUBvTRwzPsZT+BqdNymTUwOS4lL8h090XIEAu/iQe4gJnt0BgrgWBM4Frys2KJcAm3krNqdXy+DSCpdWPtWGtx5+LvX1oOVeeU96OOnvz0l/1WA/9fJ+w2cta68jCgkKRJq1/FxhikZ0iPrfCxZOjVRI64dONWMe+8nc2pwIcntfJp6wBICdT8MUK1i3Z7Lj1bl/byfuH6iikrZhWsfNLtExU/HN9F6nrBYI+kjF1xcSMRNIzwgg5Vs1fm+F+DGytzn3CYBcdcwxgBhQmMPmz/urRpHoCIam7nBb4TA+8jyWLjhSJ1jyDdNXraeoaeqP/V4EAp5B/n8apCoHd3uGOQ+xZ/IcDjkBwwmUHxCeObHt0"
             BW_CLIENTID: "AgCNvnPsZ5jQnaNCr/snsOg47KWdVo3yFN/ZnI9G1UpR3msvrhZYTFcGwkyyMwsCH0Dh+53KyBL9vOkdeq61F/xE/UAWIrJROmhtgBgTmr2RA6YrHPzXvFEfdBY18AzGl3AdEaA0aH7vcfjacvcBTxYT0jTqB+cLCcbfygq324E2dXW/Nk5n9lbAduZvDCrAGOgJnOOEniAAi9EeKNvchjNB1YEcs5AqilU28rPf6fipRjs3jprGIp7OpDDTE+t+XFVy3ukB+r7bdCpLsdNN83woKpVumyIDKW9JpNFpttAbgauicuLOX095M9nmahdvx6fm2Y+9s8InG0w/dULeP/JtCcv/HZU+Oranc1gP6pODSspeEke/RW6x7mZmgX1lGhUMIRsxMyc3xgO233ECl5tg/xile6BZA5LRluudX8z46uICPvNQ3teg08t/nxJdR11fimwIAoqmumEXvbAtLcyojhjvxEawvtQSbYDPKHSeTO5eFUSEs/BwlsMlkwW96KPIbvQuPcu5k72FR7fvFFp5j4jkcpO1LfcUwjim/NSf0JB8J3TzTYKcb6PHAJ5HJSmiR24MmWfeUTtiHV4VlsjMpCeqVSL5Hcs0/uNNwAk67SF8tb/a298aPdnmJUtpZYcqtN46PMspCF+ulW//7W22h+Rb2GfAv04HV7AWbynIOYKiIuSdr7UNVQgZDyOE5cOuzKbQB0kui4KHW1D1rK1+j8Ed5zGyL34FmhKTqLW3ZdSoTzPdwbN+Pw=="
             BW_CLIENTSECRET: "AgAkmiFVHs3pMuOdHOESd3888FRsNHU1vkesKStwktyND71OI3l+GEohkX/q+BvliDrOrFTaw/YtWTktXDkx+UdqzW5iby5qLBxYgYyvBSHzaWA8b9IquYOm3jtg+NBOD/yyl9L48Y/+M472dGaopa24e3H0IqWxSQ1CJtuC7JGKiaEhjcuGi9frR2k1enH8ZA0iH1mXvEK5HaZMfiiIpVlJI3QvncgV4X22BJQSwXbAWPnRpnWmbeiDk+znyGbDaL7wYGE/GeVoyOMDEpCLjiaGaMvEjUPLGZy37Pj4W7o/Sy+062IpKTUI1gedILCyW+61TapOtrqJ6chsSMQzLW8J/mgEjLGT8M3wFCW4BsecKjbGN9EAK+73ASL4wjSLzvGYCV733O9rqoC0eY9zMXN4sn4MnxmidXfF+9g1Wu0hsKKIJOEodg8psaFJX4f0zA3aNKkzfbe0QvT2Ws9RmqbO5R9krNi5Y8T5FNKKILZ2kcsLNPzRRKzvlqcLW5uxYADheA7BjAbcLNCkUa42n9rh31mDQBHPgiINDorbaKJeePp4FOdZFRjvuLSUddkTGDlJ1QlVadNOod4uOAdBxGhaJH5ZXNIrJPXK8zkNyl+syojld3q7vFMwOdCtr+baMrr6FxaEW3jcS8YCq+iWIAMZ+I61GXE0e9tv/fLhfwPloQ5rxMQ3jUUhgVw8yfadsFwDFCiCNU5yz2zOzqhb3lzKJzhWgLbBfUYIFWc5DOE="
+            PASSKEY_SETUP_TOKEN: "AgADERogb31EOhY5gOERv8EzxzisWAFUlQxPkZSguHLBdGckX+igvLSLPkWXL9PiEgtRdfivmg7HFODMZlPdnVGEpMW29fDhbVcsE2amCCotJCbZaYU4YZwnADS06PEn+vlJ1GwQgOhQVLZ5nt8v/zVh4ytH5jmHsPX1Fc0j88rt8S5lhyLyJVsBtOPMOktNKjtTMIa7rvWihQD2z+N0XvvKZ12bVk6WuLObgemCw/3fy0s5hyyx7weyqa/InbRo57Dkf/naF5SLSaWuoIPqo2yBOq8CnXrKWETvtfcuUvibf8FIQTBWI/XL+BtgCT5rOWjc5gEG4yjChB4G9nZCmIAwBr1ZrWBl5e1LhzNk87jaTYJ7p3Ynp7GAz542zzWoIed/d/ggcNTpddyTSSUHZlebhgkQUnMkbAuUH8p7YeC1pICPpH+4NqLGbCGEP1QVe2RUvi+t9sVTZntvCs3o8bs0IjumfB+Lpv6wRvNgQcmmfJco+HEc/fZ6UKGr1OnGbnlPNQE3i8AL0RvJ+T0uL3riVTgym4GmqybGCzzvdD+/nDo0pQtajrUX0tLxE+4j7LjR/xBadAqnTxPS8wsV+KPeScX2+rgFLpyfArZurY7FJgFaKqXUxKwEBz/7RukIrs1MK+X44K2vYBcZXjaMw/51st1yLVeFtMEcEvnvrdUlWdSSCnpsZu31Rf6J+vCdRVVMG6IFU/xjPnNGsb/1znNnFg/PJzwaR0tY/Uvh96NoDr+AKRwbG0nVdq/sUQ=="
 
         gatewayApi:
           enabled: true
