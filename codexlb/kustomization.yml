@@ -8,5 +8,5 @@ resources:
   - ./ingress.yml
 images:
   - name: ghcr.io/soju06/codex-lb
-    newTag: latest
-    digest: sha256:3b369ac16e03d31b940be35dd8e61583f9cbd74bfca5e92e4bd03bfec62e5b13
+    newTag: beta
+    digest: sha256:d9df6fdef5d900bf96cd6e183b5d2d8abf9387f9cca642e317206ced5362c704
