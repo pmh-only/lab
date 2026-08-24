@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: codexlb
-          image: ghcr.io/soju06/codex-lb:latest
+          image: ghcr.io/soju06/codex-lb:beta
           ports:
             - containerPort: 2455
           env:
