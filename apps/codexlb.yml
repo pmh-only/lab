@@ -39,6 +39,6 @@ spec:
     - namePattern: codexlb
       images:
         - alias: codexlb
-          imageName: ghcr.io/soju06/codex-lb:latest
+          imageName: ghcr.io/soju06/codex-lb:beta
           commonUpdateSettings:
             updateStrategy: digest
