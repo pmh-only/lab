@@ -1,9 +1,10 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: nameserver
 spec:
   revisionHistoryLimit: 0
+  serviceName: nameserver
   selector:
     matchLabels:
       app: nameserver
@@ -21,6 +22,13 @@ spec:
       containers:
         - name: nameserver
           image: ghcr.io/pmh-only/technitium:latest
+          ports:
+          - containerPort: 53
+            hostPort: 53
+            protocol: TCP
+          - containerPort: 53
+            hostPort: 53
+            protocol: UDP
           env:
             - name: DNS_SERVER_DOMAIN
               value: pmhdns
