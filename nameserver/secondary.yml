@@ -1,17 +1,26 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
-  name: nameserver
+  name: nameserver-secondary
 spec:
   revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: nameserver
+      app: nameserver-secondary
   template:
     metadata:
       labels:
-        app: nameserver
+        app: nameserver-secondary
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: NotIn
+                values:
+                  - 'true'
       securityContext:
         sysctls:
           - name: net.ipv4.ip_local_port_range
@@ -19,13 +28,10 @@ spec:
       containers:
         - name: nameserver
           image: ghcr.io/pmh-only/technitium:latest
-          env:
-            - name: DNS_SERVER_DOMAIN
-              value: pmhdns
           volumeMounts:
             - name: nameserver
               mountPath: /etc/dns
       volumes:
         - name: nameserver
-          persistentVolumeClaim:
-            claimName: nameserver-pvc
+          hostPath:
+            path: /etc/dns
