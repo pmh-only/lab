@@ -1,0 +1,31 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nameserver-tls-secret
+  namespace: nameserver
+spec:
+  dnsNames:
+    - "ns1.pmh.codes"
+    - "ns2.pmh.codes"
+    - "ns3.pmh.codes"
+    - "ns1.internal.pmh.codes"
+    - "ns2.internal.pmh.codes"
+    - "ns3.internal.pmh.codes"
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt
+  secretName: nameserver-tls-secret
+  keystores:
+    pkcs12:
+      create: true
+      passwordSecretRef:
+        name: nameserver-tls-keystore
+        key: password
+      profile: Modern2023
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  usages:
+    - digital signature
+    - key encipherment
