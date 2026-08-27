@@ -6,6 +6,8 @@ resources:
   - ./secondary.yml
   - ./service.yml
   - ./ingress.yml
+  - ./certificate.yml
+  - ./secret.yml
   - ./pvc.yml
 images:
   - name: ghcr.io/pmh-only/technitium
