@@ -25,7 +25,3 @@ spec:
     - name: doh
       protocol: TCP
       port: 80
-
-    - name: cluster
-      protocol: TCP
-      port: 53443

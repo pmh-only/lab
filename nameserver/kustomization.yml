@@ -2,13 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: nameserver
 resources:
-  - ./primary.yml
-  - ./secondary.yml
+  - ./daemonset.yml
   - ./service.yml
   - ./ingress.yml
   - ./certificate.yml
   - ./secret.yml
-  - ./pvc.yml
 images:
   - name: ghcr.io/pmh-only/technitium
     newTag: latest

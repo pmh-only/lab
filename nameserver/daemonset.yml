@@ -1,26 +1,17 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: nameserver-secondary
+  name: nameserver
 spec:
   revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: nameserver-secondary
+      app: nameserver
   template:
     metadata:
       labels:
-        app: nameserver-secondary
+        app: nameserver
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/control-plane
-                operator: NotIn
-                values:
-                  - 'true'
       securityContext:
         sysctls:
           - name: net.ipv4.ip_local_port_range
