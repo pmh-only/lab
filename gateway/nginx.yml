@@ -258,20 +258,6 @@ data:
         listen 22;
         proxy_pass here-ssh-service.here.svc.cluster.local:22;
       }
-
-      server {
-        listen 53;
-        proxy_protocol on;
-        proxy_pass nameserver.nameserver.svc.cluster.local:538;
-      }
-
-      server {
-        listen 53 udp;
-        proxy_protocol on;
-        proxy_pass nameserver.nameserver.svc.cluster.local:538;
-        proxy_timeout 1s;
-        proxy_responses 1;
-      }
     }
 ---
 apiVersion: apps/v1

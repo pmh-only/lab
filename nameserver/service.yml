@@ -22,16 +22,6 @@ spec:
       port: 53
       targetPort: 53
 
-    - name: dnsproxy
-      protocol: UDP
-      port: 538
-      targetPort: 538
-
-    - name: dnsproxytcp
-      protocol: TCP
-      port: 538
-      targetPort: 538
-
     - name: doh
       protocol: TCP
       port: 80

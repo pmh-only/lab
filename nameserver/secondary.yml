@@ -36,6 +36,12 @@ spec:
           - containerPort: 53443
             hostPort: 53443
             protocol: TCP
+          - containerPort: 53
+            hostPort: 53
+            protocol: TCP
+          - containerPort: 53
+            hostPort: 53
+            protocol: UDP
           volumeMounts:
             - name: nameserver
               mountPath: /etc/dns
