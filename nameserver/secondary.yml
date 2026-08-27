@@ -12,10 +12,6 @@ spec:
       labels:
         app: nameserver-secondary
     spec:
-      dnsPolicy: None
-      dnsConfig:
-        nameservers:
-          - 172.17.0.20
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
