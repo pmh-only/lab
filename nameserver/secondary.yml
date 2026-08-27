@@ -28,6 +28,10 @@ spec:
       containers:
         - name: nameserver
           image: ghcr.io/pmh-only/technitium:latest
+          ports:
+          - containerPort: 53443
+            hostPort: 53443
+            protocol: TCP
           volumeMounts:
             - name: nameserver
               mountPath: /etc/dns
