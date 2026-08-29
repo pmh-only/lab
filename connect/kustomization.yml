@@ -10,4 +10,4 @@ resources:
 images:
   - name: ghcr.io/pmh-only/connect
     newTag: latest
-    digest: sha256:4b30643a1b453fccf20f8eded87f4af9599e423a225007e5ecaf345bf236b8ec
+    digest: sha256:98d6ed47f92085a9f80d54b836c2fee4d652aefbf8755d502cb52ebdf9381ff3
