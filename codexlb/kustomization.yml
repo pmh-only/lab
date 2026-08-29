@@ -6,7 +6,3 @@ resources:
   - ./service.yml
   - ./pvc.yml
   - ./ingress.yml
-images:
-  - name: ghcr.io/soju06/codex-lb
-    newTag: beta
-    digest: sha256:2c1b6f7340633b3f436af0056c361038afb4036ef3b0c9851db32a26c61b1e34
