@@ -6,3 +6,7 @@ resources:
   - ./service.yml
   - ./pvc.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/aafqaq/codex-lb-enhanced
+    newTag: latest
+    digest: sha256:f7240cdcc819b8a3468818919db70e9fb0ef06149c6885cc031dc3bd99151f2d
