@@ -19,7 +19,7 @@ spec:
             - containerPort: 2455
           env:
             - name: CODEX_LB_HTTP_RESPONSES_SESSION_BRIDGE_AMBIGUOUS_CONTINUATION_RECOVERY_MODE
-              value: /server_indefinite_recovery
+              value: server_indefinite_recovery
             - name: CODEX_LB_DATA_DIR
               value: /var/lib/codex-lb
           volumeMounts:
