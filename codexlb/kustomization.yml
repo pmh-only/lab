@@ -9,4 +9,4 @@ resources:
 images:
   - name: ghcr.io/aafqaq/codex-lb-enhanced
     newTag: latest
-    digest: sha256:49542e2cb8543d7cdee88085fba41ad10d83e40e66ecf0e5a3cdd1d5da52158b
+    digest: sha256:e495395eca492d6db32f25c351685516abd426d40c020769ab5e21fb6dbba7a8
