@@ -10,7 +10,7 @@ resources:
 images:
   - name: ghcr.io/pmh-only/dawarich
     newTag: latest
-    digest: sha256:f33f302bc49ff0ec6af7720c6d08d57423427bdb6c54b2f6726b99899c1e98b1
+    digest: sha256:8653f1d9be645aeae456d0c60d605f9a3b8eda6bd6a39107058d3b71382d16cb
   - name: ghcr.io/pmh-only/postgis
     newTag: 17-3.5-alpine
     digest: sha256:a2f9a5c63bdb8cf101d34641339719017a0fd80da2bf2cb233761cabc1d33495
