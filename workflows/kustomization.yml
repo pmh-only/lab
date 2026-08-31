@@ -10,4 +10,4 @@ resources:
 images:
   - name: ghcr.io/n8n-io/n8n
     newTag: latest
-    digest: sha256:cfe2704ff858395503d42548206c2c99ea351a205e941063a9d9b77b0f404478
+    digest: sha256:a9e2e3c8006ed453238266669ea1274be7136f515abe290a2f75a0ab9044c93d
