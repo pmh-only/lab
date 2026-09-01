@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bird
+  namespace: as218822
+spec:
+  clusterIP: None
+  selector:
+    app: bird
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bird
+  namespace: as218822
+spec:
+  serviceName: bird
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bird
+  template:
+    metadata:
+      labels:
+        app: bird
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      terminationGracePeriodSeconds: 30
+
+      containers:
+        - name: bird
+          image: ghcr.io/pmh-only/as218822:latest
+          imagePullPolicy: Always
+
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_ADMIN
+                - NET_BIND_SERVICE
+                - NET_RAW
+
+          env:
+            - name: DOTENV_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bird-dotenvx
+                  key: DOTENV_PRIVATE_KEY
+
+          startupProbe:
+            exec:
+              command:
+                - birdc
+                - -s
+                - /run/bird/bird.ctl
+                - show
+                - status
+            periodSeconds: 5
+            failureThreshold: 60
+
+          readinessProbe:
+            exec:
+              command:
+                - birdc
+                - -s
+                - /run/bird/bird.ctl
+                - show
+                - status
+            periodSeconds: 10
+
+          livenessProbe:
+            exec:
+              command:
+                - birdc
+                - -s
+                - /run/bird/bird.ctl
+                - show
+                - status
+            periodSeconds: 30
+            failureThreshold: 3
+
+          volumeMounts:
+            - name: run
+              mountPath: /run/bird
+            - name: zerotier-state
+              mountPath: /var/lib/zerotier-one
+            - name: tun
+              mountPath: /dev/net/tun
+
+      volumes:
+        - name: run
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Mi
+        - name: zerotier-state
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Mi
+        - name: tun
+          hostPath:
+            path: /dev/net/tun
+            type: CharDevice
