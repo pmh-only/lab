@@ -10,4 +10,4 @@ images:
     digest: sha256:754e71685e716254c1df1cf0e58b6e3c6e1263220291d0d250c4c3bcd3821641
   - name: ghcr.io/pmh-only/as218822
     newTag: latest
-    digest: sha256:fa058402f14a1f56e17df081337a87c3a41778efe8ffac792c67962b8106b090
+    digest: sha256:072625a9512dea43d77bff941f775a17f9f94a84948e14fa76f4739a8b3e0f1b
