@@ -28,6 +28,9 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       terminationGracePeriodSeconds: 30
 
+      nodeSelector:
+        infra.pmh.codes/bgp: enabled
+
       containers:
         - name: bird
           image: ghcr.io/pmh-only/as218822:latest
