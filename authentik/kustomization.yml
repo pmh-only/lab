@@ -9,4 +9,4 @@ resources:
   - ./ingress.yml
 images:
   - name: ghcr.io/goauthentik/server
-    newTag: 2026.8.0
+    newTag: 2026.8.1
