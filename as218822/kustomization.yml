@@ -18,3 +18,4 @@ images:
     digest: sha256:4732fb2e8b6522d2cf518146ca705f95bd17443beadaca6235c8f09d26c3c61d
   - name: ghcr.io/tailscale/tailscale
     newTag: latest
+    digest: sha256:8c42c4574ab066384fcb72f69e086a2ff1dd3652eb6f56856cee34bcf0d2f680
