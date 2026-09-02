@@ -142,6 +142,51 @@ spec:
               mountPath: /var/lib/zerotier-one
             - name: tun
               mountPath: /dev/net/tun
+        - name: looking-glass
+          image: ghcr.io/pmh-only/as218822-looking-glass:latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_RAW
+          env:
+            - name: LG_ALLOWED_ORIGINS
+              value: https://as218822.net,https://www.as218822.net
+            - name: LG_HOST
+              value: 0.0.0.0
+            - name: LG_LOCATION
+              value: core
+            - name: LG_TRUST_PROXY
+              value: "1"
+          ports:
+            - name: looking-glass
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: looking-glass
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: looking-glass
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          volumeMounts:
+            - name: run
+              mountPath: /run/bird
+              readOnly: true
         - name: tailscale
           image: ghcr.io/tailscale/tailscale:latest
           env:
