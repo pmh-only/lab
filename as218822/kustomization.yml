@@ -3,6 +3,8 @@ kind: Kustomization
 namespace: as218822
 resources:
   - ./bird.yml
+  - ./gre-gateway.yml
+  - ./router-secret.yml
   - ./secret.yml
 images:
   - name: ghcr.io/pmh-only/here
@@ -11,3 +13,7 @@ images:
   - name: ghcr.io/pmh-only/as218822
     newTag: latest
     digest: sha256:f075ff44189b2dce5e4ad1bd207f99da26ed4fa093b2480ddd42500c83c6821a
+  - name: ghcr.io/pmh-only/as218822-gre-gateway
+    newTag: latest
+  - name: ghcr.io/tailscale/tailscale
+    newTag: latest
