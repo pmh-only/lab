@@ -46,6 +46,10 @@ spec:
           imageName: ghcr.io/pmh-only/as218822-gre-gateway:latest
           commonUpdateSettings:
             updateStrategy: digest
+        - alias: looking-glass
+          imageName: ghcr.io/pmh-only/as218822-looking-glass:latest
+          commonUpdateSettings:
+            updateStrategy: digest
         - alias: tailscale
           imageName: ghcr.io/tailscale/tailscale:latest
           commonUpdateSettings:

@@ -4,6 +4,7 @@ namespace: as218822
 resources:
   - ./bird.yml
   - ./gre-gateway.yml
+  - ./looking-glass.yml
   - ./router-secret.yml
   - ./secret.yml
 images:
@@ -16,6 +17,8 @@ images:
   - name: ghcr.io/pmh-only/as218822-gre-gateway
     newTag: latest
     digest: sha256:3da1b5377d465de93a1ffc45f0506db3782be44d92104a0ec9e8fd7dfd57f8e0
+  - name: ghcr.io/pmh-only/as218822-looking-glass
+    newTag: latest
   - name: ghcr.io/tailscale/tailscale
     newTag: latest
     digest: sha256:8c42c4574ab066384fcb72f69e086a2ff1dd3652eb6f56856cee34bcf0d2f680
