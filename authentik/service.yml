@@ -3,8 +3,6 @@ kind: Service
 metadata:
   name: authentik-service
 spec:
-  externalTrafficPolicy: Local
-  internalTrafficPolicy: Local
   selector:
     app: authentik-server
   ports:

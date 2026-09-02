@@ -6,6 +6,8 @@ spec:
   clusterIP: 172.17.0.20
   selector:
     app: nameserver
+  externalTrafficPolicy: Local
+  internalTrafficPolicy: Local
   ports:
     - name: webconsole
       protocol: TCP
