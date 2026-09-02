@@ -52,6 +52,8 @@ spec:
     chart: cert-manager-technitium-webhook
     helm:
       valuesObject:
+        nodeSelector:
+          infra.pmh.codes/primary: "true"
         image:
           repository: ghcr.io/pmh-only/cert-manager-technitium-webhook
     repoURL: https://kittizz.github.io/cert-manager-technitium-webhook
