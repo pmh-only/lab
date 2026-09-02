@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bird-gre-gateway
+  namespace: as218822
+spec:
+  serviceName: bird-gre-gateway
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bird-gre-gateway
+  template:
+    metadata:
+      labels:
+        app: bird-gre-gateway
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      terminationGracePeriodSeconds: 30
+      nodeSelector:
+        infra.pmh.codes/bgp: enabled
+      initContainers:
+        - name: forwarding
+          image: ghcr.io/tailscale/tailscale:latest
+          command:
+            - /bin/sh
+            - -ceu
+            - |
+              sysctl -w net.ipv6.conf.all.forwarding=1
+          securityContext:
+            privileged: true
+      containers:
+        - name: bird
+          image: ghcr.io/pmh-only/as218822-gre-gateway:latest
+          imagePullPolicy: Always
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_ADMIN
+                - NET_BIND_SERVICE
+                - NET_RAW
+          env:
+            - name: WG_GRE_GATEWAY_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: as218822-router-wireguard
+                  key: WG_GRE_GATEWAY_PRIVATE_KEY
+          startupProbe:
+            exec:
+              command:
+                - birdc
+                - -s
+                - /run/bird/bird.ctl
+                - show
+                - status
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command:
+                - birdc
+                - -s
+                - /run/bird/bird.ctl
+                - show
+                - status
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - birdc
+                - -s
+                - /run/bird/bird.ctl
+                - show
+                - status
+            periodSeconds: 30
+            failureThreshold: 3
+          volumeMounts:
+            - name: run
+              mountPath: /run/bird
+      volumes:
+        - name: run
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Mi

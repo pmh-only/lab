@@ -42,3 +42,11 @@ spec:
           imageName: ghcr.io/pmh-only/as218822:latest
           commonUpdateSettings:
             updateStrategy: digest
+        - alias: gre-gateway
+          imageName: ghcr.io/pmh-only/as218822-gre-gateway:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: tailscale
+          imageName: ghcr.io/tailscale/tailscale:latest
+          commonUpdateSettings:
+            updateStrategy: digest
