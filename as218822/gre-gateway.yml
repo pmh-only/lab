@@ -47,6 +47,16 @@ spec:
                 secretKeyRef:
                   name: as218822-router-wireguard
                   key: WG_GRE_GATEWAY_PRIVATE_KEY
+            - name: WG_LUNALIGHT_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: as218822-router-wireguard
+                  key: WG_LUNALIGHT_PRIVATE_KEY
+            - name: WG_LUNALIGHT_PRESHARED_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: as218822-router-wireguard
+                  key: WG_LUNALIGHT_PRESHARED_KEY
           startupProbe:
             exec:
               command:
