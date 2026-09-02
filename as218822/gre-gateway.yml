@@ -5,7 +5,7 @@ metadata:
   namespace: as218822
 spec:
   serviceName: bird-gre-gateway
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: bird-gre-gateway
