@@ -51,7 +51,7 @@ metadata:
   namespace: as218822
 spec:
   serviceName: bird
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: bird
