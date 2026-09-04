@@ -52,11 +52,6 @@ spec:
         app: ripe-atlas-as218822
     spec:
       serviceAccountName: bird
-      dnsPolicy: None
-      dnsConfig:
-        nameservers:
-          - 1.1.1.1
-          - 8.8.8.8
       nodeSelector:
         infra.pmh.codes/bgp: enabled
       containers:
@@ -126,6 +121,17 @@ spec:
               value: --exit-node=100.91.148.11 --exit-node-allow-lan-access --advertise-tags=tag:k8s
           securityContext:
             privileged: true
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -ceu
+                  - |
+                    until ip route show table 52 | grep -q '^default dev tailscale0'; do
+                      sleep 1
+                    done
+                    ip route replace throw 10.43.0.0/16 table 52
           volumeMounts:
             - name: tun
               mountPath: /dev/net/tun
