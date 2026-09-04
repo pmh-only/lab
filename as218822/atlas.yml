@@ -73,6 +73,8 @@ spec:
           env:
             - name: RXTXRPT
               value: "yes"
+            - name: SSH_ADDRESS_FAMILY
+              value: inet6
             - name: WAIT_FOR_INTERFACE
               value: tailscale0
           resources:
@@ -136,7 +138,7 @@ spec:
                     done
                     ip route replace throw 10.43.0.0/16 table 52
                     ip route replace throw 172.17.0.0/16 table 52
-                    ip -6 route replace unreachable default table 52
+                    ip route replace unreachable default table 52
           volumeMounts:
             - name: tun
               mountPath: /dev/net/tun
