@@ -10,3 +10,131 @@ spec:
   resources:
     requests:
       storage: 100Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ripe-atlas-as218822
+  namespace: as218822
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ripe-atlas-as218822
+  namespace: as218822
+spec:
+  clusterIP: None
+  selector:
+    app: ripe-atlas-as218822
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ripe-atlas-as218822
+  namespace: as218822
+spec:
+  serviceName: ripe-atlas-as218822
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ripe-atlas-as218822
+  template:
+    metadata:
+      labels:
+        app: ripe-atlas-as218822
+    spec:
+      serviceAccountName: bird
+      nodeSelector:
+        infra.pmh.codes/bgp: enabled
+      containers:
+        - name: ripe-atlas
+          image: ghcr.io/pmh-only/as218822-ripe-atlas:latest
+          imagePullPolicy: Always
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - CHOWN
+                - DAC_OVERRIDE
+                - FOWNER
+                - KILL
+                - NET_RAW
+                - SETGID
+                - SETUID
+          env:
+            - name: RXTXRPT
+              value: "yes"
+            - name: WAIT_FOR_INTERFACE
+              value: tailscale0
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          startupProbe:
+            exec:
+              command:
+                - test
+                - -s
+                - /etc/ripe-atlas/probe_key.pub
+            periodSeconds: 5
+            failureThreshold: 120
+          volumeMounts:
+            - name: config
+              mountPath: /etc/ripe-atlas
+            - name: run
+              mountPath: /run/ripe-atlas
+            - name: spool
+              mountPath: /var/spool/ripe-atlas
+        - name: tailscale
+          image: ghcr.io/tailscale/tailscale:latest
+          env:
+            - name: TS_KUBE_SECRET
+              value: ripe-atlas-as218822-tailscale
+            - name: TS_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: tailscale-oauth
+                  key: client_id
+            - name: TS_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: tailscale-oauth
+                  key: client_secret
+            - name: TS_HOSTNAME
+              value: ripe-atlas-as218822
+            - name: TS_USERSPACE
+              value: "false"
+            - name: TS_ACCEPT_DNS
+              value: "false"
+            - name: TS_EXTRA_ARGS
+              value: --exit-node=as218822-exit --exit-node-allow-lan-access --advertise-tags=tag:k8s
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: tun
+              mountPath: /dev/net/tun
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: ripe-atlas-as218822
+        - name: run
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Mi
+        - name: spool
+          emptyDir:
+            sizeLimit: 100Mi
+        - name: tun
+          hostPath:
+            path: /dev/net/tun
+            type: CharDevice
