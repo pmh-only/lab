@@ -35,13 +35,14 @@ spec:
     app: ripe-atlas-as218822
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: ripe-atlas-as218822
   namespace: as218822
 spec:
-  serviceName: ripe-atlas-as218822
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: ripe-atlas-as218822
