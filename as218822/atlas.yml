@@ -11,6 +11,75 @@ spec:
     requests:
       storage: 100Mi
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ripe-atlas-ipv4
+  namespace: as218822
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: ripe-atlas-ipv4
+  template:
+    metadata:
+      labels:
+        app: ripe-atlas-ipv4
+    spec:
+      containers:
+        - name: ripe-atlas
+          image: ghcr.io/pmh-only/as218822-ripe-atlas:latest
+          imagePullPolicy: Always
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - CHOWN
+                - DAC_OVERRIDE
+                - FOWNER
+                - KILL
+                - NET_RAW
+                - SETGID
+                - SETUID
+          env:
+            - name: RXTXRPT
+              value: "yes"
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          startupProbe:
+            exec:
+              command:
+                - test
+                - -s
+                - /etc/ripe-atlas/probe_key.pub
+            periodSeconds: 5
+            failureThreshold: 120
+          volumeMounts:
+            - name: config
+              mountPath: /etc/ripe-atlas
+            - name: run
+              mountPath: /run/ripe-atlas
+            - name: spool
+              mountPath: /var/spool/ripe-atlas
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: ripe-atlas
+        - name: run
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Mi
+        - name: spool
+          emptyDir:
+            sizeLimit: 100Mi
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
