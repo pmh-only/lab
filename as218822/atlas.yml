@@ -117,7 +117,7 @@ spec:
             - name: TS_ACCEPT_DNS
               value: "false"
             - name: TS_EXTRA_ARGS
-              value: --exit-node=as218822-exit --exit-node-allow-lan-access --advertise-tags=tag:k8s
+              value: --exit-node=100.91.148.11 --exit-node-allow-lan-access --advertise-tags=tag:k8s
           securityContext:
             privileged: true
           volumeMounts:
