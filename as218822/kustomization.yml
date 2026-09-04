@@ -17,7 +17,7 @@ images:
     digest: sha256:754e71685e716254c1df1cf0e58b6e3c6e1263220291d0d250c4c3bcd3821641
   - name: ghcr.io/pmh-only/as218822
     newTag: latest
-    digest: sha256:2daa5dca5118fd2f3180e4b491b9b8a356e8ecd1800aecad3b6b38074717f1dc
+    digest: sha256:168263f36bd85bf9986c19419b13eed14f91ed924aa4e8ef6ba1d27cd708843a
   - name: ghcr.io/pmh-only/as218822-gre-gateway
     newTag: latest
     digest: sha256:2caa5452fc71efff60edd925dab44a206fd611829321e44f703314e4fa9d41f7
