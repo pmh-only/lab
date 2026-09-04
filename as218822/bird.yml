@@ -116,6 +116,7 @@ spec:
                 - status
             periodSeconds: 5
             failureThreshold: 60
+            timeoutSeconds: 10
           readinessProbe:
             exec:
               command:
@@ -125,6 +126,7 @@ spec:
                 - show
                 - status
             periodSeconds: 10
+            timeoutSeconds: 10
           livenessProbe:
             exec:
               command:
@@ -135,6 +137,7 @@ spec:
                 - status
             periodSeconds: 30
             failureThreshold: 3
+            timeoutSeconds: 10
           volumeMounts:
             - name: run
               mountPath: /run/bird
@@ -268,9 +271,9 @@ spec:
                       -j SNAT --to-source 2a06:9801:ff0::
                     for uid in 997 999; do
                       ip6tables-legacy -w -C OUTPUT \
-                        -m owner --uid-owner "$uid" -j REJECT 2>/dev/null || \
+                        -m owner --uid-owner "$uid" -j DROP 2>/dev/null || \
                       ip6tables-legacy -w -I OUTPUT 1 \
-                        -m owner --uid-owner "$uid" -j REJECT
+                        -m owner --uid-owner "$uid" -j DROP
                     done
             preStop:
               exec:
@@ -283,7 +286,7 @@ spec:
                       -j SNAT --to-source 2a06:9801:ff0:: 2>/dev/null || true
                     for uid in 997 999; do
                       ip6tables-legacy -w -D OUTPUT \
-                        -m owner --uid-owner "$uid" -j REJECT 2>/dev/null || true
+                        -m owner --uid-owner "$uid" -j DROP 2>/dev/null || true
                     done
                     ip -6 address del 2a06:9801:ff0::/128 dev lo 2>/dev/null || true
           volumeMounts:
