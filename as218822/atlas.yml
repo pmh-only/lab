@@ -131,8 +131,12 @@ spec:
                     until ip route show table 52 | grep -q '^default dev tailscale0'; do
                       sleep 1
                     done
+                    until ip -6 route show table 52 | grep -q '^default dev tailscale0'; do
+                      sleep 1
+                    done
                     ip route replace throw 10.43.0.0/16 table 52
                     ip route replace throw 172.17.0.0/16 table 52
+                    ip -6 route replace unreachable default table 52
           volumeMounts:
             - name: tun
               mountPath: /dev/net/tun
