@@ -41,6 +41,7 @@ spec:
         - alias: ripe-atlas
           imageName: ghcr.io/pmh-only/as218822-ripe-atlas:latest
           commonUpdateSettings:
+            forceUpdate: true
             updateStrategy: digest
         - alias: as218822
           imageName: ghcr.io/pmh-only/as218822:latest
