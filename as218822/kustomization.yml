@@ -11,7 +11,7 @@ resources:
 images:
   - name: ghcr.io/pmh-only/as218822-ripe-atlas
     newTag: latest
-    digest: sha256:ce3961f12694bf2a81388266fa733932870c7d0a72003b0a7981522f2b451c1e
+    digest: sha256:dd213d8ddc65330b52f700a9ed341e536beb49eff5b391dba7eb7247adaf28f9
   - name: ghcr.io/pmh-only/here
     newTag: latest
     digest: sha256:754e71685e716254c1df1cf0e58b6e3c6e1263220291d0d250c4c3bcd3821641
