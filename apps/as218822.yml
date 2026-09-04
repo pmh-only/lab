@@ -38,6 +38,10 @@ spec:
   applicationRefs:
     - namePattern: as218822
       images:
+        - alias: ripe-atlas
+          imageName: ghcr.io/pmh-only/as218822-ripe-atlas:latest
+          commonUpdateSettings:
+            updateStrategy: digest
         - alias: as218822
           imageName: ghcr.io/pmh-only/as218822:latest
           commonUpdateSettings:

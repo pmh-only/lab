@@ -188,6 +188,39 @@ spec:
             - name: run
               mountPath: /run/bird
               readOnly: true
+        - name: ripe-atlas
+          image: ghcr.io/pmh-only/as218822-ripe-atlas:latest
+          imagePullPolicy: Always
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - CHOWN
+                - DAC_OVERRIDE
+                - FOWNER
+                - KILL
+                - NET_RAW
+                - SETGID
+                - SETUID
+          env:
+            - name: HTTP_POST_PORT
+              value: "8081"
+            - name: RXTXRPT
+              value: "yes"
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          volumeMounts:
+            - name: ripe-atlas-config
+              mountPath: /etc/ripe-atlas
+            - name: ripe-atlas-run
+              mountPath: /run/ripe-atlas
+            - name: ripe-atlas-spool
+              mountPath: /var/spool/ripe-atlas
         - name: tailscale
           image: ghcr.io/tailscale/tailscale:latest
           env:
@@ -259,3 +292,13 @@ spec:
           hostPath:
             path: /dev/net/tun
             type: CharDevice
+        - name: ripe-atlas-config
+          persistentVolumeClaim:
+            claimName: ripe-atlas
+        - name: ripe-atlas-run
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Mi
+        - name: ripe-atlas-spool
+          emptyDir:
+            sizeLimit: 100Mi

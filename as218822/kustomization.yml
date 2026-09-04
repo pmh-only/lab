@@ -2,12 +2,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: as218822
 resources:
+  - ./atlas.yml
   - ./bird.yml
   - ./gre-gateway.yml
   - ./looking-glass.yml
   - ./router-secret.yml
   - ./secret.yml
 images:
+  - name: ghcr.io/pmh-only/as218822-ripe-atlas
+    newTag: latest
   - name: ghcr.io/pmh-only/here
     newTag: latest
     digest: sha256:754e71685e716254c1df1cf0e58b6e3c6e1263220291d0d250c4c3bcd3821641
