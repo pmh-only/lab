@@ -52,6 +52,11 @@ spec:
         app: ripe-atlas-as218822
     spec:
       serviceAccountName: bird
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 1.1.1.1
+          - 8.8.8.8
       nodeSelector:
         infra.pmh.codes/bgp: enabled
       containers:
