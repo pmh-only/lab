@@ -29,7 +29,7 @@ data:
       const inventory = await request("/tailnet/-/devices?fields=all", { headers });
       const matches = inventory.devices.filter((device) =>
         device.hostname === "as218822-exit" && device.authorized &&
-        device.addresses.includes("100.91.148.11") && device.tags?.includes("tag:k8s"));
+        device.addresses.includes("100.94.47.53") && device.tags?.includes("tag:k8s"));
       if (matches.length !== 1) throw new Error("Expected exactly one authorized AS218822 exit device");
       const device = matches[0];
       if (device.isEphemeral) throw new Error("Refusing to approve an ephemeral exit device");
