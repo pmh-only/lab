@@ -246,6 +246,9 @@ spec:
                     until tailscale set --exit-node=100.91.148.11 --exit-node-allow-lan-access; do
                       sleep 10
                     done
+                    until tailscale status --json | sed -n '/^  "Self": {/,/^  },/p' | grep -q '"Online": true'; do
+                      sleep 1
+                    done
                     # Do not overwrite Tailscale-owned table 52. Keep the
                     # IPv4 measurement restriction in a separate policy table.
                     ip rule show | grep -q '^5255:' || ip rule add pref 5255 to 172.17.0.0/16 lookup main
