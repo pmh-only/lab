@@ -51,7 +51,7 @@ metadata:
   namespace: as218822
 spec:
   serviceName: bird
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: bird
@@ -228,6 +228,9 @@ spec:
             - name: exit-approval
               mountPath: /etc/exit-approval
               readOnly: true
+            - name: exit-identity
+              mountPath: /var/run/exit-identity
+              readOnly: true
         - name: tailscale
           image: ghcr.io/tailscale/tailscale:latest
           env:
@@ -320,6 +323,15 @@ spec:
             - name: tun
               mountPath: /dev/net/tun
       volumes:
+        - name: exit-identity
+          secret:
+            secretName: bird-0-tailscale
+            optional: true
+            items:
+              - key: device_id
+                path: device_id
+              - key: device_ips
+                path: device_ips
         - name: exit-approval
           configMap:
             name: exit-approval

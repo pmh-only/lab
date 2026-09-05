@@ -181,6 +181,7 @@ spec:
               mountPath: /var/spool/ripe-atlas
         - name: tailscale
           image: ghcr.io/tailscale/tailscale:latest
+          command: ["/bin/sh", "/etc/atlas-routing/run.sh"]
           env:
             - name: TS_KUBE_SECRET
               value: ripe-atlas-as218822-tailscale
@@ -205,7 +206,7 @@ spec:
             - name: TS_ACCEPT_DNS
               value: "false"
             - name: TS_EXTRA_ARGS
-              value: --exit-node=100.94.47.53 --exit-node-allow-lan-access --advertise-tags=tag:k8s
+              value: --advertise-tags=tag:k8s
             - name: TS_ENABLE_METRICS
               value: "true"
             - name: TS_LOCAL_ADDR_PORT
@@ -233,35 +234,28 @@ spec:
               memory: 256Mi
           securityContext:
             privileged: true
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                  - /bin/sh
-                  - -ceu
-                  - |
-                    # Resolve the persisted exit selection again without reauth.
-                    # Wait for administrative approval instead of restarting
-                    # an otherwise healthy Tailscale daemon on an upstream fault.
-                    until tailscale set --exit-node=100.94.47.53 --exit-node-allow-lan-access; do
-                      sleep 10
-                    done
-                    until tailscale status --json | sed -n '/^  "Self": {/,/^  },/p' | grep -q '"Online": true'; do
-                      sleep 1
-                    done
-                    # Do not overwrite Tailscale-owned table 52. Keep the
-                    # IPv4 measurement restriction in a separate policy table.
-                    ip rule show | grep -q '^5255:' || ip rule add pref 5255 to 172.17.0.0/16 lookup main
-                    ip rule show | grep -q '^5256:' || ip rule add pref 5256 to 172.16.0.0/16 lookup main
-                    ip route replace 193.0.19.0/24 dev tailscale0 table 218822
-                    ip route replace 52.18.0.0/16 dev tailscale0 table 218822
-                    ip route replace 100.100.100.100/32 dev tailscale0 table 218822
-                    ip route replace unreachable default table 218822
-                    ip rule show | grep -q '^5260:' || ip rule add pref 5260 lookup 218822
           volumeMounts:
             - name: tun
               mountPath: /dev/net/tun
+            - name: exit-identity
+              mountPath: /var/run/exit-identity
+              readOnly: true
+            - name: atlas-routing
+              mountPath: /etc/atlas-routing
+              readOnly: true
       volumes:
+        - name: exit-identity
+          secret:
+            secretName: bird-0-tailscale
+            optional: true
+            items:
+              - key: device_id
+                path: device_id
+              - key: device_ips
+                path: device_ips
+        - name: atlas-routing
+          configMap:
+            name: atlas-routing
         - name: config
           persistentVolumeClaim:
             claimName: ripe-atlas-as218822
@@ -276,3 +270,39 @@ spec:
           hostPath:
             path: /dev/net/tun
             type: CharDevice
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlas-routing
+  namespace: as218822
+data:
+  run.sh: |
+    #!/bin/sh
+    set -eu
+    /usr/local/bin/containerboot &
+    pid=$!
+    trap 'kill -TERM "$pid" 2>/dev/null || true; wait "$pid" || true; exit 0' TERM INT
+    configured=
+    while kill -0 "$pid" 2>/dev/null; do
+      id=$(cat /var/run/exit-identity/device_id 2>/dev/null || true)
+      exit_ip=$(tr '",[] ' '\n' < /var/run/exit-identity/device_ips | grep -E '^100\.[0-9]+\.[0-9]+\.[0-9]+$' || true)
+      if [ -n "$id" ] && [ -n "$exit_ip" ] && [ "$configured" != "$id:$exit_ip" ] &&
+          tailscale status --json 2>/dev/null | sed -n '/^  "Self": {/,/^  },/p' | grep -q '"Online": true'; then
+        if tailscale set --exit-node="$exit_ip" --exit-node-allow-lan-access; then
+          # Keep service/pod return traffic on the underlay and leave table 52
+          # entirely under Tailscale's control, including during reconnection.
+          ip rule show | grep -q '^5255:' || ip rule add pref 5255 to 172.17.0.0/16 lookup main
+          ip rule show | grep -q '^5256:' || ip rule add pref 5256 to 172.16.0.0/16 lookup main
+          ip route replace 193.0.19.0/24 dev tailscale0 table 218822
+          ip route replace 52.18.0.0/16 dev tailscale0 table 218822
+          ip route replace 100.100.100.100/32 dev tailscale0 table 218822
+          ip route replace unreachable default table 218822
+          ip rule show | grep -q '^5260:' || ip rule add pref 5260 lookup 218822
+          configured="$id:$exit_ip"
+        fi
+      fi
+      sleep 10 &
+      wait $! || true
+    done
+    wait "$pid"
