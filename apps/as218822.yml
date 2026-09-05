@@ -29,6 +29,8 @@ metadata:
   name: as218822
   namespace: argocd
 spec:
+  commonUpdateSettings:
+    allowTags: regexp:^latest$
   writeBackConfig:
     method: "git:secret:argocd/git"
     gitConfig:
