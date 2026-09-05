@@ -13,7 +13,7 @@ resources:
 images:
   - name: ghcr.io/pmh-only/as218822-ripe-atlas
     newTag: latest
-    digest: sha256:2e472c804b5bfa1b5ce6094043c46e1815363e0a73f039c36ad4d10041892675
+    digest: sha256:bfa5117a3bb9c52fbd53bddac500fa905764a35b755c638ac02e11bb2f47a9de
   - name: ghcr.io/pmh-only/here
     newTag: latest
     digest: sha256:754e71685e716254c1df1cf0e58b6e3c6e1263220291d0d250c4c3bcd3821641
@@ -22,10 +22,10 @@ images:
     digest: sha256:680b30eefa1b4cd7904edc34d399cf90cd34d19f8b5435ecd68526c877d15eae
   - name: ghcr.io/pmh-only/as218822-gre-gateway
     newTag: latest
-    digest: sha256:7f0f84556c30255e23c2023698333b4ad54ea40b817f64c4dcc1185ae0495071
+    digest: sha256:8b86803fcd4ad8a86a22bb300733bce2cfd164c0150d65274d5f3d432e774591
   - name: ghcr.io/pmh-only/as218822-looking-glass
     newTag: latest
-    digest: sha256:c73066395971a59bb9d0805626298644f321ef5acd44161c8a6be165ea19a24e
+    digest: sha256:9f52928de5e28addbb89e8bea90f3fc282d0394c87e432eb7d386c10a28ed4cf
   - name: ghcr.io/tailscale/tailscale
     newTag: latest
     digest: sha256:8c42c4574ab066384fcb72f69e086a2ff1dd3652eb6f56856cee34bcf0d2f680
