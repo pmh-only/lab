@@ -51,7 +51,7 @@ metadata:
   namespace: as218822
 spec:
   serviceName: bird
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: bird
@@ -197,6 +197,37 @@ spec:
             - name: run
               mountPath: /run/bird
               readOnly: true
+        - name: exit-approval
+          image: ghcr.io/pmh-only/as218822-looking-glass:latest
+          command: ["node", "/etc/exit-approval/approve.mjs"]
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: TS_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: tailscale-oauth
+                  key: client_id
+            - name: TS_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: tailscale-oauth
+                  key: client_secret
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          volumeMounts:
+            - name: exit-approval
+              mountPath: /etc/exit-approval
+              readOnly: true
         - name: tailscale
           image: ghcr.io/tailscale/tailscale:latest
           env:
@@ -289,6 +320,9 @@ spec:
             - name: tun
               mountPath: /dev/net/tun
       volumes:
+        - name: exit-approval
+          configMap:
+            name: exit-approval
         - name: run
           emptyDir:
             medium: Memory
