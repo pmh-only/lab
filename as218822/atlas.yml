@@ -61,6 +61,12 @@ spec:
                 - /etc/ripe-atlas/probe_key.pub
             periodSeconds: 5
             failureThreshold: 120
+          readinessProbe:
+            exec:
+              command: ["/usr/local/bin/atlas-healthcheck"]
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
           volumeMounts:
             - name: config
               mountPath: /etc/ripe-atlas
@@ -160,6 +166,12 @@ spec:
                 - /etc/ripe-atlas/probe_key.pub
             periodSeconds: 5
             failureThreshold: 120
+          readinessProbe:
+            exec:
+              command: ["/usr/local/bin/atlas-healthcheck"]
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
           volumeMounts:
             - name: config
               mountPath: /etc/ripe-atlas
@@ -177,11 +189,15 @@ spec:
                 secretKeyRef:
                   name: tailscale-oauth
                   key: client_id
-            - name: TS_CLIENT_SECRET
+            - name: TS_CLIENT_SECRET_BASE
               valueFrom:
                 secretKeyRef:
                   name: tailscale-oauth
                   key: client_secret
+            - name: TS_CLIENT_SECRET
+              value: $(TS_CLIENT_SECRET_BASE)?ephemeral=false&preauthorized=true
+            - name: TS_AUTH_ONCE
+              value: "true"
             - name: TS_HOSTNAME
               value: ripe-atlas-as218822
             - name: TS_USERSPACE
@@ -190,6 +206,31 @@ spec:
               value: "false"
             - name: TS_EXTRA_ARGS
               value: --exit-node=100.91.148.11 --exit-node-allow-lan-access --advertise-tags=tag:k8s
+            - name: TS_ENABLE_METRICS
+              value: "true"
+            - name: TS_LOCAL_ADDR_PORT
+              value: 0.0.0.0:9002
+          ports:
+            - name: ts-metrics
+              containerPort: 9002
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -ec
+                - |
+                  state=$(tailscale status --json)
+                  printf '%s\n' "$state" | sed -n '/^  "Self": {/,/^  },/p' | grep -q '"Online": true'
+                  printf '%s\n' "$state" | sed -n '/^  "ExitNodeStatus": {/,/^  },/p' | grep -q '"Online": true'
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
           securityContext:
             privileged: true
           lifecycle:
@@ -199,10 +240,21 @@ spec:
                   - /bin/sh
                   - -ceu
                   - |
+                    # Resolve the persisted exit selection again without reauth.
+                    # Wait for administrative approval instead of restarting
+                    # an otherwise healthy Tailscale daemon on an upstream fault.
+                    until tailscale set --exit-node=100.91.148.11 --exit-node-allow-lan-access; do
+                      sleep 10
+                    done
+                    attempts=0
                     until ip route show table 52 | grep -q '^default dev tailscale0'; do
+                      attempts=$((attempts + 1))
+                      [ "$attempts" -lt 120 ] || exit 1
                       sleep 1
                     done
                     until ip -6 route show table 52 | grep -q '^default dev tailscale0'; do
+                      attempts=$((attempts + 1))
+                      [ "$attempts" -lt 120 ] || exit 1
                       sleep 1
                     done
                     ip route replace throw 10.43.0.0/16 table 52
