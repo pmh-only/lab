@@ -125,6 +125,8 @@ spec:
     metadata:
       labels:
         app: ripe-atlas-as218822
+      annotations:
+        as218822.net/routing-revision: "2"
     spec:
       serviceAccountName: bird
       nodeSelector:
@@ -280,6 +282,10 @@ data:
   run.sh: |
     #!/bin/sh
     set -eu
+    # Preserve the daemon's transport path even while it rebuilds its rules.
+    ip rule show | grep -q '^5205:' || ip rule add pref 5205 fwmark 0x80000/0xff0000 lookup main
+    ip rule show | grep -q '^5255:' || ip rule add pref 5255 to 172.17.0.0/16 lookup main
+    ip rule show | grep -q '^5256:' || ip rule add pref 5256 to 172.16.0.0/16 lookup main
     /usr/local/bin/containerboot &
     pid=$!
     trap 'kill -TERM "$pid" 2>/dev/null || true; wait "$pid" || true; exit 0' TERM INT
