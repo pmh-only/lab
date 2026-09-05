@@ -7,6 +7,7 @@ data:
   approve.mjs: |
     import { setDefaultResultOrder } from "node:dns";
     import { setTimeout } from "node:timers/promises";
+    import { readFile } from "node:fs/promises";
     setDefaultResultOrder("ipv6first");
     const api = "https://api.tailscale.com/api/v2";
     const desired = ["0.0.0.0/0", "::/0"];
@@ -26,12 +27,13 @@ data:
       });
       const token = await request("/oauth/token", { method: "POST", body: credentials });
       const headers = { authorization: `Bearer ${token.access_token}` };
-      const inventory = await request("/tailnet/-/devices?fields=all", { headers });
-      const matches = inventory.devices.filter((device) =>
-        device.hostname === "as218822-exit" && device.authorized &&
-        device.addresses.includes("100.94.47.53") && device.tags?.includes("tag:k8s"));
-      if (matches.length !== 1) throw new Error("Expected exactly one authorized AS218822 exit device");
-      const device = matches[0];
+      const id = (await readFile("/var/run/exit-identity/device_id", "utf8")).trim();
+      const ips = JSON.parse(await readFile("/var/run/exit-identity/device_ips", "utf8"));
+      const device = await request(`/device/${encodeURIComponent(id)}`, { headers });
+      if (device.hostname !== "as218822-exit" || !device.authorized ||
+          !device.tags?.includes("tag:k8s") || !device.addresses.some((ip) => ips.includes(ip))) {
+        throw new Error("Device does not match the persisted AS218822 core identity");
+      }
       if (device.isEphemeral) throw new Error("Refusing to approve an ephemeral exit device");
       const path = `/device/${encodeURIComponent(device.id)}/routes`;
       const routes = await request(path, { headers });
