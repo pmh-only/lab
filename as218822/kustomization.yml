@@ -8,6 +8,8 @@ resources:
   - ./looking-glass.yml
   - ./router-secret.yml
   - ./secret.yml
+  - ./rpki.yml
+  - ./network-services.yml
 images:
   - name: ghcr.io/pmh-only/as218822-ripe-atlas
     newTag: latest

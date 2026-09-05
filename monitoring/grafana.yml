@@ -20,6 +20,8 @@ metadata:
   namespace: monitoring
 spec:
   revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: grafana
