@@ -57,6 +57,12 @@ spec:
                 secretKeyRef:
                   name: as218822-router-wireguard
                   key: WG_LUNALIGHT_PRESHARED_KEY
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              memory: 2Gi
           startupProbe:
             exec:
               command:
@@ -67,6 +73,7 @@ spec:
                 - status
             periodSeconds: 5
             failureThreshold: 60
+            timeoutSeconds: 10
           readinessProbe:
             exec:
               command:
@@ -76,6 +83,7 @@ spec:
                 - show
                 - status
             periodSeconds: 10
+            timeoutSeconds: 10
           livenessProbe:
             exec:
               command:
@@ -86,9 +94,50 @@ spec:
                 - status
             periodSeconds: 30
             failureThreshold: 3
+            timeoutSeconds: 10
           volumeMounts:
             - name: run
               mountPath: /run/bird
+        - name: monitoring
+          image: ghcr.io/pmh-only/as218822-looking-glass:latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 0
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: LG_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: LG_PORT
+              value: "18080"
+            - name: LG_METRICS_PORT
+              value: "19003"
+            - name: LG_LOCATION
+              value: gre-gateway
+            - name: LG_ENABLE_QUERIES
+              value: "0"
+          ports:
+            - name: bird-metrics
+              containerPort: 19003
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: 18080
+            periodSeconds: 30
+          volumeMounts:
+            - name: run
+              mountPath: /run/bird
+              readOnly: true
       volumes:
         - name: run
           emptyDir:

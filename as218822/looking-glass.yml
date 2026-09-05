@@ -4,6 +4,8 @@ metadata:
   name: looking-glass
   namespace: as218822
 spec:
+  # Keep diagnostics available when the exit-node sidecar is not ready.
+  publishNotReadyAddresses: true
   selector:
     app: bird
   ports:

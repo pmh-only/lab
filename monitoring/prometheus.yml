@@ -36,6 +36,9 @@ spec:
             - name: prometheus-config
               mountPath: /etc/prometheus/prometheus.yml
               subPath: prometheus.yml
+            - name: prometheus-config
+              mountPath: /etc/prometheus/as218822-rules.yml
+              subPath: as218822-rules.yml
             - name: prometheus-pvc
               mountPath: /prometheus
         - name: thanos-sidecar
@@ -98,7 +101,41 @@ data:
         cluster: lab
         replica: "0"
 
+    rule_files:
+      - /etc/prometheus/as218822-rules.yml
+
     scrape_configs:
+      - job_name: as218822-bird
+        scrape_interval: 30s
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: [as218822]
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_container_port_name]
+            action: keep
+            regex: bird-metrics
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+
+      - job_name: as218822-tailscale
+        scrape_interval: 30s
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: [as218822]
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_container_port_name]
+            action: keep
+            regex: ts-metrics
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+
+      - job_name: as218822-rpki
+        scrape_interval: 60s
+        static_configs:
+          - targets: [rpki.as218822.svc.cluster.local:8323]
+
       - job_name: "ne"
         kubernetes_sd_configs:
           - role: pod
@@ -172,6 +209,52 @@ data:
         static_configs:
           - targets:
             - pmhraspberry.tailscale.svc.cluster.local:9811
+  as218822-rules.yml: |
+    groups:
+      - name: as218822
+        rules:
+          - alert: AS218822BirdUnavailable
+            expr: as218822_bird_up == 0 or up{job="as218822-bird"} == 0 or absent(up{job="as218822-bird"})
+            for: 2m
+            labels:
+              severity: critical
+            annotations:
+              summary: "AS218822 routing daemon or its monitor is unavailable"
+          - alert: AS218822BGPSessionDown
+            expr: as218822_protocol_up{type="BGP"} == 0
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "BGP session {{ $labels.protocol }} at {{ $labels.location }} is down"
+          - alert: AS218822RPKIUnavailable
+            expr: as218822_protocol_up{type="RPKI"} == 0 or up{job="as218822-rpki"} == 0
+            for: 10m
+            labels:
+              severity: warning
+            annotations:
+              summary: "RPKI validation cache is unavailable; origin validation may become stale"
+          - alert: AS218822IPv6Unreachable
+            expr: max by (location) (as218822_ipv6_reachable) == 0
+            for: 2m
+            labels:
+              severity: critical
+            annotations:
+              summary: "AS218822 cannot reach either IPv6 connectivity target"
+          - alert: AS218822AtlasNotReady
+            expr: kube_pod_container_status_ready{namespace="as218822",container="ripe-atlas"} == 0
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Atlas controller connection is unavailable on {{ $labels.pod }}"
+          - alert: AS218822TailscaleNotReady
+            expr: kube_pod_container_status_ready{namespace="as218822",container="tailscale"} == 0
+            for: 3m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Tailscale is offline on {{ $labels.pod }}"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
