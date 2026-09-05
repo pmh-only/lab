@@ -219,7 +219,7 @@ spec:
             - name: TS_CLIENT_SECRET
               value: $(TS_CLIENT_SECRET_BASE)?ephemeral=false&preauthorized=true
             - name: TS_AUTH_ONCE
-              value: "true"
+              value: "false"
             - name: TS_HOSTNAME
               value: as218822-exit
             - name: TS_USERSPACE
@@ -227,7 +227,7 @@ spec:
             - name: TS_ACCEPT_DNS
               value: "false"
             - name: TS_EXTRA_ARGS
-              value: --advertise-exit-node --advertise-tags=tag:k8s
+              value: --advertise-exit-node --advertise-tags=tag:k8s --force-reauth
             - name: TS_ENABLE_METRICS
               value: "true"
             - name: TS_LOCAL_ADDR_PORT
