@@ -205,7 +205,7 @@ spec:
             - name: TS_ACCEPT_DNS
               value: "false"
             - name: TS_EXTRA_ARGS
-              value: --exit-node=100.91.148.11 --exit-node-allow-lan-access --advertise-tags=tag:k8s
+              value: --exit-node=100.94.47.53 --exit-node-allow-lan-access --advertise-tags=tag:k8s
             - name: TS_ENABLE_METRICS
               value: "true"
             - name: TS_LOCAL_ADDR_PORT
@@ -243,7 +243,7 @@ spec:
                     # Resolve the persisted exit selection again without reauth.
                     # Wait for administrative approval instead of restarting
                     # an otherwise healthy Tailscale daemon on an upstream fault.
-                    until tailscale set --exit-node=100.91.148.11 --exit-node-allow-lan-access; do
+                    until tailscale set --exit-node=100.94.47.53 --exit-node-allow-lan-access; do
                       sleep 10
                     done
                     until tailscale status --json | sed -n '/^  "Self": {/,/^  },/p' | grep -q '"Online": true'; do
