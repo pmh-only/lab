@@ -246,22 +246,15 @@ spec:
                     until tailscale set --exit-node=100.91.148.11 --exit-node-allow-lan-access; do
                       sleep 10
                     done
-                    attempts=0
-                    until ip route show table 52 | grep -q '^default dev tailscale0'; do
-                      attempts=$((attempts + 1))
-                      [ "$attempts" -lt 120 ] || exit 1
-                      sleep 1
-                    done
-                    until ip -6 route show table 52 | grep -q '^default dev tailscale0'; do
-                      attempts=$((attempts + 1))
-                      [ "$attempts" -lt 120 ] || exit 1
-                      sleep 1
-                    done
-                    ip route replace throw 10.43.0.0/16 table 52
-                    ip route replace throw 172.16.0.0/16 table 52
-                    ip route replace 193.0.19.0/24 dev tailscale0 table 52
-                    ip route replace 52.18.0.0/16 dev tailscale0 table 52
-                    ip route replace unreachable default table 52
+                    # Do not overwrite Tailscale-owned table 52. Keep the
+                    # IPv4 measurement restriction in a separate policy table.
+                    ip rule show | grep -q '^5255:' || ip rule add pref 5255 to 172.17.0.0/16 lookup main
+                    ip rule show | grep -q '^5256:' || ip rule add pref 5256 to 172.16.0.0/16 lookup main
+                    ip route replace 193.0.19.0/24 dev tailscale0 table 218822
+                    ip route replace 52.18.0.0/16 dev tailscale0 table 218822
+                    ip route replace 100.100.100.100/32 dev tailscale0 table 218822
+                    ip route replace unreachable default table 218822
+                    ip rule show | grep -q '^5260:' || ip rule add pref 5260 lookup 218822
           volumeMounts:
             - name: tun
               mountPath: /dev/net/tun

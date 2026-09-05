@@ -10,6 +10,7 @@ resources:
   - ./secret.yml
   - ./rpki.yml
   - ./network-services.yml
+  - ./exit-approval.yml
 images:
   - name: ghcr.io/pmh-only/as218822-ripe-atlas
     newTag: latest

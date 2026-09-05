@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: exit-approval
+  namespace: as218822
+data:
+  approve.mjs: |
+    const api = "https://api.tailscale.com/api/v2";
+    const desired = ["0.0.0.0/0", "::/0"];
+    async function request(path, options = {}) {
+      const response = await fetch(`${api}${path}`, {
+        ...options, signal: AbortSignal.timeout(10_000),
+      });
+      if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
+      const text = await response.text();
+      return text ? JSON.parse(text) : {};
+    }
+    const credentials = new URLSearchParams({
+      client_id: process.env.TS_CLIENT_ID,
+      client_secret: process.env.TS_CLIENT_SECRET.split("?")[0],
+      scope: "devices:core:read devices:routes",
+    });
+    const token = await request("/oauth/token", { method: "POST", body: credentials });
+    const headers = { authorization: `Bearer ${token.access_token}` };
+    const inventory = await request("/tailnet/-/devices?fields=all", { headers });
+    const matches = inventory.devices.filter((device) =>
+      device.hostname === "as218822-exit" && device.authorized &&
+      device.addresses.includes("100.91.148.11") && device.tags?.includes("tag:k8s"));
+    if (matches.length !== 1) throw new Error("Expected exactly one authorized AS218822 exit device");
+    const device = matches[0];
+    if (device.isEphemeral) throw new Error("Refusing to approve an ephemeral exit device");
+    const path = `/device/${encodeURIComponent(device.id)}/routes`;
+    const routes = await request(path, { headers });
+    if (!desired.every((route) => routes.advertisedRoutes.includes(route))) {
+      throw new Error("Exit device is not advertising both default routes");
+    }
+    if (!desired.every((route) => routes.enabledRoutes.includes(route))) {
+      await request(path, {
+        method: "POST",
+        headers: { ...headers, "content-type": "application/json" },
+        body: JSON.stringify({ routes: [...new Set([...routes.enabledRoutes, ...desired])] }),
+      });
+      console.log("Approved the AS218822 exit routes");
+    } else {
+      console.log("AS218822 exit routes are already approved");
+    }
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: exit-approval
+  namespace: as218822
+spec:
+  schedule: "* * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 60
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 55
+      template:
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          containers:
+            - name: approve
+              image: node:24-alpine
+              command: ["node", "/app/approve.mjs"]
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 1000
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              env:
+                - name: TS_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: tailscale-oauth
+                      key: client_id
+                - name: TS_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: tailscale-oauth
+                      key: client_secret
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 128Mi
+              volumeMounts:
+                - name: script
+                  mountPath: /app
+                  readOnly: true
+          volumes:
+            - name: script
+              configMap:
+                name: exit-approval
