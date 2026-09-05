@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: as218822-recovery
+  namespace: argocd
+spec:
+  destination:
+    namespace: as218822
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: as218822
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
