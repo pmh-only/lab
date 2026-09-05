@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rpki
+  namespace: as218822
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rpki
+  template:
+    metadata:
+      labels:
+        app: rpki
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 1012
+      containers:
+        - name: routinator
+          image: nlnetlabs/routinator:v0.15.2
+          args: ["server", "--rtr", "0.0.0.0:3323", "--http", "0.0.0.0:8323"]
+          ports:
+            - name: rtr
+              containerPort: 3323
+            - name: metrics
+              containerPort: 8323
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              memory: 2Gi
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: metrics
+            periodSeconds: 30
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: cache
+              mountPath: /home/routinator/.rpki-cache
+      volumes:
+        - name: cache
+          emptyDir:
+            sizeLimit: 8Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rpki
+  namespace: as218822
+spec:
+  selector:
+    app: rpki
+  ports:
+    - name: rtr
+      port: 3323
+    - name: metrics
+      port: 8323
