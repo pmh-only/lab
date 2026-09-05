@@ -258,7 +258,7 @@ spec:
                       sleep 1
                     done
                     ip route replace throw 10.43.0.0/16 table 52
-                    ip route replace throw 172.17.0.0/16 table 52
+                    ip route replace throw 172.16.0.0/16 table 52
                     ip route replace 193.0.19.0/24 dev tailscale0 table 52
                     ip route replace 52.18.0.0/16 dev tailscale0 table 52
                     ip route replace unreachable default table 52
