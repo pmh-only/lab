@@ -60,6 +60,7 @@ spec:
         - alias: console
           imageName: ghcr.io/pmh-only/as218822-console:latest
           commonUpdateSettings:
+            forceUpdate: true
             updateStrategy: digest
         - alias: tailscale
           imageName: ghcr.io/tailscale/tailscale:latest
