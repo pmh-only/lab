@@ -57,6 +57,10 @@ spec:
           imageName: ghcr.io/pmh-only/as218822-looking-glass:latest
           commonUpdateSettings:
             updateStrategy: digest
+        - alias: console
+          imageName: ghcr.io/pmh-only/as218822-console:latest
+          commonUpdateSettings:
+            updateStrategy: digest
         - alias: tailscale
           imageName: ghcr.io/tailscale/tailscale:latest
           commonUpdateSettings:
