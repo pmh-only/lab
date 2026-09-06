@@ -21,7 +21,7 @@ images:
     digest: sha256:754e71685e716254c1df1cf0e58b6e3c6e1263220291d0d250c4c3bcd3821641
   - name: ghcr.io/pmh-only/as218822
     newTag: latest
-    digest: sha256:0c893f4e81ad650bef72238b7bda378d8a9e39f8ff9ddb7405b9f22994bc1e33
+    digest: sha256:aaf9b3ee02677c1187a6540f3ef392c0e29ad8394cb7c454e8da425428a81048
   - name: ghcr.io/pmh-only/as218822-gre-gateway
     newTag: latest
     digest: sha256:8b86803fcd4ad8a86a22bb300733bce2cfd164c0150d65274d5f3d432e774591
@@ -30,7 +30,7 @@ images:
     digest: sha256:68b8f707f93aa1b1aa67b7193fdc89d04bea60d8cf6ee1234e7f6d4e2b534760
   - name: ghcr.io/pmh-only/as218822-console
     newTag: latest
-    digest: sha256:29d637ee595234ff625f7dd323b19f52f7504584dcf26f7c918ffd4253e16d2a
+    digest: sha256:228fa8753be645e73ffefcdf2c273006e9147b7231c88c570e5d7346570dfd4e
   - name: ghcr.io/tailscale/tailscale
     newTag: latest
     digest: sha256:8c42c4574ab066384fcb72f69e086a2ff1dd3652eb6f56856cee34bcf0d2f680
