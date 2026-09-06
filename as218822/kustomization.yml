@@ -21,13 +21,13 @@ images:
     digest: sha256:754e71685e716254c1df1cf0e58b6e3c6e1263220291d0d250c4c3bcd3821641
   - name: ghcr.io/pmh-only/as218822
     newTag: latest
-    digest: sha256:c9c4bbf7c282372820dcd81720a90c8544f77b0176cbd7c4ac77ee8de984c1f6
+    digest: sha256:3a0f0269fef7a58312b8e1fb22fee7adb2cabf8dfdb4f1f221a837e094829e0a
   - name: ghcr.io/pmh-only/as218822-gre-gateway
     newTag: latest
     digest: sha256:45ae6d87d57da44e760b52721e35592eb0495a1f65aff00023c23fa007c92b4a
   - name: ghcr.io/pmh-only/as218822-looking-glass
     newTag: latest
-    digest: sha256:0efa5e0fac5e7a497701e2332b47a08fb7e8927d69847fe35ae8717295cb6cfd
+    digest: sha256:4a65f304f93f6a5f4d3149a13442dedd12d7e066c3aa73e38849fd5fb8d5db67
   - name: ghcr.io/pmh-only/as218822-console
     newTag: latest
     digest: sha256:a4427b366990e3cf18dcf529b773154a63685bbd679aecd5552d1b739704d8b7
