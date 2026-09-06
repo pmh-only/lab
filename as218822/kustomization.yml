@@ -30,7 +30,7 @@ images:
     digest: sha256:926b678e98b5d96fcbe1c92c0408c2a3e609492f232c9d318fc6a5e414cb3d6a
   - name: ghcr.io/pmh-only/as218822-console
     newTag: latest
-    digest: sha256:059448aca9345c9a23e40171100ad5caf5d8e81127af5ed0b2a2343e791016e4
+    digest: sha256:fea00c5b2cac9851bc662a8fa7cf56a054186597b2b62c0ec8e2155cc204a369
   - name: ghcr.io/tailscale/tailscale
     newTag: latest
     digest: sha256:8c42c4574ab066384fcb72f69e086a2ff1dd3652eb6f56856cee34bcf0d2f680
