@@ -32,6 +32,8 @@ spec:
               drop:
                 - ALL
           env:
+            - name: CONSOLE_PORT
+              value: "8080"
             - name: PROMETHEUS_URL
               value: http://prometheus.monitoring.svc.cluster.local:9090
           ports:
