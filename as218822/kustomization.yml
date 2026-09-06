@@ -15,13 +15,13 @@ resources:
 images:
   - name: ghcr.io/pmh-only/as218822-ripe-atlas
     newTag: latest
-    digest: sha256:7d75a1d635fda35033f9749557303829405ca6eec39ea0ef8e6b97f29c73ee54
+    digest: sha256:5490a5f434188c4a89d3bb06e060b12974079d32bcad2b7a0daa19a0a042db72
   - name: ghcr.io/pmh-only/here
     newTag: latest
     digest: sha256:754e71685e716254c1df1cf0e58b6e3c6e1263220291d0d250c4c3bcd3821641
   - name: ghcr.io/pmh-only/as218822
     newTag: latest
-    digest: sha256:aaf9b3ee02677c1187a6540f3ef392c0e29ad8394cb7c454e8da425428a81048
+    digest: sha256:4578d4a1d5dfa27d8bddd73d974e92783ab4538c414e7ba74e8328f77729c271
   - name: ghcr.io/pmh-only/as218822-gre-gateway
     newTag: latest
     digest: sha256:8b86803fcd4ad8a86a22bb300733bce2cfd164c0150d65274d5f3d432e774591
