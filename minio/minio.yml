@@ -35,7 +35,7 @@ spec:
             - name: RUSTFS_CONSOLE_ADDRESS
               value: 0.0.0.0:9001
             - name: RUSTFS_SERVER_DOMAINS
-              value: s3.pmh.codes
+              value: s3.pmh.codes:9000
             - name: RUSTFS_DRIVE_ACTIVE_MONITORING
               value: "false"
             - name: RUSTFS_TLS_PATH
