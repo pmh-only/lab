@@ -31,6 +31,7 @@ metadata:
 spec:
   commonUpdateSettings:
     allowTags: regexp:^latest$
+    forceUpdate: true
   writeBackConfig:
     method: "git:secret:argocd/git"
     gitConfig:
