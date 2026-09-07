@@ -205,6 +205,14 @@ data:
             - pmhraspberry.tailscale.svc.cluster.local:9273
             - pmhraspberry.tailscale.svc.cluster.local:9274
 
+      - job_name: 'bgptools'
+        scheme: https
+        metrics_path: /prom/7c443f55-6386-4238-adf9-37c6c3703dc0
+        static_configs:
+          - targets:
+            - prometheus.bgp.tools
+        scrape_interval: 1h
+
       - job_name: "scd41"
         static_configs:
           - targets:
