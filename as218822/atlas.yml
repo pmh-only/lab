@@ -89,19 +89,6 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ripe-atlas-as218822
-  namespace: as218822
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: local-path
-  resources:
-    requests:
-      storage: 100Mi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
   name: ripe-atlas-as218822-v2
   namespace: as218822
 spec:
