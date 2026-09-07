@@ -100,6 +100,19 @@ spec:
       storage: 100Mi
 ---
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ripe-atlas-as218822-v2
+  namespace: as218822
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: ripe-atlas-as218822
@@ -126,7 +139,7 @@ spec:
       labels:
         app: ripe-atlas-as218822
       annotations:
-        as218822.net/routing-revision: "5"
+        as218822.net/routing-revision: "6"
     spec:
       serviceAccountName: bird
       nodeSelector:
@@ -267,7 +280,7 @@ spec:
             name: atlas-routing
         - name: config
           persistentVolumeClaim:
-            claimName: ripe-atlas-as218822
+            claimName: ripe-atlas-as218822-v2
         - name: run
           emptyDir:
             medium: Memory
