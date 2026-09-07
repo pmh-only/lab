@@ -126,7 +126,7 @@ spec:
       labels:
         app: ripe-atlas-as218822
       annotations:
-        as218822.net/routing-revision: "4"
+        as218822.net/routing-revision: "5"
     spec:
       serviceAccountName: bird
       nodeSelector:
@@ -135,6 +135,13 @@ spec:
         - name: ripe-atlas
           image: ghcr.io/pmh-only/as218822-ripe-atlas:latest
           imagePullPolicy: Always
+          command: ["/usr/bin/tini", "--", "/bin/sh", "-ec"]
+          args:
+            - |
+              until ip -6 address show dev lo | grep -q '2a06:9801:ffa::101:7386/128'; do
+                sleep 1
+              done
+              exec /usr/local/bin/entrypoint.sh
           securityContext:
             capabilities:
               drop:
@@ -286,8 +293,6 @@ data:
     ip rule show | grep -q '^5205:' || ip rule add pref 5205 fwmark 0x80000/0xff0000 lookup main
     ip rule show | grep -q '^5255:' || ip rule add pref 5255 to 172.17.0.0/16 lookup main
     ip rule show | grep -q '^5256:' || ip rule add pref 5256 to 172.16.0.0/16 lookup main
-    ip route replace unreachable default table 218822
-    ip rule show | grep -q '^5260:' || ip rule add pref 5260 lookup 218822
     /usr/local/bin/containerboot &
     pid=$!
     trap 'kill -TERM "$pid" 2>/dev/null || true; wait "$pid" || true; exit 0' TERM INT
@@ -297,12 +302,14 @@ data:
       exit_ip=$(tr '",[] ' '\n' < /var/run/exit-identity/device_ips | grep -E '^100\.[0-9]+\.[0-9]+\.[0-9]+$' || true)
       if [ -n "$id" ] && [ -n "$exit_ip" ] && [ "$configured" != "$id:$exit_ip" ] &&
           tailscale status --json 2>/dev/null | sed -n '/^  "Self": {/,/^  },/p' | grep -q '"Online": true'; then
-        ip -6 address replace 2a06:9801:ffa::101:7386/128 dev lo
         if tailscale set --exit-node="$exit_ip" --exit-node-allow-lan-access; then
+          ip -6 address replace 2a06:9801:ffa::101:7386/128 dev lo
           # Keep service/pod return traffic on the underlay and leave table 52
           # entirely under Tailscale's control, including during reconnection.
           ip rule show | grep -q '^5255:' || ip rule add pref 5255 to 172.17.0.0/16 lookup main
           ip rule show | grep -q '^5256:' || ip rule add pref 5256 to 172.16.0.0/16 lookup main
+          ip route replace unreachable default table 218822
+          ip rule show | grep -q '^5260:' || ip rule add pref 5260 lookup 218822
           configured="$id:$exit_ip"
         fi
       fi
