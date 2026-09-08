@@ -5,6 +5,7 @@ resources:
   - ./atlas.yml
   - ./bird.yml
   - ./console.yml
+  - ./console-oidc-secret.yml
   - ./gre-gateway.yml
   - ./looking-glass.yml
   - ./router-secret.yml
