@@ -13,7 +13,7 @@ resources:
 images:
   - name: ghcr.io/pmh-only/grafana-image-renderer
     newTag: latest
-    digest: sha256:cafd7afe8cc1995f26434e0194fadd823656b322cb7c8c2784e1477c72ff9e46
+    digest: sha256:cf36a94431662540a72d2058a43e0cbf72638334475d8216a25a77526a627be7
   - name: ghcr.io/pmh-only/grafana
     newTag: latest
     digest: sha256:86e7689f5166b8f2952acb314dde641b2c2f68113ba39827534d0df5ff0f24ab
