@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: spoofer-segment-a-20260908-r2
+  name: spoofer-segment-a-20260908-r3
   namespace: as218822
 spec:
   backoffLimit: 0
@@ -70,9 +70,11 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: spoofer-segment-b-20260908-r2
+  name: spoofer-segment-b-20260908-r3
   namespace: as218822
 spec:
+  # Release through GitOps only after segment A finishes.
+  suspend: true
   backoffLimit: 0
   activeDeadlineSeconds: 900
   template:
