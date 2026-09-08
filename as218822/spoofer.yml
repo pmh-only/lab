@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: spoofer-segment-a-20260908
+  name: spoofer-segment-a-20260908-r2
   namespace: as218822
 spec:
   backoffLimit: 0
@@ -20,7 +20,8 @@ spec:
         kubernetes.io/hostname: pmhoci2
       containers:
         - name: spoofer
-          image: ghcr.io/pmh-only/as218822:spoofer
+          # Explicit TLS port keeps this tag outside the router's image-name rewrite.
+          image: ghcr.io:443/pmh-only/as218822:spoofer
           imagePullPolicy: Always
           securityContext:
             runAsUser: 0
@@ -69,7 +70,7 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: spoofer-segment-b-20260908
+  name: spoofer-segment-b-20260908-r2
   namespace: as218822
 spec:
   backoffLimit: 0
@@ -87,7 +88,8 @@ spec:
         kubernetes.io/hostname: pmhoci3
       containers:
         - name: spoofer
-          image: ghcr.io/pmh-only/as218822:spoofer
+          # Explicit TLS port keeps this tag outside the router's image-name rewrite.
+          image: ghcr.io:443/pmh-only/as218822:spoofer
           imagePullPolicy: Always
           securityContext:
             runAsUser: 0
