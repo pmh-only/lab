@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: as218822-spoofer-release
+  namespace: argocd
+  # No resources finalizer: removing this recovery app must retain the Job.
+spec:
+  project: default
+  destination:
+    namespace: as218822
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+    path: as218822/spoofer-release
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
