@@ -4,6 +4,9 @@ kind: Job
 metadata:
   name: spoofer-segment-a-20260908-r3
   namespace: as218822
+  annotations:
+    as218822.net/caida-report: https://spoofer.caida.org/report.php?sessionid=2229220
+    as218822.net/caida-baseline: https://spoofer.caida.org/report.php?sessionid=2229072
 spec:
   backoffLimit: 0
   activeDeadlineSeconds: 900
@@ -74,7 +77,7 @@ metadata:
   namespace: as218822
 spec:
   # Release through GitOps only after segment A finishes.
-  suspend: true
+  suspend: false
   backoffLimit: 0
   activeDeadlineSeconds: 900
   template:
