@@ -30,10 +30,10 @@ images:
     digest: sha256:93171cb7b6e9f3672b40e59710aa6459782462395caceb6cc3628bab983ec8f2
   - name: ghcr.io/pmh-only/as218822-looking-glass
     newTag: latest
-    digest: sha256:5a8050431b441d7481cdefaf98d4d87903490d0a8e549502913cb1e3b13558ad
+    digest: sha256:e41c8abfa5e635c79653be733afa0116afe144482697949a43f26fed9edfe1da
   - name: ghcr.io/pmh-only/as218822-console
     newTag: latest
-    digest: sha256:7bb50f90271f5f28b8d2b47c31eab20bc916892be006503b6d392358450b634e
+    digest: sha256:9aa1dd4dbd695224225476cb9150f0e478902d8ccde5e4a966bbbdc540fbbe23
   - name: ghcr.io/tailscale/tailscale
     newTag: latest
     digest: sha256:8c42c4574ab066384fcb72f69e086a2ff1dd3652eb6f56856cee34bcf0d2f680
