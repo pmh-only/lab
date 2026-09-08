@@ -78,6 +78,7 @@ metadata:
   name: spoofer-segment-b-20260908-r4
   namespace: as218822
   annotations:
+    as218822.net/caida-report: https://spoofer.caida.org/report.php?sessionid=2229273
     as218822.net/caida-baseline: https://spoofer.caida.org/report.php?sessionid=2229071
 spec:
   backoffLimit: 0
