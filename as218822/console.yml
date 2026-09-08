@@ -36,6 +36,26 @@ spec:
               value: "8080"
             - name: PROMETHEUS_URL
               value: http://prometheus.monitoring.svc.cluster.local:9090
+            - name: OIDC_ISSUER_URL
+              value: https://auth.pmh.codes/application/o/as218822/
+            - name: OIDC_CLIENT_ID
+              value: 8pIztfBRh51wufpeGKJysw4vUDhLbywjns3RwE4t
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: console-oidc
+                  key: OIDC_CLIENT_SECRET
+            - name: OIDC_REDIRECT_URI
+              value: https://bgp.pmh.codes/auth/callback
+            - name: OIDC_SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: console-oidc
+                  key: OIDC_SESSION_SECRET
+            - name: OIDC_ALLOWED_GROUPS
+              value: authentik Admins
+            - name: OIDC_SCOPES
+              value: openid profile email
           ports:
             - name: http
               containerPort: 8080
