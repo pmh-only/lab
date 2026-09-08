@@ -1,4 +1,6 @@
 # Keep completed Jobs for evidence. TTL deletion plus Argo self-heal would rerun tests.
+# Sequence future runs by adding the next Job after the previous one completes,
+# rather than suspending a Job that Argo CD is waiting to finish.
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -73,11 +75,11 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: spoofer-segment-b-20260908-r3
+  name: spoofer-segment-b-20260908-r4
   namespace: as218822
+  annotations:
+    as218822.net/caida-baseline: https://spoofer.caida.org/report.php?sessionid=2229071
 spec:
-  # Release through GitOps only after segment A finishes.
-  suspend: false
   backoffLimit: 0
   activeDeadlineSeconds: 900
   template:
@@ -111,7 +113,7 @@ spec:
             - name: SPOOFER_PEERING_ADDRESS
               value: fd00:218:822:84::1/127
             - name: SPOOFER_ENDPOINT
-              value: bird.as218822.svc.cluster.local:51831
+              value: spoofer-router.as218822.svc.cluster.local:51831
             - name: SPOOFER_SERVER_PUBLIC_KEY
               value: guHhnQ4SzmkIn+RYBa+WW/sH1hggf6EcX5JX/rPTT2c=
           resources:
