@@ -27,7 +27,7 @@ images:
     digest: sha256:1de72935ed8cae34c1f59c6c57adf8b5753dda82815be575117d3291fb1a6c7f
   - name: ghcr.io/pmh-only/as218822-looking-glass
     newTag: latest
-    digest: sha256:3014eb765a5660b2b697b7275c231cc1c6d703feeaa88695eab9dd5664b1fbdf
+    digest: sha256:814ca1afe963908172074df78061a77809774563b7841da0c9cba5e3bb936226
   - name: ghcr.io/pmh-only/as218822-console
     newTag: latest
     digest: sha256:7ae30e10580c91f4d24894337a43628cac612e24ad290039e5e00dd0ab4cfc24
