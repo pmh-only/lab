@@ -52,8 +52,8 @@ spec:
                 secretKeyRef:
                   name: console-oidc
                   key: OIDC_SESSION_SECRET
-            - name: OIDC_ALLOWED_GROUPS
-              value: authentik Admins
+            - name: OIDC_ALLOW_ANY_AUTHENTICATED
+              value: "true"
             - name: OIDC_SCOPES
               value: openid profile email
           ports:
