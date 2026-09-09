@@ -29,7 +29,7 @@ images:
     digest: sha256:bdc0a6d9b83042817c5c5236b339fc8427befdce890299bcf62e046ef9f08af5
   - name: ghcr.io/pmh-only/mongo
     newTag: latest
-    digest: sha256:4b19b0c55d4dc372fcebd6904dee24263a395eb24c79e2af336decbe80dcfb16
+    digest: sha256:d26e6e27afb31eaea261eae52670bdfc6e924914b99c4d8dbe7ea0801b7577e2
   - name: ghcr.io/pmh-only/mysql
     newTag: "8"
     digest: sha256:3ef9fe0729606ce79d1b2e2fa00864e1f038368089ef8d642f576b798856755c
