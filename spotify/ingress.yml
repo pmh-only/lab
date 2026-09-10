@@ -37,22 +37,3 @@ spec:
           name: spotify-web-service
           port: 3000
           weight: 1
----
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: EnvoyExtensionPolicy
-metadata:
-  name: spotify-token-redirect
-spec:
-  targetRefs:
-    - group: gateway.networking.k8s.io
-      kind: HTTPRoute
-      name: spotify-route
-  lua:
-    - type: Inline
-      inline: |
-        function envoy_on_request(request_handle)
-          local path = request_handle:headers():get(":path")
-          if path == "/" then
-            request_handle:respond({[":status"] = "302", ["location"] = "/?token=7e349c70-567e-427f-9a62-6dc2c964589f"}, "")
-          end
-        end
