@@ -231,7 +231,8 @@ spec:
                 - |
                   state=$(tailscale status --json)
                   printf '%s\n' "$state" | sed -n '/^  "Self": {/,/^  },/p' | grep -q '"Online": true'
-                  printf '%s\n' "$state" | sed -n '/^  "ExitNodeStatus": {/,/^  },/p' | grep -q '"Online": true'
+                  exit_ip=$(tr '",[] ' '\n' < /var/run/exit-identity/device_ips | grep -E '^100\.[0-9]+\.[0-9]+\.[0-9]+$')
+                  tailscale ping --c=1 --timeout=5s --until-direct=false "$exit_ip"
             periodSeconds: 30
             timeoutSeconds: 10
             failureThreshold: 3
