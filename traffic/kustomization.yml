@@ -11,7 +11,7 @@ resources:
 images:
   - name: ghcr.io/pmh-only/goaccess
     newTag: latest
-    digest: sha256:c71aed901220a4a3b8492d7bd5452b5070f1a70d20d16d860144e03537f19b0b
+    digest: sha256:618ba4f1eef45e5bd2508822d5823bea13225320d3a10d7d6f20a14fd67859da
   - name: cr.fluentbit.io/fluent/fluent-bit
     newTag: latest
     digest: sha256:d792375ca8e53be72fc25716c28f291f32c6fc6f4f31d12d0d14bc78cefe9226
