@@ -78,3 +78,32 @@ spec:
                 secretKeyRef:
                   name: spotify-secret
                   key: MONGO_ENDPOINT
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spotify-stats-worker
+spec:
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: spotify-stats-worker
+  template:
+    metadata:
+      labels:
+        app: spotify-stats-worker
+    spec:
+      containers:
+        - name: stats-worker
+          image: ghcr.io/pmh-only/playstats:latest
+          command: ["node", "./dist/worker.mjs"]
+          env:
+            - name: TIMEZONE
+              value: Asia/Seoul
+            - name: STATS_REFRESH_INTERVAL_MS
+              value: "900000"
+            - name: MONGO_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: spotify-secret
+                  key: MONGO_ENDPOINT
