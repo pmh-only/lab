@@ -58,7 +58,7 @@ spec:
     spec:
       containers:
         - name: spotify-api
-          image: ghcr.io/yooooomi/your_spotify_client:latest
+          image: ghcr.io/pmh-only/playstats:latest
           env:
             - name: CLIENT_ENDPOINT
               value: https://spotify.pmh.codes
