@@ -44,6 +44,6 @@ spec:
           commonUpdateSettings:
             updateStrategy: digest
         - alias: spotify_web
-          imageName: ghcr.io/yooooomi/your_spotify_client:latest
+          imageName: ghcr.io/pmh-only/playstats:latest
           commonUpdateSettings:
             updateStrategy: digest
