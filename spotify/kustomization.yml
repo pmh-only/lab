@@ -13,3 +13,4 @@ images:
     digest: sha256:624ea009f2ef9d877989bee9c7913ac66840449f566517871696c31a8ea13ddf
   - name: ghcr.io/pmh-only/playstats
     newTag: latest
+    digest: sha256:e09903df54b7a68daf4df75728a21275c2f9c4fb61f6f05505788fd7404da644
