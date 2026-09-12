@@ -9,7 +9,7 @@ resources:
 images:
   - name: ghcr.io/rybbit-io/rybbit-backend
     newTag: latest
-    digest: sha256:f729f42575bf018ff97e9f36d49200665b99003a14868acbe56a9b32a9ed6ac7
+    digest: sha256:5a824932c8b7b16364c8ee132e29d1d9d9574445e0d1f091e6364695e117bd66
   - name: ghcr.io/rybbit-io/rybbit-client
     newTag: latest
-    digest: sha256:f384c1f73a0c2fc0794526908a1fdb2ba410a5cdb3f105487af70f067c8f103a
+    digest: sha256:2f6f7cbfd65f50129573b67082148b5bb00c20c04420d74ae133c1fd4dc8ac99
