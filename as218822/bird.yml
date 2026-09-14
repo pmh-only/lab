@@ -77,6 +77,8 @@ spec:
               # Tailscale's marked transport must use the IPv4 underlay, not
               # the tunneled IPv6 network that it is responsible for serving.
               ip -6 rule add pref 5200 fwmark 0x80000/0xff0000 unreachable
+              # Prefer Vultr for traffic sourced from the routed aggregate.
+              ip -6 rule add pref 10000 from 2a06:9801:ff0::/44 table 218822
           securityContext:
             privileged: true
       containers:
