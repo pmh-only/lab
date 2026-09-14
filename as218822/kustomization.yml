@@ -25,7 +25,7 @@ images:
     digest: sha256:76451c592657f7a0948bb2b9fbc88702eae4c44b1a179fcd413521a363d7e0f7
   - name: ghcr.io/pmh-only/as218822-gre-gateway
     newTag: latest
-    digest: sha256:f4ebaf0fafafa24cc02979fe7bc088ddd7e3d05a34693eed00444941a545b957
+    digest: sha256:360bce7d75fc3df33ca5c5c22cfd3787bb60481024e6a9ad1d933947456604c3
   - name: ghcr.io/pmh-only/as218822-looking-glass
     newTag: latest
     digest: sha256:fcff9f1072e3eca02eb6dd4a3fa6d0d632ec37fcdf236c97db5b0d63ec6e9c35
