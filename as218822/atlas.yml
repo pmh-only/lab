@@ -158,7 +158,7 @@ spec:
             - name: RXTXRPT
               value: "yes"
             - name: SSH_ADDRESS_FAMILY
-              value: inet
+              value: inet6
             - name: WAIT_FOR_INTERFACE
               value: tailscale0
           resources:
@@ -253,9 +253,6 @@ spec:
             - name: atlas-routing
               mountPath: /etc/atlas-routing
               readOnly: true
-            - name: run
-              mountPath: /run/ripe-atlas
-              readOnly: true
       volumes:
         - name: exit-identity
           secret:
@@ -301,7 +298,6 @@ data:
     pid=$!
     trap 'kill -TERM "$pid" 2>/dev/null || true; wait "$pid" || true; exit 0' TERM INT
     configured=
-    controller_route=
     while kill -0 "$pid" 2>/dev/null; do
       id=$(cat /var/run/exit-identity/device_id 2>/dev/null || true)
       exit_ip=$(tr '",[] ' '\n' < /var/run/exit-identity/device_ips | grep -E '^100\.[0-9]+\.[0-9]+\.[0-9]+$' || true)
@@ -313,20 +309,10 @@ data:
           # entirely under Tailscale's control, including during reconnection.
           ip rule show | grep -q '^5255:' || ip rule add pref 5255 to 172.17.0.0/16 lookup main
           ip rule show | grep -q '^5256:' || ip rule add pref 5256 to 172.16.0.0/16 lookup main
-          # RIPE's IPv6 endpoints accept TCP but do not send an SSH banner on
-          # this path. Permit the registration IPv4 subnet via the exit.
-          ip route replace 193.0.19.0/24 dev tailscale0 table 218822
           ip route replace unreachable default table 218822
           ip rule show | grep -q '^5260:' || ip rule add pref 5260 lookup 218822
           configured="$id:$exit_ip"
         fi
-      fi
-      controller=$(awk '$1 == "CONTROLLER_1_HOST" { print $2 }' /run/ripe-atlas/status/con_init_conf.txt 2>/dev/null || true)
-      controller_ip=$(getent ahostsv4 "$controller" 2>/dev/null | awk 'NR == 1 { print $1 }' || true)
-      if [ -n "$controller_ip" ] && [ "$controller_route" != "$controller_ip" ]; then
-        [ -z "$controller_route" ] || ip route del "$controller_route/32" table 218822 2>/dev/null || true
-        ip route replace "$controller_ip/32" dev tailscale0 table 218822
-        controller_route=$controller_ip
       fi
       sleep 10 &
       wait $! || true
