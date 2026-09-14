@@ -265,6 +265,14 @@ spec:
             - name: address-https
               containerPort: 443
               protocol: TCP
+          startupProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -ec
+                - test -s /etc/address-website-tls/tls.crt && test -s /etc/address-website-tls/tls.key
+            periodSeconds: 2
+            failureThreshold: 300
           readinessProbe:
             exec:
               command:

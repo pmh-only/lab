@@ -42,3 +42,4 @@ spec:
                 kind: Gateway
                 name: main
                 namespace: gateway
+        waitInsteadOfSelfCheck: 30s
