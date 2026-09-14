@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: envoy-gateway-main
+  namespace: gateway
+spec:
+  type: ExternalName
+  externalName: envoy-gateway-main.envoy-gateway-system.svc.cluster.local
