@@ -57,6 +57,8 @@ spec:
       app: bird
   template:
     metadata:
+      annotations:
+        secret.reloader.stakater.com/reload: address-website-tls
       labels:
         app: bird
     spec:
@@ -197,6 +199,101 @@ spec:
             - name: run
               mountPath: /run/bird
               readOnly: true
+        - name: address-http
+          image: ghcr.io/pmh-only/as218822-website:latest
+          imagePullPolicy: Always
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+          ports:
+            - name: address-http
+              containerPort: 80
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 5m
+              memory: 8Mi
+            limits:
+              memory: 32Mi
+          volumeMounts:
+            - name: address-website-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: http.conf
+              readOnly: true
+            - name: address-http-tmp
+              mountPath: /tmp
+        - name: address-https
+          image: ghcr.io/pmh-only/as218822-website:latest
+          imagePullPolicy: Always
+          command:
+            - /bin/sh
+            - -ceu
+            - |
+              until [ -s /etc/address-website-tls/tls.crt ] && [ -s /etc/address-website-tls/tls.key ]; do
+                sleep 2
+              done
+              exec nginx -g 'daemon off;'
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+          ports:
+            - name: address-https
+              containerPort: 443
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - nginx
+                - -t
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - nginx
+                - -t
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 5m
+              memory: 8Mi
+            limits:
+              memory: 32Mi
+          volumeMounts:
+            - name: address-website-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: https.conf
+              readOnly: true
+            - name: address-website-tls
+              mountPath: /etc/address-website-tls
+              readOnly: true
+            - name: address-https-tmp
+              mountPath: /tmp
         - name: exit-approval
           image: ghcr.io/pmh-only/as218822-looking-glass:latest
           command: ["node", "/etc/exit-approval/approve.mjs"]
@@ -323,6 +420,21 @@ spec:
             - name: tun
               mountPath: /dev/net/tun
       volumes:
+        - name: address-website-config
+          configMap:
+            name: address-website
+        - name: address-website-tls
+          secret:
+            secretName: address-website-tls
+            optional: true
+        - name: address-http-tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 8Mi
+        - name: address-https-tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 8Mi
         - name: exit-identity
           secret:
             secretName: bird-0-tailscale
