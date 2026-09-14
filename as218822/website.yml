@@ -82,6 +82,8 @@ metadata:
   namespace: as218822
 spec:
   secretName: address-website-tls
+  duration: 160h
+  renewBeforePercentage: 33
   privateKey:
     algorithm: ECDSA
     size: 256

@@ -7,6 +7,7 @@ resources:
   - ./nginx.yml
   - ./envoy.yml
   - ./backend-policy.yml
+  - ./service-alias.yml
 images:
   - name: ghcr.io/pmh-only/nginx
     newTag: latest
