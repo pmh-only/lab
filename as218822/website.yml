@@ -1,0 +1,172 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website
+  namespace: as218822
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: website
+  template:
+    metadata:
+      labels:
+        app: website
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: website
+          image: ghcr.io/pmh-only/as218822-website:latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 5m
+              memory: 8Mi
+            limits:
+              memory: 32Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 8Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: website
+  namespace: as218822
+spec:
+  selector:
+    app: website
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: address-website
+  namespace: as218822
+spec:
+  secretName: address-website-tls
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+    rotationPolicy: Always
+  ipAddresses:
+    - "2a06:9801:ff0::"
+  dnsNames:
+    - as218822.net
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: address-website
+  namespace: as218822
+data:
+  http.conf: |
+    pid /tmp/nginx.pid;
+    error_log /dev/stderr;
+
+    events {}
+
+    http {
+      access_log /dev/stdout;
+      client_body_temp_path /tmp/client_body;
+      proxy_temp_path /tmp/proxy;
+      fastcgi_temp_path /tmp/fastcgi;
+      uwsgi_temp_path /tmp/uwsgi;
+      scgi_temp_path /tmp/scgi;
+
+      server {
+        listen [2a06:9801:ff0::]:80;
+
+        location ^~ /.well-known/acme-challenge/ {
+          proxy_set_header Host $http_host;
+          proxy_pass http://envoy-gateway-main.gateway.svc.cluster.local;
+        }
+
+        location = /api/query {
+          proxy_set_header Origin "";
+          proxy_set_header X-Forwarded-For $remote_addr;
+          proxy_pass http://127.0.0.1:8080;
+        }
+
+        location / {
+          proxy_pass http://website;
+        }
+      }
+
+      server {
+        listen 8081;
+        location = /health { return 200; }
+      }
+    }
+  https.conf: |
+    pid /tmp/nginx.pid;
+    error_log /dev/stderr;
+
+    events {}
+
+    http {
+      access_log /dev/stdout;
+      client_body_temp_path /tmp/client_body;
+      proxy_temp_path /tmp/proxy;
+      fastcgi_temp_path /tmp/fastcgi;
+      uwsgi_temp_path /tmp/uwsgi;
+      scgi_temp_path /tmp/scgi;
+
+      server {
+        listen [2a06:9801:ff0::]:443 ssl;
+        ssl_certificate /etc/address-website-tls/tls.crt;
+        ssl_certificate_key /etc/address-website-tls/tls.key;
+        ssl_protocols TLSv1.2 TLSv1.3;
+
+        location = /api/query {
+          proxy_set_header Origin "";
+          proxy_set_header X-Forwarded-For $remote_addr;
+          proxy_pass http://127.0.0.1:8080;
+        }
+
+        location / {
+          proxy_pass http://website;
+        }
+      }
+    }
