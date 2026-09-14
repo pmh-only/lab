@@ -231,9 +231,8 @@ data:
             annotations:
               summary: "AS218822 routing daemon or its monitor is unavailable"
           - alert: AS218822BGPSessionDown
-            # Open IX sessions remain visible in telemetry but are not required
-            # until reciprocal peering or route-server activation is complete.
-            expr: as218822_protocol_up{type="BGP",protocol!~"(bgx|p7)_.*|bgpexchange_(hk|jp|tw)_v6|ixp4_rs[1-3]_v6"} == 0
+            # Route-server sessions are not required until activation is complete.
+            expr: as218822_protocol_up{type="BGP",protocol!~"bgpexchange_(hk|jp|tw)_v6|ixp4_rs[1-3]_v6"} == 0
             for: 5m
             labels:
               severity: warning
