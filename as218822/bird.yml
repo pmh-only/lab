@@ -58,7 +58,7 @@ spec:
   template:
     metadata:
       annotations:
-        secret.reloader.stakater.com/reload: address-website-tls-v2
+        secret.reloader.stakater.com/reload: address-website-tls
       labels:
         app: bird
     spec:
@@ -433,7 +433,7 @@ spec:
             name: address-website
         - name: address-website-tls
           secret:
-            secretName: address-website-tls-v2
+            secretName: address-website-tls
             optional: true
         - name: address-http-tmp
           emptyDir:
