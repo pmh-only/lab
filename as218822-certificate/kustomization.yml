@@ -3,3 +3,4 @@ kind: Kustomization
 namespace: as218822
 resources:
   - ./certificate.yml
+  - ./cleanup-job.yml
