@@ -3,4 +3,3 @@ kind: Kustomization
 namespace: as218822
 resources:
   - ./certificate.yml
-  - ./rollout-job.yml
