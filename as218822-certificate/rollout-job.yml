@@ -37,7 +37,7 @@ roleRef:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: address-certificate-rollout
+  name: address-certificate-rollout-v2
   namespace: as218822
 spec:
   backoffLimit: 6
@@ -50,7 +50,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: copy
-          image: rancher/kubectl:v1.36.1
+          image: alpine/k8s:1.36.0
           command:
             - /bin/sh
             - -ceu
