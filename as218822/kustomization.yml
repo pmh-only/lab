@@ -35,6 +35,7 @@ images:
     digest: sha256:692db05cfd3c5a8f5cacc1c0b1c5803c7c56a3f65243a8e8e3805b10e1579d2d
   - name: ghcr.io/pmh-only/as218822-website
     newTag: latest
+    digest: sha256:777116e09ef02f6eee7f0278b8a662309a7a0e1961f22c7de5d8dba35c3abaa3
   - name: ghcr.io/tailscale/tailscale
     newTag: latest
     digest: sha256:8c42c4574ab066384fcb72f69e086a2ff1dd3652eb6f56856cee34bcf0d2f680
