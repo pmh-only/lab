@@ -10,6 +10,8 @@ spec:
       app: prometheus
   template:
     metadata:
+      annotations:
+        pmh.codes/config-revision: "2026-09-14-1"
       labels:
         app: prometheus
     spec:
