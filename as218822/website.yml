@@ -78,7 +78,7 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: address-website
+  name: address-website-v2
   namespace: as218822
 spec:
   secretName: address-website-tls-v2
