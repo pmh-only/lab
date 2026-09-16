@@ -13,6 +13,7 @@ resources:
   - ./rpki.yml
   - ./website.yml
   - ./network-services.yml
+  - ./wireguard-portal-secret.yml
   - ./exit-approval.yml
 images:
   - name: ghcr.io/pmh-only/as218822-ripe-atlas

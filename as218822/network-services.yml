@@ -8,6 +8,10 @@ spec:
   selector:
     app: bird-gre-gateway
   ports:
+    - name: ip-tunnel
+      protocol: UDP
+      port: 51820
+      targetPort: 51820
     - name: wireguard
       protocol: UDP
       port: 51821

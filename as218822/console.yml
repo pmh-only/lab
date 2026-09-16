@@ -1,3 +1,48 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: console
+  namespace: as218822
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: console-tunnel-state
+  namespace: as218822
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["wireguard-tunnels"]
+    verbs: ["get", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: console-tunnel-state
+  namespace: as218822
+subjects:
+  - kind: ServiceAccount
+    name: console
+    namespace: as218822
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: console-tunnel-state
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wireguard-tunnels
+  namespace: as218822
+  annotations:
+    # Bootstrap only. It is removed from GitOps after first sync so user state
+    # is never reconciled back to an empty value.
+    argocd.argoproj.io/sync-options: Prune=false
+type: Opaque
+stringData:
+  state.json: "[]"
+  peers.conf: ""
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,7 +59,7 @@ spec:
       labels:
         app: console
     spec:
-      automountServiceAccountToken: false
+      serviceAccountName: console
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -56,6 +101,14 @@ spec:
               value: "true"
             - name: OIDC_SCOPES
               value: openid profile email
+            - name: WIREGUARD_ENDPOINT
+              value: 158.179.174.47:51820
+            - name: WIREGUARD_PUBLIC_KEY
+              value: MYUSD8fc7jG5ti927pynJkXDZND9lngbcdqK6vV/qW8=
+            - name: WIREGUARD_CLIENT_PREFIX
+              value: 2a06:9801:ff0:200
+            - name: WIREGUARD_CONNECTION_LIMIT
+              value: "3"
           ports:
             - name: http
               containerPort: 8080

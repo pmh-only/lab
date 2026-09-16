@@ -63,6 +63,13 @@ spec:
                 secretKeyRef:
                   name: as218822-router-wireguard
                   key: WG_LUNALIGHT_PRESHARED_KEY
+            - name: WG_PORTAL_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wireguard-portal-key
+                  key: WG_PORTAL_PRIVATE_KEY
+            - name: WIREGUARD_PEER_CONFIG
+              value: /run/tunnel-state/peers.conf
           resources:
             requests:
               cpu: 100m
@@ -104,6 +111,9 @@ spec:
           volumeMounts:
             - name: run
               mountPath: /run/bird
+            - name: tunnel-state
+              mountPath: /run/tunnel-state
+              readOnly: true
         - name: monitoring
           image: ghcr.io/pmh-only/as218822-looking-glass:latest
           imagePullPolicy: Always
@@ -149,3 +159,6 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 1Mi
+        - name: tunnel-state
+          secret:
+            secretName: wireguard-tunnels
