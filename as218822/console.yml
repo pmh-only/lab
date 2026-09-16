@@ -29,6 +29,19 @@ roleRef:
   kind: Role
   name: console-tunnel-state
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wireguard-tunnels
+  namespace: as218822
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: Prune=false
+type: Opaque
+stringData:
+  state.json: "[]"
+  peers.conf: ""
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
