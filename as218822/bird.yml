@@ -94,6 +94,15 @@ spec:
                 - NET_BIND_SERVICE
                 - NET_RAW
           env:
+            - name: ANYCAST_RETURN_PATHS
+              value: >-
+                gre-gateway,218830,218830,9000
+                hyehost-us,218831,218831,9001
+                hyehost-uk,218832,218832,9002
+                hyehost-nz,218833,218833,9003
+                bgptunnel-no,218834,218834,9004
+                bgptunnel-es,218835,218835,9005
+                route64-sg,218836,218836,9006
             - name: DOTENV_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
