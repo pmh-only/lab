@@ -29,20 +29,6 @@ roleRef:
   kind: Role
   name: console-tunnel-state
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: wireguard-tunnels
-  namespace: as218822
-  annotations:
-    # Bootstrap only. It is removed from GitOps after first sync so user state
-    # is never reconciled back to an empty value.
-    argocd.argoproj.io/sync-options: Prune=false
-type: Opaque
-stringData:
-  state.json: "[]"
-  peers.conf: ""
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
