@@ -47,7 +47,6 @@ spec:
                 p7ix-342,218841,218841,9011,2602:f92a:1315:3::1
                 hkix-gretap,218842,218842,9012,2602:f92a:1315:2::1
                 lagrange,218843,218843,9013
-                tun10012,218844,218844,9014
             - name: WG_GRE_GATEWAY_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
