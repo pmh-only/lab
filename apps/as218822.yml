@@ -53,6 +53,7 @@ spec:
         - alias: gre-gateway
           imageName: ghcr.io/pmh-only/as218822-gre-gateway:latest
           commonUpdateSettings:
+            forceUpdate: true
             updateStrategy: digest
         - alias: looking-glass
           imageName: ghcr.io/pmh-only/as218822-looking-glass:latest
