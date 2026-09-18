@@ -6,6 +6,9 @@ metadata:
 spec:
   serviceName: bird-gre-gateway
   replicas: 1
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 2
   selector:
     matchLabels:
       app: bird-gre-gateway
