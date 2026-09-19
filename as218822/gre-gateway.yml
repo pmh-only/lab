@@ -48,6 +48,7 @@ spec:
                 hkix-gretap,218842,218842,9012,2602:f92a:1315:2::1
                 lagrange,218843,218843,9013
                 tun10012,218844,218844,9014
+                tun10002,218845,218845,9015
             - name: WG_GRE_GATEWAY_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
