@@ -32,7 +32,7 @@ images:
     digest: sha256:54937fd17d81c2e61ce922e79ce26a5aa3433ca270993c4254ee07ab79e1766c
   - name: ghcr.io/pmh-only/mysql
     newTag: "8"
-    digest: sha256:95d122e9a97e9748ad0eb36c41ec5f8601d1ccbbadb0d817b51b993ef092e2cb
+    digest: sha256:3431b9771381bcbef84a9117aee80b40896782ff0a57195e7797e204c761b6f9
   - name: ghcr.io/immich-app/postgres
     newTag: 14-vectorchord0.4.3-pgvectors0.2.0
     digest: sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
