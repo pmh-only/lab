@@ -10,4 +10,4 @@ resources:
 images:
   - name: ghcr.io/librespeed/speedtest
     newTag: latest-alpine
-    digest: sha256:fd0d772063820f3f04e82e9d480ddce2ac63493c2ba1abdb82392348c38ba287
+    digest: sha256:630f765d128b067309ab873573ce48c7f93d4be3dbd7eba0d03858616a3418cb
