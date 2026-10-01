@@ -21,12 +21,28 @@ spec:
           name: nameserver
           port: 5380
           weight: 1
-      sessionPersistence:
-        sessionName: UI_SESSION
-        type: Cookie
-        absoluteTimeout: 10m
-        cookieConfig:
-          lifetimeType: Permanent
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: nameserver-ui-session
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: nameserver-route
+  loadBalancer:
+    type: ConsistentHash
+    consistentHash:
+      type: Cookie
+      cookie:
+        name: UI_SESSION
+        ttl: 600s
+        attributes:
+          Path: /
+          Secure: ""
+          HttpOnly: ""
+          SameSite: Lax
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
