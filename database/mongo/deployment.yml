@@ -8,8 +8,10 @@ spec:
   # Keep the data directory offline while the GitOps migration job runs.
   replicas: 0
   strategy:
-    type: Recreate
-    rollingUpdate: null
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   revisionHistoryLimit: 0
   selector:
     matchLabels:
