@@ -5,8 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
 spec:
-  # Keep the data directory offline while the GitOps migration job runs.
-  replicas: 0
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -57,9 +56,18 @@ spec:
               value: us-east-1
       containers:
         - name: mongo
-          image: ghcr.io/pmh-only/mongo:latest
+          image: docker.io/library/mongo:9.0
           ports:
             - containerPort: 27017
+          readinessProbe:
+            exec:
+              command:
+                - mongosh
+                - --quiet
+                - --eval
+                - "quit(db.adminCommand({ ping: 1 }).ok === 1 ? 0 : 1)"
+            periodSeconds: 10
+            timeoutSeconds: 5
           volumeMounts:
             - mountPath: /data/db
               name: mongo-storage
