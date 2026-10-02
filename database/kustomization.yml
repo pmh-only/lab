@@ -21,6 +21,7 @@ resources:
   - ./mongo/migration-backup.yml
   - ./mongo/migration-scripts.yml
   - ./mongo/migration-job.yml
+  - ./mongo/migration-inspect.yml
   - ./redis/deployment.yml
   - ./redis/service.yml
 images:
