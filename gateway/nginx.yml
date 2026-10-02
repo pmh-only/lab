@@ -241,7 +241,8 @@ data:
           default_type text/plain;
           more_set_headers 'Cache-Control: no-store';
 
-          return 200 "Request
+          # Keep each quoted parameter below Nginx's 4096-byte parser limit.
+          set $wtf_request "Request
             id: $request_id
             time: $time_iso8601
             request: $request
@@ -262,7 +263,8 @@ data:
             unix_timestamp: $msec
             basic_auth_username: $remote_user
 
-          Nginx
+          ";
+          set $wtf_connection "Nginx
             hostname: $hostname
             version: $nginx_version
             worker_pid: $pid
@@ -282,7 +284,8 @@ data:
             congestion_window_segments: $tcpinfo_snd_cwnd
             receive_space_bytes: $tcpinfo_rcv_space
 
-          TLS
+          ";
+          set $wtf_tls "TLS
             sni: $ssl_server_name
             protocol: $ssl_protocol
             cipher: $ssl_cipher
@@ -305,7 +308,8 @@ data:
             validity_remaining_days: $ssl_client_v_remain
             certificate_url_escaped: $ssl_client_escaped_cert
 
-          Selected request headers (not exhaustive)
+          ";
+          set $wtf_headers "Selected request headers (not exhaustive)
             Host: $http_host
             User-Agent: $http_user_agent
             Accept: $http_accept
@@ -329,7 +333,8 @@ data:
             X-Request-ID: $http_x_request_id
             Traceparent: $http_traceparent
             Tracestate: $http_tracestate
-            Sec-Fetch-Site: $http_sec_fetch_site
+          ";
+          set $wtf_extra_headers "  Sec-Fetch-Site: $http_sec_fetch_site
             Sec-Fetch-Mode: $http_sec_fetch_mode
             Sec-Fetch-Dest: $http_sec_fetch_dest
             Sec-Fetch-User: $http_sec_fetch_user
@@ -357,6 +362,8 @@ data:
 
           Body: not read by this config-only endpoint
           ";
+
+          return 200 "$wtf_request$wtf_connection$wtf_tls$wtf_headers$wtf_extra_headers";
         }
 
         location /_gwhealthz {
@@ -398,7 +405,7 @@ spec:
   template:
     metadata:
       annotations:
-        pmh.codes/config-revision: "2026-10-02-1"
+        pmh.codes/config-revision: "2026-10-02-2"
       labels:
         app: gateway-nginx
     spec:
