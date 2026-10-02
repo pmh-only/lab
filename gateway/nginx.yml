@@ -234,6 +234,131 @@ data:
           proxy_pass http://$envoy_gateway:80;
         }
 
+        # Diagnostic response reflects sensitive headers; never cache it.
+        # Core Nginx cannot enumerate arbitrary headers or read the body here.
+        location = /_wtf {
+          access_log off;
+          default_type text/plain;
+          more_set_headers 'Cache-Control: no-store';
+
+          return 200 "Request
+            id: $request_id
+            time: $time_iso8601
+            request: $request
+            method: $request_method
+            scheme: $scheme
+            protocol: $server_protocol
+            host: $host
+            uri: $request_uri
+            normalized_uri: $uri
+            query: $args
+            size_bytes_at_response: $request_length
+            elapsed_seconds_at_response: $request_time
+            http3: $http3
+            http2: $http2
+            https: $https
+            completion_at_response: $request_completion
+            pipelined: $pipe
+            unix_timestamp: $msec
+            basic_auth_username: $remote_user
+
+          Nginx
+            hostname: $hostname
+            version: $nginx_version
+            worker_pid: $pid
+            matched_server_name: $server_name
+
+          Connection
+            client_address: $remote_addr
+            client_port: $remote_port
+            server_address: $server_addr
+            server_port: $server_port
+            connection_id: $connection
+            connection_requests: $connection_requests
+
+          TCP (not applicable to QUIC)
+            rtt_microseconds: $tcpinfo_rtt
+            rtt_variation_microseconds: $tcpinfo_rttvar
+            congestion_window_segments: $tcpinfo_snd_cwnd
+            receive_space_bytes: $tcpinfo_rcv_space
+
+          TLS
+            sni: $ssl_server_name
+            protocol: $ssl_protocol
+            cipher: $ssl_cipher
+            negotiated_curve: $ssl_curve
+            client_supported_curves: $ssl_curves
+            client_supported_ciphers: $ssl_ciphers
+            alpn_protocol: $ssl_alpn_protocol
+            session_reused: $ssl_session_reused
+            session_id: $ssl_session_id
+            early_data: $ssl_early_data
+
+          Client certificate (if supplied)
+            verification: $ssl_client_verify
+            subject: $ssl_client_s_dn
+            fingerprint: $ssl_client_fingerprint
+            issuer: $ssl_client_i_dn
+            serial: $ssl_client_serial
+            validity_start: $ssl_client_v_start
+            validity_end: $ssl_client_v_end
+            validity_remaining_days: $ssl_client_v_remain
+            certificate_url_escaped: $ssl_client_escaped_cert
+
+          Selected request headers (not exhaustive)
+            Host: $http_host
+            User-Agent: $http_user_agent
+            Accept: $http_accept
+            Accept-Encoding: $http_accept_encoding
+            Accept-Language: $http_accept_language
+            Authorization: $http_authorization
+            Cookie: $http_cookie
+            Content-Type: $http_content_type
+            Content-Length: $http_content_length
+            Transfer-Encoding: $http_transfer_encoding
+            Connection: $http_connection
+            Upgrade: $http_upgrade
+            Origin: $http_origin
+            Referer: $http_referer
+            Forwarded: $http_forwarded
+            X-Forwarded-For: $http_x_forwarded_for
+            X-Forwarded-Proto: $http_x_forwarded_proto
+            X-Forwarded-Host: $http_x_forwarded_host
+            X-Forwarded-Port: $http_x_forwarded_port
+            X-Real-IP: $http_x_real_ip
+            X-Request-ID: $http_x_request_id
+            Traceparent: $http_traceparent
+            Tracestate: $http_tracestate
+            Sec-Fetch-Site: $http_sec_fetch_site
+            Sec-Fetch-Mode: $http_sec_fetch_mode
+            Sec-Fetch-Dest: $http_sec_fetch_dest
+            Sec-Fetch-User: $http_sec_fetch_user
+            Priority: $http_priority
+            Sec-CH-UA: $http_sec_ch_ua
+            Sec-CH-UA-Mobile: $http_sec_ch_ua_mobile
+            Sec-CH-UA-Platform: $http_sec_ch_ua_platform
+            Cache-Control: $http_cache_control
+            Pragma: $http_pragma
+            If-None-Match: $http_if_none_match
+            If-Modified-Since: $http_if_modified_since
+            Range: $http_range
+            If-Range: $http_if_range
+            Expect: $http_expect
+            Content-Encoding: $http_content_encoding
+            Sec-WebSocket-Key: $http_sec_websocket_key
+            Sec-WebSocket-Version: $http_sec_websocket_version
+            Sec-WebSocket-Protocol: $http_sec_websocket_protocol
+            Sec-WebSocket-Extensions: $http_sec_websocket_extensions
+            DNT: $http_dnt
+            Sec-GPC: $http_sec_gpc
+            Sec-CH-UA-Arch: $http_sec_ch_ua_arch
+            Sec-CH-UA-Bitness: $http_sec_ch_ua_bitness
+            Sec-CH-UA-Full-Version-List: $http_sec_ch_ua_full_version_list
+
+          Body: not read by this config-only endpoint
+          ";
+        }
+
         location /_gwhealthz {
           access_log off;
 
@@ -273,7 +398,7 @@ spec:
   template:
     metadata:
       annotations:
-        pmh.codes/config-revision: "2026-09-14-1"
+        pmh.codes/config-revision: "2026-10-02-1"
       labels:
         app: gateway-nginx
     spec:
