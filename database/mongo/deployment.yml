@@ -2,15 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mongo
-  annotations:
-    argocd.argoproj.io/sync-wave: "-1"
 spec:
-  replicas: 1
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -56,18 +48,9 @@ spec:
               value: us-east-1
       containers:
         - name: mongo
-          image: docker.io/library/mongo:9.0
+          image: ghcr.io/pmh-only/mongo:latest
           ports:
             - containerPort: 27017
-          readinessProbe:
-            exec:
-              command:
-                - mongosh
-                - --quiet
-                - --eval
-                - "quit(db.adminCommand({ ping: 1 }).ok === 1 ? 0 : 1)"
-            periodSeconds: 10
-            timeoutSeconds: 5
           volumeMounts:
             - mountPath: /data/db
               name: mongo-storage

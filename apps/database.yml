@@ -40,7 +40,7 @@ spec:
     - namePattern: database
       images:
         - alias: mongo
-          imageName: docker.io/library/mongo:9.0
+          imageName: ghcr.io/pmh-only/mongo:latest
           commonUpdateSettings:
             updateStrategy: digest
         - alias: mysql

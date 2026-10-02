@@ -18,7 +18,6 @@ resources:
   - ./mongo/pvc.yml
   - ./mongo/deployment.yml
   - ./mongo/service.yml
-  - ./mongo/migration-backup.yml
   - ./redis/deployment.yml
   - ./redis/service.yml
 images:
@@ -28,8 +27,8 @@ images:
   - name: ghcr.io/pmh-only/redis
     newTag: alpine
     digest: sha256:42447a15c58ed2014f8b9ed5573488331bcc9f409043b16cf6d954a6b4a36590
-  - name: docker.io/library/mongo
-    newTag: "9.0"
+  - name: ghcr.io/pmh-only/mongo
+    newTag: latest
   - name: ghcr.io/pmh-only/mysql
     newTag: "8"
     digest: sha256:1a836ed8493fc686cb90ff045014a281518063d43f2a06187c8f746e6f1319c8
