@@ -3,6 +3,10 @@ kind: Deployment
 metadata:
   name: mongo
 spec:
+  # Keep the data directory offline while the GitOps migration job runs.
+  replicas: 0
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:

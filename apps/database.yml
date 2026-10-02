@@ -39,10 +39,6 @@ spec:
   applicationRefs:
     - namePattern: database
       images:
-        - alias: mongo
-          imageName: ghcr.io/pmh-only/mongo:latest
-          commonUpdateSettings:
-            updateStrategy: digest
         - alias: mysql
           imageName: ghcr.io/pmh-only/mysql:8
           commonUpdateSettings:
