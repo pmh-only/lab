@@ -18,6 +18,9 @@ resources:
   - ./mongo/pvc.yml
   - ./mongo/deployment.yml
   - ./mongo/service.yml
+  - ./mongo/migration-backup.yml
+  - ./mongo/migration-scripts.yml
+  - ./mongo/migration-job.yml
   - ./redis/deployment.yml
   - ./redis/service.yml
 images:

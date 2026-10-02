@@ -1,0 +1,120 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongo-upgrade-20261002
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 3600
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      initContainers:
+        - name: backup-and-test-copy
+          image: alpine:3.23
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              test ! -e /backup/pre-upgrade.tar.gz
+              echo "Backing up the offline data directory"
+              tar -czf /backup/pre-upgrade.tar.gz -C /data/db .
+              cd /backup
+              sha256sum pre-upgrade.tar.gz > pre-upgrade.sha256
+              sha256sum -c pre-upgrade.sha256
+              gzip -t pre-upgrade.tar.gz
+              mkdir staging
+              tar -xzf pre-upgrade.tar.gz -C staging
+              echo "Backup verified; isolated test copy ready"
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
+              readOnly: true
+            - name: backup
+              mountPath: /backup
+        - name: test-8-3
+          image: docker.io/library/mongo:8.3
+          resources:
+            requests: { cpu: 100m, memory: 768Mi }
+            limits: { memory: 2Gi }
+          command: ["/bin/bash", "/scripts/upgrade.sh"]
+          env:
+            - { name: DBPATH, value: /backup/staging }
+            - { name: PHASE, value: test-8.3 }
+            - { name: VERSION_PREFIX, value: "8.3" }
+            - { name: EXPECTED_FCV, value: "8.2" }
+            - { name: TARGET_FCV, value: "8.3" }
+          volumeMounts:
+            - { name: backup, mountPath: /backup }
+            - { name: scripts, mountPath: /scripts, readOnly: true }
+        - name: test-9-0
+          image: docker.io/library/mongo:9.0
+          resources:
+            requests: { cpu: 100m, memory: 768Mi }
+            limits: { memory: 2Gi }
+          command: ["/bin/bash", "/scripts/upgrade.sh"]
+          env:
+            - { name: DBPATH, value: /backup/staging }
+            - { name: PHASE, value: test-9.0 }
+            - { name: VERSION_PREFIX, value: "9.0" }
+            - { name: EXPECTED_FCV, value: "8.3" }
+            - { name: TARGET_FCV, value: "9.0" }
+          volumeMounts:
+            - { name: backup, mountPath: /backup }
+            - { name: scripts, mountPath: /scripts, readOnly: true }
+        - name: migrate-8-3
+          image: docker.io/library/mongo:8.3
+          resources:
+            requests: { cpu: 100m, memory: 768Mi }
+            limits: { memory: 2Gi }
+          command: ["/bin/bash", "/scripts/upgrade.sh"]
+          env:
+            - { name: DBPATH, value: /data/db }
+            - { name: PHASE, value: production-8.3 }
+            - { name: VERSION_PREFIX, value: "8.3" }
+            - { name: EXPECTED_FCV, value: "8.2" }
+            - { name: TARGET_FCV, value: "8.3" }
+          volumeMounts:
+            - { name: data, mountPath: /data/db }
+            - { name: backup, mountPath: /backup }
+            - { name: scripts, mountPath: /scripts, readOnly: true }
+        - name: migrate-9-0
+          image: docker.io/library/mongo:9.0
+          resources:
+            requests: { cpu: 100m, memory: 768Mi }
+            limits: { memory: 2Gi }
+          command: ["/bin/bash", "/scripts/upgrade.sh"]
+          env:
+            - { name: DBPATH, value: /data/db }
+            - { name: PHASE, value: production-9.0 }
+            - { name: VERSION_PREFIX, value: "9.0" }
+            - { name: EXPECTED_FCV, value: "8.3" }
+            - { name: TARGET_FCV, value: "9.0" }
+          volumeMounts:
+            - { name: data, mountPath: /data/db }
+            - { name: backup, mountPath: /backup }
+            - { name: scripts, mountPath: /scripts, readOnly: true }
+      containers:
+        - name: verify
+          image: alpine:3.23
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              cd /backup
+              sha256sum -c pre-upgrade.sha256
+              cmp before.json test-9.0.json
+              cmp before.json production-9.0.json
+              echo "Migration to MongoDB 9.0 complete; backup and collection inventories verified"
+          volumeMounts:
+            - { name: backup, mountPath: /backup, readOnly: true }
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+        - name: backup
+          persistentVolumeClaim:
+            claimName: mongo-upgrade-20261002-backup
+        - name: scripts
+          configMap:
+            name: mongo-upgrade-20261002-scripts
