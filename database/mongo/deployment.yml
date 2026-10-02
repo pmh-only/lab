@@ -2,11 +2,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mongo
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   # Keep the data directory offline while the GitOps migration job runs.
   replicas: 0
   strategy:
     type: Recreate
+    rollingUpdate: null
   revisionHistoryLimit: 0
   selector:
     matchLabels:
