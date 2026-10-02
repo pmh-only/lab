@@ -13,7 +13,8 @@ data:
       for (const collection of database.getCollectionInfos({ type: "collection" })
         .sort((a, b) => a.name.localeCompare(b.name))) {
         if (collection.name === "system.profile" ||
-          (name === "admin" && collection.name === "system.version")) continue;
+          (name === "admin" && collection.name === "system.version") ||
+          (name === "config" && collection.name === "queryShapeRepresentativeQueries")) continue;
         const target = database.getCollection(collection.name);
         result.push({
           database: name,
