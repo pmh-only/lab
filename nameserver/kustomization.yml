@@ -10,4 +10,4 @@ resources:
 images:
   - name: ghcr.io/pmh-only/technitium
     newTag: latest
-    digest: sha256:269d9fc75521a5fb6ffb23bcb6eeb1bae1482c9752821d68bee461e9a83f2da5
+    digest: sha256:43ef30d69718e6b7e81c3d25d74b71527ce28e6e0e4257e0c2f3c4d7a58af20a
