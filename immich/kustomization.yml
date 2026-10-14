@@ -13,4 +13,4 @@ images:
     digest: sha256:bae7664ff3aa4c2c1fcbdcdd86b40b105643c5f861f3e6a770fc760089f25862
   - name: ghcr.io/immich-app/immich-machine-learning
     newTag: release
-    digest: sha256:513c831cfb010ad319341a0c86b42c575a0d5b688d3e8cae346ee624074a58ed
+    digest: sha256:73915f07e1f4289ba45b174c58443db74cef47ddf502613f475fc5e52458ea42
