@@ -26,6 +26,7 @@ rules:
       - resourcequotas
       - serviceaccounts
       - services
+    verbs: ["get", "list", "watch"]
   - apiGroups:
       - apps
       - batch
