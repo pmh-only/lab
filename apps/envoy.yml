@@ -13,7 +13,7 @@ spec:
   source:
     path: .
     repoURL: oci://docker.io/envoyproxy/gateway-helm
-    targetRevision: x
+    targetRevision: v1.9.2
     helm:
       valuesObject:
         config:
