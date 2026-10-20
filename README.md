@@ -22,7 +22,7 @@ This repository defines many components of Kubernetes cluster such as:
 * SQL/No-SQL Databases (MySQL, PostgreSQL, MongoDB, Redis)
 * Observabilities (Grafana, Prometheus, Thanos)
 * Public Gateway / Internal Connector of my Tailscale Network
-* Encrypted Secrets (SealedSecret)
+* Secrets Management (HashiCorp Vault and Vault Secrets Operator)
 * Volume and Cluster Backup Schedule (Velero, Kopia)
 * and Actual Service Components.
 
@@ -216,7 +216,7 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   
-  <td><img src="https://argo.pmh.codes/api/badge?name=sealedsecrets&revision=false&showAppName=true" width="200px" /><br /></td>
+  <td><img src="https://argo.pmh.codes/api/badge?name=vault&revision=false&showAppName=true" width="200px" /><br /><img src="https://argo.pmh.codes/api/badge?name=vault-secrets-operator&revision=false&showAppName=true" width="200px" /></td>
   
   
   

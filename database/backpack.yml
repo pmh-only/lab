@@ -1,15 +1,38 @@
-apiVersion: bitnami.com/v1alpha1
-kind: SealedSecret
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
 metadata:
   name: backpack-secrets
   namespace: database
 spec:
-  encryptedData:
-    MONGO_BACKPACK_PASSWORD: AgAE7P7UHyxA4+eIDFpE0wvtUTl1/Nz3rizMtMc/glD7tWlnHsGPLq2S3ku+6u3pT78pMH1/Fgn/bfZZych4QDDV+LczOt4wRBToXbuzY7BdDpanlKlA8dVp2a3vlUSusz6Fh0bxk2j7aY/YvpTLL4I7PtR9kFWiyClp33P53844ktRVvPVTojkLOv/MHtJnrG8+WJz58vHgd9Xpch6xjVMBvxgtprkfLdeZrcCpCAau06VdkMjld5HU28GOnAlByQDU2PgC82lnoH1j1Te5SAPkFQhxK08nVdRehERNFqRKVlbXb9TpPxZ6H6rJJtzbLHVr/y6n2VGsaRnd8PdDRiypBKBlQmppP402AYUbyzdx/P4VHIcrFwELnHSAfAuOg4LTrLBUv3bM8ecgO8gzjyJc4mboN7yrM4MQW+ULTlTIFUygL7/2VUhnjqPBt877TFwyUAqctJ/LYpkbMd53EYwAdhNfv9nnbcH0DgXvtPI4CQSlpC1isKa66UMQ3zwL58o3+CvL/PBzgAO4M/n5WnoZQz6B1hCqrJ1S9m6IG4qj2SHOaiCWn2GhJqj9+4f1VELZ32xi0zOV2wXUtuxKRHOnwFXBX1Q3IFKyGhjnN55Xlh0MmJrKiYlgh46gP/yeTk9kuJ8k7Bxe5db80er9c8upDscvwk4J6W7hRf5cBCUD4ihbTliKluP0257XDzgmxXAYyxBkBTaWOkAWeEiI
-    S3_ACCESS_TOKEN: AgDnnGkFrWVAmH6pGL0Y/62yP3dEvNxgaxNZDHMuUld0dRG5yzYJYlSoMEH05Ph4FUecSCW8WrxPaqbRw6d9Vh9k/M+Ro+OQtQLpbAFXJt8PLW8DTKwBjpIAA94v60RQYeYoko+h2KUqrvmhtXu+lO5SXIhX6NENs5XaTFVs1zqrsj2Cca7fhv6NmQ13nVZbTnqF/2FF7ru9vo2G3vX0hgK2YKH25DDUz1+LqFnhryg3MPblK6IfcAClssMjHANrx7KBgoLMDAqapFv5jZ+JTjUWiMHk8aT6UUNSso3rYQf2X8jiPKVliolYKgiN4WkcSeR2e4pqEY88XZLPhlHWrcmls/usRaIcy5Dea4UW3LP0FKYEiIOAIELwGNYMr4dQlIe1VE5VvEDEJPxM+xOHCth576u2sTOxh4y/0sAnAZ/e/BM/MNEjt49VzZvbhsdRYELmvE99nmSAb2TiTahsYyoLoxrRnxAiYD0yfQbxS7Hz3QwoTTdt26aqp6bSW4/1gxA1LFmt9aD/09+D32HDmAFmrDtT8N4v9zkWBtiaTwvT9omiWWqtcZOIDzhLq1FggazZZ1nbzaG+eCX1ZjhcUct051Jmry2+72G5qTWz53MNvvax5DWHWq6GWdCM+tq1PJrfwIeVKGj+h7b+7FoHP3JYmBkiUTs/fjz4wlOEFKPpl0WKOaSiEE3t88DV7cab4/xKMT9fD4Y5fdi6eZwR8YcwWbcZwQ==
-    S3_SECRET_TOKEN: AgC8J4xkgn+165+Rg/TqCybRDf24BrtcyoXKA0TmWG3IF+95BNk1IMihpaR/eWjrHlcbmC1/N2e3YUGP539JIjSfzlvdFHBGRggm6VDm23UPjxCVFyZXPzEACLYwXc8dk0SUrDIOfrHP0bsalaU+g/IiDiao/IMxrbUzzxdzd+gNGZQQg5pIv3EuH3N+5xmkQsmVeybgyhcZfvspGeVIArKWZuktUoMFuqPLBd4mJaQxvLE5PxaQBAIihbSisfGsjHiRlKjR/9gx35NR+82lZe8iBKnQulzDPhMPb0l9YQ3VV1a/iqZbZEyM1vq0b9QOhlz+1uINLL6swwsfF9JFGphflqxQtDIWMOljCqoQRT6CYJjqDa4tyT6b0SAkpZG/0Tv6KCfhIoda2tUyguy8QeCvy6t+SJMnu9kvmJzzr9c3Ks2+S8YtdFpfRQpb696THbf7fUTJ7ycYhwRrLpOOFBvLtInukd4ObdS0Fqm1ngfumsfrdFUSXqfx+Vohd2Y6D0k69SJoTjrz4G2PFMx+ByNu9A1qoHAc6aJrTd74+RtUISyc2/WzQ5jOqSN7VCiwGc0QV8E8BoXxc9rEf4dxAhyTpgc8T08zwKROwzcPrQMenTvaS44590qHhcDxhqEps9YiOf/mcclGw/MRRIAnobpY1YMHFBg03LjD/AD8XPObgqNCMPsyI0GyLdZpjdru2e2ERZLZx1erc3DpGtmZW+2vERCtBRMhp3ZZHk+WunLTJFzKVsKeIqoD
-  template:
-    metadata:
-      name: backpack-secrets
-      namespace: database
+  vaultAuthRef: vault
+  mount: secret
+  type: kv-v2
+  path: database/backpack-secrets
+  refreshAfter: 1m
+  destination:
+    create: true
+    overwrite: false
+    name: backpack-secrets
     type: Opaque
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-auth
+  namespace: database
+automountServiceAccountToken: false
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: vault
+  namespace: database
+spec:
+  vaultConnectionRef: vault/cluster
+  method: kubernetes
+  mount: kubernetes
+  kubernetes:
+    role: database
+    serviceAccount: vault-auth
+    audiences:
+    - vault

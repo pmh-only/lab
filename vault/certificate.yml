@@ -1,0 +1,72 @@
+# A separate CA avoids a circular dependency on DNS-provider credentials in Vault.
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: vault-bootstrap
+  namespace: vault
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vault-ca
+  namespace: vault
+spec:
+  isCA: true
+  commonName: lab-vault-ca
+  secretName: vault-ca
+  duration: 87600h
+  renewBefore: 8760h
+  privateKey:
+    algorithm: ECDSA
+    size: 384
+  issuerRef:
+    name: vault-bootstrap
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: vault-ca
+  namespace: vault
+spec:
+  ca:
+    secretName: vault-ca
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vault-server
+  namespace: vault
+spec:
+  secretName: vault-server-tls
+  duration: 2160h
+  renewBefore: 720h
+  privateKey:
+    algorithm: ECDSA
+    size: 384
+    rotationPolicy: Always
+  dnsNames:
+    - vault
+    - vault.vault
+    - vault.vault.svc
+    - vault.vault.svc.cluster.local
+    - vault-0.vault-internal
+    - vault-0.vault-internal.vault.svc.cluster.local
+    - localhost
+  ipAddresses:
+    - 127.0.0.1
+  issuerRef:
+    name: vault-ca
+    kind: Issuer
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultConnection
+metadata:
+  name: cluster
+  namespace: vault
+spec:
+  address: https://vault.vault.svc.cluster.local:8200
+  caCertSecretRef: vault-server-tls
+  skipTLSVerify: false

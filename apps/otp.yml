@@ -10,41 +10,38 @@ spec:
     namespace: otp
     server: https://kubernetes.default.svc
   project: default
-  source:
-    chart: otp-inbox
-    helm:
-      valuesObject:
-        bitwarden:
-          enabled: true
-          server: https://vault.pmh.codes
+  sources:
+    - path: otp_configs
+      repoURL: git@github.com:pmh-only/lab.git
+      targetRevision: HEAD
+    - chart: otp-inbox
+      helm:
+        valuesObject:
+          bitwarden:
+            enabled: true
+            server: https://vault.pmh.codes
 
-        passkey:
-          enabled: true
-          storageClass: local-path
+          passkey:
+            enabled: true
+            storageClass: local-path
 
-        sealedSecret:
-          enabled: true
-          encryptedData:
-            CONNECT_ROSTACK_TOKEN: AgB1a9mtV2GZckh2epCKmp87WW5c4yhatDzyKBK2b9Q5ejs59ZrejFEgLcuwfo52c+Fy8Hi8gSB4SCmlwthsCpK0BANwG67R/iEB2m7PJVmOSUgGPOUZQlKbEbMXUp5TkGUD+sidTVrRajM2/gjdExyLwz56pLy+u5zyB8jgiHD131oH3yFJg6JHqd4Gsw6lnljlKyUvdCHFst77Ra3rlrHPQL/FldiX/Eu9M4HdZTkWlkYCM0lWmj99WsUfCBgwwjQLCWCyTLZaASD1ofZGHPLAa6/kapkabL38pWqTUmjDlzfGobzFz6HCVefT88gpoBBu6+xDCW0VPgVNx/gg0YtzXU54UI7Hw3LByRr30KtkKhlZ/4x4Y9vuALypTnSjjhEEZcUNUHoYv8xermXS4z7fTDNzjN34Fp3D3WXpmLRlF35nIIboGCCE9FZUrZ6w6c5EJ2ZgSZKkWuUpnrXr3BN+Z5zGkQc/v7PTg6NlB0Smw32O6QzbuoHqXXoqcZAkQsEXaNVa6Ruh2gyvzbuA7wKJn+EyUpJLrExO9F56vjque1E2DZYGO9tdDJDrFyqQmrYNf7hBFQG/qAkAx5GIeHpwrRN8NHhXT8THN4K3tmipGGz0uJJNlMAy4EJkZfgU7k2RTEGMu3LhUAsvkCBl+T7K+eWawMn0xHtSclwZVtZL07LvnuoWlk1V7pcC7NjaVLS170WOsTcQp+3a3xWz+mYgO7RFHA+burtjCIyDhlT75sZ2RA0P+yNhhGcnFg==
-            MAIL_ROSTACK_TOKEN: AgB6F2OslShlQ/fTT+L705igOEtoG4Xi1Ibi50waPMbpp3R++3mkVSjaOlI59t+H6IGm0ziZXEpNPTpFsbpolqQMb+HjTv+ffRtNUQpYzdTXmqgI1yn4GtdXihFZi3J/03VQ/s4flUr/hf/qwieYf/hi5Viy5fHJUU58Gux2VOlqEpHzKUDpTqcUU5iS0UtY5dHMEPbxX/xl9QIx3F6enYEq/tTgAEyMTm38bqzb0laoQBPMftCKNX0yqBOa04NxRj1NRVWOQmVQl+FvAusM4yx+mT5U5xjmBXrhBZtvt/r0lKRAXzNOFmoJH7ocLI90rZOk/fgKKD+tZX4kvKca3YYlybWO/baTYcwsIS5pcCM2abXwDfptiso+QzGZmBlMoAOfRFkeeAypCdS7bJ9qXTTo7tsnfmyU7Yf1JlIHDv8JWlOOM2LXemKvACpnSJsxClE7zvuShj2oEFYI+PET670c+bveOLbSO8c98061ag1jIHLix0CFgWMeiVHiwI3PY70/kJZO58tqCQxIyrMlfWeMdSPC2Wn6OFB8OBA4W0GlI94lNcggIOoPmdAASzpYvWKIBItZQb04Qm1JpYsErVOowu2bxBXe/QcsgxRgFeHpcLJcKDeStQBOoe2tvR8pAnk20+wHtStoNpEWoHSbN///YNBEHRiTVf0rV+yFZiERBiGuqe/hQ0mVIz9L0g7VNBH3S2awGYD48UQMOcTvFq6bxSksVJgOTIPFUQlT5TYz5euh69i2g/FrN1rIsFVm2Iwc
-            BW_CLIENTID: AgDfu2rrtc5c8m63z41edKlOO3BU+P3Yz2habrpnQUuUa3c57Z1y9UHM906gmxRJECZ0hc6S2onYgnCz5HZdaVMQp2qB30lPfDiGIILkyEIofyiKu0sJoFWPtDVDBUJfb3PuRIgh7PG+4zbJjcj8pi6e25vHbTKghMxTMfHSEP0kWXdxpqd5TZrkXlpgxdfIFZIX3U9xO5OaNDfQK2gvCVM0CH0d5pBD4UVIKiIVrBk5EoXAaNw5Pl1jO4jZqsvG5pgIV3oygi+m6QqGDRhbqO8hUf/eH4jFzS18kMnbD9VCfD6lP2ITbeR3HoSqEjh+uQ+iGZEE+Obeb2gEe8rZK11fuJ8p2wITWBIczaQ05YgL4atV/bQnsbRiFfMpOCwR6z2BXRqWaESc3qvyLKua5LLn34wU7AhKLTbVcxtrymznG7fUdO9YTloXfEkG2uA+sAjYLzR+OXYGEhFlnSuNmIa2izSnozThu9xmy5eCW48imHI9sCiML/bzmEVkHTQYI/Hf+6nEHORT+bmfBl4vEjoEKOhrR6xp+Dq7+VzjHfp9I18/mI2c9iL7FZAhLRsp6Vksw0qy12zgHJgHu6F6tAjmBOo+kJRtye0Cl7ec6Z5LFrEd8ATA1xFYxpqXJTap68qhgsQmEyK0aKulRQpCplyri73wQ6FQC8HxNxATHvBQ8uBnIats4fQmBWDIPZdCgZnSr63qO1W4zHw0luda5Wop8fI6nPyuMe5NXpD8EN/bIhS3TeskL+jSxg==
-            BW_CLIENTSECRET: AgCPncCaefEquh4OIVuL0cWpLlRffTNpGDDz3IlCe7vSk5EajVoHzC7GVYp3c17iNjTYov2fl0xVa+Uvi/OG1ZWcS49CTav510Zh1mjbEg82520vzPkpeeIWrjfgx18WEic3HzgHPYqIQE0uu6mqSHeyqU8l38q5dmuftXIqE+Zl+A7UvkL6bIOGAJ+G6mdgYNFdCAaE33/wLBK3b+Mb22qaVVmYvJkbnny7Zdcj1sLXT13//z3bMWY/aNsyyKeVN/8fSKOefRCIzJGi9NqfX3QKzJPXCgDSJtRWU7G3y7QcwknOhrmP+CJSjXP+2mnkOkkPhaxDOvsxKGet/DhXjcGvJR84r6myl8TJOdhA3vr5RjDpdlgVVJOm9u0uqSLtNEdQQZYmoBqtHVkra+i4WViJK6RNfQZ64Ol5b4BESUNvJZ/L9lgQDF9WXpqk0czJ1yqWG2yx78kmhU1Vxoj1W1o4ppAj6wlz5f3/0EDN2/08NVA1psHWk91lsdOL00K7M8kBTWyxY3LJpl/WFe1OsRIKkT7J9lOtb44owvlyFB17NG4sx7I/fShQ+uUm/sf86rE19pMlyN1pZqQsk6DPM3Id2APF5Bptc0eF8e8JxzptOs+9IX9X+1OiuWRvrJHbPcmOIDnCb1Peyy0AXfCPr3qd1Zm1IqZ8q65EwsHXIBKPM9GP9ZTvfJynSQ0lXNMYzWXJfly9fpo8cUxsybmVNMDklH2GcZ49gEvFLW30x7Q=
-            PASSKEY_SETUP_TOKEN: AgCUzpU3XaHXjOl/MMRci7xLns8mlRqTWHk309Rq5Z/VZf+j2pzmuA38hgD4G27Vj212bmIPW5j7tofwIR5ApLaHrvjBffoLP1YjMsWjPxbck/Ly2PoDRQUvpSZ3MURSDuluSCei1nK8Li8d2BLYZ66wePgnu4nvIR2pciR9dptbwVOLZwCKcnOXHD3DFIR9kaVtnDApNUDWxuhAhoM28aBjOcSnv+a9Fvj31e2yb/Rz9MfunmdTldCwpUyg7BoJddS08SJgk1q0nX7qtWkIF1SyMFFlvnKhlGE+MrEu5GL71w2QkB1dhCWRPLr49RFk3dI+51yzR97Ak0e3ce7C/39nWrVlcDaKoqJ0uYcp0T02Rak6b/pzKPEwUVV4cQ3SxUzHiGaR2HxlSgl0KmkptdcYWGBKdZgQS39gzT3RIQteQQNlHOb4mM9mCxeMRk9VT2VfBL7qYjGgIrnjhkTswnkDaksmtptOsWCJpkLJ/s/vX48xZxWXAG3ijg0tAh9p5MXfTDPF5NnKFSU0R+gMbN0jZYykM6erQIeA+UDnqYTAbhEobKyj5VSZuaNELSd4I1eLlbFeJtQz2QM7n1LvOfOxhlXqOaKALDjJcFcL3Yj+vueIMMsRNrAHjhjYMHY6kE7f8Pk1+JkQMX5MyCE+Udy7XVm37Z/Qt9ELQUsyatSmy8D2PPE5NcEWLHZMbEpjYOQ4hjbs80ZpQxyZV4sDtvNN/uc/Hof+5T6y1eXB/Urm8GkL3toYHkbDdT1JtA==
+          secrets:
+            existingSecret: otp-inbox
 
-        gatewayApi:
-          enabled: true
-          parentRefs:
-            - name: main
-              namespace: gateway
-          hostnames:
-            - otp.pmh.codes
+          gatewayApi:
+            enabled: true
+            parentRefs:
+              - name: main
+                namespace: gateway
+            hostnames:
+              - otp.pmh.codes
 
-        config:
-          connectDiscoveryUrl: http://connect-service.connect.svc.cluster.local:8080/.well-known/rostack
-          mailDiscoveryUrl: http://mailui.mail.svc.cluster.local:3000/.well-known/rostack
+          config:
+            connectDiscoveryUrl: http://connect-service.connect.svc.cluster.local:8080/.well-known/rostack
+            mailDiscoveryUrl: http://mailui.mail.svc.cluster.local:3000/.well-known/rostack
 
-    repoURL: https://pmh-only.github.io/otp
-    targetRevision: x
+      repoURL: https://pmh-only.github.io/otp
+      targetRevision: x
   syncPolicy:
     automated:
       prune: true

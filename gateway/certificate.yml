@@ -38,16 +38,41 @@ spec:
     - digital signature
     - key encipherment
 ---
-apiVersion: bitnami.com/v1alpha1
-kind: SealedSecret
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
 metadata:
   name: gateway-ech-secrets
   namespace: gateway
 spec:
-  template:
+  vaultAuthRef: vault
+  mount: secret
+  type: kv-v2
+  path: gateway/gateway-ech-secrets
+  refreshAfter: 1m
+  destination:
+    create: true
+    overwrite: false
+    name: gateway-ech-secrets
     type: Opaque
-    metadata:
-      name: gateway-ech-secrets
-      namespace: gateway
-  encryptedData:
-    server.ech.pem: AgA6yMU24Zqtmzvys8gn8QDqetRYuG/bHhT5rRDLZTR2t8Zxrr52G14TNI/vHgtTPSa7s9PAuR7W9Mt/eiFVcDsgVc8H1Q0qkKZs/T/6lKKltJvLy08rtjOGib70zRQRYkF5ulfG0iD5pQBRHZmtyRiYiVG6AlCD1nVpk7i07PnWehzBBNftl/1KT3+zButVx/M3OVaHA5iLbQbNKj8ybwv0N545xd9ji62e4ZJKitmjVyXIIcSTJHybhTGJJQoRu63mm5uvIBjQzVamIh/Mg4oJ303R+Q3/Yp+p4DkepZx7szUh/ULJTlgWUisn2QiK7EceNH6PxRcGx0/PSgAYRvNGR3cVIvj3HRwnq8az8OxOAQU7Yu8GRSheIPIiViJeq3C391uOdMZwWTIhpttuguu6sOVIYh+Ptu38G126KpQMxEDbLPHi2bbam3/wssb+8mYjPpN4x1SaeJC0GDFY5bXJ5buA7IkP5QbMvzARN9fJGjIgGVDq/zwrDKXOESM90lPssWKvA/J1tNnLns1vGO3gVEa+f+FDHKOBPzg7KGqZffqmuBD2lhWw7AfyD6RvFnARyj+bJ8e8u+gNAeeYrWmGS4Nyxa/0FxM6AB6xSojTvqwsM+lY4z7/wXN5iVSA9Y6aqS79E0CQpkA3GrG8SF/hiCNl3INsekrdRg3w6SxCtgqLGPQR8K8aFgf7qkFEoSG6WNoXIKZju3EojUFJNzfhpZmiRbLSU8Pz12PEBJ5GAIEIogXqpkw3Oc3OUOIBBb4gijfoUs08BrjQhlENZd/IK4uzsJWURaf7i0dtREhaI8vfskWwfxq5pvHUAykGI06GqmbdfHZJodcZy8cfmx1qIA4cDFspxPkFOeQ7bwAK6vx9WK6oOqJYZzTDLJ9HOoowadFO3T7CuMQLplBlufjNif+hMknxuz8P+jM/wKqNM/XQWc7KgyTdNkGWi964IKcsGPT1TW8W2uftOWNubIuDASzv/3Bn48wxOqw266hgzRR+FngPsXHbB93j2S+7J8Fx1MpWMktrhQ5dJZweeAA=
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-auth
+  namespace: gateway
+automountServiceAccountToken: false
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: vault
+  namespace: gateway
+spec:
+  vaultConnectionRef: vault/cluster
+  method: kubernetes
+  mount: kubernetes
+  kubernetes:
+    role: gateway
+    serviceAccount: vault-auth
+    audiences:
+    - vault

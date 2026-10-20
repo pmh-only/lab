@@ -1,0 +1,77 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-20"
+spec:
+  destination:
+    namespace: vault
+    server: https://kubernetes.default.svc
+  project: default
+  sources:
+    - path: vault
+      repoURL: git@github.com:pmh-only/lab.git
+      targetRevision: HEAD
+    - chart: vault
+      repoURL: https://helm.releases.hashicorp.com
+      targetRevision: 0.34.1
+      helm:
+        valuesObject:
+          global:
+            tlsDisable: false
+          injector:
+            enabled: false
+          server:
+            dev:
+              enabled: false
+            standalone:
+              enabled: false
+            dataStorage:
+              enabled: true
+              size: 10Gi
+              storageClass: local-path
+            persistentVolumeClaimRetentionPolicy:
+              whenDeleted: Retain
+              whenScaled: Retain
+            extraEnvironmentVars:
+              VAULT_CACERT: /vault/userconfig/vault-server-tls/ca.crt
+            volumes:
+              - name: vault-server-tls
+                secret:
+                  secretName: vault-server-tls
+                  defaultMode: 0440
+            volumeMounts:
+              - name: vault-server-tls
+                mountPath: /vault/userconfig/vault-server-tls
+                readOnly: true
+            ha:
+              enabled: true
+              apiAddr: https://vault.vault.svc.cluster.local:8200
+              # Single-node Raft, not HA. Increase only with a planned Raft join.
+              replicas: 1
+              raft:
+                enabled: true
+                setNodeId: true
+                config: |
+                  ui = true
+                  listener "tcp" {
+                    address = "[::]:8200"
+                    cluster_address = "[::]:8201"
+                    tls_cert_file = "/vault/userconfig/vault-server-tls/tls.crt"
+                    tls_key_file = "/vault/userconfig/vault-server-tls/tls.key"
+                  }
+                  storage "raft" {
+                    path = "/vault/data"
+                  }
+                  service_registration "kubernetes" {}
+          ui:
+            enabled: true
+            serviceType: ClusterIP
+  # No automated sync/prune: initialization, unseal, and upgrades are deliberate.
+  # No deletion finalizer: deleting this Application must not delete Vault's data.
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
