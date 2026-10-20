@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Initialize/unseal Vault and configure namespace-scoped Kubernetes auth.
+"""Initialize/unseal Vault without authenticating with its root token.
 
 Run with Python 3 and PyYAML installed, after forwarding Vault's TLS port:
   kubectl -n vault port-forward svc/vault 8200:8200
   python3 bootstrap/vault/setup.py
 
+Configuration is a separate, explicit step: pass --configure with a non-root
+administrator token supplied through VAULT_TOKEN. Root tokens are rejected.
 No application credentials are imported or generated. Bootstrap credentials are
 stored outside Git with mode 0600. Move the unseal shares to separate secure
-custodians and establish non-root administrative access after setup.
+custodians. This script never authenticates using the saved bootstrap root token.
 """
 
 import argparse
@@ -80,9 +82,24 @@ def protected_credentials(path, vault):
             output.flush()
             os.fsync(output.fileno())
         print(f"New bootstrap credentials saved privately to {path}")
-    if not credentials.get("root_token") or len(credentials.get("keys_base64", [])) < 3:
+    if len(credentials.get("keys_base64", [])) < 3:
         raise RuntimeError("Bootstrap credential file is incomplete")
     return credentials
+
+
+def authenticate_operator(vault, credentials, token):
+    if not token:
+        raise RuntimeError("--configure requires a non-root administrator token in VAULT_TOKEN")
+    if token == credentials.get("root_token"):
+        raise RuntimeError("The bootstrap root token must not be used")
+    vault.token = token
+    try:
+        policies = vault.request("auth/token/lookup-self")["data"]["policies"]
+        if "root" in policies:
+            raise RuntimeError("Root-policy tokens must not be used")
+    except Exception:
+        vault.token = None
+        raise
 
 
 def configure(vault, root):
@@ -137,6 +154,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--address", default="https://127.0.0.1:8200")
     parser.add_argument("--credentials", type=Path, default=Path.home() / ".local/share/lab-vault/bootstrap.json")
+    parser.add_argument("--configure", action="store_true", help="Configure Vault using a non-root VAULT_TOKEN")
     args = parser.parse_args()
     ca = base64.b64decode(subprocess.check_output([
         "kubectl", "get", "secret", "-n", "vault", "vault-server-tls",
@@ -150,9 +168,10 @@ def main():
             result = vault.request("sys/unseal", {"key": key}, "PUT")
         if result["sealed"]:
             raise RuntimeError("Vault remains sealed")
-    vault.token = credentials["root_token"]
-    configure(vault, Path(__file__).resolve().parents[2])
-    print("Vault is initialized and unsealed. Application secret paths remain unpopulated.")
+    print("Vault is initialized and unsealed. No root token was used for authentication.")
+    if args.configure:
+        authenticate_operator(vault, credentials, os.environ.get("VAULT_TOKEN"))
+        configure(vault, Path(__file__).resolve().parents[2])
 
 
 if __name__ == "__main__":
