@@ -12,7 +12,7 @@ spec:
   project: default
   source:
     path: database
-    repoURL: git@github.com:pmh-only/lab.git
+    repoURL: https://github.com/pmh-only/lab.git
     targetRevision: HEAD
   syncPolicy:
     automated:
@@ -47,8 +47,8 @@ spec:
           imageName: ghcr.io/pmh-only/mysql:8
           commonUpdateSettings:
             updateStrategy: digest
-        - alias: pgvecto-rs
-          imageName: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
+        - alias: postgres
+          imageName: ghcr.io/pmh-only/postgres:18
           commonUpdateSettings:
             updateStrategy: digest
         - alias: redis
