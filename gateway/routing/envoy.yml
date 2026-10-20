@@ -1,3 +1,4 @@
+# Internal routing is deployed separately from the certificate-dependent edge.
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyProxy
 metadata:

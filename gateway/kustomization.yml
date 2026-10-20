@@ -5,9 +5,7 @@ resources:
   - ./certificate.yml
   - ./clusterissuer.yml
   - ./nginx.yml
-  - ./envoy.yml
-  - ./backend-policy.yml
-  - ./service-alias.yml
+# Internal Envoy routing is owned by the separate gateway-routing Application.
 images:
   - name: ghcr.io/pmh-only/nginx
     newTag: latest
