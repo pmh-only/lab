@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  source:
+    repoURL: https://github.com/pmh-only/lab.git
+    targetRevision: main
+    path: apps
+    directory:
+      recurse: false
+  # Manual initial sync: child Applications enable their own automated rollout.
+  # Bootstrap Vault and provision fresh credentials before syncing this app.
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true

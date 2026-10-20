@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: argocd
+resources:
+  - namespace.yml
+  - https://raw.githubusercontent.com/argoproj/argo-cd/v3.5.5/manifests/install.yaml
+patches:
+  - target:
+      kind: Deployment
+      name: argocd-repo-server
+    patch: |
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: argocd-repo-server
+      spec:
+        template:
+          spec:
+            containers:
+              - name: argocd-repo-server
+                env:
+                  - name: GIT_CONFIG_COUNT
+                    value: "1"
+                  - name: GIT_CONFIG_KEY_0
+                    value: url.https://github.com/pmh-only/lab.git.insteadOf
+                  - name: GIT_CONFIG_VALUE_0
+                    value: git@github.com:pmh-only/lab.git
