@@ -12,7 +12,7 @@ spec:
   project: default
   sources:
     - path: vault
-      repoURL: git@github.com:pmh-only/lab.git
+      repoURL: https://github.com/pmh-only/lab.git
       targetRevision: HEAD
     - chart: vault
       repoURL: https://helm.releases.hashicorp.com
