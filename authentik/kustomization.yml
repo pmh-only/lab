@@ -6,7 +6,8 @@ resources:
   - ./deployment.yml
   - ./secret.yml
   - ./service.yml
-  # Publish the route only after the fresh administrator has been verified.
+  # Fresh administrator password and API identity verified before publication.
+  - ./ingress.yml
   - ./network-policy.yml
 configMapGenerator:
   - name: authentik-runtime
