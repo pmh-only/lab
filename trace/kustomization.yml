@@ -6,7 +6,8 @@ resources:
   - ./secret.yml
   - ./service.yml
   - ./initialize-job.yml
-  # Publish only after native owner/session and original tracking-ID checks.
+  # Native owner/session, scoped SQL and original tracking-ID checks verified.
+  - ./ingress.yml
 configMapGenerator:
   - name: trace-bootstrap
     files:
