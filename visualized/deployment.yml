@@ -16,3 +16,11 @@ spec:
       containers:
         - name: visualized
           image: ghcr.io/pmh-only/kube-universe:latest
+          startupProbe:
+            tcpSocket:
+              port: 3000
+            failureThreshold: 30
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 3000

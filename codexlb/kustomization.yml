@@ -7,7 +7,8 @@ resources:
   - ./pvc.yml
   - ./secret.yml
   - ./initialize-job.yml
-  # Publish only after native dashboard password initialization and verification.
+  # Native owner login/account API verified; anonymous account access rejected.
+  - ./ingress.yml
 configMapGenerator:
   - name: codexlb-initialize
     files:

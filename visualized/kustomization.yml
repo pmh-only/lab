@@ -4,7 +4,7 @@ namespace: visualized
 resources:
   - ./deployment.yml
   - ./service.yml
-  - ./ingress.yml
+  # Publish after checking the live graph excludes Secret values/annotations.
   - ./rbac.yml
 images:
   - name: ghcr.io/pmh-only/kube-universe
