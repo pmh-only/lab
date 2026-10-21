@@ -39,21 +39,22 @@ class Authentik:
 
 def provision_client(vault, api, slug, desired):
     provider_name = "lab bootstrap: " + slug
+    secret_field = desired.get("secretField", "client-secret")
     providers = api.list("providers/oauth2/")
     existing = next((p for p in providers if p["client_id"] == desired["clientID"]), None)
     stored = vault.get(desired["vaultPath"])
     if existing and (existing["name"] != provider_name or stored is None):
         raise RuntimeError("An existing OIDC provider is not managed by this bootstrap; refusing takeover")
     if stored is None:
-        stored = {"client-secret": secrets.token_urlsafe(48)}
+        stored = {secret_field: secrets.token_urlsafe(48)}
         vault.create(desired["vaultPath"], stored)
-    if set(stored) != {"client-secret"} or len(stored["client-secret"]) < 48:
+    if set(stored) != {secret_field} or len(stored[secret_field]) < 48:
         raise RuntimeError("Existing OIDC credentials need manual review")
     redirects = [{"matching_mode": "strict", "url": desired["redirectURI"], "redirect_uri_type": "authorization"}]
     if existing:
         if existing["redirect_uris"] != redirects or existing["issuer_mode"] != "per_provider":
             raise RuntimeError("Existing managed provider has unexpected redirect/issuer settings")
-        if existing.get("client_secret") and not secrets.compare_digest(existing["client_secret"], stored["client-secret"]):
+        if existing.get("client_secret") and not secrets.compare_digest(existing["client_secret"], stored[secret_field]):
             raise RuntimeError("Provider/Vault client secret mismatch; refusing uncoordinated rotation")
         provider = existing
     else:
@@ -73,7 +74,7 @@ def provision_client(vault, api, slug, desired):
         provider = api.request("providers/oauth2/", {
             "name": provider_name, "authorization_flow": flows["default-provider-authorization-implicit-consent"],
             "invalidation_flow": flows["default-provider-invalidation-flow"], "client_type": "confidential",
-            "client_id": desired["clientID"], "client_secret": stored["client-secret"], "redirect_uris": redirects,
+            "client_id": desired["clientID"], "client_secret": stored[secret_field], "redirect_uris": redirects,
             "issuer_mode": "per_provider", "signing_key": signing, "property_mappings": mappings,
             "grant_types": ["authorization_code", "refresh_token"],
         })

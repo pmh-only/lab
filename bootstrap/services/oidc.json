@@ -13,6 +13,14 @@
     "launchURL": "https://meta.pmh.codes",
     "redirectURI": "https://meta.pmh.codes/oauth2/callback"
   },
+  "stmt": {
+    "namespace": "stmt",
+    "vaultPath": "stmt/stmt-secret",
+    "secretField": "OIDC_CLIENT_SECRET",
+    "clientID": "6DgXGTRW2Q9J09niYQIKkKoZT7PPSuuGKH7tBb7d",
+    "launchURL": "https://stmt.pmh.codes",
+    "redirectURI": "https://stmt.pmh.codes/auth/callback"
+  },
   "pdf": {
     "namespace": "pdf",
     "vaultPath": "pdf/pdf-auth-secrets",

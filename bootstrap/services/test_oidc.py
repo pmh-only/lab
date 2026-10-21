@@ -16,6 +16,13 @@ DECLARATIONS = json.loads(Path(__file__).with_name("oidc.json").read_text())
 class OIDCTests(unittest.TestCase):
     def test_public_client_ids_match_existing_security_policies(self):
         for slug, declaration in DECLARATIONS.items():
+            if slug == "stmt":
+                docs = list(yaml.safe_load_all((ROOT / "stmt/deployment.yml").read_text()))
+                env = docs[0]["spec"]["template"]["spec"]["containers"][0]["env"]
+                actual = next(e["value"] for e in env if e["name"] == "OIDC_CLIENT_ID")
+                self.assertEqual(actual, declaration["clientID"])
+                self.assertEqual(declaration["redirectURI"], "https://stmt.pmh.codes/auth/callback")
+                continue
             directory = "pdf_configs" if slug == "pdf" else slug
             docs = list(yaml.safe_load_all((ROOT / directory / "ingress.yml").read_text()))
             policy = next(d["spec"]["oidc"] for d in docs if d["kind"] == "SecurityPolicy")

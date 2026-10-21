@@ -16,7 +16,7 @@ spec:
       valuesObject:
         kind: Deployment
     repoURL: https://kubernetes-sigs.github.io/descheduler/
-    targetRevision: x
+    targetRevision: 0.37.0
   syncPolicy:
     automated:
       prune: true
