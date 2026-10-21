@@ -2,10 +2,12 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: nameserver
 resources:
-  - ./daemonset.yml
+  - ./deployment.yml
+  - ./pvc.yml
   - ./service.yml
   - ./ingress.yml
   - ./certificate.yml
+  - ./bootstrap-issuer.yml
 # Vault authentication and Secret synchronization are owned by nameserver-secrets.
 images:
   - name: ghcr.io/pmh-only/technitium

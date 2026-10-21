@@ -1,0 +1,8 @@
+# Break the DNS01 bootstrap cycle. Switch the Certificate to the public issuer
+# only after DNS zones, delegation, and the ACME webhook have been configured.
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: nameserver-bootstrap
+spec:
+  selfSigned: {}

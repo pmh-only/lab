@@ -6,12 +6,18 @@ spec:
   clusterIP: 172.17.0.20
   selector:
     app: nameserver
-  internalTrafficPolicy: Local
+  # The bootstrap primary runs on one node; clients on both nodes must reach it.
+  internalTrafficPolicy: Cluster
   ports:
     - name: webconsole
       protocol: TCP
       port: 5380
       targetPort: 5380
+
+    - name: webconsole-tls
+      protocol: TCP
+      port: 53443
+      targetPort: 53443
 
     - name: dns
       protocol: UDP

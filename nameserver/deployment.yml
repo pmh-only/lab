@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nameserver
+spec:
+  # Start with one primary on a fresh PVC; add a configured secondary separately.
+  replicas: 1
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: nameserver
+  template:
+    metadata:
+      labels:
+        app: nameserver
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: nameserver
+          image: ghcr.io/pmh-only/technitium:latest
+          # Technitium reads these settings only when initializing a new config.
+          env:
+            - name: DNS_SERVER_DOMAIN
+              value: ns1.pmh.codes
+            - name: DNS_SERVER_ADMIN_PASSWORD_FILE
+              value: /run/secrets/nameserver-admin/password
+            - name: DNS_SERVER_RECURSION
+              value: AllowOnlyForPrivateNetworks
+            - name: DNS_SERVER_WEB_SERVICE_HTTP_PORT
+              value: "5380"
+            - name: DNS_SERVER_WEB_SERVICE_ENABLE_HTTPS
+              value: "true"
+            - name: DNS_SERVER_WEB_SERVICE_HTTPS_PORT
+              value: "53443"
+            - name: DNS_SERVER_WEB_SERVICE_TLS_CERTIFICATE_PATH
+              value: /run/secrets/nameserver-tls/keystore.p12
+            - name: DNS_SERVER_WEB_SERVICE_TLS_CERTIFICATE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nameserver-tls-keystore
+                  key: password
+            - name: DNS_SERVER_WEB_SERVICE_HTTP_TO_TLS_REDIRECT
+              value: "false"
+            - name: DNS_SERVER_OPTIONAL_PROTOCOL_DNS_OVER_HTTP
+              value: "true"
+          ports:
+            - name: https
+              containerPort: 53443
+              protocol: TCP
+            - name: http
+              containerPort: 5380
+              protocol: TCP
+            - name: dns-tcp
+              containerPort: 53
+              protocol: TCP
+            - name: dns-udp
+              containerPort: 53
+              protocol: UDP
+            - name: doh
+              containerPort: 80
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+            failureThreshold: 3
+          volumeMounts:
+            - name: nameserver
+              mountPath: /etc/dns
+            - name: tls
+              mountPath: /run/secrets/nameserver-tls
+              readOnly: true
+            - name: admin
+              mountPath: /run/secrets/nameserver-admin
+              readOnly: true
+      volumes:
+        - name: tls
+          secret:
+            secretName: nameserver-tls-secret
+        - name: nameserver
+          persistentVolumeClaim:
+            claimName: nameserver-config
+        - name: admin
+          secret:
+            secretName: nameserver-admin
