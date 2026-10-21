@@ -1,0 +1,114 @@
+{
+  "zones": [
+    {
+      "zone": "pmh.codes",
+      "emptyApexWeb": true,
+      "records": [
+        {
+          "name": "*.pmh.codes",
+          "type": "A",
+          "ttl": 300,
+          "data": {
+            "ipAddress": "168.110.121.95"
+          }
+        },
+        {
+          "name": "_autodiscover._tcp.pmh.codes",
+          "type": "SRV",
+          "ttl": 300,
+          "data": {
+            "priority": 0,
+            "weight": 0,
+            "port": 443,
+            "target": "autodiscover.purelymail.com"
+          }
+        },
+        {
+          "name": "_dmarc.pmh.codes",
+          "type": "CNAME",
+          "ttl": 300,
+          "data": {
+            "cname": "dmarcroot.purelymail.com"
+          }
+        },
+        {
+          "name": "auth.pmh.codes",
+          "type": "CNAME",
+          "ttl": 300,
+          "data": {
+            "cname": "pmhonly-cd-wydx5vkqda3gfq8y.edge.tenants.jp.auth0.com"
+          }
+        },
+        {
+          "name": "autoconfig.pmh.codes",
+          "type": "CNAME",
+          "ttl": 300,
+          "data": {
+            "cname": "autoconfig.purelymail.com"
+          }
+        },
+        {
+          "name": "pmh.codes",
+          "type": "MX",
+          "ttl": 300,
+          "data": {
+            "preference": 1,
+            "exchange": "mailserver.purelymail.com"
+          }
+        },
+        {
+          "name": "pmh.codes",
+          "type": "TXT",
+          "ttl": 300,
+          "data": {
+            "characterStringsBase64": [
+              "cHVyZWx5bWFpbF9vd25lcnNoaXBfcHJvb2Y9YmVjZDY1YzViZTFhYTNhY2YyMjUwYzcyMmI4YWVmMmQ5YWRjNDRlYzcyYjU3NGYzMTg0MDYwN2MzMjJhNzg2YmVjY2I4ZWZlNDFhYmVkOWFlM2I0MDY1NjFkMzI0YjY0OGMwMzNkNjAzZDljOTg1ZDQ5YWU5NTFlN2ZmYzU2YmM="
+            ]
+          }
+        },
+        {
+          "name": "pmh.codes",
+          "type": "TXT",
+          "ttl": 300,
+          "data": {
+            "characterStringsBase64": [
+              "dj1zcGYxIGluY2x1ZGU6X3NwZi5wdXJlbHltYWlsLmNvbSB+YWxs"
+            ]
+          }
+        },
+        {
+          "name": "purelymail1._domainkey.pmh.codes",
+          "type": "CNAME",
+          "ttl": 300,
+          "data": {
+            "cname": "key1.dkimroot.purelymail.com"
+          }
+        },
+        {
+          "name": "purelymail2._domainkey.pmh.codes",
+          "type": "CNAME",
+          "ttl": 300,
+          "data": {
+            "cname": "key2.dkimroot.purelymail.com"
+          }
+        },
+        {
+          "name": "purelymail3._domainkey.pmh.codes",
+          "type": "CNAME",
+          "ttl": 300,
+          "data": {
+            "cname": "key3.dkimroot.purelymail.com"
+          }
+        },
+        {
+          "name": "welplan.pmh.codes",
+          "type": "A",
+          "ttl": 300,
+          "data": {
+            "ipAddress": "158.247.242.239"
+          }
+        }
+      ]
+    }
+  ]
+}

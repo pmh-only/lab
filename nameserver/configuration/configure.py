@@ -167,7 +167,7 @@ def reconcile_authoritative(client, zones, desired):
     print(f"Authoritative NS/A records and DNSSEC prepared for {len(zones)} private zones; external delegation unchanged")
 
 
-def configure(client, desired, password, dns01=None, authoritative=None, after_configure=None):
+def configure(client, desired, password, dns01=None, authoritative=None, after_configure=None, imported=None):
     result = client.post("user/login", {"user": "admin", "pass": password})
     client.token = result.get("token")
     if not client.token:
@@ -178,6 +178,10 @@ def configure(client, desired, password, dns01=None, authoritative=None, after_c
             reconcile_dns01(client, dns01)
             if authoritative:
                 reconcile_authoritative(client, dns01["zones"], authoritative)
+            if imported:
+                from records import reconcile as reconcile_records
+
+                reconcile_records(client, imported, dns01["zones"])
         if after_configure:
             after_configure(client)
     finally:
@@ -213,6 +217,7 @@ def main():
         dns01,
         json.loads(Path("/configuration/authoritative.json").read_text()),
         after_configure=replicate,
+        imported=json.loads(Path("/configuration/imported-records.json").read_text()),
     )
 
 
