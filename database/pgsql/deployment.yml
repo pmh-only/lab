@@ -49,6 +49,15 @@ spec:
       containers:
         - name: pgsql
           image: ghcr.io/pmh-only/postgres:18
+          startupProbe:
+            exec:
+              command: [pg_isready, -U, admin, -d, postgres]
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command: [pg_isready, -U, admin, -d, postgres]
+            periodSeconds: 5
           ports:
             - containerPort: 5432
           env:

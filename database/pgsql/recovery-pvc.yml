@@ -1,0 +1,26 @@
+# Preserve the failed original PVC. Recovery is performed on a separate copy.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pgsql-recovery-work
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pgsql-recovery-clean
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi

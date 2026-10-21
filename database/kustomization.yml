@@ -8,6 +8,7 @@ resources:
   - ./mysql/secret.yml
   - ./mysql/service.yml
   - ./pgsql/pvc.yml
+  - ./pgsql/recovery-pvc.yml
   - ./pgsql/deployment.yml
   - ./pgsql/secret.yml
   - ./pgsql/service.yml
@@ -23,6 +24,19 @@ resources:
 # Temporary fresh-cluster bootstrap without Tailscale/S3 backups; see todo.md.
 # Remove both patches only after provisioning and testing the backup dependencies.
 patches:
+  # A node-local RWO PVC can still be mounted by two Pods on the same node.
+  # Never overlap database writers during a Secret-triggered restart.
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: (mysql|pgsql|clickhouse|mongo)
+    patch: |-
+      - op: add
+        path: /spec/strategy
+        value:
+          type: Recreate
+          rollingUpdate: null
   - target:
       group: apps
       version: v1
