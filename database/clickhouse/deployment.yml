@@ -47,6 +47,16 @@ spec:
       containers:
         - name: clickhouse
           image: ghcr.io/pmh-only/clickhouse-server:rybbit
+          startupProbe:
+            httpGet:
+              path: /ping
+              port: 8123
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8123
           ports:
             - containerPort: 8123
           env:
@@ -64,7 +74,14 @@ spec:
               name: clickhouse-storage
             - mountPath: /etc/clickhouse-server/config.d
               name: clickhouse-config
+            - mountPath: /etc/clickhouse-server/config.d/lab-cluster-listen.xml
+              name: cluster-listen
+              subPath: lab-cluster-listen.xml
+              readOnly: true
       volumes:
+        - name: cluster-listen
+          configMap:
+            name: clickhouse-cluster-listen
         - name: clickhouse-storage
           persistentVolumeClaim:
             claimName: clickhouse-pvc

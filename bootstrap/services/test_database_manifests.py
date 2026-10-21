@@ -9,6 +9,18 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class DatabaseSafetyTests(unittest.TestCase):
+    def test_clickhouse_listens_for_private_service_clients_without_resetting_config(self):
+        docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "database")], text=True)))
+        config = next(d for d in docs if d["kind"] == "ConfigMap" and d["metadata"]["name"] == "clickhouse-cluster-listen")
+        self.assertIn('<listen_host replace="replace">0.0.0.0</listen_host>', config["data"]["lab-cluster-listen.xml"])
+        deployment = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "clickhouse")
+        pod = deployment["spec"]["template"]["spec"]
+        self.assertEqual(next(v["persistentVolumeClaim"]["claimName"] for v in pod["volumes"] if v["name"] == "clickhouse-config"), "clickhouse-config-pvc")
+        container = pod["containers"][0]
+        self.assertEqual(container["readinessProbe"]["httpGet"]["path"], "/ping")
+        service = next(d for d in docs if d["kind"] == "Service" and d["metadata"]["name"] == "clickhouse-service")
+        self.assertEqual(service["spec"].get("type", "ClusterIP"), "ClusterIP")
+
     @classmethod
     def setUpClass(cls):
         cls.docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "database")], text=True)))

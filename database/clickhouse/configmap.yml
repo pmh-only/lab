@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clickhouse-cluster-listen
+data:
+  lab-cluster-listen.xml: |
+    <clickhouse>
+      <!-- The original config.d PVC hides the image's Docker listen config. -->
+      <!-- The Service remains ClusterIP; every SQL user still authenticates. -->
+      <listen_host replace="replace">0.0.0.0</listen_host>
+    </clickhouse>

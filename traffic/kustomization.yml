@@ -7,7 +7,8 @@ resources:
   - ./aggregator.yml
   - ./collector_cm.yml
   - ./collector.yml
-  # Publish after real Gateway logs produce the native dashboard.
+  # Real Gateway log privacy, native dashboard and /ws handshake verified.
+  - ./ingress.yml
 configMapGenerator:
   - name: traffic-preparation
     files:
