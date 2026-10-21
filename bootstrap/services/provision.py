@@ -20,6 +20,7 @@ from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
 
 ROOT = Path(__file__).resolve().parents[2]
 PROFILES = {
+    "codexlb": ("codexlb/bootstrap-login", {"ADMIN_PASSWORD": "random"}),
     "indexgen": ("indexgen/indexgen-secrets", {"S3_ACCESS_TOKEN": "s3-access:indexgen", "S3_SECRET_TOKEN": "random"}),
     "books": ("books/books-secret", {"DATABASE_URL": "postgres:books", "OIDC_CLIENT_SECRET": "random", "JWT_ACCESS_SECRET": "random", "JWT_REFRESH_SECRET": "random", "S3_ACCESS_KEY_ID": "s3-access:books", "S3_SECRET_ACCESS_KEY": "random"}),
     "monitoring": ("monitoring/monitoring-secret", {"GF_SECURITY_ADMIN_PASSWORD": "random", "GF_SECURITY_SECRET_KEY": "random", "GF_RENDERING_RENDERER_TOKEN": "random"}),

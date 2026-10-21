@@ -5,7 +5,13 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./pvc.yml
-  - ./ingress.yml
+  - ./secret.yml
+  - ./initialize-job.yml
+  # Publish only after native dashboard password initialization and verification.
+configMapGenerator:
+  - name: codexlb-initialize
+    files:
+      - initialize.py
 images:
   - name: ghcr.io/aafqaq/codex-lb-enhanced
     newTag: latest

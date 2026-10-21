@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: codexlb
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -12,11 +14,20 @@ spec:
       labels:
         app: codexlb
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: codexlb
           image: ghcr.io/aafqaq/codex-lb-enhanced:latest
           ports:
             - containerPort: 2455
+          startupProbe:
+            tcpSocket:
+              port: 2455
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 2455
           env:
             - name: CODEX_LB_HTTP_RESPONSES_SESSION_BRIDGE_AMBIGUOUS_CONTINUATION_RECOVERY_MODE
               value: server_indefinite_recovery

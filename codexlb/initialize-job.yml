@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: codexlb-initialize
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 180
+  template:
+    spec:
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+      containers:
+        - name: initialize
+          image: python:3.14-alpine@sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72
+          command: [python, /initialize/initialize.py]
+          env:
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: initialize
+              mountPath: /initialize
+              readOnly: true
+            - name: bootstrap
+              mountPath: /run/secrets/bootstrap
+              readOnly: true
+      volumes:
+        - name: initialize
+          configMap:
+            name: codexlb-initialize
+        - name: bootstrap
+          secret:
+            secretName: codexlb-bootstrap
+            defaultMode: 0440
