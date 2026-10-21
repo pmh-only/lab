@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mailui
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   revisionHistoryLimit: 0
   selector:
@@ -49,6 +51,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mailui-worker
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   revisionHistoryLimit: 0
   selector:
@@ -78,6 +82,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: maildemo
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   revisionHistoryLimit: 0
   selector:

@@ -23,13 +23,19 @@ PROFILES = {
     "speed": ("speed/speed-secret", {"PASSWORD": "random", "IPINFO_APIKEY": "optional-empty"}),
     "here": ("here/here-secret", {"SSH_PASSWORD": "random"}),
     "minio": ("minio/minio-secrets", {"MINIO_ROOT_USER": "random", "MINIO_ROOT_PASSWORD": "random"}),
-    "heartbeat": ("heartbeat/heartbeat-secret", {"DATABASE_URL": "postgres:heartbeat"}),
-    "keysboard": ("keysboard/keysboard-secret", {"DATABASE_URL": "postgres:keysboard", "REDIS_URL": "redis", "JWT_SECRET": "random"}),
+    "heartbeat": ("heartbeat/heartbeat-secret", {"DATABASE_URL": "mysql-dsn:heartbeat"}),
+    "keysboard": ("keysboard/keysboard-secret", {"DATABASE_URL": "mysql-url:keysboard", "REDIS_URL": "redis", "JWT_SECRET": "random"}),
     "mail": ("mail/mailui-secret", {"DATABASE_URL": "postgres:mailui", "BETTER_AUTH_SECRET": "random", "MAIL_SECRET_KEY": "random"}),
 }
 
 
 def generated(kind):
+    if kind.startswith(("mysql-url:", "mysql-dsn:")):
+        style, role = kind.split(":", 1)
+        password = secrets.token_urlsafe(48)
+        if style == "mysql-url":
+            return f"mysql://{role}:{password}@mysql-service.database.svc.cluster.local:3306/{role}"
+        return f"{role}:{password}@tcp(mysql-service.database.svc.cluster.local:3306)/{role}?charset=utf8mb4&parseTime=true&loc=UTC"
     if kind.startswith("postgres:"):
         role = kind.split(":", 1)[1]
         return f"postgresql://{role}:{secrets.token_urlsafe(48)}@pgsql-service.database.svc.cluster.local:5432/{role}"
@@ -43,6 +49,12 @@ def valid_field(value, kind):
         return False
     if kind == "random":
         return len(value) >= 48
+    if kind.startswith(("mysql-url:", "mysql-dsn:")):
+        try:
+            mysql_identity(value, kind)
+            return True
+        except RuntimeError:
+            return False
     if kind.startswith("postgres:"):
         role = kind.split(":", 1)[1]
         parsed = urllib.parse.urlsplit(value)
@@ -50,6 +62,79 @@ def valid_field(value, kind):
     if kind == "redis":
         return value == generated("redis")
     return kind == "optional-empty"
+
+
+def mysql_identity(value, kind):
+    style, role = kind.split(":", 1)
+    if not re.fullmatch("[a-z][a-z0-9_]*", role):
+        raise RuntimeError("Unsafe MySQL identity")
+    if style == "mysql-url":
+        parsed = urllib.parse.urlsplit(value)
+        if parsed.scheme != "mysql" or parsed.username != role or parsed.hostname != "mysql-service.database.svc.cluster.local" or parsed.path != "/" + role:
+            raise RuntimeError("Unexpected managed MySQL URL")
+        password = parsed.password or ""
+    else:
+        prefix = role + ":"
+        suffix = "@tcp(mysql-service.database.svc.cluster.local:3306)/" + role + "?charset=utf8mb4&parseTime=true&loc=UTC"
+        if not value.startswith(prefix) or not value.endswith(suffix):
+            raise RuntimeError("Unexpected managed Go MySQL DSN")
+        password = value[len(prefix):-len(suffix)]
+    if not re.fullmatch("[A-Za-z0-9_-]{48,}", password):
+        raise RuntimeError("Unexpected managed MySQL password")
+    return role, password
+
+
+def mysql_sql(statement):
+    command = ["kubectl", "exec", "-i", "-n", "database", "deployment/mysql", "-c", "mysql", "--", "sh", "-c",
+               'export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; exec mysql -uroot --batch --skip-column-names']
+    result = subprocess.run(command, input=statement, text=True, capture_output=True, timeout=30)
+    if result.returncode:
+        raise RuntimeError("MySQL provisioning failed; SQL/error bodies suppressed")
+    return result.stdout.strip()
+
+
+def mysql_database(value, kind):
+    role, password = mysql_identity(value, kind)
+    state = json.loads(mysql_sql(f"""SELECT JSON_OBJECT(
+ 'userCount',(SELECT COUNT(*) FROM mysql.user WHERE User='{role}'),
+ 'marker',(SELECT COALESCE(JSON_UNQUOTE(JSON_EXTRACT(User_attributes,'$.metadata.lab_managed')),JSON_UNQUOTE(JSON_EXTRACT(User_attributes,'$.lab_managed'))) FROM mysql.user WHERE User='{role}' AND Host='%'),
+ 'databaseCount',(SELECT COUNT(*) FROM information_schema.SCHEMATA WHERE SCHEMA_NAME='{role}'),
+ 'globalPrivileges',(SELECT COUNT(*) FROM information_schema.USER_PRIVILEGES WHERE GRANTEE=CONCAT(QUOTE('{role}'),'@',QUOTE('%')) AND PRIVILEGE_TYPE <> 'USAGE'));"""))
+    if state["userCount"] and (state["userCount"] != 1 or state["marker"] != role or state["globalPrivileges"]):
+        raise RuntimeError("Existing MySQL role is not safely managed; refusing modification")
+    if state["databaseCount"] and not state["userCount"]:
+        raise RuntimeError("Existing database has no managed MySQL owner")
+    if not state["userCount"]:
+        attribute = json.dumps({"lab_managed": role})
+        mysql_sql(f"CREATE USER '{role}'@'%' IDENTIFIED BY '{password}' ATTRIBUTE '{attribute}';")
+    if not state["databaseCount"]:
+        mysql_sql(f"CREATE DATABASE `{role}`;")
+    mysql_sql(f"GRANT ALL PRIVILEGES ON `{role}`.* TO '{role}'@'%';")
+    command = ["kubectl", "exec", "-i", "-n", "database", "deployment/mysql", "-c", "mysql", "--", "sh", "-c",
+               f'IFS= read -r MYSQL_PWD; export MYSQL_PWD; exec mysql --protocol=TCP -h mysql-service.database.svc.cluster.local -u {role} -D {role} --batch --skip-column-names -e "SELECT CURRENT_USER()"']
+    good = subprocess.run(command, input=password + "\n", text=True, capture_output=True, timeout=30)
+    bad = subprocess.run(command, input=secrets.token_urlsafe(48) + "\n", text=True, capture_output=True, timeout=30)
+    if good.returncode or good.stdout.strip() != role + "@%" or not bad.returncode:
+        raise RuntimeError("MySQL credential positive/negative verification failed")
+    print(f"{role}: dedicated MySQL database verified; wrong password rejected")
+
+
+def repair_unused_bootstrap_driver(vault, name, path, data, fields):
+    # Correct only our two unused initial bootstrap URLs, not user-managed data.
+    if name not in {"heartbeat", "keysboard"} or not fields["DATABASE_URL"].startswith("mysql-"):
+        return data
+    if not valid_field(data.get("DATABASE_URL"), "postgres:" + name):
+        return data
+    state = json.loads(sql(f"SELECT json_build_object('marker',(SELECT shobj_description(oid,'pg_authid') FROM pg_roles WHERE rolname='{name}'))"))
+    count = sql("SELECT COUNT(*) FROM pg_tables WHERE schemaname !~ '^pg_' AND schemaname <> 'information_schema'", name)
+    if state["marker"] != "lab-service-bootstrap-v1:" + name or count != "0":
+        raise RuntimeError("Refusing to change a non-empty or unrelated bootstrap database")
+    version = json.loads(vault.run("kv", "metadata", "get", "-format=json", "-mount=secret", path))["data"]["current_version"]
+    updated = {**data, "DATABASE_URL": generated(fields["DATABASE_URL"])}
+    mysql_database(updated["DATABASE_URL"], fields["DATABASE_URL"])
+    vault.run("kv", "put", "-cas=" + str(version), "-mount=secret", path, "-", payload=json.dumps(updated))
+    print(f"{name}: corrected unused bootstrap driver to the application's verified MySQL backend; original empty PG database retained")
+    return updated
 
 
 def sql(statement, database="postgres"):
@@ -146,13 +231,16 @@ def provision(vault, name):
         if data is None:
             data = {field: generated(kind) for field, kind in fields.items()}
             vault.create(path, data)
+        data = repair_unused_bootstrap_driver(vault, name, path, data, fields)
         if set(data) != set(fields) or any(not valid_field(data[field], kind) for field, kind in fields.items()):
             raise RuntimeError("Existing service credentials need manual review")
         for field, kind in fields.items():
             if kind.startswith("postgres:"):
                 postgres_database(data[field])
+            elif kind.startswith(("mysql-url:", "mysql-dsn:")):
+                mysql_database(data[field], kind)
     reader(vault, name, path)
-    print(f"{name}: managed fresh credentials present; no values printed or rotated")
+    print(f"{name}: managed credentials verified; values suppressed")
 
 
 def main():

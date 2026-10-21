@@ -6,6 +6,11 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./ingress.yml
+  - ./migrate-job.yml
+configMapGenerator:
+  - name: keysboard-migration
+    files:
+      - migrate.cjs
 images:
   - name: ghcr.io/pmh-only/keysboard
     newTag: latest
