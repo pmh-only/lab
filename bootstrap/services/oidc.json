@@ -1,0 +1,23 @@
+{
+  "go": {
+    "namespace": "go",
+    "vaultPath": "go/go-auth-secrets",
+    "clientID": "erwP1MS4wHuI8jSFfGdjSOTtPUHxUmhgZvziFX9s",
+    "launchURL": "https://link.pmh.codes",
+    "redirectURI": "https://link.pmh.codes/oauth2/callback"
+  },
+  "meta": {
+    "namespace": "meta",
+    "vaultPath": "meta/meta-auth-secrets",
+    "clientID": "f121rKrivB4rDKxIJ8K5aQsu5Zi53geShPlr2rRc",
+    "launchURL": "https://meta.pmh.codes",
+    "redirectURI": "https://meta.pmh.codes/oauth2/callback"
+  },
+  "pdf": {
+    "namespace": "pdf",
+    "vaultPath": "pdf/pdf-auth-secrets",
+    "clientID": "Wesp1sln4SvvYxrMihkyVctV1ALKzWurjHUGdBm8",
+    "launchURL": "https://pdf.pmh.codes",
+    "redirectURI": "https://pdf.pmh.codes/oauth2/callback"
+  }
+}

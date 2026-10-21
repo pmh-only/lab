@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 PROFILES = {
     "speed": ("speed/speed-secret", {"PASSWORD": "random", "IPINFO_APIKEY": "optional-empty"}),
     "here": ("here/here-secret", {"SSH_PASSWORD": "random"}),
+    "minio": ("minio/minio-secrets", {"MINIO_ROOT_USER": "random", "MINIO_ROOT_PASSWORD": "random"}),
 }
 
 

@@ -13,7 +13,6 @@ spec:
     helm:
       valuesObject:
         fullnameOverride: pdf
-        image:
         persistence:
           enabled: true
         deployment:
@@ -35,8 +34,9 @@ spec:
             enabled: false
           readiness:
             enabled: false
-    repoURL: https://stirling-tools.github.io/Stirling-PDF-chart
-    targetRevision: x
+    # Official published index; avoids the old Pages URL's HTTP redirect.
+    repoURL: https://raw.githubusercontent.com/Stirling-Tools/Stirling-PDF-chart/gh-pages
+    targetRevision: 3.1.0
   syncPolicy:
     automated:
       prune: true
@@ -60,7 +60,7 @@ spec:
   project: default
   source:
     path: pdf_configs
-    repoURL: git@github.com:pmh-only/lab.git
+    repoURL: https://github.com/pmh-only/lab.git
     targetRevision: HEAD
   syncPolicy:
     automated:
