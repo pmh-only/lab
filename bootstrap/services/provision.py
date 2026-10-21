@@ -20,6 +20,7 @@ from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
 
 ROOT = Path(__file__).resolve().parents[2]
 PROFILES = {
+    "seafile": ("seafile/seafile-secrets", {"DB_PASSWORD": "random", "JWT_PRIVATE_KEY": "random", "INIT_SEAFILE_ADMIN_PASSWORD": "random", "OAUTH_CLIENT_SECRET": "random"}),
     "codexlb": ("codexlb/bootstrap-login", {"ADMIN_PASSWORD": "random", "BOOTSTRAP_TOKEN": "random"}),
     "indexgen": ("indexgen/indexgen-secrets", {"S3_ACCESS_TOKEN": "s3-access:indexgen", "S3_SECRET_TOKEN": "random"}),
     "books": ("books/books-secret", {"DATABASE_URL": "postgres:books", "OIDC_CLIENT_SECRET": "random", "JWT_ACCESS_SECRET": "random", "JWT_REFRESH_SECRET": "random", "S3_ACCESS_KEY_ID": "s3-access:books", "S3_SECRET_ACCESS_KEY": "random"}),
@@ -152,6 +153,37 @@ def repair_unused_bootstrap_driver(vault, name, path, data, fields):
     return updated
 
 
+def seafile_databases(password):
+    role = "seafile"
+    databases = ["ccnet_db", "seafile_db", "seahub_db"]
+    if not re.fullmatch("[A-Za-z0-9_-]{48,}", password):
+        raise RuntimeError("Unexpected managed Seafile database password")
+    names = ",".join("'" + name + "'" for name in databases)
+    state = json.loads(mysql_sql(f"""SELECT JSON_OBJECT(
+ 'userCount',(SELECT COUNT(*) FROM mysql.user WHERE User='{role}'),
+ 'marker',(SELECT COALESCE(JSON_UNQUOTE(JSON_EXTRACT(User_attributes,'$.metadata.lab_managed')),JSON_UNQUOTE(JSON_EXTRACT(User_attributes,'$.lab_managed'))) FROM mysql.user WHERE User='{role}' AND Host='%'),
+ 'databases',(SELECT COUNT(*) FROM information_schema.SCHEMATA WHERE SCHEMA_NAME IN ({names})),
+ 'globalPrivileges',(SELECT COUNT(*) FROM information_schema.USER_PRIVILEGES WHERE GRANTEE=CONCAT(QUOTE('{role}'),'@',QUOTE('%')) AND PRIVILEGE_TYPE <> 'USAGE'),
+ 'foreignSchemas',(SELECT COUNT(*) FROM information_schema.SCHEMA_PRIVILEGES WHERE GRANTEE=CONCAT(QUOTE('{role}'),'@',QUOTE('%')) AND TABLE_SCHEMA NOT IN ({names})));"""))
+    if state["userCount"] and (state["userCount"] != 1 or state["marker"] != role or state["globalPrivileges"] or state["foreignSchemas"]):
+        raise RuntimeError("Existing Seafile MySQL identity is not safely managed")
+    if state["databases"] and not state["userCount"]:
+        raise RuntimeError("Refusing to take over existing Seafile databases")
+    if not state["userCount"]:
+        mysql_sql(f"CREATE USER '{role}'@'%' IDENTIFIED BY '{password}' ATTRIBUTE '{{\"lab_managed\":\"{role}\"}}';")
+    for database in databases:
+        if mysql_sql(f"SELECT COUNT(*) FROM information_schema.SCHEMATA WHERE SCHEMA_NAME='{database}';") == "0":
+            mysql_sql(f"CREATE DATABASE `{database}` CHARACTER SET utf8mb4;")
+        mysql_sql(f"GRANT ALL PRIVILEGES ON `{database}`.* TO '{role}'@'%';")
+        command = ["kubectl", "exec", "-i", "-n", "database", "deployment/mysql", "-c", "mysql", "--", "sh", "-c",
+                   f'IFS= read -r MYSQL_PWD; export MYSQL_PWD; exec mysql --protocol=TCP -h mysql-service.database.svc.cluster.local -u {role} -D {database} --batch --skip-column-names -e "SELECT CURRENT_USER()"']
+        good = subprocess.run(command, input=password + "\n", text=True, capture_output=True, timeout=30)
+        bad = subprocess.run(command, input=secrets.token_urlsafe(48) + "\n", text=True, capture_output=True, timeout=30)
+        if good.returncode or good.stdout.strip() != role + "@%" or not bad.returncode:
+            raise RuntimeError("Seafile dedicated database credential verification failed")
+    print("seafile: dedicated MySQL identity limited to three native databases verified; wrong passwords rejected")
+
+
 def sql(statement, database="postgres"):
     result = subprocess.run(["kubectl", "exec", "-i", "-n", "database", "deployment/pgsql", "-c", "pgsql", "--", "psql", "-U", "admin", "-d", database, "-v", "ON_ERROR_STOP=1", "-At"],
                             input=statement, text=True, capture_output=True, timeout=30)
@@ -272,6 +304,8 @@ def provision(vault, name):
                 role = kind.split(":", 1)[1]
                 value = f"postgresql://{role}:{data[field]}@pgsql-service.database.svc.cluster.local:5432/{role}"
                 postgres_database(value)
+    if name == "seafile":
+        seafile_databases(data["DB_PASSWORD"])
     reader(vault, name, [path, "monitoring/thanos-secrets"] if name == "monitoring" else path)
     print(f"{name}: managed credentials verified; values suppressed")
 

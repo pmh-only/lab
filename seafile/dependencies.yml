@@ -1,0 +1,145 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memcached
+spec:
+  selector:
+    matchLabels:
+      app: seafile-cache
+  template:
+    metadata:
+      labels:
+        app: seafile-cache
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: memcached
+          image: memcached:1.6-alpine
+          args: [-m, "64", -U, "0"]
+          ports:
+            - containerPort: 11211
+          resources:
+            requests:
+              memory: 64Mi
+            limits:
+              memory: 128Mi
+          readinessProbe:
+            tcpSocket:
+              port: 11211
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: memcached
+spec:
+  selector:
+    app: seafile-cache
+  ports:
+    - port: 11211
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seafile-search
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: seafile-search
+  template:
+    metadata:
+      labels:
+        app: seafile-search
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: elasticsearch
+          image: elasticsearch:8.19.23
+          env:
+            - name: discovery.type
+              value: single-node
+            - name: xpack.security.enabled
+              value: "false"
+            - name: node.store.allow_mmap
+              value: "false"
+            - name: ES_JAVA_OPTS
+              value: -Xms1g -Xmx1g
+          ports:
+            - containerPort: 9200
+          resources:
+            requests:
+              memory: 1Gi
+            limits:
+              memory: 2Gi
+          startupProbe:
+            httpGet:
+              path: /_cluster/health?wait_for_status=yellow&timeout=5s
+              port: 9200
+            timeoutSeconds: 6
+            failureThreshold: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /_cluster/health?wait_for_status=yellow&timeout=5s
+              port: 9200
+            timeoutSeconds: 6
+            periodSeconds: 10
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/elasticsearch/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: seafile-search
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+spec:
+  selector:
+    app: seafile-search
+  ports:
+    - port: 9200
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: seafile-private-dependencies
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values: [seafile-cache, seafile-search]
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values: [seafile, seafile-sdoc]
+      ports:
+        - port: 11211
+          protocol: TCP
+        - port: 9200
+          protocol: TCP

@@ -104,7 +104,7 @@ def provision_client(vault, api, slug, desired):
         discovery = json.load(response)
     if discovery["issuer"] != "https://auth.pmh.codes/application/o/" + slug + "/":
         raise RuntimeError("OIDC issuer differs from the repository configuration")
-    print(f"{slug}: original client ID, strict redirect and signed OIDC discovery verified; {'public client (no client secret required)' if public_client else 'fresh managed secret'}")
+    print(f"{slug}: declared client ID, strict redirect and signed OIDC discovery verified; {'public client (no client secret required)' if public_client else 'fresh managed secret'}")
 
 
 def main():

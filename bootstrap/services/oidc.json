@@ -1,4 +1,13 @@
 {
+  "seafile": {
+    "namespace": "seafile",
+    "vaultPath": "seafile/seafile-secrets",
+    "secretField": "OAUTH_CLIENT_SECRET",
+    "companionSecretFields": ["DB_PASSWORD", "JWT_PRIVATE_KEY", "INIT_SEAFILE_ADMIN_PASSWORD"],
+    "clientID": "lab-seafile",
+    "launchURL": "https://drive.pmh.codes",
+    "redirectURI": "https://drive.pmh.codes/oauth/callback/"
+  },
   "books": {
     "namespace": "books",
     "vaultPath": "books/books-secret",

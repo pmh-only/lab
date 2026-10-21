@@ -4,5 +4,27 @@ namespace: seafile
 resources:
   - ./deployment.yml
   - ./service.yml
-  - ./ingress.yml
+  # Publish the original OAuth/SeaDoc/notification routes after initialization checks.
   - ./secret.yml
+  - ./dependencies.yml
+configMapGenerator:
+  - name: seafile-integration
+    files:
+      - initialize.py
+      - seahub_lab.py
+images:
+  - name: seafileltd/seafile-pro-mc
+    newTag: 12.0.14-arm
+    digest: sha256:f531bb7e4eb5f2a05881f072972bceaa795a58cd12a4bee1540d0369dd65dad8
+  - name: seafileltd/sdoc-server
+    newTag: 1.0.5-arm
+    digest: sha256:07657aa4a45b5a3adb777f0d2c34ebdc519f3b96aa2febfad5933593e5eaf26e
+  - name: seafileltd/notification-server
+    newTag: 12.0.11-arm
+    digest: sha256:89c875c05b9ce52f0fd129d1adf6601650e8dc7d5881a5d37c1b383b47f3e555
+  - name: memcached
+    newTag: 1.6-alpine
+    digest: sha256:9e4de012dc607573052061c0bcb38abc775e1dd59b24e7ac38d1892842094aaf
+  - name: elasticsearch
+    newTag: 8.19.23
+    digest: sha256:3f4d63c59ca5a05b535179dfcced47a514119e351fa81653f69902beacae90c9

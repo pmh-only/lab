@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: seafile
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -12,11 +14,50 @@ spec:
       labels:
         app: seafile
     spec:
+      automountServiceAccountToken: false
+      initContainers:
+        - name: native-initialize
+          image: seafileltd/seafile-pro-mc:12.0.14-arm
+          command: [python3, /lab-config/initialize.py]
+          env:
+            - name: TIME_ZONE
+              value: Asia/Seoul
+            - name: SEAFILE_SERVER_HOSTNAME
+              value: drive.pmh.codes
+            - name: SEAFILE_SERVER_PROTOCOL
+              value: https
+            - name: DB_HOST
+              value: mysql-service.database.svc.cluster.local
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
+              value: seafile
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: seafile-secrets
+                  key: DB_PASSWORD
+          volumeMounts:
+            - name: seafile-storage
+              mountPath: /shared
+            - name: integration
+              mountPath: /lab-config
+              readOnly: true
       containers:
         - name: seafile
           image: seafileltd/seafile-pro-mc:12.0.14-arm
           ports:
             - containerPort: 80
+          startupProbe:
+            httpGet:
+              path: /api2/ping/
+              port: 80
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /api2/ping/
+              port: 80
           env:
             - name: TIME_ZONE
               value: Asia/Seoul
@@ -56,11 +97,11 @@ spec:
                 secretKeyRef:
                   name: seafile-secrets
                   key: DB_PASSWORD
-            - name: DB_ROOT_PASSWD
+            - name: OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: seafile-secrets
-                  key: DB_ROOT_PASSWD
+                  key: OAUTH_CLIENT_SECRET
             - name: INIT_SEAFILE_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -70,15 +111,21 @@ spec:
             - mountPath: /shared
               name: seafile-storage
       volumes:
+        - name: integration
+          configMap:
+            name: seafile-integration
         - name: seafile-storage
           hostPath:
             path: /mnt/data/seafile
+            type: DirectoryOrCreate
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: seafile-sdoc
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -88,9 +135,20 @@ spec:
       labels:
         app: seafile-sdoc
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: seafile
           image: seafileltd/sdoc-server:1.0.5-arm
+          startupProbe:
+            httpGet:
+              path: /
+              port: 80
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
           ports:
             - containerPort: 80
           env:
@@ -125,12 +183,15 @@ spec:
         - name: seafile-seadoc-storage
           hostPath:
             path: /mnt/data/seafile-seadoc
+            type: DirectoryOrCreate
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: seafile-noti
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -140,9 +201,20 @@ spec:
       labels:
         app: seafile-noti
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: seafile
           image: seafileltd/notification-server:12.0.11-arm
+          startupProbe:
+            httpGet:
+              path: /ping
+              port: 8083
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8083
           ports:
             - containerPort: 8083
           env:
@@ -176,3 +248,4 @@ spec:
         - name: seafile-noti-storage
           hostPath:
             path: /mnt/data/seafile-noti
+            type: DirectoryOrCreate

@@ -16,6 +16,10 @@ DECLARATIONS = json.loads(Path(__file__).with_name("oidc.json").read_text())
 class OIDCTests(unittest.TestCase):
     def test_public_client_ids_match_existing_security_policies(self):
         for slug, declaration in DECLARATIONS.items():
+            if slug == "seafile":
+                self.assertEqual(declaration["clientID"], "lab-seafile")
+                self.assertEqual(declaration["redirectURI"], "https://drive.pmh.codes/oauth/callback/")
+                continue
             if slug == "remote":
                 docs = list(yaml.safe_load_all((ROOT / "remote/deployment.yml").read_text()))
                 server = next(d for d in docs if d["metadata"]["name"] == "remote-guacamole")

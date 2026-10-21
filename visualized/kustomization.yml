@@ -4,7 +4,8 @@ namespace: visualized
 resources:
   - ./deployment.yml
   - ./service.yml
-  # Publish after checking the live graph excludes Secret values/annotations.
+  # Live canary verified: Secret values/annotations are omitted from the graph.
+  - ./ingress.yml
   - ./rbac.yml
 images:
   - name: ghcr.io/pmh-only/kube-universe
