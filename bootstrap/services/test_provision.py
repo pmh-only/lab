@@ -2,7 +2,7 @@ import copy
 import unittest
 from unittest.mock import Mock
 
-from provision import fresh_ech, provision, validate_ech
+from provision import fresh_ech, generated, provision, valid_field, validate_ech
 
 
 class ProvisionTests(unittest.TestCase):
@@ -33,6 +33,13 @@ class ProvisionTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             provision(vault, "here")
         vault.create.assert_not_called()
+
+    def test_database_urls_are_fresh_and_scope_checked(self):
+        url = generated("postgres:keysboard")
+        self.assertTrue(valid_field(url, "postgres:keysboard"))
+        self.assertFalse(valid_field(url, "postgres:heartbeat"))
+        self.assertFalse(valid_field(url.replace("pgsql-service", "unknown-host"), "postgres:keysboard"))
+        self.assertNotEqual(url, generated("postgres:keysboard"))
 
 
 if __name__ == "__main__":

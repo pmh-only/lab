@@ -6,10 +6,13 @@ import base64
 import importlib.util
 import json
 from pathlib import Path
+import re
 import secrets
 import struct
+import subprocess
 import sys
 import textwrap
+import urllib.parse
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
@@ -20,7 +23,72 @@ PROFILES = {
     "speed": ("speed/speed-secret", {"PASSWORD": "random", "IPINFO_APIKEY": "optional-empty"}),
     "here": ("here/here-secret", {"SSH_PASSWORD": "random"}),
     "minio": ("minio/minio-secrets", {"MINIO_ROOT_USER": "random", "MINIO_ROOT_PASSWORD": "random"}),
+    "heartbeat": ("heartbeat/heartbeat-secret", {"DATABASE_URL": "postgres:heartbeat"}),
+    "keysboard": ("keysboard/keysboard-secret", {"DATABASE_URL": "postgres:keysboard", "REDIS_URL": "redis", "JWT_SECRET": "random"}),
+    "mail": ("mail/mailui-secret", {"DATABASE_URL": "postgres:mailui", "BETTER_AUTH_SECRET": "random", "MAIL_SECRET_KEY": "random"}),
 }
+
+
+def generated(kind):
+    if kind.startswith("postgres:"):
+        role = kind.split(":", 1)[1]
+        return f"postgresql://{role}:{secrets.token_urlsafe(48)}@pgsql-service.database.svc.cluster.local:5432/{role}"
+    if kind == "redis":
+        return "redis://redis-service.database.svc.cluster.local:6379/1"
+    return secrets.token_urlsafe(48) if kind == "random" else ""
+
+
+def valid_field(value, kind):
+    if not isinstance(value, str):
+        return False
+    if kind == "random":
+        return len(value) >= 48
+    if kind.startswith("postgres:"):
+        role = kind.split(":", 1)[1]
+        parsed = urllib.parse.urlsplit(value)
+        return parsed.scheme == "postgresql" and parsed.hostname == "pgsql-service.database.svc.cluster.local" and parsed.username == role and parsed.path == "/" + role and len(parsed.password or "") >= 48
+    if kind == "redis":
+        return value == generated("redis")
+    return kind == "optional-empty"
+
+
+def sql(statement, database="postgres"):
+    result = subprocess.run(["kubectl", "exec", "-i", "-n", "database", "deployment/pgsql", "-c", "pgsql", "--", "psql", "-U", "admin", "-d", database, "-v", "ON_ERROR_STOP=1", "-At"],
+                            input=statement, text=True, capture_output=True, timeout=30)
+    if result.returncode:
+        raise RuntimeError("Service database provisioning failed; SQL/error bodies suppressed")
+    return result.stdout.strip()
+
+
+def postgres_database(url):
+    parsed = urllib.parse.urlsplit(url)
+    role = parsed.username
+    if not role or not re.fullmatch("[a-z][a-z0-9_]*", role) or parsed.path != "/" + role:
+        raise RuntimeError("Unsafe managed PostgreSQL identity")
+    marker = "lab-service-bootstrap-v1:" + role
+    state = json.loads(sql(f"""SELECT json_build_object(
+ 'role', (SELECT row_to_json(r) FROM (SELECT rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolcanlogin,shobj_description(oid,'pg_authid') AS marker FROM pg_roles WHERE rolname='{role}') r),
+ 'database', (SELECT pg_get_userbyid(datdba) FROM pg_database WHERE datname='{role}'),
+ 'memberships', (SELECT count(*) FROM pg_auth_members m JOIN pg_roles r ON m.member=r.oid WHERE r.rolname='{role}'));"""))
+    existing = state["role"]
+    if existing and (existing["marker"] != marker or any(existing[k] for k in ["rolsuper", "rolcreatedb", "rolcreaterole", "rolreplication"]) or not existing["rolcanlogin"] or state["memberships"]):
+        raise RuntimeError("Existing PostgreSQL role is not safely managed; refusing modification")
+    if state["database"] and (state["database"] != role or not existing):
+        raise RuntimeError("Existing service database has an unexpected owner")
+    if not existing:
+        password = parsed.password.replace("'", "''")
+        sql(f"CREATE ROLE {role} LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION PASSWORD '{password}'; COMMENT ON ROLE {role} IS '{marker}';")
+    if not state["database"]:
+        sql(f"CREATE DATABASE {role} OWNER {role};")
+    sql(f"REVOKE ALL ON DATABASE {role} FROM PUBLIC;")
+    sql("REVOKE CREATE ON SCHEMA public FROM PUBLIC;", role)
+    command = ["kubectl", "exec", "-i", "-n", "database", "deployment/pgsql", "-c", "pgsql", "--", "sh", "-c",
+               f'IFS= read -r PGPASSWORD; export PGPASSWORD; exec psql -h pgsql-service.database.svc.cluster.local -U {role} -d {role} -At -c "SELECT current_user"']
+    good = subprocess.run(command, input=parsed.password + "\n", text=True, capture_output=True, timeout=30)
+    bad = subprocess.run(command, input=secrets.token_urlsafe(48) + "\n", text=True, capture_output=True, timeout=30)
+    if good.returncode or good.stdout.strip() != role or not bad.returncode:
+        raise RuntimeError("Service DB credential positive/negative verification failed")
+    print(f"{role}: dedicated non-superuser database verified; wrong password rejected")
 
 
 def fresh_ech(public_name="pmh.codes"):
@@ -76,10 +144,13 @@ def provision(vault, name):
         path, fields = PROFILES[name]
         data = vault.get(path)
         if data is None:
-            data = {field: secrets.token_urlsafe(48) if kind == "random" else "" for field, kind in fields.items()}
+            data = {field: generated(kind) for field, kind in fields.items()}
             vault.create(path, data)
-        if set(data) != set(fields) or any(not isinstance(data[field], str) or (kind == "random" and len(data[field]) < 48) for field, kind in fields.items()):
+        if set(data) != set(fields) or any(not valid_field(data[field], kind) for field, kind in fields.items()):
             raise RuntimeError("Existing service credentials need manual review")
+        for field, kind in fields.items():
+            if kind.startswith("postgres:"):
+                postgres_database(data[field])
     reader(vault, name, path)
     print(f"{name}: managed fresh credentials present; no values printed or rotated")
 

@@ -4,6 +4,8 @@ metadata:
   name: minio
 spec:
   revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: minio
@@ -12,9 +14,31 @@ spec:
       labels:
         app: minio
     spec:
+      initContainers:
+        - name: data-directory-permissions
+          image: ghcr.io/pmh-only/rustfs:latest
+          command: [/bin/sh, -ec, "chown 10001:10001 /data"]
+          securityContext:
+            runAsUser: 0
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+              add: [CHOWN]
+          volumeMounts:
+            - name: minio-storage
+              mountPath: /data
       containers:
         - name: minio
           image: ghcr.io/pmh-only/rustfs:latest
+          startupProbe:
+            exec:
+              command:
+                - curl
+                - -kfH
+                - "Host: hello.s3.pmh.codes"
+                - https://localhost:9000/index.html
+            periodSeconds: 5
+            failureThreshold: 60
           livenessProbe:
             exec:
               command:
