@@ -29,7 +29,10 @@ def main():
     opener = session()
     state = request(opener, "/api/dashboard-auth/session")
     if not state.get("passwordRequired"):
-        request(opener, "/api/dashboard-auth/password/setup", {"password": password})
+        bootstrap = Path("/run/secrets/bootstrap/BOOTSTRAP_TOKEN").read_text().strip()
+        if len(bootstrap) < 48:
+            raise RuntimeError("Invalid managed bootstrap token")
+        request(opener, "/api/dashboard-auth/password/setup", {"password": password, "bootstrapToken": bootstrap})
         request(opener, "/api/dashboard-auth/logout", {})
         print("Fresh native dashboard password initialized")
     else:

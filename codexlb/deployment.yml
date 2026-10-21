@@ -29,6 +29,11 @@ spec:
             tcpSocket:
               port: 2455
           env:
+            - name: CODEX_LB_DASHBOARD_BOOTSTRAP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: codexlb-bootstrap
+                  key: BOOTSTRAP_TOKEN
             - name: CODEX_LB_HTTP_RESPONSES_SESSION_BRIDGE_AMBIGUOUS_CONTINUATION_RECOVERY_MODE
               value: server_indefinite_recovery
             - name: CODEX_LB_DATA_DIR

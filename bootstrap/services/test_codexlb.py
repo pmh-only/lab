@@ -10,12 +10,13 @@ class CodexTests(unittest.TestCase):
     def test_native_setup_is_isolated_from_upstream_credentials(self):
         path, fields = PROFILES["codexlb"]
         self.assertEqual(path, "codexlb/bootstrap-login")
-        self.assertEqual(fields, {"ADMIN_PASSWORD": "random"})
+        self.assertEqual(fields, {"ADMIN_PASSWORD": "random", "BOOTSTRAP_TOKEN": "random"})
         script = (ROOT / "codexlb/initialize.py").read_text()
         self.assertIn('if not state.get("passwordRequired"):', script)
         self.assertIn('/api/dashboard-auth/password/setup', script)
         self.assertNotIn('/api/dashboard-auth/password/change', script)
         self.assertNotIn('OPENAI_API_KEY', script)
+        self.assertIn('"bootstrapToken": bootstrap', script)
 
     def test_persistent_writer_and_bootstrap_job_are_safe(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "codexlb")], text=True)))
