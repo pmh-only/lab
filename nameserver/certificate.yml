@@ -4,7 +4,7 @@ metadata:
   name: nameserver-tls-secret
   namespace: nameserver
 spec:
-  commonName: ns1.pmh.codes
+  commonName: ns2.pmh.codes
   duration: 2160h
   renewBefore: 720h
   dnsNames:

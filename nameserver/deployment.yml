@@ -28,7 +28,7 @@ spec:
           # Technitium reads these settings only when initializing a new config.
           env:
             - name: DNS_SERVER_DOMAIN
-              value: ns1.pmh.codes
+              value: ns2.pmh.codes
             - name: DNS_SERVER_ADMIN_PASSWORD_FILE
               value: /run/secrets/nameserver-admin/password
             - name: DNS_SERVER_RECURSION

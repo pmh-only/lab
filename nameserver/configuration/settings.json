@@ -1,4 +1,5 @@
 {
+  "dnsServerDomain": "ns2.pmh.codes",
   "enableDnsOverHttp": true,
   "dnsReverseProxyNetworkACL": [
     "172.16.0.0/24",

@@ -17,6 +17,19 @@ DESIRED = {
 
 
 class ReconcileTests(unittest.TestCase):
+    def test_public_names_follow_node_numbers_without_moving_primary(self):
+        root = Path(__file__).resolve().parents[1]
+        authority = json.loads((root / "configuration/authoritative.json").read_text())
+        self.assertEqual(authority["nameservers"], [
+            {"name": "ns1.pmh.codes", "node": "pmhoci", "publicIPv4": "168.110.121.95"},
+            {"name": "ns2.pmh.codes", "node": "pmhoci2", "publicIPv4": "138.2.112.39"},
+        ])
+        cluster = json.loads((root / "native-cluster.json").read_text())
+        self.assertEqual(cluster["primaryNodeUrl"], "https://ns2.pmh.codes:53443/")
+        self.assertEqual(cluster["primaryNodeIpAddresses"], "138.2.112.39")
+        self.assertEqual(cluster["secondaryNodeIpAddresses"], "168.110.121.95")
+        self.assertEqual(json.loads((root / "configuration/settings.json").read_text())["dnsServerDomain"], "ns2.pmh.codes")
+
     def test_network_acl_order_is_reconciled(self):
         client = Mock()
         desired = {**DESIRED, "recursionNetworkACL": ["!10.0.0.10", "10.0.0.0/8"]}

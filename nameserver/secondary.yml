@@ -25,7 +25,7 @@ spec:
           image: ghcr.io/pmh-only/technitium:latest
           env:
             - name: DNS_SERVER_DOMAIN
-              value: ns2.pmh.codes
+              value: ns1.pmh.codes
             - name: DNS_SERVER_ADMIN_PASSWORD_FILE
               value: /run/secrets/nameserver-admin/password
             - name: DNS_SERVER_RECURSION
@@ -135,11 +135,12 @@ kind: Certificate
 metadata:
   name: nameserver-secondary-tls-secret
 spec:
-  commonName: ns2.pmh.codes
+  commonName: ns1.pmh.codes
   secretName: nameserver-secondary-tls-secret
   duration: 2160h
   renewBefore: 720h
   dnsNames:
+    - ns1.pmh.codes
     - ns2.pmh.codes
     - nameserver-secondary.nameserver.svc.cluster.local
     - localhost
