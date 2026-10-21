@@ -20,6 +20,19 @@ def initializer():
 
 
 class SeafileTests(unittest.TestCase):
+    def test_mysql_sha2_plugin_is_pinned_without_weaker_server_authentication(self):
+        script = (ROOT / "seafile/prepare_mysql_plugins.py").read_text()
+        self.assertIn("ead7fdf6f5fc79a4809db03889763791190973591b872a93c063f5109abfe0ff", script)
+        self.assertIn("hashlib.sha256(archive).hexdigest() != SHA256", script)
+        self.assertIn("caching_sha2_password.so", script)
+        self.assertNotIn("mysql_native_password", script)
+        docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "seafile")], text=True)))
+        pod = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "seafile")["spec"]["template"]["spec"]
+        self.assertEqual(pod["initContainers"][0]["name"], "mysql-client-plugins")
+        self.assertNotIn("env", pod["initContainers"][0])
+        env = {e["name"]: e for e in pod["containers"][0]["env"]}
+        self.assertEqual(env["MARIADB_PLUGIN_DIR"]["value"], "/run/mariadb-client-plugins")
+
     def test_no_root_credentials_and_all_images_are_pinned(self):
         self.assertNotIn("DB_ROOT_PASSWD", PROFILES["seafile"][1])
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "seafile")], text=True)))

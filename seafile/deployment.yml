@@ -19,6 +19,22 @@ spec:
     spec:
       automountServiceAccountToken: false
       initContainers:
+        - name: mysql-client-plugins
+          image: seafileltd/seafile-pro-mc:12.0.14-arm
+          command: [python3, /lab-config/prepare_mysql_plugins.py]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: integration
+              mountPath: /lab-config
+              readOnly: true
+            - name: mysql-client-plugins
+              mountPath: /run/mariadb-client-plugins
+            - name: plugin-scratch
+              mountPath: /tmp
         - name: native-initialize
           image: seafileltd/seafile-pro-mc:12.0.14-arm
           command: [python3, /lab-config/initialize.py]
@@ -62,6 +78,8 @@ spec:
               path: /api2/ping/
               port: 80
           env:
+            - name: MARIADB_PLUGIN_DIR
+              value: /run/mariadb-client-plugins
             - name: TIME_ZONE
               value: Asia/Seoul
             - name: SEAFILE_LOG_TO_STDOUT
@@ -111,9 +129,16 @@ spec:
                   name: seafile-secrets
                   key: INIT_SEAFILE_ADMIN_PASSWORD
           volumeMounts:
+            - name: mysql-client-plugins
+              mountPath: /run/mariadb-client-plugins
+              readOnly: true
             - mountPath: /shared
               name: seafile-storage
       volumes:
+        - name: mysql-client-plugins
+          emptyDir: {}
+        - name: plugin-scratch
+          emptyDir: {}
         - name: integration
           configMap:
             name: seafile-integration

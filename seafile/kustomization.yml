@@ -13,6 +13,7 @@ configMapGenerator:
       - initialize.py
       - seahub_lab.py
       - native-schema.json
+      - prepare_mysql_plugins.py
 images:
   - name: seafileltd/seafile-pro-mc
     newTag: 12.0.14-arm
