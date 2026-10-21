@@ -124,7 +124,7 @@ class AuthoritativeTests(unittest.TestCase):
         client.post.return_value = {"response": {"records": [{"name": "ns1.pmh.codes", "type": "A", "rData": {"ipAddress": "192.0.2.1"}}]}}
         with self.assertRaises(RuntimeError):
             ensure_record_set(client, "pmh.codes", "ns1.pmh.codes", "A", "ipAddress", ["138.2.112.39"], 3600)
-        client.post.assert_called_once_with("zones/records/get", {"domain": "pmh.codes"})
+        client.post.assert_called_once_with("zones/records/get", {"zone": "pmh.codes", "domain": "ns1.pmh.codes"})
 
     def test_unexpected_nameserver_is_not_removed(self):
         client = Mock()
@@ -139,6 +139,8 @@ class AuthoritativeTests(unittest.TestCase):
         client.post.side_effect = [{"response": {"records": []}}, {"status": "ok"}, {"response": {"records": [record]}}]
         ensure_record_set(client, "pmh.codes", "ns1.pmh.codes", "A", "ipAddress", ["138.2.112.39"], 3600)
         self.assertEqual(client.post.call_args_list[1].args[1]["overwrite"], "false")
+        self.assertEqual(client.post.call_args_list[0].args[1], {"zone": "pmh.codes", "domain": "ns1.pmh.codes"})
+        self.assertEqual(client.post.call_args_list[2].args[1], {"zone": "pmh.codes", "domain": "ns1.pmh.codes"})
 
     def test_existing_signing_keys_are_not_rotated(self):
         client = Mock()

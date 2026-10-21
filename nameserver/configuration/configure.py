@@ -123,7 +123,9 @@ def reconcile_dns01(client, desired):
 
 
 def ensure_record_set(client, zone, name, record_type, field, expected, ttl):
-    records = client.post("zones/records/get", {"domain": zone})["response"]["records"]
+    # The API returns records at the requested name, not every record in a zone.
+    scope = {"zone": zone, "domain": name}
+    records = client.post("zones/records/get", scope)["response"]["records"]
     existing = {
         record["rData"][field].rstrip(".").lower()
         for record in records
@@ -136,7 +138,7 @@ def ensure_record_set(client, zone, name, record_type, field, expected, ttl):
             "zone": zone, "domain": name, "type": record_type,
             field: value, "ttl": ttl, "overwrite": "false", "comments": "Managed by GitOps nameserver",
         })
-    actual = client.post("zones/records/get", {"domain": zone})["response"]["records"]
+    actual = client.post("zones/records/get", scope)["response"]["records"]
     values = {
         record["rData"][field].rstrip(".").lower()
         for record in actual
