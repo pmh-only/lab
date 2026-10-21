@@ -20,6 +20,7 @@ from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
 
 ROOT = Path(__file__).resolve().parents[2]
 PROFILES = {
+    "trace": ("trace/trace-secrets", {"POSTGRES_PASSWORD": "postgres-password:traffic", "CLICKHOUSE_PASSWORD": "random", "CLICKHOUSE_QUERY_PASSWORD": "random", "BETTER_AUTH_SECRET": "random", "MAPBOX_TOKEN": "optional-empty"}),
     "seafile": ("seafile/seafile-secrets", {"DB_PASSWORD": "random", "JWT_PRIVATE_KEY": "random", "INIT_SEAFILE_ADMIN_PASSWORD": "random", "OAUTH_CLIENT_SECRET": "random"}),
     "codexlb": ("codexlb/bootstrap-login", {"ADMIN_PASSWORD": "random", "BOOTSTRAP_TOKEN": "random"}),
     "indexgen": ("indexgen/indexgen-secrets", {"S3_ACCESS_TOKEN": "s3-access:indexgen", "S3_SECRET_TOKEN": "random"}),
@@ -306,7 +307,10 @@ def provision(vault, name):
                 postgres_database(value)
     if name == "seafile":
         seafile_databases(data["DB_PASSWORD"])
-    reader(vault, name, [path, "monitoring/thanos-secrets"] if name == "monitoring" else path)
+    paths = [path, "monitoring/thanos-secrets"] if name == "monitoring" else path
+    if name == "trace":
+        paths = [path, "trace/trace-auth-secrets"]
+    reader(vault, name, paths)
     print(f"{name}: managed credentials verified; values suppressed")
 
 

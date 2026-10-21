@@ -5,7 +5,14 @@ resources:
   - ./deployment.yml
   - ./secret.yml
   - ./service.yml
-  - ./ingress.yml
+  - ./initialize-job.yml
+  # Publish only after native owner/session and original tracking-ID checks.
+configMapGenerator:
+  - name: trace-bootstrap
+    files:
+      - prepare-clickhouse-client.mjs
+      - initialize-owner.mjs
+      - bootstrap.json
 images:
   - name: ghcr.io/rybbit-io/rybbit-backend
     newTag: latest

@@ -1,0 +1,102 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: trace-initialize-owner
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 240
+  template:
+    spec:
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        runAsNonRoot: true
+      initContainers:
+        - name: native-client-compatibility
+          image: ghcr.io/rybbit-io/rybbit-backend:latest
+          command: [node, /bootstrap/prepare-clickhouse-client.mjs]
+          volumeMounts:
+            - name: bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+            - name: native-client
+              mountPath: /prepared
+      containers:
+        - name: owner
+          image: ghcr.io/rybbit-io/rybbit-backend:latest
+          command: [node, /bootstrap/initialize-owner.mjs]
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: BASE_URL
+              value: https://trace.pmh.codes
+            - name: DISABLE_SIGNUP
+              value: "false"
+            - name: POSTGRES_HOST
+              value: pgsql-service.database.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: traffic
+            - name: POSTGRES_USER
+              value: traffic
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: trace-secrets
+                  key: POSTGRES_PASSWORD
+            - name: BETTER_AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: trace-secrets
+                  key: BETTER_AUTH_SECRET
+            - name: CLICKHOUSE_HOST
+              value: http://clickhouse-service.database.svc.cluster.local:8123
+            - name: CLICKHOUSE_DB
+              value: traffic
+            - name: CLICKHOUSE_USER
+              value: traffic
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: trace-secrets
+                  key: CLICKHOUSE_PASSWORD
+            - name: CLICKHOUSE_QUERY_USER
+              value: traffic_query
+            - name: CLICKHOUSE_QUERY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: trace-secrets
+                  key: CLICKHOUSE_QUERY_PASSWORD
+            - name: REDIS_HOST
+              value: redis-service.database.svc.cluster.local
+            - name: REDIS_PORT
+              value: "6379"
+          volumeMounts:
+            - name: bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+            - name: owner
+              mountPath: /run/secrets/bootstrap
+              readOnly: true
+            - name: native-client
+              mountPath: /app/dist/db/clickhouse/client.js
+              subPath: client.js
+              readOnly: true
+      volumes:
+        - name: bootstrap
+          configMap:
+            name: trace-bootstrap
+        - name: owner
+          secret:
+            secretName: trace-auth-secrets
+            defaultMode: 0440
+        - name: native-client
+          emptyDir: {}

@@ -1,0 +1,7 @@
+{
+  "organization": {"name": "Lab", "slug": "lab"},
+  "sites": [
+    {"siteId": 1, "name": "PMH services", "domain": "pmh.codes", "features": {"firstPartyProxy": true, "webVitals": true, "trackErrors": true}},
+    {"siteId": 2, "name": "Welplan", "domain": "welplan.pmh.codes", "publicId": "578f3fabe057", "features": {"firstPartyProxy": true}}
+  ]
+}

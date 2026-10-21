@@ -2,7 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: trace
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -12,11 +16,47 @@ spec:
       labels:
         app: trace
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 65532
+      initContainers:
+        - name: native-client-compatibility
+          image: ghcr.io/rybbit-io/rybbit-backend:latest
+          command: [node, /bootstrap/prepare-clickhouse-client.mjs]
+          securityContext:
+            runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+            - name: native-client
+              mountPath: /prepared
       containers:
         - name: trace
           image: ghcr.io/rybbit-io/rybbit-backend:latest
           ports:
             - containerPort: 3001
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+          volumeMounts:
+            - name: native-client
+              mountPath: /app/dist/db/clickhouse/client.js
+              subPath: client.js
+              readOnly: true
           env:
             - name: NODE_ENV
               value: "production"
@@ -32,6 +72,13 @@ spec:
                 secretKeyRef:
                   name: trace-secrets
                   key: CLICKHOUSE_PASSWORD
+            - name: CLICKHOUSE_QUERY_USER
+              value: traffic_query
+            - name: CLICKHOUSE_QUERY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: trace-secrets
+                  key: CLICKHOUSE_QUERY_PASSWORD
 
             - name: POSTGRES_HOST
               value: "pgsql-service.database.svc.cluster.local"
@@ -67,6 +114,12 @@ spec:
                 secretKeyRef:
                   name: trace-secrets
                   key: MAPBOX_TOKEN
+      volumes:
+        - name: native-client
+          emptyDir: {}
+        - name: bootstrap
+          configMap:
+            name: trace-bootstrap
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -82,15 +135,20 @@ spec:
       labels:
         app: trace-client
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: trace-client
           image: ghcr.io/rybbit-io/rybbit-client:latest
           ports:
             - containerPort: 3002
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3002
           env:
             - name: NODE_ENV
               value: "production"
             - name: NEXT_PUBLIC_BACKEND_URL
               value: "https://trace.pmh.codes"
             - name: NEXT_PUBLIC_DISABLE_SIGNUP
-              value: "false"
+              value: "true"
