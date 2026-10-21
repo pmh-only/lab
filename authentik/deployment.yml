@@ -4,6 +4,8 @@ metadata:
   name: authentik-server
 spec:
   revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: authentik-server
@@ -14,6 +16,27 @@ spec:
         app.kubernetes.io/component: server
         app.kubernetes.io/name: authentik
     spec:
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/hostname: pmhoci2
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: storage-directories
+          image: ghcr.io/goauthentik/server:latest
+          command: [/bin/sh, -ec, "mkdir -p /storage/data /storage/templates /storage/certs"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: authentik-storage
+              mountPath: /storage
       containers:
         - name: authentik
           image: ghcr.io/goauthentik/server:latest
@@ -21,44 +44,39 @@ spec:
             - server
           ports:
             - containerPort: 9000
-          env:
-            - name: AUTHENTIK_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: authentik-secrets
-                  key: AUTHENTIK_SECRET_KEY
-            - name: AUTHENTIK_REDIS__HOST
-              value: redis-service.database.svc.cluster.local
-            - name: AUTHENTIK_POSTGRESQL__HOST
-              value: pgsql-service.database.svc.cluster.local
-            - name: AUTHENTIK_POSTGRESQL__USER
-              value: authentik
-            - name: AUTHENTIK_POSTGRESQL__NAME
-              value: authentik
-            - name: AUTHENTIK_POSTGRESQL__PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: authentik-secrets
-                  key: AUTHENTIK_POSTGRESQL__PASSWORD
-            - name: AUTHENTIK_EMAIL__HOST
-              value: smtp.purelymail.com
-            - name: AUTHENTIK_EMAIL__USERNAME
-              value: pmh_only@pmh.codes
-            - name: AUTHENTIK_EMAIL__FROM
-              value: pmh_only@pmh.codes
-            - name: AUTHENTIK_EMAIL__PORT
-              value: "465"
-            - name: AUTHENTIK_EMAIL__USE_TLS
-              value: "true"
-            - name: AUTHENTIK_EMAIL__PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: authentik-secrets
-                  key: AUTHENTIK_EMAIL__PASSWORD
+          envFrom:
+            - configMapRef:
+                name: authentik-runtime
+            - secretRef:
+                name: authentik-secrets
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+          startupProbe:
+            httpGet:
+              path: /-/health/ready/
+              port: 9000
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /-/health/ready/
+              port: 9000
+          livenessProbe:
+            httpGet:
+              path: /-/health/live/
+              port: 9000
           volumeMounts:
-            - mountPath: /media
+            - mountPath: /data
               name: authentik-storage
-              subPath: media
+              subPath: data
             - mountPath: /templates
               name: authentik-storage
               subPath: templates
@@ -73,6 +91,8 @@ metadata:
   name: authentik-worker
 spec:
   revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: authentik-worker
@@ -81,49 +101,66 @@ spec:
       labels:
         app: authentik-worker
     spec:
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/hostname: pmhoci2
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: storage-directories
+          image: ghcr.io/goauthentik/server:latest
+          command: [/bin/sh, -ec, "mkdir -p /storage/data /storage/templates /storage/certs"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: authentik-storage
+              mountPath: /storage
       containers:
         - name: authentik
           image: ghcr.io/goauthentik/server:latest
           args:
             - worker
-          env:
-            - name: AUTHENTIK_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: authentik-secrets
-                  key: AUTHENTIK_SECRET_KEY
-            - name: AUTHENTIK_REDIS__HOST
-              value: redis-service.database.svc.cluster.local
-            - name: AUTHENTIK_POSTGRESQL__HOST
-              value: pgsql-service.database.svc.cluster.local
-            - name: AUTHENTIK_POSTGRESQL__USER
-              value: authentik
-            - name: AUTHENTIK_POSTGRESQL__NAME
-              value: authentik
-            - name: AUTHENTIK_POSTGRESQL__PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: authentik-secrets
-                  key: AUTHENTIK_POSTGRESQL__PASSWORD
-            - name: AUTHENTIK_EMAIL__HOST
-              value: smtp.purelymail.com
-            - name: AUTHENTIK_EMAIL__USERNAME
-              value: pmh_only@pmh.codes
-            - name: AUTHENTIK_EMAIL__FROM
-              value: pmh_only@pmh.codes
-            - name: AUTHENTIK_EMAIL__PORT
-              value: "465"
-            - name: AUTHENTIK_EMAIL__USE_TLS
-              value: "true"
-            - name: AUTHENTIK_EMAIL__PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: authentik-secrets
-                  key: AUTHENTIK_EMAIL__PASSWORD
+          envFrom:
+            - configMapRef:
+                name: authentik-runtime
+            - secretRef:
+                name: authentik-secrets
+            - secretRef:
+                name: authentik-bootstrap-worker
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+          startupProbe:
+            exec:
+              command: [ak, healthcheck]
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command: [ak, healthcheck]
+            periodSeconds: 15
+          livenessProbe:
+            exec:
+              command: [ak, healthcheck]
+            periodSeconds: 30
           volumeMounts:
-            - mountPath: /media
+            - mountPath: /data
               name: authentik-storage
-              subPath: media
+              subPath: data
             - mountPath: /templates
               name: authentik-storage
               subPath: templates
