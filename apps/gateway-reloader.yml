@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gateway-reloader
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: gateway
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: reloader
+    repoURL: https://stakater.github.io/stakater-charts
+    targetRevision: 2.2.18
+    helm:
+      releaseName: gateway-reloader
+      valuesObject:
+        fullnameOverride: gateway-reloader
+        image:
+          digest: sha256:def2480040adc164b3a57340e77674eadfd88fb7f0593df25e93297f29c7fd7c
+        reloader:
+          watchGlobally: false
+          autoReloadAll: false
+          ignoreConfigMaps: true
+          ignoreJobs: true
+          ignoreCronJobs: true
+          reloadOnCreate: true
+          reloadOnDelete: false
+          syncAfterRestart: true
+          reloadStrategy: annotations
+          resourceLabelSelector: edge.pmh.codes/reload=true
+          deployment:
+            containerSecurityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: [ALL]
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - PruneLast=true

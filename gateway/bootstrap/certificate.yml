@@ -12,6 +12,9 @@ metadata:
   name: gateway-bootstrap-tls
 spec:
   secretName: gateway-bootstrap-tls
+  secretTemplate:
+    labels:
+      edge.pmh.codes/reload: "true"
   commonName: gateway-bootstrap
   subject:
     organizations:

@@ -56,6 +56,29 @@ class BootstrapEdgeTests(unittest.TestCase):
         self.assertIn("@sha256:", pod["containers"][0]["image"])
         self.assertEqual({p["containerPort"] for p in pod["containers"][0]["ports"]}, {80, 443})
 
+    def test_certificate_changes_only_restart_opted_in_edge(self):
+        annotations = self.resources["DaemonSet"]["metadata"]["annotations"]
+        self.assertEqual(annotations["secret.reloader.stakater.com/reload"], "gateway-bootstrap-tls")
+        labels = self.resources["Certificate"]["spec"]["secretTemplate"]["labels"]
+        self.assertEqual(labels, {"edge.pmh.codes/reload": "true"})
+        app = yaml.safe_load((ROOT / "apps/gateway-reloader.yml").read_text())
+        self.assertEqual(app["spec"]["destination"]["namespace"], "gateway")
+        self.assertEqual(app["spec"]["source"]["targetRevision"], "2.2.18")
+        values = app["spec"]["source"]["helm"]["valuesObject"]
+        self.assertTrue(values["image"]["digest"].startswith("sha256:"))
+        self.assertFalse(values["reloader"]["watchGlobally"])
+        self.assertFalse(values["reloader"]["autoReloadAll"])
+        self.assertTrue(values["reloader"]["ignoreConfigMaps"])
+        self.assertEqual(values["reloader"]["reloadStrategy"], "annotations")
+
+    def test_argocd_ignores_only_the_reloader_annotation(self):
+        app = next(d for d in yaml.safe_load_all((ROOT / "apps/gateway.yml").read_text()) if d["kind"] == "Application")
+        self.assertEqual(app["spec"]["ignoreDifferences"], [{
+            "group": "apps", "kind": "DaemonSet", "namespace": "gateway", "name": "gateway-nginx",
+            "jsonPointers": ["/spec/template/metadata/annotations/reloader.stakater.com~1last-reloaded-from"],
+        }])
+        self.assertIn("RespectIgnoreDifferences=true", app["spec"]["syncPolicy"]["syncOptions"])
+
 
 if __name__ == "__main__":
     unittest.main()
