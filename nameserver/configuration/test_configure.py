@@ -1,4 +1,7 @@
 import copy
+import ipaddress
+import json
+from pathlib import Path
 import unittest
 from unittest.mock import Mock, patch
 
@@ -14,6 +17,14 @@ DESIRED = {
 
 
 class ReconcileTests(unittest.TestCase):
+    def test_network_acl_order_is_reconciled(self):
+        client = Mock()
+        desired = {**DESIRED, "recursionNetworkACL": ["!10.0.0.10", "10.0.0.0/8"]}
+        current = {**desired, "recursionNetworkACL": ["10.0.0.0/8", "!10.0.0.10"]}
+        client.post.side_effect = [{"response": current}, {"status": "ok"}, {"response": desired}]
+        reconcile(client, desired)
+        self.assertEqual(client.post.call_args_list[1].args[1]["recursionNetworkACL"], "!10.0.0.10,10.0.0.0/8")
+
     def test_matching_settings_are_not_written(self):
         client = Mock()
         client.post.return_value = {"response": copy.deepcopy(DESIRED)}
@@ -165,6 +176,30 @@ class AuthoritativeTests(unittest.TestCase):
         self.assertEqual(parameters["algorithm"], "ECDSA")
         self.assertNotIn("pemKskPrivateKey", parameters)
         self.assertNotIn("pemZskPrivateKey", parameters)
+
+
+class RecursionGuardTests(unittest.TestCase):
+    def setUp(self):
+        self.settings = json.loads(Path(__file__).with_name("settings.json").read_text())
+
+    def allowed(self, address):
+        ip = ipaddress.ip_address(address)
+        for entry in self.settings["recursionNetworkACL"]:
+            network = ipaddress.ip_network(entry.lstrip("!"))
+            if network.version == ip.version and ip in network:
+                return not entry.startswith("!")
+        return False
+
+    def test_node_nat_addresses_and_public_clients_are_denied(self):
+        self.assertEqual(self.settings["recursion"], "UseSpecifiedNetworkACL")
+        for ip in ["10.0.0.10", "10.1.0.102", "138.2.112.39", "168.110.121.95", "203.0.113.17", "2001:db8::1"]:
+            with self.subTest(ip=ip):
+                self.assertFalse(self.allowed(ip))
+
+    def test_private_pods_and_loopback_clients_remain_allowed(self):
+        for ip in ["172.16.0.18", "172.16.1.20", "127.0.0.1", "192.168.1.20", "100.64.1.10", "::1", "fd00::1"]:
+            with self.subTest(ip=ip):
+                self.assertTrue(self.allowed(ip))
 
 
 if __name__ == "__main__":

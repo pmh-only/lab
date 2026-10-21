@@ -12,7 +12,7 @@ def encoded(value):
 
 
 def equal(left, right):
-    return sorted(left) == sorted(right) if isinstance(left, list) and isinstance(right, list) else left == right
+    return left == right
 
 
 def update(client, get_path, set_path, desired, scope=None):

@@ -43,7 +43,8 @@ class Client:
 
 
 def normalized(value):
-    return sorted(value) if isinstance(value, list) else value
+    # Network ACLs are first-match rules: reordering can change authorization.
+    return value
 
 
 def reconcile(client, desired):
