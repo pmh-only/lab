@@ -1,0 +1,5 @@
+{
+  "username": "cert-manager-dns01",
+  "displayName": "cert-manager DNS01 (GitOps)",
+  "zones": ["as218822.net", "pmh.so", "pmh.codes"]
+}

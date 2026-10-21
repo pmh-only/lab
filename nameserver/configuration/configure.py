@@ -73,13 +73,64 @@ def reconcile(client, desired):
     print("DNS proxy ACL, client-IP header, and private recursion settings reconciled from Git")
 
 
-def configure(client, desired, password):
+def permission_table(rows, key):
+    return "|".join(
+        str(value).lower() if isinstance(value, bool) else str(value)
+        for row in rows
+        for value in (row[key], row["canView"], row["canModify"], row["canDelete"])
+    )
+
+
+def grant_user(client, get_path, set_path, parameters, username, modify, delete):
+    permissions = client.post(get_path, parameters)["response"]
+    expected = {"username": username, "canView": True, "canModify": modify, "canDelete": delete}
+    rows = permissions.get("userPermissions", [])
+    existing = next((row for row in rows if row["username"] == username), None)
+    if existing and all(existing.get(key) == value for key, value in expected.items()):
+        return
+    users = [row for row in rows if row["username"] != username] + [expected]
+    client.post(set_path, {
+        **parameters,
+        "userPermissions": permission_table(users, "username"),
+        "groupPermissions": permission_table(permissions.get("groupPermissions", []), "name"),
+    })
+    actual = client.post(get_path, parameters)["response"]
+    user = next((row for row in actual.get("userPermissions", []) if row["username"] == username), {})
+    if not all(user.get(key) == value for key, value in expected.items()):
+        raise RuntimeError("DNS01 permission verification failed")
+
+
+def reconcile_dns01(client, desired):
+    username = desired["username"]
+    user = client.post("admin/users/get", {"user": username})["response"]
+    if user.get("displayName") != desired["displayName"] or user.get("disabled"):
+        raise RuntimeError("Provision the managed DNS01 service account before reconciling zone permissions")
+    if set(user.get("memberOfGroups", [])) - {"Everyone"}:
+        raise RuntimeError("DNS01 service account belongs to an unexpected privileged group")
+    # Global list access only: no new-zone creation, zone deletion, or ACL edits.
+    grant_user(client, "admin/permissions/get", "admin/permissions/set", {"section": "Zones"}, username, False, False)
+    zones = {zone["name"].rstrip(".").lower(): zone for zone in client.post("zones/list")["response"]["zones"]}
+    for name in desired["zones"]:
+        existing = zones.get(name)
+        if existing and (existing.get("type") != "Primary" or existing.get("disabled") or existing.get("internal")):
+            raise RuntimeError(f"Refusing to replace or enable the existing zone {name}")
+        if not existing:
+            client.post("zones/create", {"zone": name, "type": "Primary"})
+        # Zone delete permission is needed to remove TXT records. Global zone
+        # delete remains denied, so the account cannot delete entire zones.
+        grant_user(client, "zones/permissions/get", "zones/permissions/set", {"zone": name}, username, True, True)
+    print(f"DNS01 service account restricted to {len(desired['zones'])} declared zones; other users and groups preserved")
+
+
+def configure(client, desired, password, dns01=None):
     result = client.post("user/login", {"user": "admin", "pass": password})
     client.token = result.get("token")
     if not client.token:
         raise RuntimeError("DNS login did not return a session token")
     try:
         reconcile(client, desired)
+        if dns01:
+            reconcile_dns01(client, dns01)
     finally:
         try:
             client.post("user/logout")
@@ -96,6 +147,7 @@ def main():
         client,
         json.loads(Path("/configuration/settings.json").read_text()),
         Path("/run/secrets/nameserver-admin/password").read_text(),
+        json.loads(Path("/configuration/dns01.json").read_text()),
     )
 
 

@@ -15,6 +15,7 @@ configMapGenerator:
     files:
       - configuration/configure.py
       - configuration/settings.json
+      - configuration/dns01.json
 # Vault authentication and Secret synchronization are owned by nameserver-secrets.
 images:
   - name: ghcr.io/pmh-only/technitium
