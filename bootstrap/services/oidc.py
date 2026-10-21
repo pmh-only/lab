@@ -40,6 +40,7 @@ class Authentik:
 def provision_client(vault, api, slug, desired):
     provider_name = "lab bootstrap: " + slug
     secret_field = desired.get("secretField", "client-secret")
+    companion_fields = desired.get("companionSecretFields", [])
     public_client = desired.get("publicClient", False)
     providers = api.list("providers/oauth2/")
     existing = next((p for p in providers if p["client_id"] == desired["clientID"]), None)
@@ -48,8 +49,9 @@ def provision_client(vault, api, slug, desired):
         raise RuntimeError("An existing OIDC provider is not managed by this bootstrap; refusing takeover")
     if stored is None and not public_client:
         stored = {secret_field: secrets.token_urlsafe(48)}
+        stored.update({field: secrets.token_urlsafe(48) for field in companion_fields})
         vault.create(desired["vaultPath"], stored)
-    if not public_client and (set(stored) != {secret_field} or len(stored[secret_field]) < 48):
+    if not public_client and (set(stored) != {secret_field, *companion_fields} or any(not isinstance(v, str) or len(v) < 48 for v in stored.values())):
         raise RuntimeError("Existing OIDC credentials need manual review")
     redirects = [{"matching_mode": "strict", "url": desired["redirectURI"], "redirect_uri_type": "authorization"}]
     if existing:

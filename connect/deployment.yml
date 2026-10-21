@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: connect
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -16,8 +18,20 @@ spec:
         - name: connect
           image: ghcr.io/pmh-only/connect:latest
           ports:
-            - containerPort: 80
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 5
           env:
+            - name: DATA_FILE
+              value: /data/collections.jsonl
             - name: OIDC_ISSUER_URL
               value: https://auth.pmh.codes/application/o/connect/
             - name: OIDC_CLIENT_ID
@@ -42,7 +56,7 @@ spec:
             - name: ROSTACK_BASE_URL
               value: https://connect.pmh.codes
             - name: ROSTACK_API_VERSION
-              value: 2026-08-13
+              value: "2026-08-13"
             - name: OIDC_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:

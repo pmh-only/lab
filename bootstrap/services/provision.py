@@ -20,6 +20,7 @@ from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
 
 ROOT = Path(__file__).resolve().parents[2]
 PROFILES = {
+    "connect": ("connect/connect-secrets", {"COLLECT_TOKEN": "random", "MCP_TOKEN": "random", "ROSTACK_TOKEN": "random", "OIDC_CLIENT_SECRET": "random"}),
     "speed": ("speed/speed-secret", {"PASSWORD": "random", "IPINFO_APIKEY": "optional-empty"}),
     "here": ("here/here-secret", {"SSH_PASSWORD": "random"}),
     "minio": ("minio/minio-secrets", {"MINIO_ROOT_USER": "random", "MINIO_ROOT_PASSWORD": "random"}),

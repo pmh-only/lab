@@ -1,4 +1,13 @@
 {
+  "connect": {
+    "namespace": "connect",
+    "vaultPath": "connect/connect-secrets",
+    "secretField": "OIDC_CLIENT_SECRET",
+    "companionSecretFields": ["COLLECT_TOKEN", "MCP_TOKEN", "ROSTACK_TOKEN"],
+    "clientID": "wA1ypwpdd0ilNF9jNJSahpQeWAyViZ0ucbhx9aPm",
+    "launchURL": "https://connect.pmh.codes",
+    "redirectURI": "https://connect.pmh.codes/oidc/callback"
+  },
   "go": {
     "namespace": "go",
     "vaultPath": "go/go-auth-secrets",

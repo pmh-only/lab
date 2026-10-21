@@ -26,12 +26,13 @@ class OIDCTests(unittest.TestCase):
                 self.assertTrue(declaration["publicClient"])
                 self.assertEqual(declaration["grantTypes"], ["implicit"])
                 continue
-            if slug == "stmt":
-                docs = list(yaml.safe_load_all((ROOT / "stmt/deployment.yml").read_text()))
+            if slug in {"stmt", "connect"}:
+                docs = list(yaml.safe_load_all((ROOT / slug / "deployment.yml").read_text()))
                 env = docs[0]["spec"]["template"]["spec"]["containers"][0]["env"]
                 actual = next(e["value"] for e in env if e["name"] == "OIDC_CLIENT_ID")
                 self.assertEqual(actual, declaration["clientID"])
-                self.assertEqual(declaration["redirectURI"], "https://stmt.pmh.codes/auth/callback")
+                redirect = "https://stmt.pmh.codes/auth/callback" if slug == "stmt" else "https://connect.pmh.codes/oidc/callback"
+                self.assertEqual(declaration["redirectURI"], redirect)
                 continue
             directory = "pdf_configs" if slug == "pdf" else slug
             docs = list(yaml.safe_load_all((ROOT / directory / "ingress.yml").read_text()))
@@ -64,6 +65,22 @@ class OIDCTests(unittest.TestCase):
             provision_client(vault, api, "go", DECLARATIONS["go"])
         vault.create.assert_not_called()
         api.request.assert_not_called()
+
+    def test_connect_companion_tokens_are_preserved(self):
+        desired = DECLARATIONS["connect"]
+        fields = {k: "fresh-placeholder-" * 5 for k in ["OIDC_CLIENT_SECRET", *desired["companionSecretFields"]]}
+        provider = {"pk": 44, "name": "lab bootstrap: connect", "client_id": desired["clientID"],
+                    "client_secret": fields["OIDC_CLIENT_SECRET"], "issuer_mode": "per_provider", "redirect_uris": [
+                        {"matching_mode": "strict", "url": desired["redirectURI"], "redirect_uri_type": "authorization"}]}
+        api, vault = Mock(), Mock()
+        api.list.return_value = [provider]
+        api.request.return_value = {"provider": 44}
+        vault.get.return_value = fields.copy()
+        discovery = {"issuer": "https://auth.pmh.codes/application/o/connect/"}
+        with patch("oidc.urllib.request.urlopen", return_value=io.BytesIO(json.dumps(discovery).encode())):
+            provision_client(vault, api, "connect", desired)
+        vault.create.assert_not_called()
+        self.assertEqual(vault.get.return_value, fields)
 
     def test_native_public_client_does_not_fabricate_a_client_secret(self):
         desired = DECLARATIONS["remote"]
