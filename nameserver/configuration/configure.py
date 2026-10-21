@@ -122,7 +122,49 @@ def reconcile_dns01(client, desired):
     print(f"DNS01 service account restricted to {len(desired['zones'])} declared zones; other users and groups preserved")
 
 
-def configure(client, desired, password, dns01=None):
+def ensure_record_set(client, zone, name, record_type, field, expected, ttl):
+    records = client.post("zones/records/get", {"domain": zone})["response"]["records"]
+    existing = {
+        record["rData"][field].rstrip(".").lower()
+        for record in records
+        if record["name"].rstrip(".").lower() == name and record["type"] == record_type
+    }
+    if existing - set(expected):
+        raise RuntimeError(f"Conflicting {record_type} records at {name}; refusing to discard existing data")
+    for value in sorted(set(expected) - existing):
+        client.post("zones/records/add", {
+            "zone": zone, "domain": name, "type": record_type,
+            field: value, "ttl": ttl, "overwrite": "false", "comments": "Managed by GitOps nameserver",
+        })
+    actual = client.post("zones/records/get", {"domain": zone})["response"]["records"]
+    values = {
+        record["rData"][field].rstrip(".").lower()
+        for record in actual
+        if record["name"].rstrip(".").lower() == name and record["type"] == record_type
+    }
+    if values != set(expected):
+        raise RuntimeError(f"Authoritative {record_type} verification failed at {name}")
+
+
+def reconcile_authoritative(client, zones, desired):
+    nameservers = [item["name"] for item in desired["nameservers"]]
+    for zone in zones:
+        ensure_record_set(client, zone, zone, "NS", "nameServer", nameservers, desired["ttl"])
+        for item in desired["nameservers"]:
+            if item["name"].endswith("." + zone):
+                ensure_record_set(client, zone, item["name"], "A", "ipAddress", [item["publicIPv4"]], desired["ttl"])
+    zone_status = {zone["name"]: zone for zone in client.post("zones/list")["response"]["zones"]}
+    for zone in zones:
+        if zone_status[zone]["dnssecStatus"] == "Unsigned":
+            # Generate fresh server-side keys; never import previous private keys.
+            client.post("zones/dnssec/sign", {"zone": zone, **desired["dnssec"]})
+        state = client.post("zones/dnssec/viewDS", {"zone": zone})["response"]
+        if not state["dnssecStatus"].startswith("Signed") or not state.get("dsRecords"):
+            raise RuntimeError(f"DNSSEC signing verification failed for {zone}")
+    print(f"Authoritative NS/A records and DNSSEC prepared for {len(zones)} private zones; external delegation unchanged")
+
+
+def configure(client, desired, password, dns01=None, authoritative=None):
     result = client.post("user/login", {"user": "admin", "pass": password})
     client.token = result.get("token")
     if not client.token:
@@ -131,6 +173,8 @@ def configure(client, desired, password, dns01=None):
         reconcile(client, desired)
         if dns01:
             reconcile_dns01(client, dns01)
+            if authoritative:
+                reconcile_authoritative(client, dns01["zones"], authoritative)
     finally:
         try:
             client.post("user/logout")
@@ -148,6 +192,7 @@ def main():
         json.loads(Path("/configuration/settings.json").read_text()),
         Path("/run/secrets/nameserver-admin/password").read_text(),
         json.loads(Path("/configuration/dns01.json").read_text()),
+        json.loads(Path("/configuration/authoritative.json").read_text()),
     )
 
 

@@ -1,0 +1,16 @@
+{
+  "nameservers": [
+    {"name": "ns1.pmh.codes", "node": "pmhoci2", "publicIPv4": "138.2.112.39"},
+    {"name": "ns2.pmh.codes", "node": "pmhoci", "publicIPv4": "168.110.121.95"}
+  ],
+  "ttl": 3600,
+  "dnssec": {
+    "algorithm": "ECDSA",
+    "curve": "P256",
+    "dnsKeyTtl": 3600,
+    "zskRolloverDays": 30,
+    "nxProof": "NSEC3",
+    "iterations": 0,
+    "saltLength": 0
+  }
+}

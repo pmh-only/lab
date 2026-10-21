@@ -1,0 +1,27 @@
+# Account registration only. Do not request a Certificate before public DNS
+# delegation, record preservation, DNSSEC, and authoritative reachability pass.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    email: pmh_only@pmh.codes
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-staging-account-key
+    solvers:
+      - dns01:
+          webhook:
+            groupName: acme.xver.cloud
+            solverName: technitium
+            config:
+              serverUrl: http://nameserver.nameserver.svc.cluster.local:5380
+              authTokenSecretRef:
+                name: technitium-api-token
+                key: api-token
+        selector:
+          dnsZones:
+            - as218822.net
+            - pmh.so
+            - pmh.codes

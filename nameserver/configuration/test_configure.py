@@ -2,7 +2,7 @@ import copy
 import unittest
 from unittest.mock import Mock, patch
 
-from configure import configure, grant_user, reconcile, reconcile_dns01
+from configure import configure, ensure_record_set, grant_user, reconcile, reconcile_authoritative, reconcile_dns01
 
 
 DESIRED = {
@@ -109,6 +109,60 @@ class DNS01PermissionsTests(unittest.TestCase):
         client.post.assert_any_call("zones/create", {"zone": "pmh.codes", "type": "Primary"})
         self.assertEqual(grant.call_args_list[0].args[-2:], (False, False))
         self.assertEqual(grant.call_args_list[1].args[-2:], (True, True))
+
+
+class AuthoritativeTests(unittest.TestCase):
+    def setUp(self):
+        self.desired = {
+            "nameservers": [{"name": "ns1.pmh.codes", "publicIPv4": "138.2.112.39"}],
+            "ttl": 3600,
+            "dnssec": {"algorithm": "ECDSA", "curve": "P256", "dnsKeyTtl": 3600, "nxProof": "NSEC3"},
+        }
+
+    def test_conflicting_address_is_not_overwritten(self):
+        client = Mock()
+        client.post.return_value = {"response": {"records": [{"name": "ns1.pmh.codes", "type": "A", "rData": {"ipAddress": "192.0.2.1"}}]}}
+        with self.assertRaises(RuntimeError):
+            ensure_record_set(client, "pmh.codes", "ns1.pmh.codes", "A", "ipAddress", ["138.2.112.39"], 3600)
+        client.post.assert_called_once_with("zones/records/get", {"domain": "pmh.codes"})
+
+    def test_unexpected_nameserver_is_not_removed(self):
+        client = Mock()
+        client.post.return_value = {"response": {"records": [{"name": "pmh.codes", "type": "NS", "rData": {"nameServer": "other.example."}}]}}
+        with self.assertRaises(RuntimeError):
+            ensure_record_set(client, "pmh.codes", "pmh.codes", "NS", "nameServer", ["ns1.pmh.codes"], 3600)
+        self.assertEqual(client.post.call_count, 1)
+
+    def test_missing_address_is_added_without_overwrite(self):
+        client = Mock()
+        record = {"name": "ns1.pmh.codes", "type": "A", "rData": {"ipAddress": "138.2.112.39"}}
+        client.post.side_effect = [{"response": {"records": []}}, {"status": "ok"}, {"response": {"records": [record]}}]
+        ensure_record_set(client, "pmh.codes", "ns1.pmh.codes", "A", "ipAddress", ["138.2.112.39"], 3600)
+        self.assertEqual(client.post.call_args_list[1].args[1]["overwrite"], "false")
+
+    def test_existing_signing_keys_are_not_rotated(self):
+        client = Mock()
+        client.post.side_effect = [
+            {"response": {"zones": [{"name": "pmh.codes", "dnssecStatus": "SignedWithNSEC3"}]}},
+            {"response": {"dnssecStatus": "SignedWithNSEC3", "dsRecords": [{"keyTag": 1234}]}},
+        ]
+        with patch("configure.ensure_record_set"):
+            reconcile_authoritative(client, ["pmh.codes"], self.desired)
+        self.assertFalse(any(call.args[0] == "zones/dnssec/sign" for call in client.post.call_args_list))
+
+    def test_unsigned_zone_gets_fresh_server_generated_keys(self):
+        client = Mock()
+        client.post.side_effect = [
+            {"response": {"zones": [{"name": "pmh.codes", "dnssecStatus": "Unsigned"}]}},
+            {"status": "ok"},
+            {"response": {"dnssecStatus": "SignedWithNSEC3", "dsRecords": [{"keyTag": 1234}]}},
+        ]
+        with patch("configure.ensure_record_set"):
+            reconcile_authoritative(client, ["pmh.codes"], self.desired)
+        parameters = client.post.call_args_list[1].args[1]
+        self.assertEqual(parameters["algorithm"], "ECDSA")
+        self.assertNotIn("pemKskPrivateKey", parameters)
+        self.assertNotIn("pemZskPrivateKey", parameters)
 
 
 if __name__ == "__main__":
