@@ -23,6 +23,9 @@ class SeafileTests(unittest.TestCase):
     def test_no_root_credentials_and_all_images_are_pinned(self):
         self.assertNotIn("DB_ROOT_PASSWD", PROFILES["seafile"][1])
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "seafile")], text=True)))
+        waves = {d["metadata"]["name"]: int(d["metadata"].get("annotations", {}).get("argocd.argoproj.io/sync-wave", "0")) for d in docs if d["kind"] == "Deployment"}
+        self.assertGreater(waves["seafile-sdoc"], waves["seafile"])
+        self.assertGreater(waves["seafile-noti"], waves["seafile"])
         for deployment in [d for d in docs if d["kind"] == "Deployment"]:
             pod = deployment["spec"]["template"]["spec"]
             self.assertFalse(pod["automountServiceAccountToken"])
@@ -49,10 +52,13 @@ class SeafileTests(unittest.TestCase):
             module.INTEGRATION = Path(directory) / "integration"
             module.INTEGRATION.mkdir()
             (module.INTEGRATION / "seahub_lab.py").write_text("# managed non-secret integration\n")
-            upstream = types.SimpleNamespace(call=Mock(), get_script=lambda name: "/upstream/" + name)
+            upstream_dir = Path(directory) / "upstream"
+            upstream_dir.mkdir()
+            (upstream_dir / "setup-seafile-mysql.py").write_text("def main():\n    seahub_config.do_syncdb()\n    db_config.root_conn.close()\n")
+            upstream = types.SimpleNamespace(call=Mock(), get_script=lambda name: str(upstream_dir / name), get_install_dir=lambda: str(upstream_dir))
 
             def native_setup():
-                upstream.call("/upstream/setup-seafile-mysql.sh auto -n seafile", env={"MYSQL_USER": "seafile"})
+                upstream.call(str(upstream_dir / "setup-seafile-mysql.sh") + " auto -n seafile", env={"MYSQL_USER": "seafile"})
                 (module.DATA / "conf").mkdir()
                 (module.DATA / "conf/seafile.conf").write_text("[database]\nuser=seafile\n")
                 (module.DATA / "conf/seahub_settings.py").write_text("# native settings\n")
@@ -60,10 +66,14 @@ class SeafileTests(unittest.TestCase):
                 (module.DATA / "seafile-data/current_version").write_text("12.0.14")
 
             upstream.init_seafile_server = Mock(side_effect=native_setup)
-            with patch.dict("sys.modules", {"bootstrap": upstream}), patch.dict(os.environ, {"SEAFILE_VERSION": "12.0.14"}), patch.object(module.subprocess, "run", return_value=Mock(returncode=0)) as run:
+            with patch.dict("sys.modules", {"bootstrap": upstream}), patch.dict(os.environ, {"SEAFILE_VERSION": "12.0.14"}), patch.object(module, "native_schema_complete", return_value=False), patch.object(module.subprocess, "run", return_value=Mock(returncode=0)) as run:
                 module.initialize()
                 self.assertIn("--use-existing-db 1", run.call_args.args[0])
                 self.assertNotIn("MYSQL_ROOT_PASSWD", run.call_args.kwargs["env"])
+                self.assertEqual(run.call_args.kwargs["env"]["LAB_SEAFILE_NATIVE_SCHEMA_COMPLETE"], "false")
+                patched = (upstream_dir / "setup-seafile-mysql.py").read_text()
+                self.assertIn('if os.environ.get("LAB_SEAFILE_NATIVE_SCHEMA_COMPLETE") != "true":', patched)
+                self.assertIn("if db_config.root_conn:", patched)
                 original = (module.DATA / "conf/seahub_settings.py").read_text()
                 module.initialize()
                 upstream.init_seafile_server.assert_called_once()

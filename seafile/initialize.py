@@ -1,6 +1,7 @@
 """Run Seafile's native existing-database setup without giving the app DB root."""
 
 from configparser import ConfigParser
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -15,6 +16,54 @@ MARKER = DATA / ".lab-native-bootstrap-v1"
 INTEGRATION = Path("/lab-config")
 
 
+def native_schema_complete(install):
+    import pymysql
+
+    manifest = json.loads((INTEGRATION / "native-schema.json").read_text())
+    sources = {
+        "ccnet_db": [install / "sql/mysql/ccnet.sql"],
+        "seafile_db": [install / "sql/mysql/seafile.sql"],
+        "seahub_db": [install / "pro/python/seafevents/mysql.sql", install / "seahub/sql/mysql.sql"],
+    }
+    conn = pymysql.connect(host=os.environ["DB_HOST"], port=int(os.environ["DB_PORT"]),
+                           user="seafile", passwd=os.environ["DB_PASSWORD"], charset="utf8mb4", connect_timeout=20)
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA IN ('ccnet_db','seafile_db','seahub_db')")
+        if cursor.fetchone()[0] == 0:
+            return False
+        # A previous partial attempt is never blindly re-imported. Fingerprints
+        # were verified against isolated databases built from this pinned image.
+        for database, files in sources.items():
+            names = set()
+            for path in files:
+                names.update(re.findall(r"(?im)^CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?\s+`?([A-Za-z0-9_]+)", path.read_text()))
+            if database == "seahub_db":
+                names.add("avatar_uploaded")
+            pairs = []
+            for table in sorted(names):
+                cursor.execute(f"SHOW CREATE TABLE `{database}`.`{table}`")
+                ddl = re.sub(r" AUTO_INCREMENT=\d+", "", cursor.fetchone()[1]).strip()
+                pairs.append((table, ddl))
+            digest = hashlib.sha256(json.dumps(pairs, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+            if digest != manifest["databaseSchemaSha256"][database]:
+                raise RuntimeError("Existing native schema differs; refusing re-import or reset")
+        for table, expected in manifest["fixtureSha256"].items():
+            cursor.execute("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='seahub_db' AND TABLE_NAME=%s ORDER BY ORDINAL_POSITION", (table,))
+            columns = [row[0] for row in cursor.fetchall()]
+            select = "JSON_ARRAY(" + ",".join("`" + column + "`" for column in columns) + ")"
+            cursor.execute(f"SELECT {select} FROM `seahub_db`.`{table}`")
+            rows = sorted(json.dumps(json.loads(row[0]), separators=(",", ":"), ensure_ascii=False) for row in cursor.fetchall())
+            if hashlib.sha256("\n".join(rows).encode()).hexdigest() != expected:
+                raise RuntimeError("Existing native fixture data differs; refusing re-import or reset")
+        print("All three existing native schemas and fixture hashes match the verified pinned-image reference")
+        return True
+    except pymysql.MySQLError:
+        raise RuntimeError("Native schema verification failed; refusing an unverified re-import") from None
+    finally:
+        conn.close()
+
+
 def initialize():
     DATA.mkdir(parents=True, exist_ok=True)
     config = DATA / "conf/seafile.conf"
@@ -24,6 +73,20 @@ def initialize():
         sys.path.insert(0, "/scripts")
         import bootstrap
 
+        schema_complete = native_schema_complete(Path(bootstrap.get_install_dir()))
+        installer = Path(bootstrap.get_script("setup-seafile-mysql.py"))
+        source = installer.read_text()
+        cleanup = "    db_config.root_conn.close()"
+        if source.count(cleanup) != 1:
+            raise RuntimeError("Pinned native installer cleanup changed; refusing an unverified compatibility patch")
+        # 12.0.14 calls close() on an empty root connection even in its supported
+        # existing-database mode. Guard only that cleanup in this init container.
+        source = source.replace(cleanup, "    if db_config.root_conn:\n        db_config.root_conn.close()")
+        schema_import = "    seahub_config.do_syncdb()"
+        if source.count(schema_import) != 1:
+            raise RuntimeError("Pinned native schema import changed; refusing an unverified compatibility patch")
+        source = source.replace(schema_import, '    if os.environ.get("LAB_SEAFILE_NATIVE_SCHEMA_COMPLETE") != "true":\n        seahub_config.do_syncdb()')
+        installer.write_text(source)
         original_call = bootstrap.call
         setup = bootstrap.get_script("setup-seafile-mysql.sh")
 
@@ -34,6 +97,7 @@ def initialize():
                 # and configuration generation entirely upstream-owned.
                 env = dict(kwargs["env"])
                 env.update({"CCNET_DB": "ccnet_db", "SEAFILE_DB": "seafile_db", "SEAHUB_DB": "seahub_db"})
+                env["LAB_SEAFILE_NATIVE_SCHEMA_COMPLETE"] = str(schema_complete).lower()
                 result = subprocess.run(command + " --use-existing-db 1", shell=True, env=env,
                                         capture_output=True, timeout=180)
                 if result.returncode:

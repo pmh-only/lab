@@ -1,0 +1,13 @@
+{
+  "format": "lab-seafile-native-schema-v1",
+  "databaseSchemaSha256": {
+    "ccnet_db": "8f31f36ed897ed6dfc94458085d7432a520ae700f0ec73ed4c4e6da2dc571aab",
+    "seafile_db": "0be357468986ad41c6dd9df75b4ee804c15341883bf388cb834140755e0b316c",
+    "seahub_db": "8771fc9b57a2f9993b92b33b31d68ee41fd8e66a3bc498bf647e2bc703561401"
+  },
+  "fixtureSha256": {
+    "auth_permission": "4a455897643a26f57f86cc9f782525f3b53a0a90efdb5d3242dcd0c2f069b808",
+    "django_content_type": "049bde5b237c07888ea164706e55d748f15848e14b8aa6656138af934be9d05d",
+    "django_migrations": "78b8778a8b4f54e202c56c2399367743602befdc26990ecb59ba172eb949b4c2"
+  }
+}

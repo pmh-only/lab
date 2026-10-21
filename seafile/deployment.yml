@@ -2,7 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: seafile
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
+  replicas: 1
   strategy:
     type: Recreate
   revisionHistoryLimit: 0
@@ -123,7 +126,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: seafile-sdoc
+  annotations:
+    # SeaDoc also creates Seahub tables; wait for the native core schema first.
+    argocd.argoproj.io/sync-wave: "1"
 spec:
+  replicas: 1
   strategy:
     type: Recreate
   revisionHistoryLimit: 0
@@ -189,6 +196,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: seafile-noti
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   strategy:
     type: Recreate
