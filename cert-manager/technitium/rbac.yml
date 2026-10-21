@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: technitium-api-token-reader
+  namespace: cert-manager
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["technitium-api-token"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: technitium-api-token-reader
+  namespace: cert-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: technitium-api-token-reader
+subjects:
+  - kind: ServiceAccount
+    name: cert-manager-technitium-webhook
+    namespace: cert-manager
