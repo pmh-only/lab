@@ -74,4 +74,5 @@ spec:
       volumes:
         - name: pgsql-storage
           persistentVolumeClaim:
-            claimName: pgsql-pvc
+            # Failed original pgsql-pvc remains retained/read-only for recovery.
+            claimName: pgsql-recovery-clean
