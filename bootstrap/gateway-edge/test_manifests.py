@@ -40,6 +40,17 @@ class BootstrapEdgeTests(unittest.TestCase):
         volumes = self.resources["DaemonSet"]["spec"]["template"]["spec"]["volumes"]
         self.assertNotIn(certificate["secretName"], {v["secret"]["secretName"] for v in volumes if "secret" in v})
 
+    def test_public_certificate_uses_separate_account_and_managed_dns_only(self):
+        certificate = next(d["spec"] for d in self.documents if d["kind"] == "Certificate" and d["metadata"]["name"] == "gateway-pmh-codes")
+        self.assertEqual(certificate["issuerRef"]["name"], "letsencrypt-public")
+        self.assertEqual(set(certificate["dnsNames"]), {"pmh.codes", "*.pmh.codes"})
+        self.assertNotIn("ipAddresses", certificate)
+        issuer = yaml.safe_load((ROOT / "cert-manager/technitium/production-issuer.yml").read_text())["spec"]["acme"]
+        self.assertEqual(issuer["server"], "https://acme-v02.api.letsencrypt.org/directory")
+        self.assertEqual(issuer["privateKeySecretRef"]["name"], "letsencrypt-public-account-key")
+        self.assertEqual(issuer["solvers"][0]["selector"]["dnsZones"], ["pmh.codes"])
+        self.assertEqual(certificate["secretTemplate"]["labels"], {"edge.pmh.codes/reload": "true"})
+
     def test_no_ssh_ech_or_hsts_dependency(self):
         self.assertNotIn("listen 22", self.config)
         self.assertNotIn("ssl_ech_file", self.config)

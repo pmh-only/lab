@@ -4,6 +4,7 @@ namespace: gateway
 resources:
   - certificate.yml
   - staging-certificate.yml
+  - public-certificate.yml
   - nginx.yml
 configMapGenerator:
   - name: gateway-bootstrap-config

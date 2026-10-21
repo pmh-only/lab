@@ -1,0 +1,24 @@
+# Separate production account; never reuse staging or pre-migration keys.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-public
+spec:
+  acme:
+    email: pmh_only@pmh.codes
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-public-account-key
+    solvers:
+      - dns01:
+          webhook:
+            groupName: acme.xver.cloud
+            solverName: technitium
+            config:
+              serverUrl: http://nameserver.nameserver.svc.cluster.local:5380
+              authTokenSecretRef:
+                name: technitium-api-token
+                key: api-token
+        selector:
+          dnsZones:
+            - pmh.codes
