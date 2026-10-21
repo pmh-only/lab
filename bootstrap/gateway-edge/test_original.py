@@ -51,6 +51,13 @@ class OriginalGatewayTests(unittest.TestCase):
         self.assertEqual(certificates[0]["spec"]["secretName"], "gateway-pmh-codes-tls")
         self.assertNotIn("ipAddresses", certificates[0]["spec"])
 
+    def test_original_issuer_keeps_profile_without_fabricating_cloudflare_credentials(self):
+        issuer = next(d["spec"]["acme"] for d in self.rendered if d["kind"] == "ClusterIssuer" and d["metadata"]["name"] == "letsencrypt")
+        self.assertEqual(issuer["profile"], "shortlived")
+        self.assertEqual(issuer["preferredChain"], "ISRG Root YE")
+        self.assertFalse(any("cloudflare" in solver.get("dns01", {}) for solver in issuer["solvers"]))
+        self.assertTrue(any("webhook" in solver.get("dns01", {}) for solver in issuer["solvers"]))
+
 
 if __name__ == "__main__":
     unittest.main()

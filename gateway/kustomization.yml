@@ -12,6 +12,16 @@ resources:
 # Preserve the original full certificate declaration without requesting retired
 # IPs or unmigrated domains. Keep the newly issued certificate during migration.
 patches:
+  # No old/fabricated Cloudflare token: keep the original issuer's active
+  # Technitium/HTTP01 solvers until fresh not.ai.kr credentials are supplied.
+  - target:
+      group: cert-manager.io
+      version: v1
+      kind: ClusterIssuer
+      name: letsencrypt
+    patch: |-
+      - op: remove
+        path: /spec/acme/solvers/1
   - target:
       group: cert-manager.io
       version: v1
