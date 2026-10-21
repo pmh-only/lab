@@ -14,10 +14,11 @@ import urllib.request
 
 
 class Client:
-    def __init__(self, address, certificate):
+    def __init__(self, address, certificate, timeout=20):
         self.address = address.rstrip("/")
         self.context = ssl.create_default_context(cadata=certificate)
         self.token = None
+        self.timeout = timeout
 
     def post(self, path, parameters=None):
         parameters = dict(parameters or {})
@@ -33,7 +34,7 @@ class Client:
             method="POST",
         )
         try:
-            with urllib.request.urlopen(request, context=self.context, timeout=20) as response:
+            with urllib.request.urlopen(request, context=self.context, timeout=self.timeout) as response:
                 result = json.load(response)
         except urllib.error.HTTPError as error:
             raise RuntimeError(f"DNS API {path}: HTTP {error.code}") from None
