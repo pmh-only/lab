@@ -26,6 +26,7 @@ data:
       Match   kube.*
       Host    aggregator.traffic.svc.cluster.local
       Port    24224
+      Retry_Limit False
 
   parsers.conf: |
     [PARSER]

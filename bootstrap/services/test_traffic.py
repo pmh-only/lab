@@ -13,10 +13,25 @@ class TrafficTests(unittest.TestCase):
         self.assertIn('openSync("/logs/all.log", "a"', code)
         self.assertNotIn("rmSync", code)
         self.assertNotIn("truncate", code)
+        self.assertIn('source=all.log', code)
+        self.assertIn('writeFileSync("/logs/all.safe.log", ""', code)
         config = yaml.safe_load((ROOT / "traffic/aggregator_cm.yml").read_text())["data"]["goaccess.conf"]
         self.assertIn("anonymize-ip true", config)
         self.assertIn("geoip-database /logs/GeoLite2-ASN.mmdb", config)
         self.assertIn("geoip-database /logs/GeoLite2-City.mmdb", config)
+
+    def test_public_report_uses_derived_log_while_raw_logs_remain(self):
+        config = yaml.safe_load((ROOT / "traffic/aggregator_cm.yml").read_text())["data"]["fluent-bit.conf"]
+        self.assertIn("File      all.log", config)
+        self.assertIn("File      all.safe.log", config)
+        self.assertIn("Rule          $log ^(.*)$ ds.safe true", config)
+        backfill = (ROOT / "traffic/backfill.conf").read_text()
+        self.assertIn("Read_From_Head  On", backfill)
+        self.assertIn("Exit_On_Eof     On", backfill)
+        lua = (ROOT / "traffic/redact.lua").read_text()
+        self.assertIn('["x-amz-signature"] = true', lua)
+        self.assertIn('"upload-api"', lua)
+        self.assertIn('=REDACTED', lua)
 
     def test_workloads_are_pinned_and_do_not_get_kubernetes_credentials(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "traffic")], text=True)))

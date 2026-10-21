@@ -15,11 +15,31 @@ data:
       Listen  0.0.0.0
       Port    24224
 
+    [FILTER]
+      Name          rewrite_tag
+      Match         ds.in
+      Rule          $log ^(.*)$ ds.safe true
+      Emitter_Name  report_copy
+
+    [FILTER]
+      Name   lua
+      Match  ds.safe
+      script /bootstrap/redact.lua
+      call   redact_auth
+
     [OUTPUT]
       Name      file
       Match     ds.in
       Path      /logs
       File      all.log
+      Format    template
+      Template  {log}
+
+    [OUTPUT]
+      Name      file
+      Match     ds.safe
+      Path      /logs
+      File      all.safe.log
       Format    template
       Template  {log}
   goaccess.conf: |

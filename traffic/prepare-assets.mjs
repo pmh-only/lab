@@ -1,7 +1,7 @@
 // Reuse the GeoIP datasets shipped in the pinned native Rybbit image.
 // Do not overwrite existing logs or unfamiliar user-maintained datasets.
 import { createHash } from "node:crypto";
-import { closeSync, constants, copyFileSync, existsSync, openSync, readFileSync } from "node:fs";
+import { closeSync, constants, copyFileSync, existsSync, openSync, readFileSync, writeFileSync } from "node:fs";
 
 const expected = {
   "GeoLite2-City.mmdb": "95285372ac03ebd0acd1d3fcf0832ffd142e8e0c4b6e8856bb5aa9c47844e539",
@@ -18,3 +18,11 @@ for (const [name, checksum] of Object.entries(expected)) {
 }
 closeSync(openSync("/logs/all.log", "a", 0o640));
 console.log("Native log input exists; existing log contents preserved");
+const marker = "/logs/.lab-goaccess-derived-log-v1";
+const markerValue = "lab-goaccess-derived-log-v1;source=all.log\n";
+if (existsSync("/logs/all.safe.log") && (!existsSync(marker) || readFileSync(marker, "utf8") !== markerValue)) {
+  throw new Error("Existing derived report log has no matching ownership marker; refusing replacement");
+}
+writeFileSync(marker, markerValue, { mode: 0o600 });
+// This derived cache is rebuilt by native Fluent Bit. Raw all.log is untouched.
+writeFileSync("/logs/all.safe.log", "", { mode: 0o640 });

@@ -26,13 +26,23 @@ spec:
               readOnly: true
             - name: ds-logs
               mountPath: /logs
+        - name: native-report-backfill
+          image: cr.fluentbit.io/fluent/fluent-bit:latest
+          command: [/fluent-bit/bin/fluent-bit]
+          args: [-c, /bootstrap/backfill.conf]
+          volumeMounts:
+            - name: preparation
+              mountPath: /bootstrap
+              readOnly: true
+            - name: ds-logs
+              mountPath: /logs
       containers:
         - name: goaccess
           image: ghcr.io/pmh-only/goaccess:latest
           args:
             - -p
             - /etc/conf/goaccess.conf
-            - /logs/all.log
+            - /logs/all.safe.log
           volumeMounts:
             - name: ds-logs
               mountPath: /logs
@@ -73,6 +83,9 @@ spec:
             tcpSocket:
               port: forward
           volumeMounts:
+            - name: preparation
+              mountPath: /bootstrap
+              readOnly: true
             - name: ds-logs
               mountPath: /logs
             - name: fb-conf

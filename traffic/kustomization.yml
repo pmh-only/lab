@@ -12,6 +12,8 @@ configMapGenerator:
   - name: traffic-preparation
     files:
       - prepare-assets.mjs
+      - redact.lua
+      - backfill.conf
 images:
   - name: ghcr.io/pmh-only/goaccess
     newTag: latest
