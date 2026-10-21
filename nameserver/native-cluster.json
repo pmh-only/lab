@@ -1,5 +1,6 @@
 {
   "clusterDomain": "pmh.codes",
+  "catalogDomain": "cluster-catalog.pmh.codes",
   "primaryNodeIpAddresses": "138.2.112.39",
   "secondaryNodeIpAddresses": "168.110.121.95",
   "primaryNodeUrl": "https://ns2.pmh.codes:53443/",

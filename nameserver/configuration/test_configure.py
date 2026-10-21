@@ -28,7 +28,10 @@ class ReconcileTests(unittest.TestCase):
         self.assertEqual(cluster["primaryNodeUrl"], "https://ns2.pmh.codes:53443/")
         self.assertEqual(cluster["primaryNodeIpAddresses"], "138.2.112.39")
         self.assertEqual(cluster["secondaryNodeIpAddresses"], "168.110.121.95")
+        self.assertEqual(cluster["catalogDomain"], "cluster-catalog.pmh.codes")
         self.assertEqual(json.loads((root / "configuration/settings.json").read_text())["dnsServerDomain"], "ns2.pmh.codes")
+        secondary_secrets = (root / "secrets/secondary.yml").read_text().split("---")[0]
+        self.assertIn("path: nameserver/nameserver-admin\n", secondary_secrets)
 
     def test_network_acl_order_is_reconciled(self):
         client = Mock()

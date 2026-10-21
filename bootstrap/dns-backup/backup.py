@@ -135,6 +135,7 @@ class Vault:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-root", type=Path, default=Path.home() / ".local/share/lab-dns-backups")
+    parser.add_argument("--deployment", choices=["nameserver", "nameserver-secondary"], default="nameserver")
     args = parser.parse_args()
     private_directory(args.output_root)
     # Inspect the token returned by the already-established userpass CLI login;
@@ -151,7 +152,7 @@ def main():
             raise RuntimeError("Vault TLS forwarding failed")
         vault.key()
         result = subprocess.run([
-            "kubectl", "exec", "-n", "nameserver", "deployment/nameserver", "--", "tar",
+            "kubectl", "exec", "-n", "nameserver", "deployment/" + args.deployment, "--", "tar",
             "--exclude=./logs", "--exclude=./stats", "--exclude=./cache.bin*", "-C", "/etc/dns", "-czf", "-", ".",
         ], capture_output=True, check=True, timeout=60)
         archive = result.stdout
@@ -170,7 +171,7 @@ def main():
         write_private(output / "vault-raft.snap", snapshot)
         validate_snapshot(snapshot)
         manifest = {
-            "format": "lab-dns-backup-v1", "zones": zones, "configurationFiles": file_count,
+            "format": "lab-dns-backup-v1", "deployment": args.deployment, "zones": zones, "configurationFiles": file_count,
             "archiveSha256": archive_digest, "encryptedArchiveSha256": hashlib.sha256(encrypted_data).hexdigest(),
             "snapshotSha256": hashlib.sha256(snapshot).hexdigest(),
             "dnsRoundTripVerified": True, "snapshotInternalChecksumsVerified": True,
