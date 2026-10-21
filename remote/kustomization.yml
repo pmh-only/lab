@@ -4,7 +4,8 @@ namespace: remote
 resources:
   - ./deployment.yml
   - ./service.yml
-  # Publish ingress only after native schema/owner verification.
+  # Native schema/owner login verified; upstream default account rejected.
+  - ./ingress.yml
   - ./secret.yml
   - ./initialize-job.yml
 configMapGenerator:

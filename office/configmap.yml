@@ -11,6 +11,11 @@ data:
           "autoAssembly": {
             "enable": true,
             "interval": "5m"
+          },
+          "token": {
+            "outbox": {
+              "urlExclusionRegex": "^https://([a-z0-9-]+\\.)?s3\\.pmh\\.codes(:443)?/"
+            }
           }
         }
       },
