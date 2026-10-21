@@ -6,7 +6,7 @@ resources:
   - ./service.yml
   - ./ingress.yml
   - ./certificate.yml
-  - ./secret.yml
+# Vault authentication and Secret synchronization are owned by nameserver-secrets.
 images:
   - name: ghcr.io/pmh-only/technitium
     newTag: latest
