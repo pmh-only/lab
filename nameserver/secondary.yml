@@ -1,0 +1,154 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nameserver-secondary
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: nameserver-secondary
+  template:
+    metadata:
+      labels:
+        app: nameserver-secondary
+    spec:
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/hostname: pmhoci
+      containers:
+        - name: nameserver
+          image: ghcr.io/pmh-only/technitium:latest
+          env:
+            - name: DNS_SERVER_DOMAIN
+              value: ns2.pmh.codes
+            - name: DNS_SERVER_ADMIN_PASSWORD_FILE
+              value: /run/secrets/nameserver-admin/password
+            - name: DNS_SERVER_RECURSION
+              value: Deny
+            - name: DNS_SERVER_WEB_SERVICE_HTTP_PORT
+              value: "5380"
+            - name: DNS_SERVER_WEB_SERVICE_ENABLE_HTTPS
+              value: "true"
+            - name: DNS_SERVER_WEB_SERVICE_HTTPS_PORT
+              value: "53443"
+            - name: DNS_SERVER_WEB_SERVICE_TLS_CERTIFICATE_PATH
+              value: /run/secrets/nameserver-tls/keystore.p12
+            - name: DNS_SERVER_WEB_SERVICE_TLS_CERTIFICATE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nameserver-secondary-tls-keystore
+                  key: password
+            - name: DNS_SERVER_WEB_SERVICE_HTTP_TO_TLS_REDIRECT
+              value: "false"
+          ports:
+            - name: dns-tcp
+              containerPort: 53
+              protocol: TCP
+            - name: dns-udp
+              containerPort: 53
+              protocol: UDP
+            - name: http
+              containerPort: 5380
+              protocol: TCP
+            - name: https
+              containerPort: 53443
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+          volumeMounts:
+            - name: config
+              mountPath: /etc/dns
+            - name: tls
+              mountPath: /run/secrets/nameserver-tls
+              readOnly: true
+            - name: admin
+              mountPath: /run/secrets/nameserver-admin
+              readOnly: true
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: nameserver-secondary-config
+        - name: tls
+          secret:
+            secretName: nameserver-secondary-tls-secret
+        - name: admin
+          secret:
+            secretName: nameserver-secondary-admin
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nameserver-secondary-config
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nameserver-secondary
+spec:
+  clusterIP: 172.17.0.21
+  selector:
+    app: nameserver-secondary
+  ports:
+    - name: dns
+      port: 53
+      protocol: UDP
+    - name: dnstcp
+      port: 53
+      protocol: TCP
+    - name: webconsole-tls
+      port: 53443
+      protocol: TCP
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nameserver-secondary-tls-secret
+spec:
+  commonName: ns2.pmh.codes
+  secretName: nameserver-secondary-tls-secret
+  duration: 2160h
+  renewBefore: 720h
+  dnsNames:
+    - ns2.pmh.codes
+    - nameserver-secondary.nameserver.svc.cluster.local
+    - localhost
+  ipAddresses:
+    - "127.0.0.1"
+  issuerRef:
+    name: nameserver-bootstrap
+    kind: Issuer
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+    rotationPolicy: Always
+  keystores:
+    pkcs12:
+      create: true
+      profile: Modern2023
+      passwordSecretRef:
+        name: nameserver-secondary-tls-keystore
+        key: password

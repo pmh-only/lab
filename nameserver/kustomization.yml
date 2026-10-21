@@ -10,6 +10,7 @@ resources:
   - ./bootstrap-issuer.yml
   - ./networkpolicy.yml
   - ./configure-job.yml
+  - ./secondary.yml
 configMapGenerator:
   - name: nameserver-configuration
     files:
@@ -17,6 +18,8 @@ configMapGenerator:
       - configuration/settings.json
       - configuration/dns01.json
       - configuration/authoritative.json
+      - configuration/replication.json
+      - configuration/replication.py
 # Vault authentication and Secret synchronization are owned by nameserver-secrets.
 images:
   - name: ghcr.io/pmh-only/technitium

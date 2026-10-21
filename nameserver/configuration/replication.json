@@ -1,0 +1,8 @@
+{
+  "secondaryUrl": "https://nameserver-secondary.nameserver.svc.cluster.local:53443",
+  "primaryAddresses": ["172.17.0.20"],
+  "secondaryAddresses": ["172.17.0.21"],
+  "tsigKeyName": "zone-transfer.pmh.codes",
+  "podNetworks": ["172.16.0.0/24", "172.16.1.0/24"],
+  "primaryNetworks": ["172.16.1.0/24"]
+}

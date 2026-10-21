@@ -166,7 +166,7 @@ def reconcile_authoritative(client, zones, desired):
     print(f"Authoritative NS/A records and DNSSEC prepared for {len(zones)} private zones; external delegation unchanged")
 
 
-def configure(client, desired, password, dns01=None, authoritative=None):
+def configure(client, desired, password, dns01=None, authoritative=None, after_configure=None):
     result = client.post("user/login", {"user": "admin", "pass": password})
     client.token = result.get("token")
     if not client.token:
@@ -177,6 +177,8 @@ def configure(client, desired, password, dns01=None, authoritative=None):
             reconcile_dns01(client, dns01)
             if authoritative:
                 reconcile_authoritative(client, dns01["zones"], authoritative)
+        if after_configure:
+            after_configure(client)
     finally:
         try:
             client.post("user/logout")
@@ -185,6 +187,20 @@ def configure(client, desired, password, dns01=None, authoritative=None):
 
 
 def main():
+    from replication import reconcile as reconcile_replication
+
+    dns01 = json.loads(Path("/configuration/dns01.json").read_text())
+    replication = json.loads(Path("/configuration/replication.json").read_text())
+    secondary = Client(replication["secondaryUrl"], Path("/run/secrets/secondary-ca/tls.crt").read_text())
+
+    def replicate(primary):
+        reconcile_replication(
+            primary, secondary,
+            Path("/run/secrets/secondary-admin/password").read_text(),
+            Path("/run/secrets/zone-transfer/key").read_text().strip(),
+            replication, dns01["zones"],
+        )
+
     client = Client(
         "https://nameserver.nameserver.svc.cluster.local:53443",
         Path("/run/secrets/nameserver-ca/tls.crt").read_text(),
@@ -193,8 +209,9 @@ def main():
         client,
         json.loads(Path("/configuration/settings.json").read_text()),
         Path("/run/secrets/nameserver-admin/password").read_text(),
-        json.loads(Path("/configuration/dns01.json").read_text()),
+        dns01,
         json.loads(Path("/configuration/authoritative.json").read_text()),
+        after_configure=replicate,
     )
 
 

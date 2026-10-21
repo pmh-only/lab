@@ -47,3 +47,29 @@ spec:
       ports:
         - protocol: TCP
           port: 53443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: nameserver-secondary-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app: nameserver-secondary
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: nameserver-configure
+      ports:
+        - protocol: TCP
+          port: 53443
