@@ -3,6 +3,12 @@
     {
       "zone": "pmh.codes",
       "emptyApexWeb": true,
+      "replaceCnames": [
+        {
+          "name": "auth.pmh.codes",
+          "expectedCname": "pmhonly-cd-wydx5vkqda3gfq8y.edge.tenants.jp.auth0.com"
+        }
+      ],
       "records": [
         {
           "name": "*.pmh.codes",
@@ -33,10 +39,18 @@
         },
         {
           "name": "auth.pmh.codes",
-          "type": "CNAME",
+          "type": "A",
           "ttl": 300,
           "data": {
-            "cname": "pmhonly-cd-wydx5vkqda3gfq8y.edge.tenants.jp.auth0.com"
+            "ipAddress": "138.2.112.39"
+          }
+        },
+        {
+          "name": "auth.pmh.codes",
+          "type": "A",
+          "ttl": 300,
+          "data": {
+            "ipAddress": "168.110.121.95"
           }
         },
         {

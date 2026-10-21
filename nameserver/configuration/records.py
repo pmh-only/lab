@@ -43,6 +43,7 @@ def canonical(record_type, data):
 
 def reconcile(client, declaration, allowed_zones):
     plans = []
+    cname_removals = []
     for zone in declaration["zones"]:
         name = zone["zone"]
         if name not in allowed_zones:
@@ -80,9 +81,25 @@ def reconcile(client, declaration, allowed_zones):
                 raise RuntimeError("Imported record TTL is invalid")
             identity = canonical(record_type, record["data"])
             groups.setdefault((owner, record_type), {})[identity] = record
+        replacements = {}
+        for replacement in zone.get("replaceCnames", []):
+            owner = replacement["name"]
+            if owner == name or not owner.endswith("." + name) or owner in {"ns1.pmh.codes", "ns2.pmh.codes"}:
+                raise RuntimeError("CNAME replacement is outside the permitted non-apex scope")
+            if owner in replacements or (owner, "CNAME") in groups or not any((owner, kind) in groups for kind in ["A", "AAAA"]):
+                raise RuntimeError("CNAME replacement must declare a unique address RRset")
+            identity = canonical("CNAME", {"cname": replacement["expectedCname"]})
+            selected = [r for r in read(owner) if r["type"] == "CNAME"]
+            if selected and (len(selected) != 1 or selected[0].get("disabled") or canonical("CNAME", selected[0]["rData"]) != identity):
+                raise RuntimeError(f"Unexpected CNAME at {owner}; refusing replacement")
+            replacements[owner] = identity
+            if selected:
+                cname_removals.append((name, owner, identity))
         # Validate every RRset before making any changes to this declaration.
         for (owner, record_type), expected in groups.items():
             existing = read(owner)
+            if owner in replacements:
+                existing = [r for r in existing if r["type"] != "CNAME"]
             if any(r["type"] == "CNAME" and record_type != "CNAME" for r in existing):
                 raise RuntimeError(f"Existing CNAME conflicts with import at {owner}")
             if record_type == "CNAME" and any(r["type"] not in DNSSEC_TYPES | {"CNAME"} for r in existing):
@@ -94,6 +111,18 @@ def reconcile(client, declaration, allowed_zones):
             if values - set(expected):
                 raise RuntimeError(f"Unexpected existing {record_type} data at {owner}; refusing to replace it")
             plans.append((name, owner, record_type, expected, values))
+    # Only explicitly approved, exact old CNAMEs may be removed. Check again
+    # immediately before deletion; unrelated/new data is never overwritten.
+    for zone, owner, identity in cname_removals:
+        actual = client.post("zones/records/get", {"zone": zone, "domain": owner})["response"]["records"]
+        selected = [r for r in actual if r["name"].rstrip(".").lower() == owner and r["type"] == "CNAME"]
+        if selected:
+            if len(selected) != 1 or selected[0].get("disabled") or canonical("CNAME", selected[0]["rData"]) != identity:
+                raise RuntimeError(f"CNAME changed during reconciliation at {owner}; refusing deletion")
+            client.post("zones/records/delete", {"zone": zone, "domain": owner, "type": "CNAME"})
+        remaining = client.post("zones/records/get", {"zone": zone, "domain": owner})["response"]["records"]
+        if any(r["name"].rstrip(".").lower() == owner and r["type"] == "CNAME" for r in remaining):
+            raise RuntimeError(f"Approved CNAME replacement did not clear the old alias at {owner}")
     for zone, owner, record_type, expected, existing in plans:
         for identity in sorted(set(expected) - existing):
             record = expected[identity]

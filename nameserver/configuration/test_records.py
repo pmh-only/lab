@@ -1,8 +1,9 @@
 import base64
+import copy
 import unittest
 from unittest.mock import Mock
 
-from records import canonical, reconcile
+from records import FIELDS, canonical, reconcile
 
 
 def declaration(records):
@@ -14,6 +15,56 @@ def record(owner, record_type, data):
 
 
 class RecordImportTests(unittest.TestCase):
+    def test_explicit_cname_replacement_is_exact_and_idempotent(self):
+        state = [{"name": "auth.example.test", "type": "CNAME", "rData": {"cname": "old.example"}}]
+        client = Mock()
+
+        def post(path, payload):
+            if path == "zones/records/get":
+                return {"response": {"records": copy.deepcopy([r for r in state if r["name"] == payload["domain"]])}}
+            if path == "zones/records/delete":
+                state[:] = [r for r in state if not (r["name"] == payload["domain"] and r["type"] == payload["type"])]
+            elif path == "zones/records/add":
+                state.append({"name": payload["domain"], "type": payload["type"], "rData": {key: payload[key] for key in FIELDS[payload["type"]]}})
+            else:
+                self.fail("Unexpected API call")
+            return {"status": "ok"}
+
+        client.post.side_effect = post
+        plan = declaration([record("auth.example.test", "A", {"ipAddress": "192.0.2.10"}), record("auth.example.test", "A", {"ipAddress": "192.0.2.11"})])
+        plan["zones"][0]["replaceCnames"] = [{"name": "auth.example.test", "expectedCname": "old.example"}]
+        reconcile(client, plan, ["example.test"])
+        writes = [c for c in client.post.call_args_list if c.args[0] != "zones/records/get"]
+        self.assertEqual([c.args[0] for c in writes], ["zones/records/delete", "zones/records/add", "zones/records/add"])
+        client.post.reset_mock()
+        reconcile(client, plan, ["example.test"])
+        self.assertTrue(all(c.args[0] == "zones/records/get" for c in client.post.call_args_list))
+
+    def test_unapproved_or_concurrently_changed_cname_is_not_deleted(self):
+        plan = declaration([record("auth.example.test", "A", {"ipAddress": "192.0.2.10"})])
+        plan["zones"][0]["replaceCnames"] = [{"name": "auth.example.test", "expectedCname": "old.example"}]
+        old = {"name": "auth.example.test", "type": "CNAME", "rData": {"cname": "old.example"}}
+        other = {**old, "rData": {"cname": "unexpected.example"}}
+        for sequence in [
+            [{"response": {"records": []}}, {"response": {"records": [other]}}],
+            [{"response": {"records": []}}, {"response": {"records": [old]}}, {"response": {"records": [other]}}],
+        ]:
+            client = Mock()
+            client.post.side_effect = sequence
+            with self.assertRaises(RuntimeError):
+                reconcile(client, plan, ["example.test"])
+            self.assertTrue(all(c.args[0] == "zones/records/get" for c in client.post.call_args_list))
+
+    def test_cname_retirement_cannot_remove_authority_or_unreplaced_aliases(self):
+        for owner in ["example.test", "foreign.example", "ns1.pmh.codes", "auth.example.test"]:
+            plan = declaration([])
+            plan["zones"][0]["replaceCnames"] = [{"name": owner, "expectedCname": "old.example"}]
+            client = Mock()
+            client.post.return_value = {"response": {"records": []}}
+            with self.subTest(owner=owner), self.assertRaises(RuntimeError):
+                reconcile(client, plan, ["example.test"])
+            self.assertTrue(all(c.args[0] == "zones/records/get" for c in client.post.call_args_list))
+
     def test_authority_only_zone_allows_dnssec_but_no_imports(self):
         client = Mock()
         metadata = [{"name": "example.test", "type": t} for t in ["SOA", "NS", "DNSKEY", "NSEC3PARAM", "RRSIG"]]
