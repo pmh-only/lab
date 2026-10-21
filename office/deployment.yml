@@ -4,6 +4,8 @@ metadata:
   name: office
 spec:
   revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: office
@@ -15,6 +17,23 @@ spec:
       containers:
         - name: office
           image: ghcr.io/pmh-only/onlyoffice:latest-linux-arm64
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              memory: 4Gi
+          startupProbe:
+            httpGet:
+              path: /healthcheck
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 80
+            periodSeconds: 10
           env:
             - name: DB_TYPE
               value: mysql

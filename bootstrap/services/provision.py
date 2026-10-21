@@ -26,10 +26,13 @@ PROFILES = {
     "heartbeat": ("heartbeat/heartbeat-secret", {"DATABASE_URL": "mysql-dsn:heartbeat"}),
     "keysboard": ("keysboard/keysboard-secret", {"DATABASE_URL": "mysql-url:keysboard", "REDIS_URL": "redis", "JWT_SECRET": "random"}),
     "mail": ("mail/mailui-secret", {"DATABASE_URL": "postgres:mailui", "BETTER_AUTH_SECRET": "random", "MAIL_SECRET_KEY": "random"}),
+    "office": ("office/office-secret", {"DB_PWD": "mysql-password:onlyoffice", "JWT_SECRET": "random"}),
 }
 
 
 def generated(kind):
+    if kind.startswith("mysql-password:"):
+        return secrets.token_urlsafe(48)
     if kind.startswith(("mysql-url:", "mysql-dsn:")):
         style, role = kind.split(":", 1)
         password = secrets.token_urlsafe(48)
@@ -47,7 +50,7 @@ def generated(kind):
 def valid_field(value, kind):
     if not isinstance(value, str):
         return False
-    if kind == "random":
+    if kind == "random" or kind.startswith("mysql-password:"):
         return len(value) >= 48
     if kind.startswith(("mysql-url:", "mysql-dsn:")):
         try:
@@ -239,6 +242,10 @@ def provision(vault, name):
                 postgres_database(data[field])
             elif kind.startswith(("mysql-url:", "mysql-dsn:")):
                 mysql_database(data[field], kind)
+            elif kind.startswith("mysql-password:"):
+                role = kind.split(":", 1)[1]
+                value = f"mysql://{role}:{data[field]}@mysql-service.database.svc.cluster.local:3306/{role}"
+                mysql_database(value, "mysql-url:" + role)
     reader(vault, name, path)
     print(f"{name}: managed credentials verified; values suppressed")
 
