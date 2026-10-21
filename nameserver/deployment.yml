@@ -2,8 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nameserver
+  annotations:
+    # Roll the secondary first so the primary is not restarted simultaneously.
+    argocd.argoproj.io/sync-wave: "2"
 spec:
-  # Start with one primary on a fresh PVC; add a configured secondary separately.
+  # Keep the primary on its existing node-local PVC; do not move its DNSSEC keys.
   replicas: 1
   strategy:
     type: Recreate
@@ -17,6 +20,8 @@ spec:
         app: nameserver
     spec:
       automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/hostname: pmhoci2
       containers:
         - name: nameserver
           image: ghcr.io/pmh-only/technitium:latest
@@ -54,9 +59,14 @@ spec:
               protocol: TCP
             - name: dns-tcp
               containerPort: 53
+              # Bind the VNIC only, not the host's loopback DNS stub.
+              hostIP: 10.1.0.102
+              hostPort: 53
               protocol: TCP
             - name: dns-udp
               containerPort: 53
+              hostIP: 10.1.0.102
+              hostPort: 53
               protocol: UDP
             - name: doh
               containerPort: 80
@@ -68,9 +78,8 @@ spec:
             periodSeconds: 5
             failureThreshold: 60
           readinessProbe:
-            httpGet:
-              path: /
-              port: http
+            tcpSocket:
+              port: dns-tcp
             periodSeconds: 5
           livenessProbe:
             httpGet:

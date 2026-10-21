@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nameserver-secondary
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   replicas: 1
   strategy:
@@ -46,9 +48,13 @@ spec:
           ports:
             - name: dns-tcp
               containerPort: 53
+              hostIP: 10.0.0.10
+              hostPort: 53
               protocol: TCP
             - name: dns-udp
               containerPort: 53
+              hostIP: 10.0.0.10
+              hostPort: 53
               protocol: UDP
             - name: http
               containerPort: 5380
@@ -63,9 +69,8 @@ spec:
             periodSeconds: 5
             failureThreshold: 60
           readinessProbe:
-            httpGet:
-              path: /
-              port: http
+            tcpSocket:
+              port: dns-tcp
             periodSeconds: 5
           livenessProbe:
             httpGet:
