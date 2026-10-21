@@ -1,4 +1,14 @@
 {
+  "books": {
+    "namespace": "books",
+    "vaultPath": "books/books-secret",
+    "secretField": "OIDC_CLIENT_SECRET",
+    "companionSecretFields": ["DATABASE_URL", "JWT_ACCESS_SECRET", "JWT_REFRESH_SECRET", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY"],
+    "companionMinimumLengths": {"S3_ACCESS_KEY_ID": 20},
+    "clientID": "VC17sf7b6lR03NRuLDiDN1bl69v9bsq1gHhXt6FO",
+    "launchURL": "https://books.pmh.codes",
+    "redirectURI": "https://books.pmh.codes/auth/callback"
+  },
   "connect": {
     "namespace": "connect",
     "vaultPath": "connect/connect-secrets",

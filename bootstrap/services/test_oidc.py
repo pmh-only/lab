@@ -26,12 +26,13 @@ class OIDCTests(unittest.TestCase):
                 self.assertTrue(declaration["publicClient"])
                 self.assertEqual(declaration["grantTypes"], ["implicit"])
                 continue
-            if slug in {"stmt", "connect"}:
-                docs = list(yaml.safe_load_all((ROOT / slug / "deployment.yml").read_text()))
+            if slug in {"stmt", "connect", "books"}:
+                filename = "backend.yml" if slug == "books" else "deployment.yml"
+                docs = list(yaml.safe_load_all((ROOT / slug / filename).read_text()))
                 env = docs[0]["spec"]["template"]["spec"]["containers"][0]["env"]
                 actual = next(e["value"] for e in env if e["name"] == "OIDC_CLIENT_ID")
                 self.assertEqual(actual, declaration["clientID"])
-                redirect = "https://stmt.pmh.codes/auth/callback" if slug == "stmt" else "https://connect.pmh.codes/oidc/callback"
+                redirect = f"https://{slug}.pmh.codes/" + ("oidc/callback" if slug == "connect" else "auth/callback")
                 self.assertEqual(declaration["redirectURI"], redirect)
                 continue
             directory = "pdf_configs" if slug == "pdf" else slug

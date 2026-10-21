@@ -51,7 +51,8 @@ def provision_client(vault, api, slug, desired):
         stored = {secret_field: secrets.token_urlsafe(48)}
         stored.update({field: secrets.token_urlsafe(48) for field in companion_fields})
         vault.create(desired["vaultPath"], stored)
-    if not public_client and (set(stored) != {secret_field, *companion_fields} or any(not isinstance(v, str) or len(v) < 48 for v in stored.values())):
+    minimum_lengths = desired.get("companionMinimumLengths", {})
+    if not public_client and (set(stored) != {secret_field, *companion_fields} or any(not isinstance(v, str) or len(v) < (48 if field == secret_field else minimum_lengths.get(field, 48)) for field, v in stored.items())):
         raise RuntimeError("Existing OIDC credentials need manual review")
     redirects = [{"matching_mode": "strict", "url": desired["redirectURI"], "redirect_uri_type": "authorization"}]
     if existing:

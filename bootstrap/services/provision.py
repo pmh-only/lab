@@ -20,6 +20,9 @@ from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
 
 ROOT = Path(__file__).resolve().parents[2]
 PROFILES = {
+    "indexgen": ("indexgen/indexgen-secrets", {"S3_ACCESS_TOKEN": "s3-access:indexgen", "S3_SECRET_TOKEN": "random"}),
+    "books": ("books/books-secret", {"DATABASE_URL": "postgres:books", "OIDC_CLIENT_SECRET": "random", "JWT_ACCESS_SECRET": "random", "JWT_REFRESH_SECRET": "random", "S3_ACCESS_KEY_ID": "s3-access:books", "S3_SECRET_ACCESS_KEY": "random"}),
+    "monitoring": ("monitoring/monitoring-secret", {"GF_SECURITY_ADMIN_PASSWORD": "random", "GF_RENDERING_RENDERER_TOKEN": "random"}),
     "connect": ("connect/connect-secrets", {"COLLECT_TOKEN": "random", "MCP_TOKEN": "random", "ROSTACK_TOKEN": "random", "OIDC_CLIENT_SECRET": "random"}),
     "speed": ("speed/speed-secret", {"PASSWORD": "random", "IPINFO_APIKEY": "optional-empty"}),
     "here": ("here/here-secret", {"SSH_PASSWORD": "random"}),
@@ -33,6 +36,8 @@ PROFILES = {
 
 
 def generated(kind):
+    if kind.startswith("s3-access:"):
+        return "lab-" + kind.split(":", 1)[1] + "-" + secrets.token_hex(8)
     if kind.startswith(("mysql-password:", "postgres-password:")):
         return secrets.token_urlsafe(48)
     if kind.startswith(("mysql-url:", "mysql-dsn:")):
@@ -52,6 +57,8 @@ def generated(kind):
 def valid_field(value, kind):
     if not isinstance(value, str):
         return False
+    if kind.startswith("s3-access:"):
+        return re.fullmatch("lab-" + re.escape(kind.split(":", 1)[1]) + "-[a-f0-9]{16}", value) is not None
     if kind == "random" or kind.startswith(("mysql-password:", "postgres-password:")):
         return len(value) >= 48
     if kind == "authentik-owner":
@@ -216,7 +223,9 @@ def validate_ech(data):
 
 
 def reader(vault, namespace, path):
-    vault.run("policy", "write", "lab-" + namespace, "-", payload=f'path "secret/data/{path}" {{ capabilities = ["read"] }}\n')
+    paths = [path] if isinstance(path, str) else path
+    policy = "".join(f'path "secret/data/{item}" {{ capabilities = ["read"] }}\n' for item in paths)
+    vault.run("policy", "write", "lab-" + namespace, "-", payload=policy)
     vault.run("write", "auth/kubernetes/role/" + namespace, "-", payload=json.dumps({
         "bound_service_account_names": ["vault-auth"], "bound_service_account_namespaces": [namespace],
         "audience": "vault", "token_policies": ["lab-" + namespace], "token_ttl": 3600, "token_max_ttl": 14400,
@@ -262,7 +271,7 @@ def provision(vault, name):
                 role = kind.split(":", 1)[1]
                 value = f"postgresql://{role}:{data[field]}@pgsql-service.database.svc.cluster.local:5432/{role}"
                 postgres_database(value)
-    reader(vault, name, path)
+    reader(vault, name, [path, "monitoring/thanos-secrets"] if name == "monitoring" else path)
     print(f"{name}: managed credentials verified; values suppressed")
 
 
