@@ -9,7 +9,7 @@
     "curve": "P256",
     "dnsKeyTtl": 3600,
     "zskRolloverDays": 30,
-    "nxProof": "NSEC3",
+    "nxProof": "NSEC",
     "iterations": 0,
     "saltLength": 0
   }

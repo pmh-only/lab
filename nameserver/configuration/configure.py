@@ -192,20 +192,7 @@ def configure(client, desired, password, dns01=None, authoritative=None, after_c
 
 
 def main():
-    from replication import reconcile as reconcile_replication
-
     dns01 = json.loads(Path("/configuration/dns01.json").read_text())
-    replication = json.loads(Path("/configuration/replication.json").read_text())
-    secondary = Client(replication["secondaryUrl"], Path("/run/secrets/secondary-ca/tls.crt").read_text())
-
-    def replicate(primary):
-        reconcile_replication(
-            primary, secondary,
-            Path("/run/secrets/secondary-admin/password").read_text(),
-            Path("/run/secrets/zone-transfer/key").read_text().strip(),
-            replication, dns01["zones"],
-        )
-
     client = Client(
         "https://nameserver.nameserver.svc.cluster.local:53443",
         Path("/run/secrets/nameserver-ca/tls.crt").read_text(),
@@ -216,7 +203,6 @@ def main():
         Path("/run/secrets/nameserver-admin/password").read_text(),
         dns01,
         json.loads(Path("/configuration/authoritative.json").read_text()),
-        after_configure=replicate,
         imported=json.loads(Path("/configuration/imported-records.json").read_text()),
     )
 

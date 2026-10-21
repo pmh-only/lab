@@ -18,8 +18,6 @@ configMapGenerator:
       - configuration/settings.json
       - configuration/dns01.json
       - configuration/authoritative.json
-      - configuration/replication.json
-      - configuration/replication.py
       - configuration/imported-records.json
       - configuration/records.py
 # Vault authentication and Secret synchronization are owned by nameserver-secrets.

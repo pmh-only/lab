@@ -51,15 +51,6 @@ spec:
             - name: ca
               mountPath: /run/secrets/nameserver-ca
               readOnly: true
-            - name: secondary-admin
-              mountPath: /run/secrets/secondary-admin
-              readOnly: true
-            - name: secondary-ca
-              mountPath: /run/secrets/secondary-ca
-              readOnly: true
-            - name: zone-transfer
-              mountPath: /run/secrets/zone-transfer
-              readOnly: true
       volumes:
         - name: configuration
           configMap:
@@ -78,24 +69,3 @@ spec:
             items:
               - key: tls.crt
                 path: tls.crt
-        - name: secondary-admin
-          secret:
-            secretName: nameserver-secondary-admin
-            defaultMode: 0440
-            items:
-              - key: password
-                path: password
-        - name: secondary-ca
-          secret:
-            secretName: nameserver-secondary-tls-secret
-            defaultMode: 0440
-            items:
-              - key: tls.crt
-                path: tls.crt
-        - name: zone-transfer
-          secret:
-            secretName: nameserver-zone-transfer
-            defaultMode: 0440
-            items:
-              - key: key
-                path: key

@@ -53,6 +53,8 @@ spec:
           ports:
             - name: https
               containerPort: 53443
+              hostIP: 10.1.0.102
+              hostPort: 53443
               protocol: TCP
             - name: http
               containerPort: 5380

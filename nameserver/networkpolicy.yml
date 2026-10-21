@@ -44,6 +44,15 @@ spec:
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: nameserver-configure
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values: [nameserver, nameserver-secondary]
+        - ipBlock:
+            cidr: 10.0.0.10/32
+        - ipBlock:
+            cidr: 10.1.0.102/32
       ports:
         - protocol: TCP
           port: 53443
@@ -70,6 +79,15 @@ spec:
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: nameserver-configure
+        - podSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values: [nameserver, nameserver-secondary]
+        - ipBlock:
+            cidr: 10.0.0.10/32
+        - ipBlock:
+            cidr: 10.1.0.102/32
       ports:
         - protocol: TCP
           port: 53443

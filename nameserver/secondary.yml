@@ -61,6 +61,8 @@ spec:
               protocol: TCP
             - name: https
               containerPort: 53443
+              hostIP: 10.0.0.10
+              hostPort: 53443
               protocol: TCP
           startupProbe:
             httpGet:
