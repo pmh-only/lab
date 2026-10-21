@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: gateway
 resources:
   - certificate.yml
+  - staging-certificate.yml
   - nginx.yml
 configMapGenerator:
   - name: gateway-bootstrap-config

@@ -16,6 +16,7 @@ class BootstrapEdgeTests(unittest.TestCase):
         rendered = subprocess.check_output(["kubectl", "kustomize", str(ROOT / "gateway/bootstrap")], text=True)
         cls.documents = list(yaml.safe_load_all(rendered))
         cls.resources = {document["kind"]: document for document in cls.documents}
+        cls.resources["Certificate"] = next(d for d in cls.documents if d["kind"] == "Certificate" and d["metadata"]["name"] == "gateway-bootstrap-tls")
         cls.config = cls.resources["ConfigMap"]["data"]["nginx.conf"]
 
     def test_only_bootstrap_resources_are_deployed(self):
@@ -29,6 +30,15 @@ class BootstrapEdgeTests(unittest.TestCase):
         self.assertEqual(certificate["issuerRef"]["name"], "gateway-bootstrap")
         self.assertEqual(certificate["privateKey"]["rotationPolicy"], "Always")
         self.assertNotIn("not.ai.kr", certificate["dnsNames"])
+
+    def test_staging_issuance_is_isolated_from_served_tls(self):
+        certificate = next(d["spec"] for d in self.documents if d["kind"] == "Certificate" and d["metadata"]["name"] == "gateway-pmh-codes-staging")
+        self.assertEqual(certificate["issuerRef"]["name"], "letsencrypt-staging")
+        self.assertEqual(set(certificate["dnsNames"]), {"pmh.codes", "*.pmh.codes"})
+        self.assertNotIn("ipAddresses", certificate)
+        self.assertEqual(certificate["privateKey"]["rotationPolicy"], "Always")
+        volumes = self.resources["DaemonSet"]["spec"]["template"]["spec"]["volumes"]
+        self.assertNotIn(certificate["secretName"], {v["secret"]["secretName"] for v in volumes if "secret" in v})
 
     def test_no_ssh_ech_or_hsts_dependency(self):
         self.assertNotIn("listen 22", self.config)
