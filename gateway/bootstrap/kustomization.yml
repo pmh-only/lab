@@ -10,6 +10,7 @@ configMapGenerator:
   - name: gateway-bootstrap-config
     files:
       - nginx.conf
+      - https-server.conf
 images:
   - name: ghcr.io/pmh-only/nginx
     newTag: latest

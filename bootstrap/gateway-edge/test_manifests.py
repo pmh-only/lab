@@ -17,7 +17,7 @@ class BootstrapEdgeTests(unittest.TestCase):
         cls.documents = list(yaml.safe_load_all(rendered))
         cls.resources = {document["kind"]: document for document in cls.documents}
         cls.resources["Certificate"] = next(d for d in cls.documents if d["kind"] == "Certificate" and d["metadata"]["name"] == "gateway-bootstrap-tls")
-        cls.config = cls.resources["ConfigMap"]["data"]["nginx.conf"]
+        cls.config = "\n".join(cls.resources["ConfigMap"]["data"].values())
 
     def test_only_bootstrap_resources_are_deployed(self):
         self.assertEqual(set(self.resources), {"ConfigMap", "Service", "DaemonSet", "Certificate", "Issuer"})
@@ -58,7 +58,7 @@ class BootstrapEdgeTests(unittest.TestCase):
         spec = self.resources["DaemonSet"]["spec"]["template"]["spec"]
         self.assertFalse(spec["automountServiceAccountToken"])
         self.assertNotIn("initContainers", spec)
-        self.assertEqual({v["secret"]["secretName"] for v in spec["volumes"] if "secret" in v}, {"gateway-bootstrap-tls"})
+        self.assertEqual({v["secret"]["secretName"] for v in spec["volumes"] if "secret" in v}, {"gateway-bootstrap-tls", "gateway-pmh-codes-tls"})
 
     def test_management_is_blocked_and_client_headers_are_overwritten(self):
         self.assertIn("names.pmh.codes 1;", self.config)
@@ -79,7 +79,7 @@ class BootstrapEdgeTests(unittest.TestCase):
 
     def test_certificate_changes_only_restart_opted_in_edge(self):
         annotations = self.resources["DaemonSet"]["metadata"]["annotations"]
-        self.assertEqual(annotations["secret.reloader.stakater.com/reload"], "gateway-bootstrap-tls")
+        self.assertEqual(annotations["secret.reloader.stakater.com/reload"], "gateway-bootstrap-tls,gateway-pmh-codes-tls")
         labels = self.resources["Certificate"]["spec"]["secretTemplate"]["labels"]
         self.assertEqual(labels, {"edge.pmh.codes/reload": "true"})
         app = yaml.safe_load((ROOT / "apps/gateway-reloader.yml").read_text())
@@ -91,6 +91,14 @@ class BootstrapEdgeTests(unittest.TestCase):
         self.assertFalse(values["reloader"]["autoReloadAll"])
         self.assertTrue(values["reloader"]["ignoreConfigMaps"])
         self.assertEqual(values["reloader"]["reloadStrategy"], "annotations")
+
+    def test_public_tls_is_limited_to_migrated_domain(self):
+        config = self.resources["ConfigMap"]["data"]["nginx.conf"]
+        self.assertIn("server_name pmh.codes *.pmh.codes;", config)
+        self.assertIn("ssl_certificate /etc/nginx/public-tls/tls.crt;", config)
+        self.assertIn("ssl_certificate /etc/nginx/tls/tls.crt;", config)
+        self.assertNotIn("server_name pmh.so", config)
+        self.assertEqual(config.count("include /etc/nginx/edge/https-server.conf;"), 2)
 
     def test_argocd_ignores_only_the_reloader_annotation(self):
         app = next(d for d in yaml.safe_load_all((ROOT / "apps/gateway.yml").read_text()) if d["kind"] == "Application")

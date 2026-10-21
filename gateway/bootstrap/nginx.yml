@@ -3,7 +3,7 @@ kind: DaemonSet
 metadata:
   name: gateway-nginx
   annotations:
-    secret.reloader.stakater.com/reload: gateway-bootstrap-tls
+    secret.reloader.stakater.com/reload: gateway-bootstrap-tls,gateway-pmh-codes-tls
 spec:
   selector:
     matchLabels:
@@ -61,6 +61,12 @@ spec:
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
               readOnly: true
+            - name: nginx-config
+              mountPath: /etc/nginx/edge
+              readOnly: true
+            - name: public-tls
+              mountPath: /etc/nginx/public-tls
+              readOnly: true
           readinessProbe:
             httpGet:
               scheme: HTTPS
@@ -82,6 +88,9 @@ spec:
         - name: nginx-config
           configMap:
             name: gateway-bootstrap-config
+        - name: public-tls
+          secret:
+            secretName: gateway-pmh-codes-tls
 ---
 apiVersion: v1
 kind: Service
