@@ -5,7 +5,7 @@ import unittest
 
 import yaml
 
-from clickhouse import query_user_statements
+from clickhouse import allowed_writer_grant, query_user_statements
 from provision import ROOT, PROFILES
 
 
@@ -68,6 +68,15 @@ class TraceTests(unittest.TestCase):
         self.assertIn("max_result_rows = 1000 READONLY", statements[1])
         self.assertEqual(statements[-1], "GRANT SELECT ON traffic.events TO traffic_query")
         self.assertFalse(any("GRANT ALL" in statement for statement in statements))
+
+    def test_admin_metadata_grants_are_column_scoped_not_global_administration(self):
+        grant = {"database": "system", "access_type": "SELECT", "table": "parts", "column": "bytes_on_disk", "grant_option": 0}
+        self.assertTrue(allowed_writer_grant(grant))
+        for change in [{"table": "users"}, {"column": None}, {"access_type": "ALTER"}, {"grant_option": 1}, {"database": None}]:
+            self.assertFalse(allowed_writer_grant({**grant, **change}))
+        code = (ROOT / "trace/initialize-owner.mjs").read_text()
+        self.assertIn("await initializeCloudTables()", code)
+        self.assertNotIn('IS_CLOUD = "true"', code)
 
 
 if __name__ == "__main__":

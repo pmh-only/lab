@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { auth } from "/app/dist/lib/auth.js";
 import { sql } from "/app/dist/db/postgres/postgres.js";
 import { siteConfigurationLifecycle } from "/app/dist/services/sites/siteConfigurationLifecycle.js";
+import { initializeCloudTables } from "/app/dist/db/clickhouse/schema/cloud.js";
 
 const read = name => readFileSync("/run/secrets/bootstrap/" + name, "utf8").trim();
 const email = read("ADMIN_EMAIL").toLowerCase();
@@ -36,6 +37,10 @@ async function main() {
   if (!email.includes("@") || password.length < 48 || !name || origin !== "https://trace.pmh.codes") {
     throw new Error("Invalid managed native bootstrap configuration");
   }
+  // The native self-hosted admin overview reads this hourly rollup even though
+  // normal startup only creates it in cloud mode. Use the upstream initializer
+  // without enabling cloud/billing, altering raw events, or duplicating its SQL.
+  await initializeCloudTables();
   let owners = await sql`SELECT id,email,role FROM "user" ORDER BY "createdAt" ASC LIMIT 2`;
   if (owners.length === 0) {
     await login("signUpEmail", { email, password, name });
