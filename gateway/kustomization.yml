@@ -3,9 +3,42 @@ kind: Kustomization
 namespace: gateway
 resources:
   - ./certificate.yml
-  - ./clusterissuer.yml
   - ./nginx.yml
-# Internal Envoy routing is owned by the separate gateway-routing Application.
+  - ./envoy.yml
+  - ./backend-policy.yml
+  - ./service-alias.yml
+  - ./public-certificate.yml
+# Preserve the original full certificate declaration without requesting retired
+# IPs or unmigrated domains. Keep the newly issued certificate during migration.
+patches:
+  - target:
+      group: cert-manager.io
+      version: v1
+      kind: Certificate
+      name: gateway-tls-secret
+    patch: |-
+      $patch: delete
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: gateway-tls-secret
+  - target:
+      group: apps
+      version: v1
+      kind: DaemonSet
+      name: gateway-nginx
+    patch: |-
+      apiVersion: apps/v1
+      kind: DaemonSet
+      metadata:
+        name: gateway-nginx
+      spec:
+        template:
+          spec:
+            volumes:
+              - name: tls
+                secret:
+                  secretName: gateway-pmh-codes-tls
 images:
   - name: ghcr.io/pmh-only/nginx
     newTag: latest

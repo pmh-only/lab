@@ -11,17 +11,9 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    # Temporary self-signed edge until public DNS01 issuance is available.
-    path: gateway/bootstrap
+    path: gateway
     repoURL: https://github.com/pmh-only/lab.git
     targetRevision: HEAD
-  ignoreDifferences:
-    - group: apps
-      kind: DaemonSet
-      namespace: gateway
-      name: gateway-nginx
-      jsonPointers:
-        - /spec/template/metadata/annotations/reloader.stakater.com~1last-reloaded-from
   syncPolicy:
     automated:
       prune: true
@@ -31,7 +23,6 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
       - PruneLast=true
-      - RespectIgnoreDifferences=true
 ---
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
