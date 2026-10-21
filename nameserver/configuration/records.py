@@ -49,6 +49,17 @@ def reconcile(client, declaration, allowed_zones):
             raise RuntimeError("Imported zone was not explicitly declared")
         snapshots = {}
 
+        if zone.get("authorityOnly"):
+            if zone["records"]:
+                raise RuntimeError("An authority-only zone cannot declare ordinary records")
+            all_records = client.post("zones/records/get", {"zone": name, "domain": name, "listZone": "true"})["response"]["records"]
+            for existing in all_records:
+                record_type = existing["type"]
+                apex_metadata = record_type in {"SOA", "NS", "DNSKEY", "NSEC3PARAM", "CDS", "CDNSKEY"} and existing["name"].rstrip(".").lower() == name
+                generated_proof = record_type in {"RRSIG", "NSEC", "NSEC3"}
+                if not apex_metadata and not generated_proof:
+                    raise RuntimeError(f"Unexpected non-authority record in {name}; refusing automatic deletion")
+
         def read(owner):
             if owner not in snapshots:
                 snapshots[owner] = client.post("zones/records/get", {"zone": name, "domain": owner})["response"]["records"]

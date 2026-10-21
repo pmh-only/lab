@@ -14,6 +14,26 @@ def record(owner, record_type, data):
 
 
 class RecordImportTests(unittest.TestCase):
+    def test_authority_only_zone_allows_dnssec_but_no_imports(self):
+        client = Mock()
+        metadata = [{"name": "example.test", "type": t} for t in ["SOA", "NS", "DNSKEY", "NSEC3PARAM", "RRSIG"]]
+        metadata.append({"name": "hash.example.test", "type": "NSEC3"})
+        client.post.return_value = {"response": {"records": metadata}}
+        plan = declaration([])
+        plan["zones"][0]["authorityOnly"] = True
+        reconcile(client, plan, ["example.test"])
+        self.assertTrue(all(call.args[0] == "zones/records/get" for call in client.post.call_args_list))
+
+    def test_unexpected_mail_or_child_delegation_is_not_deleted(self):
+        for kind, owner in [("MX", "example.test"), ("TXT", "example.test"), ("NS", "child.example.test")]:
+            client = Mock()
+            client.post.return_value = {"response": {"records": [{"name": owner, "type": kind}]}}
+            plan = declaration([])
+            plan["zones"][0]["authorityOnly"] = True
+            with self.subTest(kind=kind, owner=owner), self.assertRaises(RuntimeError):
+                reconcile(client, plan, ["example.test"])
+            self.assertEqual(client.post.call_count, 1)
+
     def test_existing_apex_website_is_not_deleted(self):
         client = Mock()
         client.post.return_value = {"response": {"records": [{"name": "example.test", "type": "A", "rData": {"ipAddress": "192.0.2.10"}}]}}

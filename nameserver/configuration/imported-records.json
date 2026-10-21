@@ -109,6 +109,18 @@
           }
         }
       ]
+    },
+    {
+      "zone": "pmh.so",
+      "authorityOnly": true,
+      "emptyApexWeb": true,
+      "records": []
+    },
+    {
+      "zone": "as218822.net",
+      "authorityOnly": true,
+      "emptyApexWeb": true,
+      "records": []
     }
   ]
 }
