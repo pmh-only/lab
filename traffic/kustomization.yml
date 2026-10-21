@@ -7,7 +7,11 @@ resources:
   - ./aggregator.yml
   - ./collector_cm.yml
   - ./collector.yml
-  - ./ingress.yml
+  # Publish after real Gateway logs produce the native dashboard.
+configMapGenerator:
+  - name: traffic-preparation
+    files:
+      - prepare-assets.mjs
 images:
   - name: ghcr.io/pmh-only/goaccess
     newTag: latest

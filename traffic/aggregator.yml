@@ -4,6 +4,8 @@ metadata:
   name: aggregator
   namespace: traffic
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -13,6 +15,17 @@ spec:
       labels:
         app: aggregator
     spec:
+      automountServiceAccountToken: false
+      initContainers:
+        - name: geoip-datasets
+          image: ghcr.io/rybbit-io/rybbit-backend:latest@sha256:e0d1b397e33c4c848b98c64b60366ea861523de5db4ba9df32ffdc57e6b81ec7
+          command: [node, /bootstrap/prepare-assets.mjs]
+          volumeMounts:
+            - name: preparation
+              mountPath: /bootstrap
+              readOnly: true
+            - name: ds-logs
+              mountPath: /logs
       containers:
         - name: goaccess
           image: ghcr.io/pmh-only/goaccess:latest
@@ -30,6 +43,9 @@ spec:
           ports:
             - name: ws
               containerPort: 443
+          readinessProbe:
+            tcpSocket:
+              port: ws
 
         - name: servehtml
           image: ghcr.io/pmh-only/busybox:latest
@@ -44,12 +60,18 @@ spec:
           ports:
             - name: http
               containerPort: 80
+          readinessProbe:
+            tcpSocket:
+              port: http
 
         - name: fluent-bit
           image: cr.fluentbit.io/fluent/fluent-bit:latest
           ports:
             - containerPort: 24224
               name: forward
+          readinessProbe:
+            tcpSocket:
+              port: forward
           volumeMounts:
             - name: ds-logs
               mountPath: /logs
@@ -60,9 +82,13 @@ spec:
               value: /fluent-bit/etc/fluent-bit.conf
 
       volumes:
+        - name: preparation
+          configMap:
+            name: traffic-preparation
         - name: ds-logs
           hostPath:
             path: /mnt/data/logs
+            type: DirectoryOrCreate
         - name: fb-conf
           configMap:
             name: aggregator-conf

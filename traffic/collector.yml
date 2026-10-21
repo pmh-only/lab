@@ -12,12 +12,14 @@ spec:
       labels:
         app: collector
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: fluent-bit
           image: cr.fluentbit.io/fluent/fluent-bit:latest
           volumeMounts:
             - name: varlog
               mountPath: /var/log
+              readOnly: true
             - name: fb-config
               mountPath: /fluent-bit/etc/
           env:
