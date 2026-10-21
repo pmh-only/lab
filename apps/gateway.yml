@@ -11,7 +11,8 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: gateway
+    # Temporary self-signed edge until public DNS01 issuance is available.
+    path: gateway/bootstrap
     repoURL: https://github.com/pmh-only/lab.git
     targetRevision: HEAD
   syncPolicy:

@@ -1,0 +1,41 @@
+# Deliberately untrusted bootstrap TLS, not an ACME/public certificate.
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: gateway-bootstrap
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: gateway-bootstrap-tls
+spec:
+  secretName: gateway-bootstrap-tls
+  commonName: gateway-bootstrap
+  subject:
+    organizations:
+      - Lab bootstrap - not publicly trusted
+  duration: 720h
+  renewBefore: 168h
+  dnsNames:
+    - pmh.codes
+    - "*.pmh.codes"
+    - pmh.so
+    - "*.pmh.so"
+    - as218822.net
+    - "*.as218822.net"
+  ipAddresses:
+    - "138.2.112.39"
+    - "168.110.121.95"
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: gateway-bootstrap
+  privateKey:
+    rotationPolicy: Always
+    algorithm: ECDSA
+    size: 256
+  usages:
+    - digital signature
+    - server auth
