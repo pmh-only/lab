@@ -4,7 +4,8 @@ namespace: seafile
 resources:
   - ./deployment.yml
   - ./service.yml
-  # Publish the original OAuth/SeaDoc/notification routes after initialization checks.
+  # Native admin/OAuth/file I/O and SeaDoc/notification dependencies verified.
+  - ./ingress.yml
   - ./secret.yml
   - ./dependencies.yml
 configMapGenerator:
