@@ -40,21 +40,26 @@ class Authentik:
 def provision_client(vault, api, slug, desired):
     provider_name = "lab bootstrap: " + slug
     secret_field = desired.get("secretField", "client-secret")
+    public_client = desired.get("publicClient", False)
     providers = api.list("providers/oauth2/")
     existing = next((p for p in providers if p["client_id"] == desired["clientID"]), None)
-    stored = vault.get(desired["vaultPath"])
-    if existing and (existing["name"] != provider_name or stored is None):
+    stored = None if public_client else vault.get(desired["vaultPath"])
+    if existing and (existing["name"] != provider_name or (stored is None and not public_client)):
         raise RuntimeError("An existing OIDC provider is not managed by this bootstrap; refusing takeover")
-    if stored is None:
+    if stored is None and not public_client:
         stored = {secret_field: secrets.token_urlsafe(48)}
         vault.create(desired["vaultPath"], stored)
-    if set(stored) != {secret_field} or len(stored[secret_field]) < 48:
+    if not public_client and (set(stored) != {secret_field} or len(stored[secret_field]) < 48):
         raise RuntimeError("Existing OIDC credentials need manual review")
     redirects = [{"matching_mode": "strict", "url": desired["redirectURI"], "redirect_uri_type": "authorization"}]
     if existing:
         if existing["redirect_uris"] != redirects or existing["issuer_mode"] != "per_provider":
             raise RuntimeError("Existing managed provider has unexpected redirect/issuer settings")
-        if existing.get("client_secret") and not secrets.compare_digest(existing["client_secret"], stored[secret_field]):
+        if public_client and existing.get("client_type") != "public":
+            raise RuntimeError("Existing provider has an unexpected client type")
+        if public_client and (existing.get("grant_types") != desired["grantTypes"] or existing.get("sub_mode") != desired["subMode"]):
+            raise RuntimeError("Existing public provider has unexpected grant/subject settings")
+        if not public_client and existing.get("client_secret") and not secrets.compare_digest(existing["client_secret"], stored[secret_field]):
             raise RuntimeError("Provider/Vault client secret mismatch; refusing uncoordinated rotation")
         provider = existing
     else:
@@ -71,13 +76,18 @@ def provision_client(vault, api, slug, desired):
         }]
         if len(mappings) < 3:
             raise RuntimeError("Default OpenID/email/profile mappings are unavailable")
-        provider = api.request("providers/oauth2/", {
+        payload = {
             "name": provider_name, "authorization_flow": flows["default-provider-authorization-implicit-consent"],
-            "invalidation_flow": flows["default-provider-invalidation-flow"], "client_type": "confidential",
-            "client_id": desired["clientID"], "client_secret": stored[secret_field], "redirect_uris": redirects,
+            "invalidation_flow": flows["default-provider-invalidation-flow"], "client_type": "public" if public_client else "confidential",
+            "client_id": desired["clientID"], "redirect_uris": redirects,
             "issuer_mode": "per_provider", "signing_key": signing, "property_mappings": mappings,
-            "grant_types": ["authorization_code", "refresh_token"],
-        })
+            "grant_types": desired.get("grantTypes", ["authorization_code", "refresh_token"]),
+            "sub_mode": desired.get("subMode", "hashed_user_id"),
+            "include_claims_in_id_token": True,
+        }
+        if not public_client:
+            payload["client_secret"] = stored[secret_field]
+        provider = api.request("providers/oauth2/", payload)
     application = api.request("core/applications/" + urllib.parse.quote(slug, safe="") + "/", missing_ok=True)
     if application:
         if application.get("provider") != provider["pk"]:
@@ -85,12 +95,13 @@ def provision_client(vault, api, slug, desired):
     else:
         api.request("core/applications/", {"name": slug, "slug": slug, "provider": provider["pk"],
                     "meta_launch_url": desired["launchURL"], "meta_description": "Managed by lab bootstrap", "policy_engine_mode": "all"})
-    reader(vault, desired["namespace"], desired["vaultPath"])
+    if not public_client:
+        reader(vault, desired["namespace"], desired["vaultPath"])
     with urllib.request.urlopen("https://auth.pmh.codes/application/o/" + slug + "/.well-known/openid-configuration", timeout=20) as response:
         discovery = json.load(response)
     if discovery["issuer"] != "https://auth.pmh.codes/application/o/" + slug + "/":
         raise RuntimeError("OIDC issuer differs from the repository configuration")
-    print(f"{slug}: original client ID, fresh secret, strict redirect and signed OIDC discovery verified")
+    print(f"{slug}: original client ID, strict redirect and signed OIDC discovery verified; {'public client (no client secret required)' if public_client else 'fresh managed secret'}")
 
 
 def main():

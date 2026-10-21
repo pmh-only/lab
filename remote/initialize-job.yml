@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: remote-initialize
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 300
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      initContainers:
+        - name: original-schema
+          image: ghcr.io/pmh-only/guacamole:1.6.0
+          command: [/bin/sh, -ec, "/opt/guacamole/bin/initdb.sh --postgresql > /schema/schema.sql"]
+          volumeMounts:
+            - name: schema
+              mountPath: /schema
+      containers:
+        - name: initialize
+          image: ghcr.io/pmh-only/postgres:18@sha256:edc8850c871929ad9789216ab2623d41b034c479b696964bbab94740babe44c7
+          command:
+            - /bin/sh
+            - -ec
+            - export PGPASSWORD="$POSTGRESQL_PASSWORD"; exec psql -X -q -v ON_ERROR_STOP=1 -h pgsql-service.database.svc.cluster.local -U guacamole -d guacamole -f /bootstrap/initialize.sql
+          envFrom:
+            - secretRef:
+                name: remote-secret
+          volumeMounts:
+            - name: schema
+              mountPath: /schema
+              readOnly: true
+            - name: bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+      volumes:
+        - name: schema
+          emptyDir: {}
+        - name: bootstrap
+          configMap:
+            name: remote-initialize

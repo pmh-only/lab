@@ -13,6 +13,15 @@
     "launchURL": "https://meta.pmh.codes",
     "redirectURI": "https://meta.pmh.codes/oauth2/callback"
   },
+  "remote": {
+    "namespace": "remote",
+    "publicClient": true,
+    "grantTypes": ["implicit"],
+    "subMode": "user_username",
+    "clientID": "hrvPK2hBd17Ha9oPrCxbt0zg6tVpwHwAcVAz9Bii",
+    "launchURL": "https://remote.pmh.codes",
+    "redirectURI": "https://remote.pmh.codes"
+  },
   "stmt": {
     "namespace": "stmt",
     "vaultPath": "stmt/stmt-secret",

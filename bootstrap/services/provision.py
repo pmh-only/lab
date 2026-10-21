@@ -27,11 +27,12 @@ PROFILES = {
     "keysboard": ("keysboard/keysboard-secret", {"DATABASE_URL": "mysql-url:keysboard", "REDIS_URL": "redis", "JWT_SECRET": "random"}),
     "mail": ("mail/mailui-secret", {"DATABASE_URL": "postgres:mailui", "BETTER_AUTH_SECRET": "random", "MAIL_SECRET_KEY": "random"}),
     "office": ("office/office-secret", {"DB_PWD": "mysql-password:onlyoffice", "JWT_SECRET": "random"}),
+    "remote": ("remote/remote-secret", {"POSTGRESQL_PASSWORD": "postgres-password:guacamole", "GUACAMOLE_ADMIN_USERNAME": "authentik-owner", "GUACAMOLE_ADMIN_PASSWORD": "random"}),
 }
 
 
 def generated(kind):
-    if kind.startswith("mysql-password:"):
+    if kind.startswith(("mysql-password:", "postgres-password:")):
         return secrets.token_urlsafe(48)
     if kind.startswith(("mysql-url:", "mysql-dsn:")):
         style, role = kind.split(":", 1)
@@ -50,8 +51,10 @@ def generated(kind):
 def valid_field(value, kind):
     if not isinstance(value, str):
         return False
-    if kind == "random" or kind.startswith("mysql-password:"):
+    if kind == "random" or kind.startswith(("mysql-password:", "postgres-password:")):
         return len(value) >= 48
+    if kind == "authentik-owner":
+        return 0 < len(value) <= 128 and not any(c in value for c in ['\n', '\r', '\0'])
     if kind.startswith(("mysql-url:", "mysql-dsn:")):
         try:
             mysql_identity(value, kind)
@@ -233,6 +236,14 @@ def provision(vault, name):
         data = vault.get(path)
         if data is None:
             data = {field: generated(kind) for field, kind in fields.items()}
+            if name == "remote":
+                from oidc import Authentik
+
+                bootstrap = vault.get("authentik/bootstrap-worker")
+                owner = Authentik(bootstrap["AUTHENTIK_BOOTSTRAP_TOKEN"]).request("core/users/me/")["user"]
+                if not owner["is_active"] or not owner["is_superuser"]:
+                    raise RuntimeError("Refusing to assign remote administration to a non-administrator")
+                data["GUACAMOLE_ADMIN_USERNAME"] = owner["username"]
             vault.create(path, data)
         data = repair_unused_bootstrap_driver(vault, name, path, data, fields)
         if set(data) != set(fields) or any(not valid_field(data[field], kind) for field, kind in fields.items()):
@@ -246,6 +257,10 @@ def provision(vault, name):
                 role = kind.split(":", 1)[1]
                 value = f"mysql://{role}:{data[field]}@mysql-service.database.svc.cluster.local:3306/{role}"
                 mysql_database(value, "mysql-url:" + role)
+            elif kind.startswith("postgres-password:"):
+                role = kind.split(":", 1)[1]
+                value = f"postgresql://{role}:{data[field]}@pgsql-service.database.svc.cluster.local:5432/{role}"
+                postgres_database(value)
     reader(vault, name, path)
     print(f"{name}: managed credentials verified; values suppressed")
 

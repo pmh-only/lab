@@ -78,6 +78,7 @@ spec:
         - name: office-storage
           hostPath:
             path: /mnt/data/office
+            type: DirectoryOrCreate
         - name: office-cm
           configMap:
             name: office-cm

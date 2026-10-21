@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: remote-guacd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   revisionHistoryLimit: 0
   selector:
@@ -20,6 +22,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: remote-guacamole
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   revisionHistoryLimit: 0
   selector:
@@ -33,6 +37,16 @@ spec:
       containers:
         - name: remote-guacamole
           image: ghcr.io/pmh-only/guacamole:1.6.0
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
           env:
             - name: WEBAPP_CONTEXT
               value: ROOT
