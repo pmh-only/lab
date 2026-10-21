@@ -16,10 +16,12 @@ spec:
         app: prometheus
     spec:
       serviceAccountName: prometheus-sa
+      securityContext:
+        fsGroup: 65534
       initContainers:
         - name: fix-permissions
-          image: busybox:latest
-          command: ["sh", "-c", "rm -rf /prometheus/thanos && chown -R 65534:65534 /prometheus"]
+          image: ghcr.io/pmh-only/busybox:latest@sha256:31b7557d6d9e8a5402733d26b0a2e025cc080b7cc9da87f7c3303f735363f650
+          command: ["sh", "-ec", "chown 65534:65534 /prometheus"]
           securityContext:
             runAsUser: 0
           volumeMounts:
@@ -157,7 +159,6 @@ data:
         kubernetes_sd_configs:
           - role: pod
             namespaces:
-              own_namespace: true
               names: ["monitoring"]
             selectors:
               - role: pod
@@ -167,7 +168,6 @@ data:
         kubernetes_sd_configs:
           - role: pod
             namespaces:
-              own_namespace: true
               names: ["monitoring"]
             selectors:
               - role: pod
@@ -287,6 +287,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: prometheus-pvc
   namespace: monitoring
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   accessModes:
     - ReadWriteOnce
@@ -336,6 +338,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: prometheus-sa
+    namespace: monitoring
     apiGroup: ""
 roleRef:
   kind: ClusterRole

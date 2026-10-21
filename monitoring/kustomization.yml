@@ -28,3 +28,4 @@ images:
     digest: sha256:639a1e2da549210adddc0391ff91e270e83f7873014aec53258462812f741e6f
   - name: quay.io/thanos/thanos
     newTag: main-2026-10-10-f1e0bbc
+    digest: sha256:b8219adce3eb31003e2412b291de8418f7b07a4e57d16f3f1f770cc07999d41d

@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 PROFILES = {
     "indexgen": ("indexgen/indexgen-secrets", {"S3_ACCESS_TOKEN": "s3-access:indexgen", "S3_SECRET_TOKEN": "random"}),
     "books": ("books/books-secret", {"DATABASE_URL": "postgres:books", "OIDC_CLIENT_SECRET": "random", "JWT_ACCESS_SECRET": "random", "JWT_REFRESH_SECRET": "random", "S3_ACCESS_KEY_ID": "s3-access:books", "S3_SECRET_ACCESS_KEY": "random"}),
-    "monitoring": ("monitoring/monitoring-secret", {"GF_SECURITY_ADMIN_PASSWORD": "random", "GF_RENDERING_RENDERER_TOKEN": "random"}),
+    "monitoring": ("monitoring/monitoring-secret", {"GF_SECURITY_ADMIN_PASSWORD": "random", "GF_SECURITY_SECRET_KEY": "random", "GF_RENDERING_RENDERER_TOKEN": "random"}),
     "connect": ("connect/connect-secrets", {"COLLECT_TOKEN": "random", "MCP_TOKEN": "random", "ROSTACK_TOKEN": "random", "OIDC_CLIENT_SECRET": "random"}),
     "speed": ("speed/speed-secret", {"PASSWORD": "random", "IPINFO_APIKEY": "optional-empty"}),
     "here": ("here/here-secret", {"SSH_PASSWORD": "random"}),

@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: grafana-pvc
   namespace: monitoring
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   accessModes:
     - ReadWriteOnce
@@ -30,10 +32,22 @@ spec:
       labels:
         app: grafana
     spec:
+      securityContext:
+        fsGroup: 472
       containers:
         - name: grafana
           image: ghcr.io/pmh-only/grafana:latest
           env:
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: monitoring-secret
+                  key: GF_SECURITY_ADMIN_PASSWORD
+            - name: GF_SECURITY_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: monitoring-secret
+                  key: GF_SECURITY_SECRET_KEY
             - name: GF_RENDERING_SERVER_URL
               value: http://image-renderer:8081/render
             - name: GF_RENDERING_CALLBACK_URL

@@ -70,6 +70,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: thanos-store-pvc
   namespace: monitoring
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   accessModes:
     - ReadWriteOnce
@@ -83,6 +85,8 @@ metadata:
   name: thanos-store
   namespace: monitoring
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -92,6 +96,10 @@ spec:
       labels:
         app: thanos-store
     spec:
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
       containers:
         - name: thanos-store
           image: quay.io/thanos/thanos:main-2026-04-22-a1c5191
@@ -158,6 +166,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: thanos-compactor-pvc
   namespace: monitoring
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   accessModes:
     - ReadWriteOnce
@@ -171,6 +181,8 @@ metadata:
   name: thanos-compactor
   namespace: monitoring
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -180,6 +192,10 @@ spec:
       labels:
         app: thanos-compactor
     spec:
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
       containers:
         - name: thanos-compactor
           image: quay.io/thanos/thanos:main-2026-04-22-a1c5191
