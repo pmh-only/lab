@@ -53,6 +53,10 @@ spec:
             cidr: 10.0.0.10/32
         - ipBlock:
             cidr: 10.1.0.102/32
+        - ipBlock:
+            cidr: 138.2.112.39/32
+        - ipBlock:
+            cidr: 168.110.121.95/32
       ports:
         - protocol: TCP
           port: 53443
@@ -88,6 +92,10 @@ spec:
             cidr: 10.0.0.10/32
         - ipBlock:
             cidr: 10.1.0.102/32
+        - ipBlock:
+            cidr: 138.2.112.39/32
+        - ipBlock:
+            cidr: 168.110.121.95/32
       ports:
         - protocol: TCP
           port: 53443
