@@ -16,11 +16,13 @@ class OfficeTests(unittest.TestCase):
         data = json.loads(config["data"]["local-production-linux.json"])
         token = data["services"]["CoAuthoring"]["token"]
         self.assertNotIn("enable", token)
-        pattern = re.compile(token["outbox"]["urlExclusionRegex"])
-        self.assertTrue(pattern.match("https://hello.s3.pmh.codes/index.html"))
-        self.assertTrue(pattern.match("https://s3.pmh.codes/hello/index.html"))
-        self.assertFalse(pattern.match("https://drive.pmh.codes/callback"))
-        self.assertFalse(pattern.match("https://hello.s3.pmh.codes.attacker.example/test"))
+        # The bundled ONLYOFFICE version applies escape-string-regexp first.
+        # It therefore expects a literal URL substring, despite the field name.
+        pattern = re.compile(re.escape(token["outbox"]["urlExclusionRegex"]))
+        self.assertTrue(pattern.search("https://hello.s3.pmh.codes/index.html"))
+        self.assertTrue(pattern.search("https://documents.s3.pmh.codes/file.docx"))
+        self.assertFalse(pattern.search("https://drive.pmh.codes/callback"))
+        self.assertFalse(pattern.search("https://hello.s3.pmh.codes.attacker.example/test"))
 
     def test_storage_initialization_does_not_overwrite_existing_data(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "office")], text=True)))

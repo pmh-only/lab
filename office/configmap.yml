@@ -14,7 +14,7 @@ data:
           },
           "token": {
             "outbox": {
-              "urlExclusionRegex": "^https://([a-z0-9-]+\\.)?s3\\.pmh\\.codes(:443)?/"
+              "urlExclusionRegex": ".s3.pmh.codes/"
             }
           }
         }
