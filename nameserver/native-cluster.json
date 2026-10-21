@@ -1,9 +1,8 @@
 {
-  "clusterDomain": "cluster.pmh.codes",
-  "publicCatalog": "public-zones.cluster.pmh.codes",
-  "primaryNodeIpAddresses": "10.1.0.102",
-  "secondaryNodeIpAddresses": "10.0.0.10",
-  "primaryNodeUrl": "https://ns1.cluster.pmh.codes:53443/",
+  "clusterDomain": "pmh.codes",
+  "primaryNodeIpAddresses": "138.2.112.39",
+  "secondaryNodeIpAddresses": "168.110.121.95",
+  "primaryNodeUrl": "https://ns1.pmh.codes:53443/",
   "primaryNodeIpAddress": "10.1.0.102",
   "zones": ["pmh.codes", "pmh.so", "as218822.net"]
 }

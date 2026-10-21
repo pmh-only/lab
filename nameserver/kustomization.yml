@@ -8,7 +8,6 @@ resources:
   - ./ingress.yml
   - ./certificate.yml
   - ./bootstrap-issuer.yml
-  - ./networkpolicy.yml
   - ./configure-job.yml
   - ./secondary.yml
 configMapGenerator:
