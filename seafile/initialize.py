@@ -4,6 +4,7 @@ from configparser import ConfigParser
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -36,6 +37,13 @@ def initialize():
                 result = subprocess.run(command + " --use-existing-db 1", shell=True, env=env,
                                         capture_output=True, timeout=180)
                 if result.returncode:
+                    diagnostic = (result.stdout + result.stderr).decode(errors="replace")
+                    for key, value in {**os.environ, **env}.items():
+                        if value and any(part in key.upper() for part in ["PASSWORD", "PASSWD", "SECRET", "TOKEN", "PRIVATE_KEY"]):
+                            diagnostic = diagnostic.replace(value, "<redacted>")
+                    diagnostic = re.sub(r"\x1b\[[0-9;]*m", "", diagnostic)
+                    lines = [line[:400] for line in diagnostic.splitlines() if re.search(r"error|failed|invalid|not found|no such|unknown|usage|argument", line, re.IGNORECASE)]
+                    print("Native installer diagnostic:", " | ".join(lines[-5:]) or "nonzero exit without a safe diagnostic")
                     raise RuntimeError("Native existing-database setup failed; installer output suppressed")
                 print("Native Seafile schema/configuration initialized using the dedicated three-database identity")
                 return 0
