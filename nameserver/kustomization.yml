@@ -8,6 +8,13 @@ resources:
   - ./ingress.yml
   - ./certificate.yml
   - ./bootstrap-issuer.yml
+  - ./networkpolicy.yml
+  - ./configure-job.yml
+configMapGenerator:
+  - name: nameserver-configuration
+    files:
+      - configuration/configure.py
+      - configuration/settings.json
 # Vault authentication and Secret synchronization are owned by nameserver-secrets.
 images:
   - name: ghcr.io/pmh-only/technitium

@@ -1,0 +1,9 @@
+{
+  "enableDnsOverHttp": true,
+  "dnsReverseProxyNetworkACL": [
+    "172.16.0.0/24",
+    "172.16.1.0/24"
+  ],
+  "dnsOverHttpRealIpHeader": "X-Real-IP",
+  "recursion": "AllowOnlyForPrivateNetworks"
+}
