@@ -18,8 +18,8 @@ spec:
       helm:
         valuesObject:
           bitwarden:
-            enabled: true
-            server: https://vault.pmh.codes
+            # The Bitwarden service was explicitly retired by the owner.
+            enabled: false
 
           passkey:
             enabled: true
