@@ -1,0 +1,68 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: argocd
+resources:
+  - https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/v1.4.0/config/install.yaml
+  - secret.yml
+  - mail.yml
+images:
+  - name: quay.io/argoprojlabs/argocd-image-updater
+    newTag: v1.4.0
+    digest: sha256:a8054f5b48e0e40318d7026c50486e72acb341a4d801c32fb70ac20101cdce10
+patches:
+  - target:
+      kind: CustomResourceDefinition
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          argocd.argoproj.io/sync-wave: "-3"
+  - target:
+      kind: ConfigMap
+      name: argocd-image-updater-config
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: argocd-image-updater-config
+      data:
+        argocd.namespace: argocd
+        watch.namespaces: argocd
+        interval: 2m
+        max_concurrent_apps: "1"
+        max_concurrent_reconciles: "1"
+        git.user: ArgoCD
+        git.email: lab@pmh.codes
+        git.commit-signing-method: ssh
+        git.commit-signing-key: /app/ssh-keys/id_rsa
+        git.commit-sign-off: "true"
+        git.commit-message-template: |
+          chore(images): update {{ .AppName }}
+
+          {{ range .AppChanges -}}
+          updates image {{ .Image }} from '{{ .OldTag }}' to '{{ .NewTag }}'
+          {{ end -}}
+  - target:
+      kind: Deployment
+      name: argocd-image-updater-controller
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: argocd-image-updater-controller
+      spec:
+        strategy:
+          type: Recreate
+        template:
+          spec:
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 1000
+              runAsGroup: 1000
+              fsGroup: 1000
+            volumes:
+              - name: ssh-signing-key
+                secret:
+                  secretName: git
+                  optional: false
+                  defaultMode: 0440
