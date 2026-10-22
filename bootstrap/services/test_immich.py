@@ -44,8 +44,10 @@ class ImmichTests(unittest.TestCase):
         deployments = {d["metadata"]["name"]: d for d in self.docs if d["kind"] == "Deployment"}
         db = deployments["pgsql"]
         for doc in self.docs:
-            if doc["kind"] in {"VaultStaticSecret", "VaultAuth", "ServiceAccount", "PersistentVolumeClaim"}:
+            if doc["kind"] in {"VaultStaticSecret", "VaultAuth", "ServiceAccount"}:
                 self.assertLess(wave(doc), wave(db))
+            if doc["kind"] == "PersistentVolumeClaim":
+                self.assertEqual(wave(doc), wave(db), "WaitForFirstConsumer claim needs its consumer in the same wave")
         job = next(d for d in self.docs if d["kind"] == "Job")
         self.assertGreater(wave(job), wave(deployments["immich"]))
         ingress = yaml.safe_load((ROOT / "immich/ingress.yml").read_text())
