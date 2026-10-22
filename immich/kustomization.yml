@@ -5,7 +5,8 @@ resources:
   - ./secret.yml
   - ./deployment.yml
   - ./service.yml
-  # Publish only after native owner creation, DB-role and media checks.
+  # Native admin, editable OAuth/UI, media I/O and local backup checks passed.
+  - ./ingress.yml
   - ./pvc.yml
   - ./initialize-job.yml
 configMapGenerator:
