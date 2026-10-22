@@ -81,6 +81,12 @@ class SpotifyTests(unittest.TestCase):
         self.assertIn('source.replace(previous, replacement)', source)
         self.assertIn('user-read-currently-playing', source)
         self.assertIn('source.split(scopeAnchor).length !== 2', source)
+        self.assertIn('source.split(proxyAnchor).length !== 2', source)
+        self.assertIn('app.set("trust proxy", 1)', source)
+        route = yaml.safe_load((ROOT / 'spotify/ingress.yml').read_text())
+        headers = route['spec']['rules'][0]['filters'][0]['requestHeaderModifier']['set']
+        self.assertIn({'name': 'X-Forwarded-Proto', 'value': 'https'}, headers)
+        self.assertIn({'name': 'X-Forwarded-Host', 'value': 'spotify.pmh.codes'}, headers)
 
 
 if __name__ == '__main__':

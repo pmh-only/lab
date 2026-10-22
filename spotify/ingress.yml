@@ -2,6 +2,8 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: spotify-route
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   parentRefs:
     - group: gateway.networking.k8s.io
@@ -16,6 +18,13 @@ spec:
             type: PathPrefix
             value: /api/
       filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            set:
+              - name: X-Forwarded-Proto
+                value: https
+              - name: X-Forwarded-Host
+                value: spotify.pmh.codes
         - type: URLRewrite
           urlRewrite:
             path:

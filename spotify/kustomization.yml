@@ -6,7 +6,8 @@ resources:
   - ./pvc.yml
   - ./deployment.yml
   - ./service.yml
-  # Publish after native migrations, empty-history and OAuth redirect checks.
+  # Native migrations, empty-history and OAuth/state checks verified privately.
+  - ./ingress.yml
 configMapGenerator:
   - name: spotify-native-bootstrap
     files: [prepare-api.mjs]
