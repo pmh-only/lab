@@ -79,6 +79,8 @@ class SpotifyTests(unittest.TestCase):
         self.assertIn("const replacement = '/playlists/${id}/items'", source)
         self.assertIn('source.split(previous).length !== 2', source)
         self.assertIn('source.replace(previous, replacement)', source)
+        self.assertIn('user-read-currently-playing', source)
+        self.assertIn('source.split(scopeAnchor).length !== 2', source)
 
 
 if __name__ == '__main__':

@@ -8,10 +8,13 @@ if (digest !== '79c58a52a835b5b228a5e3ceaeb44b22ae767c3f85ba1f3d596f2818ac6b37af
 }
 const previous = '/playlists/${id}/tracks';
 const replacement = '/playlists/${id}/items';
-if (source.split(previous).length !== 2) {
+const scopeAnchor = '"user-read-recently-played",';
+if (source.split(previous).length !== 2 || source.split(scopeAnchor).length !== 2 || source.includes('user-read-currently-playing')) {
   throw new Error('Native playlist endpoint differs from the reviewed single replacement');
 }
 // Spotify's February 2026 API migration renamed this endpoint. Preserve the
-// native request, OAuth scopes, playlist creation, chunking and track URIs.
-fs.writeFileSync('/prepared/index.js', source.replace(previous, replacement), { mode: 0o444 });
-console.log('Verified native YourSpotify v1.20.0; only the documented playlist endpoint name updated');
+// native request, playlist creation, chunking and track URIs. The paired native
+// Playstats frontend also needs the read-only currently-playing OAuth scope.
+const prepared = source.replace(previous, replacement).replace(scopeAnchor, scopeAnchor + '\n            "user-read-currently-playing",');
+fs.writeFileSync('/prepared/index.js', prepared, { mode: 0o444 });
+console.log('Verified native YourSpotify v1.20.0; playlist endpoint and required Playstats read scope updated');
