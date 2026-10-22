@@ -3,6 +3,9 @@ kind: Deployment
 metadata:
   name: speed
 spec:
+  # Telemetry uses SQLite on the retained PVC; never overlap image rollouts.
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -15,6 +18,16 @@ spec:
       containers:
         - name: speed
           image: ghcr.io/librespeed/speedtest:latest-alpine
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8080
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
           env:
             - name: MODE
               value: standalone
@@ -45,4 +58,3 @@ spec:
         - name: speed-pvc
           persistentVolumeClaim:
             claimName: speed-pvc
-

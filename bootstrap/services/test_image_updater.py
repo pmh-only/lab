@@ -55,6 +55,13 @@ class ImageUpdaterTests(unittest.TestCase):
         self.assertIn('"insecure": "false"', code)
         self.assertIn('"-cas="', code)
 
+    def test_speed_sqlite_has_no_overlapping_writers_and_waits_for_http(self):
+        deployment = yaml.safe_load((ROOT / "speed/deployment.yml").read_text())
+        self.assertEqual(deployment["spec"]["strategy"]["type"], "Recreate")
+        container = deployment["spec"]["template"]["spec"]["containers"][0]
+        for probe in ["startupProbe", "readinessProbe"]:
+            self.assertEqual(container[probe]["httpGet"], {"path": "/", "port": 8080})
+
 
 if __name__ == "__main__":
     unittest.main()
