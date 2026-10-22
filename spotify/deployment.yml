@@ -12,16 +12,43 @@ spec:
       labels:
         app: spotify-api
     spec:
+      automountServiceAccountToken: false
+      initContainers:
+        - name: prepare-native-api
+          image: ghcr.io/yooooomi/your_spotify_server:latest
+          command: [node, /bootstrap/prepare-api.mjs]
+          volumeMounts:
+            - name: native-bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+            - name: prepared-api
+              mountPath: /prepared
       containers:
         - name: spotify-api
           image: ghcr.io/yooooomi/your_spotify_server:latest
+          startupProbe:
+            tcpSocket:
+              port: 8080
+            failureThreshold: 120
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 8080
           env:
+            - name: MONGO_NO_ADMIN_RIGHTS
+              value: "true"
+            # Native info-level startup logs include the database URI.
+            - name: LOG_LEVEL
+              value: warn
             - name: CLIENT_ENDPOINT
               value: https://spotify.pmh.codes
             - name: API_ENDPOINT
               value: https://spotify.pmh.codes/api
             - name: SPOTIFY_PUBLIC
-              value: 500efa190abd45ebac91b4fd5998a37b
+              valueFrom:
+                secretKeyRef:
+                  name: spotify-secret
+                  key: SPOTIFY_PUBLIC
             - name: SPOTIFY_SECRET
               valueFrom:
                 secretKeyRef:
@@ -35,9 +62,18 @@ spec:
                   name: spotify-secret
                   key: MONGO_ENDPOINT
           volumeMounts:
+            - name: prepared-api
+              mountPath: /app/apps/server/build/index.js
+              subPath: index.js
+              readOnly: true
             - mountPath: /home/node
               name: spotify-pvc
       volumes:
+        - name: native-bootstrap
+          configMap:
+            name: spotify-native-bootstrap
+        - name: prepared-api
+          emptyDir: {}
         - name: spotify-pvc
           persistentVolumeClaim:
             claimName: spotify-pvc
@@ -56,16 +92,34 @@ spec:
       labels:
         app: spotify-web
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: spotify-api
           image: ghcr.io/pmh-only/playstats:latest
+          startupProbe:
+            httpGet:
+              path: /
+              port: 3000
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
           env:
+            - name: HOST
+              value: 0.0.0.0
+            - name: PORT
+              value: "3000"
             - name: CLIENT_ENDPOINT
               value: https://spotify.pmh.codes
             - name: API_ENDPOINT
               value: https://spotify.pmh.codes/api
             - name: SPOTIFY_PUBLIC
-              value: 500efa190abd45ebac91b4fd5998a37b
+              valueFrom:
+                secretKeyRef:
+                  name: spotify-secret
+                  key: SPOTIFY_PUBLIC
             - name: SPOTIFY_SECRET
               valueFrom:
                 secretKeyRef:
@@ -93,6 +147,7 @@ spec:
       labels:
         app: spotify-stats-worker
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: stats-worker
           image: ghcr.io/pmh-only/playstats:latest

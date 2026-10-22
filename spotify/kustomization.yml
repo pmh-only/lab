@@ -6,7 +6,21 @@ resources:
   - ./pvc.yml
   - ./deployment.yml
   - ./service.yml
-  - ./ingress.yml
+  # Publish after native migrations, empty-history and OAuth redirect checks.
+configMapGenerator:
+  - name: spotify-native-bootstrap
+    files: [prepare-api.mjs]
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: unused
+      spec:
+        strategy:
+          type: Recreate
 images:
   - name: ghcr.io/yooooomi/your_spotify_server
     newTag: latest

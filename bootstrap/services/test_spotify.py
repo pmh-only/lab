@@ -2,6 +2,7 @@ import base64
 import io
 import json
 import unittest
+import subprocess
 from unittest.mock import patch
 
 import yaml
@@ -49,6 +50,35 @@ class SpotifyTests(unittest.TestCase):
         self.assertEqual(pod['volumes'][0]['persistentVolumeClaim']['claimName'], 'mongo-pvc')
         kustomization = yaml.safe_load((ROOT / 'database/kustomization.yml').read_text())
         self.assertIn('backpack', str(kustomization['patches']))
+
+    def test_spotify_native_workloads_use_real_secret_identity_and_scoped_database(self):
+        docs = list(yaml.safe_load_all(subprocess.check_output(['kubectl', 'kustomize', str(ROOT / 'spotify')], text=True)))
+        deployments = {d['metadata']['name']: d for d in docs if d['kind'] == 'Deployment'}
+        self.assertEqual(set(deployments), {'spotify-api', 'spotify-web', 'spotify-stats-worker'})
+        for deployment in deployments.values():
+            self.assertEqual(deployment['spec']['strategy']['type'], 'Recreate')
+            self.assertFalse(deployment['spec']['template']['spec']['automountServiceAccountToken'])
+        for name in ['spotify-api', 'spotify-web']:
+            container = deployments[name]['spec']['template']['spec']['containers'][0]
+            env = {e['name']: e for e in container['env']}
+            self.assertEqual(env['SPOTIFY_PUBLIC']['valueFrom']['secretKeyRef']['key'], 'SPOTIFY_PUBLIC')
+            self.assertEqual(env['SPOTIFY_SECRET']['valueFrom']['secretKeyRef']['key'], 'SPOTIFY_SECRET')
+            self.assertIn('@sha256:', container['image'])
+        api = deployments['spotify-api']['spec']['template']['spec']['containers'][0]
+        env = {e['name']: e for e in api['env']}
+        self.assertEqual(env['MONGO_NO_ADMIN_RIGHTS']['value'], 'true')
+        self.assertEqual(env['LOG_LEVEL']['value'], 'warn')
+        self.assertNotIn('OFFLINE_DEV_ID', env)
+        pvc = next(d for d in docs if d['kind'] == 'PersistentVolumeClaim')
+        self.assertEqual(pvc['metadata']['annotations']['argocd.argoproj.io/sync-options'], 'Prune=false')
+
+    def test_playlist_compatibility_changes_one_verified_native_endpoint_not_functionality(self):
+        source = (ROOT / 'spotify/prepare-api.mjs').read_text()
+        self.assertIn('79c58a52a835b5b228a5e3ceaeb44b22ae767c3f85ba1f3d596f2818ac6b37af', source)
+        self.assertIn("const previous = '/playlists/${id}/tracks'", source)
+        self.assertIn("const replacement = '/playlists/${id}/items'", source)
+        self.assertIn('source.split(previous).length !== 2', source)
+        self.assertIn('source.replace(previous, replacement)', source)
 
 
 if __name__ == '__main__':
