@@ -7,7 +7,7 @@ from provision import ROOT
 
 class ApplicationInventoryTests(unittest.TestCase):
     def test_retired_services_and_their_updaters_are_not_deployment_targets(self):
-        retired = {"bitwarden", "bro", "workflows", "run"}
+        retired = {"bitwarden", "bro", "workflows", "run", "openebs-zfs"}
         for path in (ROOT / "apps").glob("*.yml"):
             for doc in yaml.safe_load_all(path.read_text()):
                 if doc and doc.get("kind") in {"Application", "ImageUpdater"}:
@@ -25,9 +25,6 @@ class ApplicationInventoryTests(unittest.TestCase):
         self.assertTrue(values["passkey"]["enabled"])
         self.assertIn("connectDiscoveryUrl", values["config"])
         self.assertIn("mailDiscoveryUrl", values["config"])
-
-    def test_unrelated_zfs_controller_is_not_silently_removed(self):
-        self.assertTrue((ROOT / "apps/openebs-zfs.yml").is_file())
 
 
 if __name__ == "__main__":
