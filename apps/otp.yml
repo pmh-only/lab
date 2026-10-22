@@ -12,24 +12,28 @@ spec:
   project: default
   sources:
     - path: otp_configs
-      repoURL: git@github.com:pmh-only/lab.git
+      repoURL: https://github.com/pmh-only/lab.git
       targetRevision: HEAD
     - chart: otp-inbox
       helm:
+        releaseName: otp-inbox
         valuesObject:
+          image:
+            tag: v0.4.0@sha256:caa00c49474cdb4e184dfe3f8a71dd187b369e51ae9234c52295a2c8667d11f7
           bitwarden:
             # The Bitwarden service was explicitly retired by the owner.
             enabled: false
 
           passkey:
             enabled: true
-            storageClass: local-path
+            existingClaim: otp-passkey
 
           secrets:
             existingSecret: otp-inbox
 
           gatewayApi:
-            enabled: true
+            # Publish after checking locked snapshots and the setup-token guard.
+            enabled: false
             parentRefs:
               - name: main
                 namespace: gateway
@@ -41,7 +45,7 @@ spec:
             mailDiscoveryUrl: http://mailui.mail.svc.cluster.local:3000/.well-known/rostack
 
       repoURL: https://pmh-only.github.io/otp
-      targetRevision: x
+      targetRevision: 0.4.0
   syncPolicy:
     automated:
       prune: true
