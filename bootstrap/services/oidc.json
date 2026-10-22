@@ -1,4 +1,13 @@
 {
+  "immich": {
+    "namespace": "immich",
+    "vaultPath": "immich/immich-oidc",
+    "clientID": "lab-immich",
+    "launchURL": "https://photos.pmh.codes",
+    "redirectURI": "https://photos.pmh.codes/auth/login",
+    "additionalRedirectURIs": ["https://photos.pmh.codes/user-settings", "app.immich:///oauth-callback"],
+    "readerPaths": ["immich/immich-secret", "immich/bootstrap-login", "immich/immich-oidc"]
+  },
   "seafile": {
     "namespace": "seafile",
     "vaultPath": "seafile/seafile-secrets",

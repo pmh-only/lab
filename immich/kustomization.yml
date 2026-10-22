@@ -5,8 +5,37 @@ resources:
   - ./secret.yml
   - ./deployment.yml
   - ./service.yml
-  - ./ingress.yml
+  # Publish only after native owner creation, DB-role and media checks.
   - ./pvc.yml
+  - ./initialize-job.yml
+configMapGenerator:
+  - name: immich-db-bootstrap
+    files:
+      - db-init.sh
+    options:
+      annotations:
+        argocd.argoproj.io/sync-wave: "-2"
+  - name: immich-owner-bootstrap
+    files:
+      - initialize-owner.py
+      - bootstrap.json
+# Backups to the real Tailscale/S3 target remain deferred as requested.
+# Native Immich local database backup features are not disabled.
+patches:
+  - target:
+      kind: Deployment
+      name: pgsql
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: pgsql
+      spec:
+        template:
+          spec:
+            initContainers:
+              - name: backpack
+                $patch: delete
 images:
   - name: ghcr.io/immich-app/immich-server
     newTag: release
@@ -14,3 +43,6 @@ images:
   - name: ghcr.io/immich-app/immich-machine-learning
     newTag: release
     digest: sha256:73915f07e1f4289ba45b174c58443db74cef47ddf502613f475fc5e52458ea42
+  - name: ghcr.io/immich-app/postgres
+    newTag: 14-vectorchord0.4.3-pgvectors0.2.0
+    digest: sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23

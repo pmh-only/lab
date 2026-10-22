@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: immich
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -12,12 +14,29 @@ spec:
       labels:
         app: immich
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: immich
           image: ghcr.io/immich-app/immich-server:release
           ports:
             - containerPort: 2283
+          startupProbe:
+            httpGet:
+              path: /api/server/ping
+              port: 2283
+            failureThreshold: 90
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /api/server/ping
+              port: 2283
           env:
+            - name: IMMICH_MEDIA_LOCATION
+              value: /usr/src/app/upload
+            - name: DB_DATABASE_NAME
+              value: immich
+            - name: DB_VECTOR_EXTENSION
+              value: vectorchord
             - name: DB_USERNAME
               value: immich
             - name: DB_HOSTNAME
@@ -36,12 +55,15 @@ spec:
         - name: immich-pvc
           hostPath:
             path: /mnt/data/immich
+            type: DirectoryOrCreate
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: immich-ml
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -51,11 +73,20 @@ spec:
       labels:
         app: immich-ml
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: immich-ml
           image: ghcr.io/immich-app/immich-machine-learning:release
           ports:
             - containerPort: 3003
+          startupProbe:
+            tcpSocket:
+              port: 3003
+            failureThreshold: 90
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 3003
           volumeMounts:
             - mountPath: /cache
               name: immich-ml-pvc
@@ -63,12 +94,17 @@ spec:
         - name: immich-ml-pvc
           hostPath:
             path: /mnt/data/immich-ml
+            type: DirectoryOrCreate
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pgsql
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -78,6 +114,9 @@ spec:
       labels:
         app: pgsql
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 999
       initContainers:
         - name: backpack
           restartPolicy: Always
@@ -117,7 +156,17 @@ spec:
           image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
           ports:
             - containerPort: 5432
+          startupProbe:
+            tcpSocket:
+              port: 5432
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 5432
           env:
+            - name: POSTGRES_DB
+              value: immich
             - name: POSTGRES_USER
               value: admin
             - name: POSTGRES_PASSWORD
@@ -128,9 +177,23 @@ spec:
             - name: POSTGRES_INITDB_ARGS
               value: --data-checksums
           volumeMounts:
+            - name: native-bootstrap
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+            - name: app-credential
+              mountPath: /run/secrets/immich-db
+              readOnly: true
             - mountPath: /var/lib/postgresql/data
               name: pgsql-storage
       volumes:
+        - name: native-bootstrap
+          configMap:
+            name: immich-db-bootstrap
+            defaultMode: 0555
+        - name: app-credential
+          secret:
+            secretName: immich-secret
+            defaultMode: 0440
         - name: pgsql-storage
           persistentVolumeClaim:
             claimName: pgsql-pvc

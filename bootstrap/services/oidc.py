@@ -54,11 +54,14 @@ def provision_client(vault, api, slug, desired):
     minimum_lengths = desired.get("companionMinimumLengths", {})
     if not public_client and (set(stored) != {secret_field, *companion_fields} or any(not isinstance(v, str) or len(v) < (48 if field == secret_field else minimum_lengths.get(field, 48)) for field, v in stored.items())):
         raise RuntimeError("Existing OIDC credentials need manual review")
-    redirects = [{"matching_mode": "strict", "url": desired["redirectURI"], "redirect_uri_type": "authorization"}]
+    uris = [desired["redirectURI"], *desired.get("additionalRedirectURIs", [])]
+    if len(uris) != len(set(uris)):
+        raise RuntimeError("Duplicate declared OAuth redirects")
+    redirects = [{"matching_mode": "strict", "url": uri, "redirect_uri_type": "authorization"} for uri in uris]
     if existing:
         if existing["redirect_uris"] != redirects or existing["issuer_mode"] != "per_provider":
             raise RuntimeError("Existing managed provider has unexpected redirect/issuer settings")
-        if public_client and existing.get("client_type") != "public":
+        if existing.get("client_type", "confidential") != ("public" if public_client else "confidential"):
             raise RuntimeError("Existing provider has an unexpected client type")
         if public_client and (existing.get("grant_types") != desired["grantTypes"] or existing.get("sub_mode") != desired["subMode"]):
             raise RuntimeError("Existing public provider has unexpected grant/subject settings")
@@ -99,7 +102,7 @@ def provision_client(vault, api, slug, desired):
         api.request("core/applications/", {"name": slug, "slug": slug, "provider": provider["pk"],
                     "meta_launch_url": desired["launchURL"], "meta_description": "Managed by lab bootstrap", "policy_engine_mode": "all"})
     if not public_client:
-        reader(vault, desired["namespace"], desired["vaultPath"])
+        reader(vault, desired["namespace"], desired.get("readerPaths", desired["vaultPath"]))
     with urllib.request.urlopen("https://auth.pmh.codes/application/o/" + slug + "/.well-known/openid-configuration", timeout=20) as response:
         discovery = json.load(response)
     if discovery["issuer"] != "https://auth.pmh.codes/application/o/" + slug + "/":

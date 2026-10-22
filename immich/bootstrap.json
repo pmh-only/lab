@@ -1,0 +1,10 @@
+{
+  "externalDomain": "https://photos.pmh.codes",
+  "machineLearningUrl": "http://immich-ml-service:3003",
+  "oauth": {
+    "clientId": "lab-immich",
+    "issuerUrl": "https://auth.pmh.codes/application/o/immich/",
+    "buttonText": "Login with Authentik",
+    "redirectURIs": ["https://photos.pmh.codes/auth/login", "https://photos.pmh.codes/user-settings", "app.immich:///oauth-callback"]
+  }
+}

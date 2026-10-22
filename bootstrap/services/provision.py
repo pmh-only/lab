@@ -20,6 +20,7 @@ from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
 
 ROOT = Path(__file__).resolve().parents[2]
 PROFILES = {
+    "immich": ("immich/immich-secret", {"DB_PASSWORD": "random", "DB_ADMIN_PASSWORD": "random"}),
     "trace": ("trace/trace-secrets", {"POSTGRES_PASSWORD": "postgres-password:traffic", "CLICKHOUSE_PASSWORD": "random", "CLICKHOUSE_QUERY_PASSWORD": "random", "BETTER_AUTH_SECRET": "random", "MAPBOX_TOKEN": "optional-empty"}),
     "seafile": ("seafile/seafile-secrets", {"DB_PASSWORD": "random", "JWT_PRIVATE_KEY": "random", "INIT_SEAFILE_ADMIN_PASSWORD": "random", "OAUTH_CLIENT_SECRET": "random"}),
     "codexlb": ("codexlb/bootstrap-login", {"ADMIN_PASSWORD": "random", "BOOTSTRAP_TOKEN": "random"}),
@@ -310,6 +311,8 @@ def provision(vault, name):
     paths = [path, "monitoring/thanos-secrets"] if name == "monitoring" else path
     if name == "trace":
         paths = [path, "trace/trace-auth-secrets"]
+    if name == "immich":
+        paths = [path, "immich/bootstrap-login", "immich/immich-oidc"]
     reader(vault, name, paths)
     print(f"{name}: managed credentials verified; values suppressed")
 

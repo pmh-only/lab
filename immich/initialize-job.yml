@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: immich-initialize-owner
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 240
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+      containers:
+        - name: owner
+          image: python:3.14-alpine@sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72
+          command: [python, /bootstrap/initialize-owner.py]
+          env:
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+            - name: owner
+              mountPath: /run/secrets/owner
+              readOnly: true
+            - name: oidc
+              mountPath: /run/secrets/oidc
+              readOnly: true
+      volumes:
+        - name: bootstrap
+          configMap:
+            name: immich-owner-bootstrap
+        - name: owner
+          secret:
+            secretName: immich-bootstrap-login
+            defaultMode: 0440
+        - name: oidc
+          secret:
+            secretName: immich-oidc
+            defaultMode: 0440

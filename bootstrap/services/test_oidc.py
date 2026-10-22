@@ -16,6 +16,11 @@ DECLARATIONS = json.loads(Path(__file__).with_name("oidc.json").read_text())
 class OIDCTests(unittest.TestCase):
     def test_public_client_ids_match_existing_security_policies(self):
         for slug, declaration in DECLARATIONS.items():
+            if slug == "immich":
+                desired = json.loads((ROOT / "immich/bootstrap.json").read_text())
+                self.assertEqual(declaration["clientID"], desired["oauth"]["clientId"])
+                self.assertEqual([declaration["redirectURI"], *declaration["additionalRedirectURIs"]], desired["oauth"]["redirectURIs"])
+                continue
             if slug == "seafile":
                 self.assertEqual(declaration["clientID"], "lab-seafile")
                 self.assertEqual(declaration["redirectURI"], "https://drive.pmh.codes/oauth/callback/")
@@ -61,6 +66,25 @@ class OIDCTests(unittest.TestCase):
             provision_client(vault, api, "go", desired)
         vault.create.assert_not_called()
         api.request.assert_called_once_with("core/applications/go/", missing_ok=True)
+
+    def test_existing_immich_client_preserves_all_strict_web_and_mobile_callbacks(self):
+        desired = DECLARATIONS["immich"]
+        secret = "fresh-immich-placeholder-" * 3
+        redirects = [{"matching_mode": "strict", "url": uri, "redirect_uri_type": "authorization"} for uri in [desired["redirectURI"], *desired["additionalRedirectURIs"]]]
+        provider = {"pk": 45, "name": "lab bootstrap: immich", "client_id": desired["clientID"], "client_type": "confidential", "client_secret": secret, "issuer_mode": "per_provider", "redirect_uris": redirects}
+        api, vault = Mock(), Mock()
+        api.list.return_value = [provider]
+        api.request.return_value = {"provider": 45}
+        vault.get.return_value = {"client-secret": secret}
+        discovery = {"issuer": "https://auth.pmh.codes/application/o/immich/"}
+        with patch("oidc.urllib.request.urlopen", return_value=io.BytesIO(json.dumps(discovery).encode())):
+            provision_client(vault, api, "immich", desired)
+        vault.create.assert_not_called()
+        self.assertEqual(len(redirects), 3)
+        self.assertIn('app.immich:///oauth-callback', [r["url"] for r in redirects])
+        policy = next(call.kwargs["payload"] for call in vault.run.call_args_list if call.args[:2] == ("policy", "write"))
+        for path in desired["readerPaths"]:
+            self.assertIn(path, policy)
 
     def test_unrelated_existing_provider_is_not_taken_over(self):
         api, vault = Mock(), Mock()
