@@ -6,7 +6,54 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./pvc.yml
-  - ./ingress.yml
+  # Publish only after private native initialization/authentication checks.
+  - ./initialize-job.yml
+configMapGenerator:
+  - name: track-runtime
+    envs: [runtime.env]
+    options:
+      annotations:
+        argocd.argoproj.io/sync-wave: "-2"
+  - name: track-bootstrap
+    files: [initialize.sh, initialize-owner.rb]
+    options:
+      annotations:
+        argocd.argoproj.io/sync-wave: "-2"
+  - name: track-db-bootstrap
+    files: [db-init.sh]
+    options:
+      annotations:
+        argocd.argoproj.io/sync-wave: "-2"
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: unused
+      spec:
+        strategy:
+          type: Recreate
+        template:
+          spec:
+            automountServiceAccountToken: false
+  - target:
+      kind: Deployment
+      name: track-(postgis|redis)
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          argocd.argoproj.io/sync-wave: "-1"
+  - target:
+      kind: Deployment
+      name: track(|-sidekiq)
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          argocd.argoproj.io/sync-wave: "1"
 images:
   - name: ghcr.io/pmh-only/dawarich
     newTag: latest

@@ -1,4 +1,13 @@
 {
+  "track": {
+    "namespace": "track",
+    "vaultPath": "track/track-oidc",
+    "secretField": "OIDC_CLIENT_SECRET",
+    "clientID": "z7QIEBurowgWfYPDxOLRa7Nx8kJdHGirkCtOlwM4",
+    "launchURL": "https://track.pmh.codes",
+    "redirectURI": "https://track.pmh.codes/users/auth/openid_connect/callback",
+    "readerPaths": ["track/track-secret", "track/track-oidc", "track/bootstrap-login", "track/db-admin"]
+  },
   "mail": {
     "namespace": "mail",
     "vaultPath": "mail/mail-oidc",

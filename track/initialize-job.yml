@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: track-initialize
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 1200
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      containers:
+        - name: initialize
+          image: ghcr.io/pmh-only/dawarich:latest
+          command: [/bin/sh, /bootstrap/initialize.sh]
+          envFrom:
+            - configMapRef:
+                name: track-runtime
+            - secretRef:
+                name: track-secret
+            - secretRef:
+                name: track-oidc
+            - secretRef:
+                name: track-bootstrap-login
+          volumeMounts:
+            - name: bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              memory: 3Gi
+      volumes:
+        - name: bootstrap
+          configMap:
+            name: track-bootstrap

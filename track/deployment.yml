@@ -15,6 +15,9 @@ spec:
       containers:
         - name: track
           image: ghcr.io/pmh-only/dawarich:latest
+          envFrom:
+            - configMapRef:
+                name: track-runtime
           command:
             - web-entrypoint.sh
           args:
@@ -34,14 +37,14 @@ spec:
             - name: DATABASE_PORT
               value: '5432'
             - name: DATABASE_USERNAME
-              value: postgres
+              value: dawarich
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: track-secret
                   key: DATABASE_PASSWORD
             - name: DATABASE_URL
-              value: postgis://postgres:$(DATABASE_PASSWORD)@track-postgis-service.track.svc.cluster.local:5432/dawarich
+              value: postgis://dawarich:$(DATABASE_PASSWORD)@track-postgis-service.track.svc.cluster.local:5432/dawarich
             - name: DATABASE_NAME
               value: 'dawarich'
             - name: APPLICATION_HOSTS
@@ -64,9 +67,9 @@ spec:
             - name: STORE_GEODATA
               value: 'true'
             - name: WEB_CONCURRENCY
-              value: '-1'
+              value: '1'
             - name: PHOTON_API_HOST
-              value: app.chibigeo.com
+              value: app.chibigeo.com/v1/photon
             - name: PHOTON_API_USE_HTTPS
               value: 'true'
             - name: PHOTON_API_KEY
@@ -87,8 +90,28 @@ spec:
             - name: OIDC_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: track-secret
+                  name: track-oidc
                   key: OIDC_CLIENT_SECRET
+          startupProbe:
+            httpGet:
+              path: /up
+              port: 3000
+              httpHeaders:
+                - name: Host
+                  value: track.pmh.codes
+                - name: X-Forwarded-Proto
+                  value: https
+            failureThreshold: 120
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /up
+              port: 3000
+              httpHeaders:
+                - name: Host
+                  value: track.pmh.codes
+                - name: X-Forwarded-Proto
+                  value: https
           volumeMounts:
             - mountPath: /var/app/public
               name: track-pvc
@@ -99,9 +122,6 @@ spec:
             - mountPath: /var/app/storage
               name: track-pvc
               subPath: storage
-            - mountPath: /dawarich_db_data
-              name: track-pvc
-              subPath: dawarich_db_data
       volumes:
         - name: track-pvc
           persistentVolumeClaim:
@@ -124,6 +144,9 @@ spec:
       containers:
         - name: track-sidekiq
           image: ghcr.io/pmh-only/dawarich:latest
+          envFrom:
+            - configMapRef:
+                name: track-runtime
           command:
             - sidekiq-entrypoint.sh
           args:
@@ -138,14 +161,14 @@ spec:
             - name: DATABASE_PORT
               value: '5432'
             - name: DATABASE_USERNAME
-              value: postgres
+              value: dawarich
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: track-secret
                   key: DATABASE_PASSWORD
             - name: DATABASE_URL
-              value: postgis://postgres:$(DATABASE_PASSWORD)@track-postgis-service.track.svc.cluster.local:5432/dawarich
+              value: postgis://dawarich:$(DATABASE_PASSWORD)@track-postgis-service.track.svc.cluster.local:5432/dawarich
             - name: DATABASE_NAME
               value: 'dawarich'
             - name: APPLICATION_HOSTS
@@ -168,7 +191,7 @@ spec:
             - name: STORE_GEODATA
               value: 'true'
             - name: PHOTON_API_HOST
-              value: app.chibigeo.com
+              value: app.chibigeo.com/v1/photon
             - name: PHOTON_API_USE_HTTPS
               value: 'true'
             - name: PHOTON_API_KEY
@@ -189,7 +212,7 @@ spec:
             - name: OIDC_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: track-secret
+                  name: track-oidc
                   key: OIDC_CLIENT_SECRET
           volumeMounts:
             - mountPath: /var/app/public
@@ -223,17 +246,34 @@ spec:
       containers:
         - name: track-postgis
           image: ghcr.io/pmh-only/postgis:17-3.5-alpine
+          startupProbe:
+            tcpSocket:
+              port: 5432
+            failureThreshold: 90
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 5432
           env:
-            - name: POSTGRES_USERNAME
-              value: postgres
+            - name: POSTGRES_USER
+              value: admin
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: track-secret
-                  key: DATABASE_PASSWORD
+                  name: track-db-admin
+                  key: password
             - name: POSTGRES_DB
               value: 'dawarich'
+            - name: POSTGRES_INITDB_ARGS
+              value: --data-checksums
           volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d/20-lab-track.sh
+              name: database-bootstrap
+              subPath: db-init.sh
+              readOnly: true
+            - mountPath: /run/secrets/track-db
+              name: app-credential
+              readOnly: true
             - mountPath: /var/shared
               name: track-pvc
               subPath: shared
@@ -241,6 +281,17 @@ spec:
               name: track-pvc
               subPath: dawarich_db_data
       volumes:
+        - name: database-bootstrap
+          configMap:
+            name: track-db-bootstrap
+            defaultMode: 0555
+        - name: app-credential
+          secret:
+            secretName: track-secret
+            defaultMode: 0444
+            items:
+              - key: DATABASE_PASSWORD
+                path: DATABASE_PASSWORD
         - name: track-pvc
           persistentVolumeClaim:
             claimName: track-pvc
@@ -262,6 +313,14 @@ spec:
       containers:
         - name: track-redis
           image: ghcr.io/pmh-only/redis:alpine
+          startupProbe:
+            tcpSocket:
+              port: 6379
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 6379
           args:
             - redis-server
             - --save
