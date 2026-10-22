@@ -16,6 +16,12 @@ DECLARATIONS = json.loads(Path(__file__).with_name("oidc.json").read_text())
 class OIDCTests(unittest.TestCase):
     def test_public_client_ids_match_existing_security_policies(self):
         for slug, declaration in DECLARATIONS.items():
+            if slug == "welplan":
+                doc = yaml.safe_load((ROOT / "welplan/deployment.yml").read_text())
+                env = {e["name"]: e.get("value") for e in doc["spec"]["template"]["spec"]["containers"][0]["env"]}
+                self.assertEqual(env["ADMIN_OIDC_CLIENT_ID"], declaration["clientID"])
+                self.assertEqual(declaration["redirectURI"], "https://welplan.pmh.codes/admin/callback")
+                continue
             if slug == "tailscale":
                 self.assertEqual(declaration["clientID"], "lab-tailscale")
                 self.assertEqual(declaration["redirectURI"], "https://login.tailscale.com/a/oauth_response")

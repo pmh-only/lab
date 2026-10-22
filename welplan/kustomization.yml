@@ -5,7 +5,8 @@ resources:
   - ./secret.yml
   - ./deployment.yml
   - ./service.yml
-  - ./ingress.yml
+  - ./initialize-job.yml
+  # Publish after native schema/vendor/menu/admin/Slack redirect checks.
 images:
   - name: ghcr.io/pmh-only/welplan2
     newTag: latest

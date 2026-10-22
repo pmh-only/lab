@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: welplan
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -12,9 +14,17 @@ spec:
       labels:
         app: welplan
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: welplan
           image: ghcr.io/pmh-only/welplan2:latest
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            failureThreshold: 90
+            periodSeconds: 5
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /api/health
@@ -23,7 +33,7 @@ spec:
             - name: ORIGIN
               value: https://welplan.pmh.codes
             - name: WELPLAN_VERBOSE_LOGS
-              value: '1'
+              value: '0'
             - name: WELSTORY_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -58,7 +68,7 @@ spec:
             - name: ADMIN_OIDC_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: welplan-secret
+                  name: welplan-admin-oidc
                   key: ADMIN_OIDC_CLIENT_SECRET
             - name: REDIS_URL
               value: redis://redis-service.database.svc.cluster.local:6379
@@ -78,7 +88,10 @@ spec:
                   name: welplan-secret
                   key: REVIEW_JWT_SECRET
             - name: SLACK_CLIENT_ID
-              value: '8648598228979.11708798725345'
+              valueFrom:
+                secretKeyRef:
+                  name: welplan-secret
+                  key: SLACK_CLIENT_ID
             - name: SLACK_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:

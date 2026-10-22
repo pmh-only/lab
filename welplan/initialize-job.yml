@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: welplan-initialize-schema
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 180
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      containers:
+        - name: initialize
+          image: ghcr.io/pmh-only/welplan2:latest
+          command:
+            - node
+            - --input-type=module
+            - -e
+            - |
+              const module = await import('/app/worker/dist/webapp/src/lib/server/db/index.js');
+              await module.ensureDbInitialized();
+              console.log('Native Welplan schema initialized with its own database identity; no vendor login, user data or Slack messages generated');
+              process.exit(0);
+          env:
+            - name: PGHOST
+              value: pgsql-service.database.svc.cluster.local
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              value: welplan
+            - name: PGUSER
+              value: welplan
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: welplan-secret
+                  key: PGPASSWORD

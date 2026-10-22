@@ -1,4 +1,13 @@
 {
+  "welplan": {
+    "namespace": "welplan",
+    "vaultPath": "welplan/admin-oidc",
+    "secretField": "ADMIN_OIDC_CLIENT_SECRET",
+    "clientID": "oFx8CL9kOoONKQW7hzMem9c4IN2dYkJ1alN1ihHK",
+    "launchURL": "https://welplan.pmh.codes/admin",
+    "redirectURI": "https://welplan.pmh.codes/admin/callback",
+    "readerPaths": ["welplan/welplan-secret", "welplan/admin-oidc"]
+  },
   "tailscale": {
     "namespace": "tailscale",
     "vaultPath": "tailscale/tailscale-oidc",
