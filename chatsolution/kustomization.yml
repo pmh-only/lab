@@ -5,3 +5,7 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./ingress.yml
+images:
+  - name: ghcr.io/pmh-only/chatsolution
+    newTag: latest
+    digest: sha256:97ad6635820c7563133379eeed8613c2e912ace4aecddf8cb8d3804896260744
