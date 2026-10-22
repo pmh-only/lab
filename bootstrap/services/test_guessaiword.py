@@ -47,6 +47,19 @@ class GuessAIWordTests(unittest.TestCase):
         self.assertEqual(pvc["metadata"]["annotations"]["argocd.argoproj.io/sync-options"], "Prune=false")
         self.assertNotIn("volumeName", pvc["spec"])
 
+    def test_public_route_preserves_native_game_auth_without_added_sso(self):
+        docs = list(yaml.safe_load_all((ROOT / 'guessaiword/ingress.yml').read_text()))
+        self.assertEqual({d['kind'] for d in docs}, {'HTTPRoute', 'EnvoyExtensionPolicy'})
+        route = next(d for d in docs if d['kind'] == 'HTTPRoute')
+        self.assertEqual(route['spec']['hostnames'], ['guess.pmh.codes'])
+        self.assertEqual(route['metadata']['annotations']['argocd.argoproj.io/sync-wave'], '1')
+        policy = next(d for d in docs if d['kind'] == 'EnvoyExtensionPolicy')
+        code = policy['spec']['lua'][0]['inline']
+        self.assertIn('^GAME_TOKEN=', code)
+        self.assertIn('; Secure', code)
+        self.assertNotIn('HttpOnly', code)
+        self.assertIn('table.insert(cookies, value)', code)
+
     def test_runtime_archive_removes_old_config_but_preserves_business_code_and_stored_libs(self):
         with tempfile.TemporaryDirectory(prefix="guessaiword-test-", dir="/tmp/opencode" if Path("/tmp/opencode").is_dir() else None) as directory:
             root = Path(directory)
