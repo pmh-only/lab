@@ -31,10 +31,14 @@ def main():
     vault = module.VaultCLI()
     vault.verify()
     stored = vault.get(VAULT_PATH)
+    desired = {"sshPrivateKey": key, "insecure": "false"}
     if stored is None:
-        vault.create(VAULT_PATH, {"sshPrivateKey": key})
-    elif set(stored) != {"sshPrivateKey"} or not secrets.compare_digest(stored["sshPrivateKey"], key):
+        vault.create(VAULT_PATH, desired)
+    elif not secrets.compare_digest(stored.get("sshPrivateKey", ""), key) or set(stored) not in ({"sshPrivateKey"}, set(desired)):
         raise RuntimeError("Existing updater key differs; refusing an uncoordinated rotation")
+    elif stored != desired:
+        metadata = json.loads(vault.run("kv", "metadata", "get", "-format=json", "-mount=secret", VAULT_PATH))["data"]
+        vault.run("kv", "put", "-cas=" + str(metadata["current_version"]), "-mount=secret", VAULT_PATH, "-", payload=json.dumps(desired))
     vault.run("policy", "write", "lab-image-updater", "-", payload=(
         f'path "secret/data/{VAULT_PATH}" {{ capabilities = ["read"] }}\n'))
     vault.run("write", "auth/kubernetes/role/image-updater", "-", payload=json.dumps({

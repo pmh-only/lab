@@ -44,10 +44,16 @@ class ImageUpdaterTests(unittest.TestCase):
         for name in REVIEWED:
             docs = list(yaml.safe_load_all((ROOT / "apps" / f"{name}.yml").read_text()))
             updater = next(d for d in docs if d and d["kind"] == "ImageUpdater")
+            self.assertEqual(updater["spec"]["writeBackConfig"]["method"], "git:secret:argocd/git")
             self.assertEqual(updater["spec"]["applicationRefs"][0]["namePattern"], name)
             for image in updater["spec"]["applicationRefs"][0]["images"]:
                 self.assertFalse(image["imageName"].startswith("gchcr.io/"))
                 self.assertEqual(image["commonUpdateSettings"]["updateStrategy"], "digest")
+
+    def test_ssh_host_verification_is_not_disabled_by_default_secret_behavior(self):
+        code = (ROOT / "bootstrap/services/image_updater.py").read_text()
+        self.assertIn('"insecure": "false"', code)
+        self.assertIn('"-cas="', code)
 
 
 if __name__ == "__main__":

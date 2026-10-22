@@ -43,7 +43,3 @@ spec:
           imageName: ghcr.io/pmh-only/heartbeat:latest
           commonUpdateSettings:
             updateStrategy: digest
-        - alias: heartbeat-migrator
-          imageName: ghcr.io/pmh-only/heartbeat-migrator:latest
-          commonUpdateSettings:
-            updateStrategy: digest
