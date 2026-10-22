@@ -12,7 +12,7 @@ spec:
   project: default
   source:
     path: guessaiword
-    repoURL: git@github.com:pmh-only/lab.git
+    repoURL: https://github.com/pmh-only/lab.git
     targetRevision: HEAD
   syncPolicy:
     automated:
@@ -39,6 +39,6 @@ spec:
     - namePattern: guessaiword
       images:
         - alias: guessaiword
-          imageName: ghcr.io/pmh-only/guessaiword:next
+          imageName: ghcr.io/pmh-only/guessaiword:latest
           commonUpdateSettings:
             updateStrategy: digest

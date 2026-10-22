@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: guessaiword
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -12,19 +14,84 @@ spec:
       labels:
         app: guessaiword
     spec:
+      automountServiceAccountToken: false
+      # Real key validation passed on pmhoci; pmhoci2 is not in its IP allowlist.
+      nodeSelector:
+        kubernetes.io/hostname: pmhoci
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      initContainers:
+        - name: copy-native-jar
+          image: ghcr.io/pmh-only/guessaiword
+          command: [cp, /app/app.jar, /source/app.jar]
+          volumeMounts:
+            - name: native-source
+              mountPath: /source
+        - name: exclude-old-configuration
+          image: python:3.14-alpine@sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72
+          command: [python, /bootstrap/prepare-jar.py]
+          volumeMounts:
+            - name: native-source
+              mountPath: /source
+            - name: prepared-jar
+              mountPath: /prepared
+            - name: native-bootstrap
+              mountPath: /bootstrap
+              readOnly: true
       containers:
         - name: guessaiword
           image: ghcr.io/pmh-only/guessaiword
+          env:
+            - name: SPRING_CONFIG_LOCATION
+              value: file:/app/config/application.properties
+            - name: JAVA_TOOL_OPTIONS
+              value: -Xms128m -Xmx512m
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8080
+            failureThreshold: 90
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
           ports:
             - containerPort: 8080
           volumeMounts:
+            - name: prepared-jar
+              mountPath: /app/app.jar
+              subPath: app.jar
+              readOnly: true
             - name: guessaiword-secret
               mountPath: "/app/config"
               readOnly: true
+            - name: game-data
+              mountPath: /var/lib/guessaiword
       volumes:
+        - name: native-source
+          emptyDir: {}
+        - name: prepared-jar
+          emptyDir: {}
+        - name: native-bootstrap
+          configMap:
+            name: guessaiword-native-bootstrap
         - name: guessaiword-secret
           secret:
             secretName: guessaiword-secret
+            defaultMode: 0440
             items:
               - key: application.properties
                 path: application.properties
+        - name: game-data
+          persistentVolumeClaim:
+            claimName: guessaiword-data

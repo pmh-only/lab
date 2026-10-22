@@ -5,4 +5,12 @@ resources:
   - ./secret.yml
   - ./deployment.yml
   - ./service.yml
-  - ./ingress.yml
+  - ./pvc.yml
+  # Publish after actual native gameplay, AI and persistent-storage checks.
+configMapGenerator:
+  - name: guessaiword-native-bootstrap
+    files: [prepare-jar.py]
+images:
+  - name: ghcr.io/pmh-only/guessaiword
+    newTag: latest
+    digest: sha256:6e10cfc4f52be561e5e6ffccefae73fff34fb5849c29e9797a6ea7bfe5a171ae
