@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - deployment.yml
+images:
+  - name: ghcr.io/pmh-only/mail
+    newTag: latest
+    digest: sha256:6c7daffccf91fc3699f3b9cbed992c4a92ad79cddd4faf3439036fd8ba57cf97
