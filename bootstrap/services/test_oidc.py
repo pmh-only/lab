@@ -16,6 +16,11 @@ DECLARATIONS = json.loads(Path(__file__).with_name("oidc.json").read_text())
 class OIDCTests(unittest.TestCase):
     def test_public_client_ids_match_existing_security_policies(self):
         for slug, declaration in DECLARATIONS.items():
+            if slug == "mail":
+                self.assertEqual(declaration["clientID"], "lab-mail")
+                self.assertEqual(declaration["redirectURI"], "https://mail.pmh.codes/api/auth/oauth2/callback/oidc")
+                self.assertEqual(declaration["readerPaths"], ["mail/mailui-secret", "mail/mail-oidc"])
+                continue
             if slug == "immich":
                 desired = json.loads((ROOT / "immich/bootstrap.json").read_text())
                 self.assertEqual(declaration["clientID"], desired["oauth"]["clientId"])

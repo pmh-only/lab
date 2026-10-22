@@ -313,6 +313,8 @@ def provision(vault, name):
         paths = [path, "trace/trace-auth-secrets"]
     if name == "immich":
         paths = [path, "immich/bootstrap-login", "immich/immich-oidc"]
+    if name == "mail":
+        paths = [path, "mail/mail-oidc"]
     reader(vault, name, paths)
     print(f"{name}: managed credentials verified; values suppressed")
 
