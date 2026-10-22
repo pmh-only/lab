@@ -49,6 +49,17 @@ spec:
       containers:
         - name: mongo
           image: ghcr.io/pmh-only/mongo:latest
+          # Users are provisioned through the native API before this rollout.
+          # Keep the existing PVC; never reinitialize the database directory.
+          args: [mongod, --auth, --bind_ip_all]
+          startupProbe:
+            tcpSocket:
+              port: 27017
+            failureThreshold: 60
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 27017
           ports:
             - containerPort: 27017
           volumeMounts:
