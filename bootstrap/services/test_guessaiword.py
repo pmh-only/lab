@@ -34,7 +34,7 @@ class GuessAIWordTests(unittest.TestCase):
         self.assertEqual(deployment["spec"]["strategy"]["type"], "Recreate")
         pod = deployment["spec"]["template"]["spec"]
         self.assertFalse(pod["automountServiceAccountToken"])
-        self.assertEqual(pod["nodeSelector"]["kubernetes.io/hostname"], "pmhoci")
+        self.assertNotIn("nodeSelector", pod)
         self.assertEqual(pod["securityContext"]["runAsUser"], 1000)
         container = pod["containers"][0]
         self.assertIn("@sha256:", container["image"])

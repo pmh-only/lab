@@ -15,9 +15,6 @@ spec:
         app: guessaiword
     spec:
       automountServiceAccountToken: false
-      # Real key validation passed on pmhoci; pmhoci2 is not in its IP allowlist.
-      nodeSelector:
-        kubernetes.io/hostname: pmhoci
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
