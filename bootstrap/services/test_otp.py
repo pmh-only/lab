@@ -24,6 +24,8 @@ class OTPTests(unittest.TestCase):
         self.assertEqual(values["secrets"]["existingSecret"], "otp-inbox")
         self.assertTrue(values["config"]["connectDiscoveryUrl"].endswith("/.well-known/rostack"))
         self.assertTrue(values["config"]["mailDiscoveryUrl"].endswith("/.well-known/rostack"))
+        header = values["gatewayApi"]["filters"][0]["responseHeaderModifier"]["set"][0]
+        self.assertEqual(header, {"name": "X-Accel-Buffering", "value": "no"})
 
     def test_passkey_claim_is_retained_and_binds_alongside_its_first_consumer(self):
         pvc = yaml.safe_load((ROOT / "otp_configs/pvc.yml").read_text())

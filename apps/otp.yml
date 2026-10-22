@@ -41,6 +41,13 @@ spec:
                 namespace: gateway
             hostnames:
               - otp.pmh.codes
+            filters:
+              # Preserve the baseline Gateway; stream native SSE immediately.
+              - type: ResponseHeaderModifier
+                responseHeaderModifier:
+                  set:
+                    - name: X-Accel-Buffering
+                      value: "no"
 
           config:
             connectDiscoveryUrl: http://connect-service.connect.svc.cluster.local:8080/.well-known/rostack
