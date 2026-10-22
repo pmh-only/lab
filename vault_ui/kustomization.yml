@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: vault
+resources:
+  - ingress.yml
+configMapGenerator:
+  - name: vault-ui-backend-ca
+    files:
+      - ca.crt=backend-ca.crt
+    options:
+      disableNameSuffixHash: true
