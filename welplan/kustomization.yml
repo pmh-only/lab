@@ -6,7 +6,8 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./initialize-job.yml
-  # Publish after native schema/vendor/menu/admin/Slack redirect checks.
+  # Native vendor/menu/image/schema/admin/Slack/MCP checks verified privately.
+  - ./ingress.yml
 configMapGenerator:
   - name: welplan-native-bootstrap
     files: [prepare-safety.mjs]
