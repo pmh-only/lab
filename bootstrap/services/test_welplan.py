@@ -39,6 +39,24 @@ class WelplanTests(unittest.TestCase):
         self.assertEqual(env['WELPLAN_VERBOSE_LOGS']['value'], '0')
         self.assertEqual(env['SLACK_OAUTH_REDIRECT_URI']['value'], 'https://welplan.pmh.codes/webhooks/slack/callback')
 
+    def test_original_session_gate_protects_destructive_api_and_startup_preserves_settings(self):
+        code = (ROOT / 'welplan/prepare-safety.mjs').read_text()
+        self.assertIn('4a1b57d086ccbdbe599c2202cbae5ec3f2c36fd675770798e285127208004f27', code)
+        self.assertIn('pathname === "/api/cache/clear" || pathname === "/admin"', code)
+        self.assertIn('Subscription preferences retained.', code)
+        self.assertIn('Legacy selection data retained.', code)
+        self.assertIn('Legacy review metadata retained.', code)
+        self.assertIn('source.split(before).length !== 2', code)
+        docs = list(yaml.safe_load_all(subprocess.check_output(['kubectl', 'kustomize', str(ROOT / 'welplan')], text=True)))
+        for doc in docs:
+            if doc['kind'] not in {'Deployment', 'Job'}:
+                continue
+            pod = doc['spec']['template']['spec']
+            self.assertEqual(pod['securityContext']['runAsUser'], 1000)
+            self.assertEqual(pod['initContainers'][0]['name'], 'prepare-native-safety')
+            mounts = pod['containers'][0]['volumeMounts']
+            self.assertIn('/app/worker/dist/webapp/src/lib/server/db/index.js', [m['mountPath'] for m in mounts])
+
 
 if __name__ == '__main__':
     unittest.main()

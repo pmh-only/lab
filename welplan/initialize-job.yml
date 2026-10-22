@@ -13,6 +13,21 @@ spec:
     spec:
       restartPolicy: Never
       automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      initContainers:
+        - name: prepare-native-safety
+          image: ghcr.io/pmh-only/welplan2:latest
+          command: [node, /bootstrap/prepare-safety.mjs]
+          volumeMounts:
+            - name: native-bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+            - name: prepared-native
+              mountPath: /prepared
       containers:
         - name: initialize
           image: ghcr.io/pmh-only/welplan2:latest
@@ -39,3 +54,14 @@ spec:
                 secretKeyRef:
                   name: welplan-secret
                   key: PGPASSWORD
+          volumeMounts:
+            - name: prepared-native
+              mountPath: /app/worker/dist/webapp/src/lib/server/db/index.js
+              subPath: worker-db.js
+              readOnly: true
+      volumes:
+        - name: native-bootstrap
+          configMap:
+            name: welplan-native-bootstrap
+        - name: prepared-native
+          emptyDir: {}

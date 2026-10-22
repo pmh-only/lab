@@ -7,6 +7,12 @@ resources:
   - ./service.yml
   - ./initialize-job.yml
   # Publish after native schema/vendor/menu/admin/Slack redirect checks.
+configMapGenerator:
+  - name: welplan-native-bootstrap
+    files: [prepare-safety.mjs]
+    options:
+      annotations:
+        argocd.argoproj.io/sync-wave: "-2"
 images:
   - name: ghcr.io/pmh-only/welplan2
     newTag: latest
