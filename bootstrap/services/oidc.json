@@ -1,4 +1,12 @@
 {
+  "tailscale": {
+    "namespace": "tailscale",
+    "vaultPath": "tailscale/tailscale-oidc",
+    "clientID": "lab-tailscale",
+    "launchURL": "https://login.tailscale.com/start/oidc",
+    "redirectURI": "https://login.tailscale.com/a/oauth_response",
+    "readerPaths": ["tailscale/tailscale-oidc", "tailscale/operator-oauth"]
+  },
   "track": {
     "namespace": "track",
     "vaultPath": "track/track-oidc",

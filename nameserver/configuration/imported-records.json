@@ -2,7 +2,7 @@
   "zones": [
     {
       "zone": "pmh.codes",
-      "emptyApexWeb": true,
+      "emptyApexWeb": false,
       "replaceCnames": [
         {
           "name": "auth.pmh.codes",
@@ -10,6 +10,22 @@
         }
       ],
       "records": [
+        {
+          "name": "pmh.codes",
+          "type": "A",
+          "ttl": 300,
+          "data": {
+            "ipAddress": "168.110.121.95"
+          }
+        },
+        {
+          "name": "pmh.codes",
+          "type": "A",
+          "ttl": 300,
+          "data": {
+            "ipAddress": "138.2.112.39"
+          }
+        },
         {
           "name": "*.pmh.codes",
           "type": "A",

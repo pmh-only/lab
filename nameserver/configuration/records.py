@@ -137,4 +137,4 @@ def reconcile(client, declaration, allowed_zones):
         values = {canonical(record_type, r["rData"]) for r in actual if r["name"].rstrip(".").lower() == owner and r["type"] == record_type}
         if values != set(expected):
             raise RuntimeError(f"Public DNS import verification failed at {owner} ({record_type})")
-    print(f"Reviewed {sum(len(p[3]) for p in plans)} public DNS records match Git; apex web records remain empty")
+    print(f"Reviewed {sum(len(p[3]) for p in plans)} public DNS records match Git; declared apex and mail policies preserved")

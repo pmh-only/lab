@@ -99,6 +99,27 @@ class RecordImportTests(unittest.TestCase):
             reconcile(client, declaration([record("example.test", "A", {"ipAddress": "192.0.2.10"})]), ["example.test"])
         self.assertFalse(any(call.args[0] == "zones/records/add" for call in client.post.call_args_list))
 
+    def test_explicit_apex_enablement_adds_only_reviewed_address_and_preserves_mail(self):
+        mail = {"name": "example.test", "type": "MX", "rData": {"preference": 10, "exchange": "mail.example.test"}}
+        state = [mail]
+        client = Mock()
+        def post(path, payload):
+            if path == "zones/records/add":
+                state.append({"name": payload["domain"], "type": "A", "rData": {"ipAddress": payload["ipAddress"]}})
+                return {"status": "ok"}
+            self.assertEqual(path, "zones/records/get")
+            return {"response": {"records": copy.deepcopy(state)}}
+        client.post.side_effect = post
+        plan = declaration([record("example.test", "A", {"ipAddress": "192.0.2.10"})])
+        plan["zones"][0]["emptyApexWeb"] = False
+        reconcile(client, plan, ["example.test"])
+        self.assertIn(mail, state)
+        self.assertEqual(len(state), 2)
+        self.assertEqual(sum(c.args[0] == "zones/records/add" for c in client.post.call_args_list), 1)
+        client.post.reset_mock()
+        reconcile(client, plan, ["example.test"])
+        self.assertFalse(any(c.args[0] != "zones/records/get" for c in client.post.call_args_list))
+
     def test_existing_unknown_value_is_not_overwritten(self):
         client = Mock()
         client.post.side_effect = [
