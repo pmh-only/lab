@@ -14,10 +14,43 @@ spec:
     - jsonPointers:
         - /data
       kind: Secret
-  source:
-    chart: tailscale-operator
-    repoURL: https://pkgs.tailscale.com/helmcharts
-    targetRevision: x
+  sources:
+    - path: tailscale_auth
+      repoURL: https://github.com/pmh-only/lab.git
+      targetRevision: main
+    - chart: tailscale-operator
+      repoURL: https://pkgs.tailscale.com/helmcharts
+      targetRevision: 1.104.2
+      helm:
+        releaseName: tailscale-operator
+        valuesObject:
+          # VSO creates operator-oauth first; never embed OAuth values in Git.
+          oauthSecretVolume:
+            secret:
+              secretName: operator-oauth
+              defaultMode: 0444
+          operatorConfig:
+            hostname: lab-operator
+            defaultTags: ["tag:k8s-operator"]
+            image:
+              repository: tailscale/k8s-operator
+              tag: v1.104.2
+              digest: sha256:9cddfcbe75a7eab2b46d610966d519a28699a5e38235a2cb3aec960487c4aa48
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+          proxyConfig:
+            defaultTags: "tag:k8s"
+            image:
+              repository: tailscale/tailscale
+              tag: v1.104.2
+              digest: sha256:b11583ad2e93e4671128538c88cf11f460444a5d7e449311dd1933a400ab849d
+          apiServerProxyConfig:
+            mode: "false"
+            allowImpersonation: "false"
   syncPolicy:
     automated:
       prune: true
@@ -27,6 +60,7 @@ spec:
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
       - RespectIgnoreDifferences=true
+      - ServerSideApply=true
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -46,7 +80,7 @@ spec:
   project: default
   source:
     path: tailscale_configs
-    repoURL: git@github.com:pmh-only/lab.git
+    repoURL: https://github.com/pmh-only/lab.git
     targetRevision: HEAD
   syncPolicy:
     automated:

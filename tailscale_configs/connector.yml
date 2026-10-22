@@ -2,7 +2,6 @@ apiVersion: tailscale.com/v1alpha1
 kind: Connector
 metadata:
   name: cluster-connector
-  namespace: tailscale
 spec:
   hostnamePrefix: cluster-connector
   subnetRouter:
@@ -12,4 +11,3 @@ spec:
       - 172.17.0.0/16
   tags:
     - tag:k8s
-

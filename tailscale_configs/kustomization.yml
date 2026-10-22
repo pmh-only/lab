@@ -1,0 +1,6 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - connector.yml
+# Keep service.yml as the original peer declarations, but do not deploy its
+# old-tailnet names until actual device discovery verifies the new identities.
