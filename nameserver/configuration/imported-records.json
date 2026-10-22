@@ -135,7 +135,15 @@
           "type": "A",
           "ttl": 300,
           "data": {
-            "ipAddress": "158.247.242.239"
+            "ipAddress": "168.110.121.95"
+          }
+        },
+        {
+          "name": "welplan.pmh.codes",
+          "type": "A",
+          "ttl": 300,
+          "data": {
+            "ipAddress": "138.2.112.39"
           }
         }
       ]

@@ -1,10 +1,12 @@
 import subprocess
 import unittest
+from unittest.mock import Mock
 
 import yaml
 
 from provision import ROOT
 from welplan import EXTERNAL, complete_credentials
+from welplan_dns import HOST, LEGACY, TARGETS, retarget
 
 
 class WelplanTests(unittest.TestCase):
@@ -56,6 +58,32 @@ class WelplanTests(unittest.TestCase):
             self.assertEqual(pod['initContainers'][0]['name'], 'prepare-native-safety')
             mounts = pod['containers'][0]['volumeMounts']
             self.assertIn('/app/worker/dist/webapp/src/lib/server/db/index.js', [m['mountPath'] for m in mounts])
+
+    def test_dns_cutover_updates_only_exact_legacy_address_and_is_idempotent(self):
+        client = Mock()
+        values = {LEGACY}
+        def post(path, data):
+            self.assertEqual(data['domain'], HOST)
+            if path == 'zones/records/get':
+                return {'response': {'records': [{'name':HOST,'type':'A','rData':{'ipAddress':v}} for v in values]}}
+            if path == 'zones/records/update':
+                self.assertEqual(data['ipAddress'], LEGACY)
+                values.remove(LEGACY);values.add(data['newIpAddress'])
+            elif path == 'zones/records/add':
+                self.assertEqual(data['overwrite'], 'false');values.add(data['ipAddress'])
+            else:self.fail('Unexpected DNS operation')
+            return {'status':'ok'}
+        client.post.side_effect = post
+        retarget(client)
+        self.assertEqual(values, TARGETS)
+        client.post.reset_mock();retarget(client)
+        self.assertTrue(all(c.args[0]=='zones/records/get' for c in client.post.call_args_list))
+
+    def test_dns_cutover_refuses_unrecognized_or_concurrently_changed_records(self):
+        for records in [[{'name':HOST,'type':'A','rData':{'ipAddress':'192.0.2.99'}}], [{'name':HOST,'type':'AAAA','rData':{'ipAddress':'2001:db8::1'}}]]:
+            client=Mock();client.post.return_value={'response':{'records':records}}
+            with self.assertRaises(RuntimeError):retarget(client)
+            self.assertTrue(all(c.args[0]=='zones/records/get' for c in client.post.call_args_list))
 
 
 if __name__ == '__main__':
