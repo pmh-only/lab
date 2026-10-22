@@ -39,6 +39,6 @@ spec:
     - namePattern: chatsolution
       images:
         - alias: chatsolution
-          imageName: gchcr.io/pmh-only/chatsolution:latest
+          imageName: ghcr.io/pmh-only/chatsolution:latest
           commonUpdateSettings:
             updateStrategy: digest

@@ -4,6 +4,7 @@ import unittest
 import yaml
 
 from provision import ROOT
+from register_image_updaters import REVIEWED
 
 
 class ImageUpdaterTests(unittest.TestCase):
@@ -37,6 +38,16 @@ class ImageUpdaterTests(unittest.TestCase):
         self.assertTrue(all(i["commonUpdateSettings"]["updateStrategy"] == "digest" for i in ref["images"]))
         app_docs = list(yaml.safe_load_all((ROOT / "apps/mail.yml").read_text()))
         self.assertFalse(any(d and d["kind"] == "ImageUpdater" for d in app_docs))
+
+    def test_registration_does_not_blindly_update_version_adapters_or_stateful_infrastructure(self):
+        self.assertTrue(REVIEWED.isdisjoint({"database", "nameserver", "trace", "traffic", "visualized", "authentik", "immich", "minio", "gateway", "monitoring", "seafile"}))
+        for name in REVIEWED:
+            docs = list(yaml.safe_load_all((ROOT / "apps" / f"{name}.yml").read_text()))
+            updater = next(d for d in docs if d and d["kind"] == "ImageUpdater")
+            self.assertEqual(updater["spec"]["applicationRefs"][0]["namePattern"], name)
+            for image in updater["spec"]["applicationRefs"][0]["images"]:
+                self.assertFalse(image["imageName"].startswith("gchcr.io/"))
+                self.assertEqual(image["commonUpdateSettings"]["updateStrategy"], "digest")
 
 
 if __name__ == "__main__":
