@@ -4,7 +4,7 @@
     "vaultPath": "mail/mail-oidc",
     "clientID": "lab-mail",
     "launchURL": "https://mail.pmh.codes",
-    "redirectURI": "https://mail.pmh.codes/api/auth/oauth2/callback/oidc",
+    "redirectURI": "https://mail.pmh.codes/api/auth/callback/oidc",
     "readerPaths": ["mail/mailui-secret", "mail/mail-oidc"]
   },
   "immich": {

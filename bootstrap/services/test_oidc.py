@@ -18,7 +18,7 @@ class OIDCTests(unittest.TestCase):
         for slug, declaration in DECLARATIONS.items():
             if slug == "mail":
                 self.assertEqual(declaration["clientID"], "lab-mail")
-                self.assertEqual(declaration["redirectURI"], "https://mail.pmh.codes/api/auth/oauth2/callback/oidc")
+                self.assertEqual(declaration["redirectURI"], "https://mail.pmh.codes/api/auth/callback/oidc")
                 self.assertEqual(declaration["readerPaths"], ["mail/mailui-secret", "mail/mail-oidc"])
                 continue
             if slug == "immich":
