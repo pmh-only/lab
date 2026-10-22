@@ -32,8 +32,10 @@ spec:
             existingSecret: otp-inbox
 
           gatewayApi:
-            # Publish after checking locked snapshots and the setup-token guard.
-            enabled: false
+            # Native locked snapshots, token/origin guards and WebAuthn checked.
+            enabled: true
+            annotations:
+              argocd.argoproj.io/sync-wave: "1"
             parentRefs:
               - name: main
                 namespace: gateway
