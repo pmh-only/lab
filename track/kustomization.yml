@@ -6,7 +6,8 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./pvc.yml
-  # Publish only after private native initialization/authentication checks.
+  # Private owner/API/worker/PostGIS/geocoding/OIDC checks verified.
+  - ./ingress.yml
   - ./initialize-job.yml
 configMapGenerator:
   - name: track-runtime

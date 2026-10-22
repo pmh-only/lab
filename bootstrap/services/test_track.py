@@ -42,6 +42,9 @@ class TrackTests(unittest.TestCase):
             self.assertEqual(env["DATABASE_USERNAME"]["value"], "dawarich")
             self.assertNotIn("track-db-admin", str(container))
             self.assertNotIn("/dawarich_db_data", [v["mountPath"] for v in container["volumeMounts"]])
+        web = self.deployments["track"]["spec"]["template"]["spec"]["containers"][0]
+        self.assertEqual(web["startupProbe"]["httpGet"]["path"], "/api/v1/health")
+        self.assertEqual(web["readinessProbe"]["httpGet"]["path"], "/api/v1/ready")
 
     def test_auth_and_original_geocoding_are_preserved_with_real_key_and_free_plan_rate(self):
         values = dict(line.split("=", 1) for line in (ROOT / "track/runtime.env").read_text().splitlines())

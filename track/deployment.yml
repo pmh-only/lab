@@ -94,7 +94,7 @@ spec:
                   key: OIDC_CLIENT_SECRET
           startupProbe:
             httpGet:
-              path: /up
+              path: /api/v1/health
               port: 3000
               httpHeaders:
                 - name: Host
@@ -103,15 +103,17 @@ spec:
                   value: https
             failureThreshold: 120
             periodSeconds: 5
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
-              path: /up
+              path: /api/v1/ready
               port: 3000
               httpHeaders:
                 - name: Host
                   value: track.pmh.codes
                 - name: X-Forwarded-Proto
                   value: https
+            timeoutSeconds: 5
           volumeMounts:
             - mountPath: /var/app/public
               name: track-pvc
