@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: welplan
 spec:
+  replicas: 0
   strategy:
     type: Recreate
   revisionHistoryLimit: 0
