@@ -6,7 +6,8 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./certificate.yml
-  # Publish after native storage/authentication/private TLS checks.
+  # Native storage roundtrip/cleanup, OAuth guards and private TLS verified.
+  - ./ingress.yml
 configMapGenerator:
   - name: thepool-native-bootstrap
     files:
