@@ -12,6 +12,8 @@ spec:
       labels:
         app: solver
     spec:
+      runtimeClassName: sysbox-runc
+      hostUsers: false
       ServiceAccountName: solver
       containers:
         - name: solver
@@ -70,15 +72,31 @@ spec:
         - name: dind
           image: docker:29-dind
           securityContext:
-            privileged: true
+            privileged: false
+          # Run only a Pod-local Unix socket; do not expose unauthenticated TCP.
+          command: [dockerd]
           args:
             - --host=unix:///var/run/docker.sock
+          startupProbe:
+            exec:
+              command: [docker, info]
+            periodSeconds: 2
+            failureThreshold: 90
+          readinessProbe:
+            exec:
+              command: [docker, info]
+            periodSeconds: 5
           volumeMounts:
             - name: docker-sock
               mountPath: /var/run
+            - name: docker-data
+              mountPath: /var/lib/docker
       volumes:
         - name: solver-pvc
           persistentVolumeClaim:
             claimName: solver-pvc
         - name: docker-sock
           emptyDir: {}
+        - name: docker-data
+          emptyDir:
+            sizeLimit: 10Gi
