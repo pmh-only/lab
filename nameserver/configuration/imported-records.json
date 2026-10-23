@@ -131,6 +131,18 @@
           }
         },
         {
+          "name": "argo.pmh.codes",
+          "type": "A",
+          "ttl": 300,
+          "data": {"ipAddress": "168.110.121.95"}
+        },
+        {
+          "name": "argo.pmh.codes",
+          "type": "A",
+          "ttl": 300,
+          "data": {"ipAddress": "138.2.112.39"}
+        },
+        {
           "name": "pool.pmh.codes",
           "type": "A",
           "ttl": 300,

@@ -1,0 +1,24 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: argocd-server-tls
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  secretName: argocd-server-tls
+  secretTemplate:
+    labels:
+      app.kubernetes.io/part-of: argocd
+  dnsNames:
+    - argo.pmh.codes
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt-public
+  privateKey:
+    rotationPolicy: Always
+    algorithm: ECDSA
+    size: 256
+  usages:
+    - digital signature
+    - server auth

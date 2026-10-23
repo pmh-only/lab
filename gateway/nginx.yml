@@ -144,6 +144,7 @@ data:
 
       map $host $tracking_site_id {
         default              "1";
+        argo.pmh.codes       "";
         bgp.pmh.codes        "";
         welplan.pmh.codes    "578f3fabe057";
       }

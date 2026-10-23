@@ -6,6 +6,16 @@ resources:
   - https://raw.githubusercontent.com/argoproj/argo-cd/v3.5.5/manifests/install.yaml
 patches:
   - target:
+      kind: ConfigMap
+      name: argocd-cm
+    patch: |
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: argocd-cm
+      data:
+        url: https://argo.pmh.codes
+  - target:
       kind: Deployment
       name: argocd-repo-server
     patch: |
