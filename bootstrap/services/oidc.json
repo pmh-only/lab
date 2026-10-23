@@ -9,7 +9,7 @@
     "extraScopeMappings": [{
       "name": "lab bootstrap: rustfs admin policy",
       "scope_name": "rustfs",
-      "expression": "return {\"rustfs_policy\": [\"consoleAdmin\"] if request.user.is_superuser else []}"
+      "expression": "return {\"rustfs_policy\": [\"consoleAdmin\"] if user.is_superuser else []}"
     }]
   },
   "welplan": {

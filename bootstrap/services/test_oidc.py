@@ -24,7 +24,7 @@ class OIDCTests(unittest.TestCase):
                 self.assertEqual(env["RUSTFS_IDENTITY_OPENID_GROUPS_CLAIM_pmh_codes"]["value"], "rustfs_policy")
                 self.assertEqual(env["RUSTFS_IDENTITY_OPENID_CLIENT_SECRET_pmh_codes"]["valueFrom"]["secretKeyRef"]["name"], "rustfs-oidc")
                 self.assertFalse(any("ROLE_POLICY" in name for name in env))
-                self.assertIn("if request.user.is_superuser else []", declaration["extraScopeMappings"][0]["expression"])
+                self.assertIn("if user.is_superuser else []", declaration["extraScopeMappings"][0]["expression"])
                 self.assertEqual(declaration["readerPaths"], ["minio/minio-secrets", "minio/rustfs-oidc"])
                 continue
             if slug == "welplan":
@@ -106,7 +106,7 @@ class OIDCTests(unittest.TestCase):
         for superuser in [False, True]:
             request = Mock()
             request.user.is_superuser = superuser
-            claim = eval(expression.removeprefix("return "), {"request": request})
+            claim = eval(expression.removeprefix("return "), {"user": request.user})
             self.assertEqual(claim, {"rustfs_policy": ["consoleAdmin"] if superuser else []})
 
     def test_custom_scope_drift_is_not_silently_overwritten(self):
