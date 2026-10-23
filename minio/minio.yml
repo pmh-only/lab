@@ -14,6 +14,9 @@ spec:
       labels:
         app: minio
     spec:
+      # Existing /mnt/data/minio is node-local; never start on an empty peer disk.
+      nodeSelector:
+        kubernetes.io/hostname: pmhoci
       initContainers:
         - name: data-directory-permissions
           image: ghcr.io/pmh-only/rustfs:latest
@@ -50,6 +53,35 @@ spec:
             periodSeconds: 5
             failureThreshold: 1
           env:
+            - name: RUSTFS_BROWSER_REDIRECT_URL
+              value: https://rustfs.pmh.codes
+            - name: RUSTFS_IDENTITY_OPENID_ENABLE_pmh_codes
+              value: "on"
+            - name: RUSTFS_IDENTITY_OPENID_CONFIG_URL_pmh_codes
+              value: https://auth.pmh.codes/application/o/rustfs/
+            - name: RUSTFS_IDENTITY_OPENID_CLIENT_ID_pmh_codes
+              value: lab-rustfs
+            - name: RUSTFS_IDENTITY_OPENID_CLIENT_SECRET_pmh_codes
+              valueFrom:
+                secretKeyRef:
+                  name: rustfs-oidc
+                  key: client-secret
+            - name: RUSTFS_IDENTITY_OPENID_SCOPES_pmh_codes
+              value: openid,profile,email,rustfs
+            - name: RUSTFS_IDENTITY_OPENID_REDIRECT_URI_pmh_codes
+              value: https://rustfs.pmh.codes/rustfs/admin/v3/oidc/callback/pmh_codes
+            - name: RUSTFS_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC_pmh_codes
+              value: "off"
+            - name: RUSTFS_IDENTITY_OPENID_DISPLAY_NAME_pmh_codes
+              value: Authentik
+            # Only the explicit superuser-gated Authentik claim grants access.
+            # Do not map arbitrary identity-provider groups or grant all logins.
+            - name: RUSTFS_IDENTITY_OPENID_CLAIM_NAME_pmh_codes
+              value: rustfs_policy
+            - name: RUSTFS_IDENTITY_OPENID_GROUPS_CLAIM_pmh_codes
+              value: rustfs_policy
+            - name: RUSTFS_IDENTITY_OPENID_ROLES_CLAIM_pmh_codes
+              value: ""
             - name: RUSTFS_VOLUMES
               value: /data
             - name: RUSTFS_ADDRESS

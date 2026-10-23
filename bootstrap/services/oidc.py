@@ -58,7 +58,25 @@ def provision_client(vault, api, slug, desired):
     if len(uris) != len(set(uris)):
         raise RuntimeError("Duplicate declared OAuth redirects")
     redirects = [{"matching_mode": "strict", "url": uri, "redirect_uri_type": "authorization"} for uri in uris]
+    extra_mappings = []
+    if desired.get("extraScopeMappings"):
+        scopes = api.list("propertymappings/provider/scope/")
+        for mapping in desired["extraScopeMappings"]:
+            matches = [m for m in scopes if m["name"] == mapping["name"]]
+            if len(matches) > 1:
+                raise RuntimeError("Custom scope mapping is not uniquely identifiable")
+            if matches:
+                current = matches[0]
+                if any(current.get(key) != value for key, value in mapping.items()):
+                    raise RuntimeError("Existing custom scope mapping differs; refusing privilege changes")
+            else:
+                if existing:
+                    raise RuntimeError("Existing provider lacks its declared custom scope mapping")
+                current = api.request("propertymappings/provider/scope/", mapping)
+            extra_mappings.append(current["pk"])
     if existing:
+        if not set(extra_mappings) <= set(existing.get("property_mappings", [])):
+            raise RuntimeError("Existing provider lacks declared policy mapping")
         if existing["redirect_uris"] != redirects or existing["issuer_mode"] != "per_provider":
             raise RuntimeError("Existing managed provider has unexpected redirect/issuer settings")
         if existing.get("client_type", "confidential") != ("public" if public_client else "confidential"):
@@ -82,6 +100,7 @@ def provision_client(vault, api, slug, desired):
         }]
         if len(mappings) < 3:
             raise RuntimeError("Default OpenID/email/profile mappings are unavailable")
+        mappings.extend(extra_mappings)
         payload = {
             "name": provider_name, "authorization_flow": flows["default-provider-authorization-implicit-consent"],
             "invalidation_flow": flows["default-provider-invalidation-flow"], "client_type": "public" if public_client else "confidential",

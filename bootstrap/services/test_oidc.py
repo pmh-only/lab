@@ -16,6 +16,17 @@ DECLARATIONS = json.loads(Path(__file__).with_name("oidc.json").read_text())
 class OIDCTests(unittest.TestCase):
     def test_public_client_ids_match_existing_security_policies(self):
         for slug, declaration in DECLARATIONS.items():
+            if slug == "rustfs":
+                doc = next(yaml.safe_load_all((ROOT / "minio/minio.yml").read_text()))
+                env = {e["name"]: e for e in doc["spec"]["template"]["spec"]["containers"][0]["env"]}
+                self.assertEqual(env["RUSTFS_IDENTITY_OPENID_CLIENT_ID_pmh_codes"]["value"], declaration["clientID"])
+                self.assertEqual(env["RUSTFS_IDENTITY_OPENID_REDIRECT_URI_pmh_codes"]["value"], declaration["redirectURI"])
+                self.assertEqual(env["RUSTFS_IDENTITY_OPENID_GROUPS_CLAIM_pmh_codes"]["value"], "rustfs_policy")
+                self.assertEqual(env["RUSTFS_IDENTITY_OPENID_CLIENT_SECRET_pmh_codes"]["valueFrom"]["secretKeyRef"]["name"], "rustfs-oidc")
+                self.assertFalse(any("ROLE_POLICY" in name for name in env))
+                self.assertIn("if request.user.is_superuser else []", declaration["extraScopeMappings"][0]["expression"])
+                self.assertEqual(declaration["readerPaths"], ["minio/minio-secrets", "minio/rustfs-oidc"])
+                continue
             if slug == "welplan":
                 doc = yaml.safe_load((ROOT / "welplan/deployment.yml").read_text())
                 env = {e["name"]: e.get("value") for e in doc["spec"]["template"]["spec"]["containers"][0]["env"]}
@@ -89,6 +100,24 @@ class OIDCTests(unittest.TestCase):
             provision_client(vault, api, "go", desired)
         vault.create.assert_not_called()
         api.request.assert_called_once_with("core/applications/go/", missing_ok=True)
+
+    def test_rustfs_claim_never_grants_admin_to_ordinary_users(self):
+        expression = DECLARATIONS["rustfs"]["extraScopeMappings"][0]["expression"]
+        for superuser in [False, True]:
+            request = Mock()
+            request.user.is_superuser = superuser
+            claim = eval(expression.removeprefix("return "), {"request": request})
+            self.assertEqual(claim, {"rustfs_policy": ["consoleAdmin"] if superuser else []})
+
+    def test_custom_scope_drift_is_not_silently_overwritten(self):
+        desired = DECLARATIONS["rustfs"]
+        api, vault = Mock(), Mock()
+        vault.get.return_value = {"client-secret": "x" * 64}
+        mapping = dict(desired["extraScopeMappings"][0], pk="mapping-id", expression="return {\"rustfs_policy\": [\"consoleAdmin\"]}")
+        api.list.side_effect = [[], [mapping]]
+        with self.assertRaisesRegex(RuntimeError, "refusing privilege changes"):
+            provision_client(vault, api, "rustfs", desired)
+        api.request.assert_not_called()
 
     def test_existing_immich_client_preserves_all_strict_web_and_mobile_callbacks(self):
         desired = DECLARATIONS["immich"]

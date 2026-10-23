@@ -1,4 +1,17 @@
 {
+  "rustfs": {
+    "namespace": "minio",
+    "vaultPath": "minio/rustfs-oidc",
+    "clientID": "lab-rustfs",
+    "launchURL": "https://rustfs.pmh.codes",
+    "redirectURI": "https://rustfs.pmh.codes/rustfs/admin/v3/oidc/callback/pmh_codes",
+    "readerPaths": ["minio/minio-secrets", "minio/rustfs-oidc"],
+    "extraScopeMappings": [{
+      "name": "lab bootstrap: rustfs admin policy",
+      "scope_name": "rustfs",
+      "expression": "return {\"rustfs_policy\": [\"consoleAdmin\"] if request.user.is_superuser else []}"
+    }]
+  },
   "welplan": {
     "namespace": "welplan",
     "vaultPath": "welplan/admin-oidc",

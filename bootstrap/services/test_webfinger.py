@@ -78,14 +78,16 @@ class WebFingerTests(unittest.TestCase):
                 publish(client, self.body)
             self.assertEqual(client.writes, [])
 
-    def test_only_pmh_codes_apex_is_enabled_without_changing_other_zones(self):
+    def test_public_apex_and_explicit_legacy_redirect_dns_preserve_authority_only_asn_zone(self):
         zones = {z["zone"]: z for z in json.loads((ROOT / "nameserver/configuration/imported-records.json").read_text())["zones"]}
         self.assertFalse(zones["pmh.codes"]["emptyApexWeb"])
         addresses = {r["data"]["ipAddress"] for r in zones["pmh.codes"]["records"] if r["name"] == "pmh.codes" and r["type"] == "A"}
         self.assertEqual(addresses, {"168.110.121.95", "138.2.112.39"})
-        for name in ["pmh.so", "as218822.net"]:
-            self.assertTrue(zones[name]["authorityOnly"])
-            self.assertTrue(zones[name]["emptyApexWeb"])
+        self.assertFalse(zones["pmh.so"]["emptyApexWeb"])
+        for owner in ["pmh.so", "*.pmh.so", "*.here.pmh.so", "*.s3.pmh.so", "*.mc.pmh.so"]:
+            self.assertEqual({r["data"]["ipAddress"] for r in zones["pmh.so"]["records"] if r["name"] == owner and r["type"] == "A"}, addresses)
+        self.assertTrue(zones["as218822.net"]["authorityOnly"])
+        self.assertTrue(zones["as218822.net"]["emptyApexWeb"])
 
 
 if __name__ == "__main__":
