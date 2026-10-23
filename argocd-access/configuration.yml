@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  url: https://argo.pmh.codes
+  # Preserve native local admin as recovery access; do not reset its password.
+  admin.enabled: "true"
+  users.anonymous.enabled: "false"
+  oidc.config: |
+    name: Authentik
+    issuer: https://auth.pmh.codes/application/o/argocd/
+    clientID: lab-argocd
+    clientSecret: $argocd-oidc:client-secret
+    requestedScopes: [openid, profile, email, argocd]
+    requestedIDTokenClaims:
+      argocd_roles:
+        essential: true
+    enablePKCEAuthentication: true
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  labels:
+    app.kubernetes.io/name: argocd-rbac-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  # An undefined default role intentionally grants no permissions.
+  policy.default: role:unauthenticated
+  policy.csv: |
+    g, lab-argocd-admins, role:admin
+    g, admin, role:admin
+  scopes: '[argocd_roles]'

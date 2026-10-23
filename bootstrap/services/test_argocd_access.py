@@ -1,4 +1,6 @@
 import subprocess
+import json
+from types import SimpleNamespace
 import unittest
 
 import yaml
@@ -27,3 +29,28 @@ class ArgoAccessTests(unittest.TestCase):
         self.assertNotIn("users.anonymous.enabled: true", bootstrap)
         nginx = next(yaml.safe_load_all((ROOT / "gateway/nginx.yml").read_text()))["data"]["nginx.conf"]
         self.assertIn('argo.pmh.codes       "";', nginx)
+
+    def test_native_oidc_uses_vault_secret_pkce_and_admin_only_claim(self):
+        docs = list(yaml.safe_load_all((ROOT / "argocd-access/configuration.yml").read_text()))
+        config = next(d["data"] for d in docs if d["metadata"]["name"] == "argocd-cm")
+        oidc = yaml.safe_load(config["oidc.config"])
+        self.assertEqual(oidc["clientSecret"], "$argocd-oidc:client-secret")
+        self.assertTrue(oidc["enablePKCEAuthentication"])
+        self.assertEqual(config["users.anonymous.enabled"], "false")
+        self.assertEqual(config["admin.enabled"], "true")
+        rbac = next(d["data"] for d in docs if d["metadata"]["name"] == "argocd-rbac-cm")
+        self.assertEqual(rbac["policy.default"], "role:unauthenticated")
+        self.assertEqual(rbac["scopes"], "[argocd_roles]")
+        self.assertNotIn("role:readonly", rbac["policy.default"])
+        secrets = list(yaml.safe_load_all((ROOT / "argocd-access/oidc-secret.yml").read_text()))
+        vss = next(d for d in secrets if d["kind"] == "VaultStaticSecret")
+        self.assertEqual(vss["spec"]["path"], "argocd/oidc")
+        self.assertEqual(vss["spec"]["destination"]["labels"]["app.kubernetes.io/part-of"], "argocd")
+
+    def test_only_active_human_authentik_administrators_receive_admin_role(self):
+        declaration = json.loads((ROOT / "bootstrap/services/oidc.json").read_text())["argocd"]
+        expression = declaration["extraScopeMappings"][0]["expression"].removeprefix("return ")
+        for active, superuser, kind in [(True, True, "internal"), (True, False, "internal"), (True, True, "service_account"), (False, True, "internal")]:
+            user = SimpleNamespace(is_active=active, is_superuser=superuser, type=kind)
+            expected = ["lab-argocd-admins"] if active and superuser and kind == "internal" else []
+            self.assertEqual(eval(expression, {"user": user}), {"argocd_roles": expected})

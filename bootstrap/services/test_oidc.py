@@ -16,6 +16,13 @@ DECLARATIONS = json.loads(Path(__file__).with_name("oidc.json").read_text())
 class OIDCTests(unittest.TestCase):
     def test_public_client_ids_match_existing_security_policies(self):
         for slug, declaration in DECLARATIONS.items():
+            if slug == "argocd":
+                doc = next(yaml.safe_load_all((ROOT / "argocd-access/configuration.yml").read_text()))
+                config = yaml.safe_load(doc["data"]["oidc.config"])
+                self.assertEqual(config["clientID"], declaration["clientID"])
+                self.assertEqual(declaration["redirectURI"], "https://argo.pmh.codes/auth/callback")
+                self.assertEqual(config["issuer"], "https://auth.pmh.codes/application/o/argocd/")
+                continue
             if slug == "solver":
                 code = (ROOT / "solver/initialize.mjs").read_text()
                 self.assertIn("clientId: '" + declaration["clientID"] + "'", code)

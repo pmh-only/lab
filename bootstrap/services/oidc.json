@@ -1,4 +1,16 @@
 {
+  "argocd": {
+    "namespace": "argocd",
+    "vaultPath": "argocd/oidc",
+    "clientID": "lab-argocd",
+    "launchURL": "https://argo.pmh.codes",
+    "redirectURI": "https://argo.pmh.codes/auth/callback",
+    "extraScopeMappings": [{
+      "name": "lab bootstrap: argocd administrator roles",
+      "scope_name": "argocd",
+      "expression": "return {\"argocd_roles\": [\"lab-argocd-admins\"] if user.is_active and user.is_superuser and user.type == \"internal\" else []}"
+    }]
+  },
   "solver": {
     "namespace": "solver",
     "vaultPath": "solver/solver-oidc",
