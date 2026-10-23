@@ -50,5 +50,7 @@ class ThepoolTests(unittest.TestCase):
         self.assertFalse(any("secretKeyRef" in str(e) for e in pod["initContainers"][0].get("env", [])))
         docs = list(yaml.safe_load_all((ROOT / "thepool/ingress.yml").read_text()))
         tls = next(d for d in docs if d["kind"] == "BackendTLSPolicy")
+        route = next(d for d in docs if d["kind"] == "HTTPRoute")
+        self.assertEqual(tls["metadata"]["annotations"]["argocd.argoproj.io/sync-wave"], route["metadata"]["annotations"]["argocd.argoproj.io/sync-wave"])
         self.assertEqual(tls["spec"]["validation"], {"hostname": "pool.pmh.codes", "wellKnownCACertificates": "System"})
         self.assertFalse(any(d["kind"] == "Backend" for d in docs))
