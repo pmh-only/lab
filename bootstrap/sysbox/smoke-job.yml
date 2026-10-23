@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sysbox-docker-smoke
+  namespace: default
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 420
+  template:
+    spec:
+      runtimeClassName: sysbox-runc
+      hostUsers: false
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      containers:
+        - name: docker
+          image: docker:29-dind@sha256:9e79b879b177fbd72c34376a3dd3d91747da5db49e1f560f76aea59561471977
+          securityContext:
+            privileged: false
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "2"
+              memory: 1Gi
+          command: [/bin/sh, -ec]
+          args:
+            - |
+              test ! -e /var/run/secrets/kubernetes.io/serviceaccount/token
+              # Root here must map to an unprivileged host UID.
+              cat /proc/self/uid_map
+              awk '$1 == 0 && $2 != 0 && $3 >= 65536 { ok=1 } END { exit !ok }' /proc/self/uid_map
+              dockerd --host=unix:///var/run/docker.sock >/tmp/dockerd.log 2>&1 &
+              daemon=$!
+              trap 'kill "$daemon" 2>/dev/null || true' EXIT
+              ready=0
+              for i in $(seq 1 90); do
+                if docker info >/dev/null 2>&1; then ready=1; break; fi
+                if ! kill -0 "$daemon" 2>/dev/null; then break; fi
+                sleep 2
+              done
+              if [ "$ready" != 1 ]; then cat /tmp/dockerd.log; exit 1; fi
+              docker version --format 'Docker server: {{.Server.Version}}'
+              image=alpine:3.23@sha256:21f3e19bafab57a9ff7aa9dd571dac72f868370472c10f450cc0416cc1aca553
+              docker run --rm "$image" sh -ec 'test "$(id -u)" = 0; wget -q -O /dev/null https://example.com; echo nested-container-and-network-ok'
+              mkdir /tmp/build-check
+              printf 'FROM %s\nRUN printf sysbox-build-ok > /proof\nCMD ["cat", "/proof"]\n' "$image" >/tmp/build-check/Dockerfile
+              docker build --network=default -t lab-sysbox-smoke /tmp/build-check
+              test "$(docker run --rm lab-sysbox-smoke)" = sysbox-build-ok
+              echo 'PASS: userns-isolated non-privileged Docker daemon, nested container networking and image build/run'
+          volumeMounts:
+            - name: docker-data
+              mountPath: /var/lib/docker
+      volumes:
+        - name: docker-data
+          emptyDir:
+            sizeLimit: 3Gi
