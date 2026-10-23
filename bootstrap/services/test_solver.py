@@ -31,9 +31,11 @@ class SolverTests(unittest.TestCase):
         api.list.assert_not_called()
         client.assert_called_once()
 
-    def test_private_manifests_preserve_native_runtime_with_least_required_identity(self):
+    def test_manifests_preserve_native_runtime_with_least_required_identity(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "solver")], text=True)))
-        self.assertFalse(any(d["kind"] == "HTTPRoute" for d in docs))
+        route = next(d for d in docs if d["kind"] == "HTTPRoute")
+        self.assertEqual(route["spec"]["hostnames"], ["solver.pmh.codes"])
+        self.assertFalse(any(d["kind"] == "SecurityPolicy" for d in docs))
         deployment = next(d for d in docs if d["kind"] == "Deployment")
         pod = deployment["spec"]["template"]["spec"]
         self.assertEqual(deployment["spec"]["strategy"]["type"], "Recreate")

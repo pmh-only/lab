@@ -5,7 +5,8 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./pvc.yml
-  # Publish only after private native OIDC/session/Docker verification.
+  # Native OIDC/session/Docker/Discord and restart persistence verified privately.
+  - ./ingress.yml
   - ./rbac.yml
   - ./secret.yml
 configMapGenerator:
