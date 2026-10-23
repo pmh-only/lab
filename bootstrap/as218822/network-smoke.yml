@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: as218822-network-smoke
+  namespace: default
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 120
+  template:
+    spec:
+      runtimeClassName: sysbox-runc
+      hostUsers: false
+      nodeSelector:
+        kubernetes.io/hostname: pmhoci2
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      containers:
+        - name: namespace-network-check
+          image: ghcr.io/pmh-only/as218822:latest@sha256:a9daebab7eda87729dfa98e9cd77738617bf2fa33c75e0da6f4ea0119340d9b8
+          command: [/bin/sh, -ec]
+          args:
+            - |
+              umask 077
+              # Do not invoke dotenvx/render-bird-config, load old keys, create
+              # a BGP session, contact a tunnel peer, or change host routing.
+              cat /proc/self/uid_map
+              awk '$1 == 0 && $2 != 0 { ok=1 } END { exit !ok }' /proc/self/uid_map
+              test ! -e /var/run/secrets/kubernetes.io/serviceaccount/token
+              sysctl -w net.ipv4.ip_forward=1
+              sysctl -w net.ipv6.conf.all.forwarding=1
+              ip link add as-smoke type wireguard
+              trap 'ip link del as-smoke 2>/dev/null || true; rm -f /tmp/as-smoke.key' EXIT
+              wg genkey >/tmp/as-smoke.key
+              chmod 600 /tmp/as-smoke.key
+              wg set as-smoke private-key /tmp/as-smoke.key
+              ip -6 address add fd00:218:822:ffff::1/128 dev as-smoke
+              ip -6 rule add pref 31000 from fd00:218:822:ffff::1/128 table 31000
+              ip -6 rule del pref 31000
+              test -c /dev/net/tun
+              ip tuntap add dev tun-smoke mode tun
+              ip link del tun-smoke
+              echo 'PASS: isolated forwarding, WireGuard, IPv6 policy routing and TUN without privileged/hostNetwork; only the TUN character device is mounted'
+          securityContext:
+            privileged: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+              add: [NET_ADMIN, NET_RAW]
+          volumeMounts:
+            - name: tun
+              mountPath: /dev/net/tun
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+      volumes:
+        - name: tun
+          hostPath:
+            path: /dev/net/tun
+            type: CharDevice
