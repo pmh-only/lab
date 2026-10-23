@@ -31,6 +31,7 @@ function redact_auth(tag, timestamp, record)
     line = line:gsub("(/seafhttp/" .. escaped .. "/)[^/%s?\"#]+", "%1REDACTED")
   end
   line = line:gsub("(/api/tokens/)[^/%s?\"#]+", "%1REDACTED")
+  line = line:gsub("(/api/token/)[^/%s?\"#]+", "%1REDACTED")
   record["log"] = line
   return 2, timestamp, record
 end

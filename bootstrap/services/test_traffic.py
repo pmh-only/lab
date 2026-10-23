@@ -32,6 +32,7 @@ class TrafficTests(unittest.TestCase):
         self.assertIn('["x-amz-signature"] = true', lua)
         self.assertIn('"upload-api"', lua)
         self.assertIn('=REDACTED', lua)
+        self.assertIn('(/api/token/)', lua)
 
     def test_workloads_are_pinned_and_do_not_get_kubernetes_credentials(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "traffic")], text=True)))
