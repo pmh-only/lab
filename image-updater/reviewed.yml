@@ -1,0 +1,249 @@
+# Existing compatibility-reviewed updaters, now owned by the image-updater app.
+# Do not add paused workloads or version-specific adapters without review.
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: books
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: books
+      images:
+        - alias: books-frontend
+          imageName: ghcr.io/documentlane/doclane-frontend:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: books-backend
+          imageName: ghcr.io/documentlane/doclane-backend:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+        - alias: books-worker
+          imageName: ghcr.io/documentlane/doclane-worker:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: chatsolution
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: chatsolution
+      images:
+        - alias: chatsolution
+          imageName: ghcr.io/pmh-only/chatsolution:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: codexlb
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: codexlb
+      images:
+        - alias: codexlb
+          imageName: ghcr.io/aafqaq/codex-lb-enhanced:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: connect
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: connect
+      images:
+        - alias: connect
+          imageName: ghcr.io/pmh-only/connect:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: go
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: go
+      images:
+        - alias: go
+          imageName: ghcr.io/pmh-only/go:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: heartbeat
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: heartbeat
+      images:
+        - alias: heartbeat
+          imageName: ghcr.io/pmh-only/heartbeat:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: here
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: here
+      images:
+        - alias: here
+          imageName: ghcr.io/pmh-only/here:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: indexgen
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: indexgen
+      images:
+        - alias: indexgen
+          imageName: ghcr.io/pmh-only/indexgen:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: keysboard
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: keysboard
+      images:
+        - alias: keysboard
+          imageName: ghcr.io/pmh-only/keysboard:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: meta
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: meta
+      images:
+        - alias: meta
+          imageName: ghcr.io/pmh-only/discord-query:latest
+          commonUpdateSettings:
+            updateStrategy: digest
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: speed
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: speed
+      images:
+        - alias: speed
+          imageName: ghcr.io/librespeed/speedtest:latest-alpine
+          commonUpdateSettings:
+            updateStrategy: digest
+---
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: stmt
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: stmt
+      images:
+        - alias: stmt
+          imageName: ghcr.io/pmh-only/stmt:latest
+          commonUpdateSettings:
+            updateStrategy: digest

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Register committed updater declarations for healthy, compatibility-reviewed apps.
+"""Audit committed updater declarations for healthy, compatibility-reviewed apps.
 
-The root apps Application stays manual. Database/DNS/storage/authentication and
-version-adapted images need a separate compatibility audit before registration.
+The image-updater Application owns these resources; root apps stays manual.
+Database/DNS/storage/authentication and version-adapted images still need a
+separate compatibility audit before adding them to the managed selection.
 """
 
 import argparse
@@ -19,8 +20,8 @@ REVIEWED = {
 
 
 def declaration(name):
-    source = subprocess.check_output(["git", "show", f"HEAD:apps/{name}.yml"], text=True)
-    docs = [d for d in yaml.safe_load_all(source) if d and d.get("kind") == "ImageUpdater"]
+    source = subprocess.check_output(["git", "show", "HEAD:image-updater/reviewed.yml"], text=True)
+    docs = [d for d in yaml.safe_load_all(source) if d and d.get("kind") == "ImageUpdater" and d["metadata"]["name"] == name]
     if len(docs) != 1:
         raise RuntimeError(f"Expected one committed updater declaration for {name}")
     updater = docs[0]

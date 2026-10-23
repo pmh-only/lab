@@ -5,6 +5,7 @@ resources:
   - https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/v1.4.0/config/install.yaml
   - secret.yml
   - mail.yml
+  - reviewed.yml
 images:
   - name: quay.io/argoprojlabs/argocd-image-updater
     newTag: v1.4.0

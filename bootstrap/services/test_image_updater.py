@@ -30,7 +30,7 @@ class ImageUpdaterTests(unittest.TestCase):
         self.assertEqual(vss["spec"]["destination"]["name"], "git")
 
     def test_mail_is_single_owned_and_does_not_track_removed_bridge(self):
-        updater = next(d for d in self.docs if d["kind"] == "ImageUpdater")
+        updater = next(d for d in self.docs if d["kind"] == "ImageUpdater" and d["metadata"]["name"] == "mail")
         self.assertEqual(updater["spec"]["writeBackConfig"]["method"], "git:secret:argocd/git")
         ref = updater["spec"]["applicationRefs"][0]
         self.assertEqual(ref["namePattern"], "mail")
@@ -41,14 +41,23 @@ class ImageUpdaterTests(unittest.TestCase):
 
     def test_registration_does_not_blindly_update_version_adapters_or_stateful_infrastructure(self):
         self.assertTrue(REVIEWED.isdisjoint({"database", "nameserver", "trace", "traffic", "visualized", "authentik", "immich", "minio", "gateway", "monitoring", "seafile"}))
+        managed = {d["metadata"]["name"]: d for d in self.docs if d["kind"] == "ImageUpdater"}
+        self.assertEqual(set(managed), REVIEWED | {"mail"})
         for name in REVIEWED:
             docs = list(yaml.safe_load_all((ROOT / "apps" / f"{name}.yml").read_text()))
-            updater = next(d for d in docs if d and d["kind"] == "ImageUpdater")
+            self.assertFalse(any(d and d["kind"] == "ImageUpdater" for d in docs))
+            self.assertTrue(any(d and d["kind"] == "Application" for d in docs))
+            updater = managed[name]
             self.assertEqual(updater["spec"]["writeBackConfig"]["method"], "git:secret:argocd/git")
             self.assertEqual(updater["spec"]["applicationRefs"][0]["namePattern"], name)
             for image in updater["spec"]["applicationRefs"][0]["images"]:
                 self.assertFalse(image["imageName"].startswith("gchcr.io/"))
                 self.assertEqual(image["commonUpdateSettings"]["updateStrategy"], "digest")
+
+    def test_bootstrap_reads_the_single_gitops_owned_declaration_source(self):
+        code = (ROOT / "bootstrap/services/register_image_updaters.py").read_text()
+        self.assertIn("HEAD:image-updater/reviewed.yml", code)
+        self.assertNotIn("HEAD:apps/{name}.yml", code)
 
     def test_ssh_host_verification_is_not_disabled_by_default_secret_behavior(self):
         code = (ROOT / "bootstrap/services/image_updater.py").read_text()
