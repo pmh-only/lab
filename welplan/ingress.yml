@@ -17,9 +17,12 @@ spec:
         - path:
             type: PathPrefix
             value: /
-      backendRefs:
-        - group: ""
-          kind: Service
-          name: welplan-service
-          port: 3000
-          weight: 1
+      filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            hostname: welplus.welstory.com
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /
+            statusCode: 302
