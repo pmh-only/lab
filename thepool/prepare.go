@@ -93,6 +93,7 @@ func prepare() error {
 		{"web.go", "MinVersion: tls.VersionTLS12,", "MinVersion: tls.VersionTLS12,\n\t\tGetCertificate: reloadBackendCertificate,", 1},
 		{"minio.go", "InsecureSkipVerify: true", "InsecureSkipVerify: false", 1},
 		{"minio.go", "GovernanceBypass: true", "GovernanceBypass: false", 1},
+		{"minio.go", "ForceDelete:      true", "ForceDelete:      false", 1},
 		{"discord.go", `"data":            {accessToken}`, `"token":           {accessToken}`, 1},
 		{"web_handlers.go", "\"fmt\"", "\"fmt\"\n\t\"html\"", 1},
 		{"web_handlers.go", "var callbackViewHandler = httpLogFn(func(w http.ResponseWriter, r *http.Request) {", "var callbackViewHandler = httpLogFn(func(w http.ResponseWriter, r *http.Request) {\n\tif DISCORD_AUTH_ENABLED && !verifyOAuthCallback(w, r) { return }", 1},

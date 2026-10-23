@@ -36,8 +36,9 @@ func TestNativeStorageProbe(t *testing.T) {
 		deleteChunks(ids)
 		for _, id := range ids {
 			_, err := minioClient.StatObject(context.Background(), MINIO_BUCKET_NAME, MINIO_BUCKET_KEY_PREFIX+id, minio.StatObjectOptions{})
-			if minio.ToErrorResponse(err).Code != "NoSuchKey" {
-				t.Error("Owned S3 probe cleanup not verified")
+			failure := minio.ToErrorResponse(err)
+			if failure.StatusCode != 404 || (failure.Code != "NoSuchKey" && failure.Code != "NotFound" && failure.Code != "NoSuchObject") {
+				t.Errorf("Owned S3 probe cleanup not verified: %s HTTP %d", failure.Code, failure.StatusCode)
 			}
 		}
 	}()
