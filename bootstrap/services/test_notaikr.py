@@ -25,9 +25,11 @@ class NotaikrTests(unittest.TestCase):
                 provision(vault)
         vault.create.assert_not_called()
 
-    def test_private_runtime_is_nonroot_readonly_and_has_no_cluster_token(self):
+    def test_runtime_is_nonroot_readonly_and_has_no_cluster_token(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "notaikr")], text=True)))
-        self.assertFalse(any(d["kind"] == "HTTPRoute" for d in docs))
+        route = next(d for d in docs if d["kind"] == "HTTPRoute")
+        self.assertEqual(route["spec"]["hostnames"], ["not.ai.kr"])
+        self.assertFalse(any(d["kind"] == "SecurityPolicy" for d in docs))
         pod = next(d for d in docs if d["kind"] == "Deployment")["spec"]["template"]["spec"]
         self.assertFalse(pod["automountServiceAccountToken"])
         self.assertEqual(pod["securityContext"]["runAsUser"], 1000)

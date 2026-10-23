@@ -5,7 +5,8 @@ resources:
   - ./secret.yml
   - ./deployment.yml
   - ./service.yml
-  # Publish the original not.ai.kr route after private checks and DNS/TLS cutover.
+  # Native files, Socket.IO/real AI streaming, DNS delegation and TLS verified.
+  - ./ingress.yml
 images:
   - name: ghcr.io/pmh-only/notaikr
     newTag: latest
