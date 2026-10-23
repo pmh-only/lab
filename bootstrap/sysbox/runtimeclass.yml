@@ -5,5 +5,5 @@ metadata:
 handler: sysbox-runc
 scheduling:
   nodeSelector:
-    # Only this worker has been manually configured and tested for Sysbox.
-    kubernetes.io/hostname: pmhoci2
+    # Label nodes only after a successful userns/Docker build+run smoke test.
+    runtime.pmh.codes/sysbox: verified

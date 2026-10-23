@@ -8,10 +8,10 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class SysboxTests(unittest.TestCase):
-    def test_runtime_only_schedules_on_the_manually_configured_worker(self):
+    def test_runtime_only_schedules_on_explicitly_verified_nodes(self):
         runtime = yaml.safe_load((ROOT / "bootstrap/sysbox/runtimeclass.yml").read_text())
         self.assertEqual(runtime["handler"], "sysbox-runc")
-        self.assertEqual(runtime["scheduling"]["nodeSelector"], {"kubernetes.io/hostname": "pmhoci2"})
+        self.assertEqual(runtime["scheduling"]["nodeSelector"], {"runtime.pmh.codes/sysbox": "verified"})
 
     def test_docker_workloads_are_nonprivileged_and_user_namespaced(self):
         for file in ["solver/deployment.yml", "bootstrap/sysbox/smoke-job.yml"]:
