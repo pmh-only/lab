@@ -81,6 +81,8 @@ def provision_client(vault, api, slug, desired):
             raise RuntimeError("Existing managed provider has unexpected redirect/issuer settings")
         if existing.get("client_type", "confidential") != ("public" if public_client else "confidential"):
             raise RuntimeError("Existing provider has an unexpected client type")
+        if "subMode" in desired and existing.get("sub_mode") != desired["subMode"]:
+            raise RuntimeError("Existing provider has an unexpected subject mode")
         if public_client and (existing.get("grant_types") != desired["grantTypes"] or existing.get("sub_mode") != desired["subMode"]):
             raise RuntimeError("Existing public provider has unexpected grant/subject settings")
         if not public_client and existing.get("client_secret") and not secrets.compare_digest(existing["client_secret"], stored[secret_field]):

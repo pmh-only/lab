@@ -5,8 +5,12 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./pvc.yml
-  - ./ingress.yml
+  # Publish only after private native OIDC/session/Docker verification.
+  - ./rbac.yml
   - ./secret.yml
+configMapGenerator:
+  - name: solver-native-bootstrap
+    files: [initialize.mjs]
 images:
   - name: docker
     newTag: 29-dind

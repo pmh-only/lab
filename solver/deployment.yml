@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: solver
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -14,17 +16,63 @@ spec:
     spec:
       runtimeClassName: sysbox-runc
       hostUsers: false
-      ServiceAccountName: solver
+      serviceAccountName: solver
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+        - name: initialize-native-web
+          image: ghcr.io/pmh-only/solver:latest
+          securityContext:
+            privileged: false
+          command: [/bin/sh, -ec]
+          args:
+            - |
+              chown 1000:1000 /data /prepared
+              exec gosu agent node /bootstrap/initialize.mjs
+          env:
+            - name: KV_STORE_PATH
+              value: /data/kv.sqlite
+            - name: WEB_SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: solver-internal
+                  key: WEB_SESSION_SECRET
+            - name: WEB_ADMIN_SUBJECTS
+              valueFrom:
+                secretKeyRef:
+                  name: solver-internal
+                  key: WEB_ADMIN_SUBJECTS
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: solver-oidc
+                  key: client-secret
+          volumeMounts:
+            - name: solver-pvc
+              mountPath: /data
+            - name: native-bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+            - name: prepared-native
+              mountPath: /prepared
       containers:
         - name: solver
           image: ghcr.io/pmh-only/solver:latest
           env:
-            - name: NODE_TLS_REJECT_UNAUTHORIZED
-              value: '0'
+            - name: WEB_DOMAIN
+              value: https://solver.pmh.codes
+            - name: WEB_TRUST_PROXY
+              value: 'true'
+            - name: WEB_SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: solver-internal
+                  key: WEB_SESSION_SECRET
             - name: AGENT_TZ
               value: Asia/Seoul
             - name: DISCORD_CLIENT_ID
-              value: '1490891535347089488'
+              value: '1563036864989106176'
             - name: DISCORD_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -46,7 +94,7 @@ spec:
                   name: solver-secret
                   key: IMAP_PASS
             - name: KV_STORE_PATH
-              value: /data/kv.json
+              value: /data/kv.sqlite
             - name: FIRECRAWL_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -67,14 +115,46 @@ spec:
           volumeMounts:
             - mountPath: /data
               name: solver-pvc
+            # Native hosted/shared HTML uses process.cwd()/data, not KV_STORE_PATH.
+            - mountPath: /app/data
+              name: solver-pvc
             - name: docker-sock
               mountPath: /var/run
+            - name: prepared-native
+              mountPath: /app/dist/web-server.js
+              subPath: web-server.js
+              readOnly: true
+            - name: cluster-view
+              mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+              readOnly: true
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            periodSeconds: 5
+            failureThreshold: 120
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              memory: 3Gi
         - name: dind
           image: docker:29-dind
           securityContext:
             privileged: false
           # Run only a Pod-local Unix socket; do not expose unauthenticated TCP.
           command: [dockerd]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 2Gi
           args:
             - --host=unix:///var/run/docker.sock
           startupProbe:
@@ -100,3 +180,26 @@ spec:
         - name: docker-data
           emptyDir:
             sizeLimit: 10Gi
+        - name: native-bootstrap
+          configMap:
+            name: solver-native-bootstrap
+        - name: prepared-native
+          emptyDir: {}
+        # Keep the original read-only Kubernetes view capability in Solver only.
+        # Docker and bootstrap containers receive no Kubernetes API token.
+        - name: cluster-view
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: token
+                  expirationSeconds: 3600
+              - configMap:
+                  name: kube-root-ca.crt
+                  items:
+                    - key: ca.crt
+                      path: ca.crt
+              - downwardAPI:
+                  items:
+                    - path: namespace
+                      fieldRef:
+                        fieldPath: metadata.namespace

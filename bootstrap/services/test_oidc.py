@@ -16,6 +16,12 @@ DECLARATIONS = json.loads(Path(__file__).with_name("oidc.json").read_text())
 class OIDCTests(unittest.TestCase):
     def test_public_client_ids_match_existing_security_policies(self):
         for slug, declaration in DECLARATIONS.items():
+            if slug == "solver":
+                code = (ROOT / "solver/initialize.mjs").read_text()
+                self.assertIn("clientId: '" + declaration["clientID"] + "'", code)
+                self.assertIn("redirectUri: '" + declaration["redirectURI"] + "'", code)
+                self.assertEqual(declaration["subMode"], "user_username")
+                continue
             if slug == "rustfs":
                 doc = next(yaml.safe_load_all((ROOT / "minio/minio.yml").read_text()))
                 env = {e["name"]: e for e in doc["spec"]["template"]["spec"]["containers"][0]["env"]}

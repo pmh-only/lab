@@ -12,7 +12,7 @@ spec:
   project: default
   source:
     path: solver
-    repoURL: git@github.com:pmh-only/lab.git
+    repoURL: https://github.com/pmh-only/lab.git
     targetRevision: HEAD
   syncPolicy:
     automated:

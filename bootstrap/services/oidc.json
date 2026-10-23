@@ -1,4 +1,13 @@
 {
+  "solver": {
+    "namespace": "solver",
+    "vaultPath": "solver/solver-oidc",
+    "clientID": "lab-solver",
+    "subMode": "user_username",
+    "launchURL": "https://solver.pmh.codes",
+    "redirectURI": "https://solver.pmh.codes/auth/callback",
+    "readerPaths": ["solver/solver-secret", "solver/solver-oidc", "solver/internal"]
+  },
   "rustfs": {
     "namespace": "minio",
     "vaultPath": "minio/rustfs-oidc",
