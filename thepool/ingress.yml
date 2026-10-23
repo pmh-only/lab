@@ -16,19 +16,22 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - group: "gateway.envoyproxy.io"
-          kind: Backend
+        - group: ""
+          kind: Service
           name: thepool-service
+          port: 8080
           weight: 1
 ---
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: Backend
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: BackendTLSPolicy
 metadata:
-  name: thepool-service
+  name: thepool-backend-tls
 spec:
-  endpoints:
-    - fqdn:
-        hostname: thepool-service.thepool.svc.cluster.local
-        port: 8080
-  tls:
-    insecureSkipVerify: true
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: thepool-service
+      sectionName: https
+  validation:
+    hostname: pool.pmh.codes
+    wellKnownCACertificates: System

@@ -1,0 +1,25 @@
+{
+  "repository": "pmh-only/thepool",
+  "commit": "d3f39f8cb4e6982251488bec341a72e873901785",
+  "files": {
+    "LICENSE": "0ae6eea4195776dc12ecad703accc2726a3265e89ecfc7c76e931e47c6780181",
+    "auth.go": "4be9683d1d53d5140f727dcb84fc83302bf79e86381e9eb1d698fdc28596d5af",
+    "cron.go": "8cec96f4e1ec66499eaf716ca629bc528f2e5675f2f1d497ecd08181a640d17c",
+    "database.go": "0c94cc646a5b75cfe2b05616afc9f8942a9e50515c54ed3d2a380c62292cf1ea",
+    "database.sql": "b3024d87e665456e470c764195052f109592b36e7aa24e3dd05a309d69a3248c",
+    "discord.go": "6ca4e4bb76262ca9410542867af518fb31bf8d04fb8d00597c18135e1beacf2b",
+    "entities.go": "28593d1a4b598aee0aad45e59e9a51924c7b1b06ee8bcc80edba8eeac97f93df",
+    "env.go": "cb85237423f98a8eec998fedc44df45034d8ec2f4ac7cf9f2b550d427e4cce47",
+    "go.mod": "df8651f220b9778cb2bfd73b09d7f148802f032cee9505cfe5dee9bb363e18a4",
+    "go.sum": "1f2efadb86887b97ff60bde6bb6dc426a00c40160eda5d2c9d6fc49cb21aba4c",
+    "http_client.go": "322dda73df889e7689fed86750a003eccb6da2fec45dd326dd699a1dbc88a06b",
+    "main.go": "4ca39f3189562af7a040e9d9698191a0b131840f781a63d349c344d7c40c0f5f",
+    "minio.go": "7994ebfbbac0d8854ceb806a59ca414adaa6422c79e526be21bdc8c1c0df0759",
+    "public/commons.js": "c4c16c354a058658cb71baf8e9b7b8a61c03fc764682c64a6911f813d906bdf0",
+    "public/download.js": "0bb13e48fb064f1e696fda3990f1cd8a4234224ea32f31e90e6215854e4d6ae4",
+    "public/upload.js": "c421024f0ac71afb6a543e010d4d144137c4980c578a38a0053b3d75a210368c",
+    "utils.go": "c147ddd0477e2888db6b6433e134b637fb676e65474228e88beae2cb15701a5d",
+    "web.go": "e6c1018147dccaca0c100e3f8cf08273f8559dc79b969cdd32714fef7142641e",
+    "web_handlers.go": "9a95f32997d42c4eb7c1e01f558e48e24061a704d634461194631107c4773416"
+  }
+}

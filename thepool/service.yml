@@ -6,6 +6,7 @@ spec:
   selector:
     app: thepool
   ports:
-    - protocol: TCP
+    - name: https
+      protocol: TCP
       port: 8080
       targetPort: 8080

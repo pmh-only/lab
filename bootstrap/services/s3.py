@@ -22,6 +22,7 @@ from provision import ROOT, generated, reader, valid_field
 
 
 PROFILES = {
+    "thepool": {"namespace": "thepool", "path": "thepool/thepool-secret", "access": "MINIO_ACCESS_KEY_ID", "secret": "MINIO_SECRET_ACCESS_KEY", "bucket": "a-s", "delete": True},
     "indexgen": {"namespace": "indexgen", "path": "indexgen/indexgen-secrets", "access": "S3_ACCESS_TOKEN", "secret": "S3_SECRET_TOKEN", "bucket": "pub", "delete": False},
     "books": {"namespace": "books", "path": "books/books-secret", "access": "S3_ACCESS_KEY_ID", "secret": "S3_SECRET_ACCESS_KEY", "bucket": "books", "delete": True},
     "monitoring": {"namespace": "monitoring", "path": "monitoring/thanos-secrets", "access": "access_key", "secret": "secret_key", "bucket": "thanos", "delete": True},

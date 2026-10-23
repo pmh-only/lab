@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: thepool
 spec:
+  strategy:
+    type: Recreate
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -12,10 +14,90 @@ spec:
       labels:
         app: thepool
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: prepare-native-runtime
+          image: golang:1.25.10-alpine@sha256:8d22e29d960bc50cd025d93d5b7c7d220b1ee9aa7a239b3c8f55a57e987e8d45
+          workingDir: /work
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          command: [/bin/sh, -ec]
+          args:
+            - |
+              env GO111MODULE=off go run /bootstrap/prepare.go
+              cd /work/source
+              env WEBSERVER_STATIC_ENDPOINT_PREFIX=https://unit.invalid MINIO_ENDPOINT=s3.unit.invalid MINIO_ACCESS_KEY_ID=unit-only MINIO_SECRET_ACCESS_KEY=unit-only MINIO_BUCKET_NAME=unit-only DATABASE_USER=unit DATABASE_SCHEMA=unit DATABASE_HOST=localhost DATABASE_PORT=3306 go test -mod=readonly ./...
+              CGO_ENABLED=0 go build -mod=readonly -trimpath -o /prepared/main .
+          env:
+            - name: HOME
+              value: /work
+            - name: GOCACHE
+              value: /work/go-cache
+            - name: GOPATH
+              value: /work/go
+            - name: CGO_ENABLED
+              value: "0"
+            - name: GOMAXPROCS
+              value: "2"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 2Gi
+          volumeMounts:
+            - name: native-bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+            - name: build-work
+              mountPath: /work
+            - name: prepared-native
+              mountPath: /prepared
+            - name: tmp
+              mountPath: /tmp
       containers:
         - name: thepool
           image: ghcr.io/pmh-only/thepool:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTPS
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTPS
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 3Gi
           env:
+            - name: GOMEMLIMIT
+              value: 2500MiB
+            - name: WEBSERVER_TLS_CERT_PATH
+              value: /tls/tls.crt
+            - name: WEBSERVER_TLS_KEY_PATH
+              value: /tls/tls.key
             - name: DATABASE_USER
               value: thepool
             - name: DATABASE_HOST
@@ -54,7 +136,7 @@ spec:
             - name: DISCORD_AUTH_ENABLED
               value: "true"
             - name: DISCORD_CLIENT_ID
-              value: "1427556421276532776"
+              value: "1563036864989106176"
             - name: DISCORD_TARGET_GUILD_ID
               value: "541782241131495434"
             - name: DISCORD_REDIRECT_URL
@@ -69,3 +151,41 @@ spec:
                 secretKeyRef:
                   name: thepool-secret
                   key: DISCORD_AUTH_TOKEN
+          volumeMounts:
+            - name: prepared-native
+              mountPath: /app/main
+              subPath: main
+              readOnly: true
+            - name: prepared-native
+              mountPath: /app/public/commons.js
+              subPath: commons.js
+              readOnly: true
+            - name: prepared-native
+              mountPath: /app/public/upload.js
+              subPath: upload.js
+              readOnly: true
+            - name: prepared-native
+              mountPath: /app/public/download.js
+              subPath: download.js
+              readOnly: true
+            - name: tls
+              mountPath: /tls
+              readOnly: true
+            # Hide the original image's retired bundled self-signed key entirely.
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: native-bootstrap
+          configMap:
+            name: thepool-native-bootstrap
+        - name: build-work
+          emptyDir:
+            sizeLimit: 3Gi
+        - name: prepared-native
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: tls
+          secret:
+            secretName: thepool-backend-tls
+            defaultMode: 0440

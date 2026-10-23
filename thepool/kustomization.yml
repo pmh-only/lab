@@ -5,7 +5,16 @@ resources:
   - ./secret.yml
   - ./deployment.yml
   - ./service.yml
-  - ./ingress.yml
+  - ./certificate.yml
+  # Publish after native storage/authentication/private TLS checks.
+configMapGenerator:
+  - name: thepool-native-bootstrap
+    files:
+      - source.json
+      - prepare.go
+      - security.go
+      - security_test.go
+      - storage_probe_test.go
 images:
   - name: ghcr.io/pmh-only/thepool
     newTag: latest
