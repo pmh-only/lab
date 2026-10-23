@@ -1,5 +1,6 @@
 {
   "username": "cert-manager-dns01",
   "displayName": "cert-manager DNS01 (GitOps)",
-  "zones": ["as218822.net", "pmh.so", "pmh.codes"]
+  "zones": ["as218822.net", "pmh.so", "pmh.codes", "not.ai.kr"],
+  "zoneCatalogs": {"not.ai.kr": "cluster-catalog.pmh.codes"}
 }

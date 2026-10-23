@@ -5,5 +5,5 @@
   "secondaryNodeIpAddresses": "168.110.121.95",
   "primaryNodeUrl": "https://ns2.pmh.codes:53443/",
   "primaryNodeIpAddress": "10.1.0.102",
-  "zones": ["pmh.codes", "pmh.so", "as218822.net"]
+  "zones": ["pmh.codes", "pmh.so", "as218822.net", "not.ai.kr"]
 }

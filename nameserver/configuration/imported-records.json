@@ -165,6 +165,14 @@
       ]
     },
     {
+      "zone": "not.ai.kr",
+      "emptyApexWeb": false,
+      "records": [
+        {"name": "not.ai.kr", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
+        {"name": "not.ai.kr", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}}
+      ]
+    },
+    {
       "zone": "as218822.net",
       "authorityOnly": true,
       "emptyApexWeb": true,

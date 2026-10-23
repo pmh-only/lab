@@ -112,12 +112,24 @@ def reconcile_dns01(client, desired):
     # Global list access only: no new-zone creation, zone deletion, or ACL edits.
     grant_user(client, "admin/permissions/get", "admin/permissions/set", {"section": "Zones"}, username, False, False)
     zones = {zone["name"].rstrip(".").lower(): zone for zone in client.post("zones/list")["response"]["zones"]}
+    catalogs = desired.get("zoneCatalogs", {})
+    if set(catalogs) - set(desired["zones"]):
+        raise RuntimeError("Catalog assignment must name an explicitly declared zone")
     for name in desired["zones"]:
+        catalog = catalogs.get(name)
+        if catalog:
+            owner = zones.get(catalog)
+            if not owner or owner.get("type") != "Catalog" or owner.get("disabled"):
+                raise RuntimeError("Declared primary catalog is unavailable; refusing standalone creation")
         existing = zones.get(name)
         if existing and (existing.get("type") != "Primary" or existing.get("disabled") or existing.get("internal")):
             raise RuntimeError(f"Refusing to replace or enable the existing zone {name}")
         if not existing:
-            client.post("zones/create", {"zone": name, "type": "Primary"})
+            client.post("zones/create", {"zone": name, "type": "Primary", **({"catalog": catalog} if catalog else {})})
+        if catalog:
+            options = client.post("zones/options/get", {"zone": name})["response"]
+            if options.get("catalog") != catalog:
+                raise RuntimeError("Zone catalog differs; refusing to reassign existing data")
         # Zone delete permission is needed to remove TXT records. Global zone
         # delete remains denied, so the account cannot delete entire zones.
         grant_user(client, "zones/permissions/get", "zones/permissions/set", {"zone": name}, username, True, True)

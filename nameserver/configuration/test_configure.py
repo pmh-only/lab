@@ -93,6 +93,31 @@ class DNS01PermissionsTests(unittest.TestCase):
         self.desired = {"username": "cert-manager-dns01", "displayName": "cert-manager DNS01 (GitOps)", "zones": ["pmh.codes"]}
         self.user = {"displayName": self.desired["displayName"], "memberOfGroups": ["Everyone"]}
 
+    def test_new_zone_is_created_in_existing_native_catalog_atomically(self):
+        desired = dict(self.desired, zones=["not.ai.kr"], zoneCatalogs={"not.ai.kr": "cluster-catalog.pmh.codes"})
+        client = Mock()
+        client.post.side_effect = [
+            {"response": self.user},
+            {"response": {"zones": [{"name": "cluster-catalog.pmh.codes", "type": "Catalog"}]}},
+            {"status": "ok"},
+            {"response": {"catalog": "cluster-catalog.pmh.codes"}},
+        ]
+        with patch("configure.grant_user"):
+            reconcile_dns01(client, desired)
+        client.post.assert_any_call("zones/create", {"zone": "not.ai.kr", "type": "Primary", "catalog": "cluster-catalog.pmh.codes"})
+
+    def test_existing_zone_catalog_is_not_silently_reassigned(self):
+        desired = dict(self.desired, zones=["not.ai.kr"], zoneCatalogs={"not.ai.kr": "cluster-catalog.pmh.codes"})
+        client = Mock()
+        client.post.side_effect = [
+            {"response": self.user},
+            {"response": {"zones": [{"name": "cluster-catalog.pmh.codes", "type": "Catalog"}, {"name": "not.ai.kr", "type": "Primary"}]}},
+            {"response": {"catalog": "unrelated-catalog"}},
+        ]
+        with patch("configure.grant_user"), self.assertRaises(RuntimeError):
+            reconcile_dns01(client, desired)
+        self.assertFalse(any(c.args[0] in {"zones/create", "zones/options/set"} for c in client.post.call_args_list))
+
     def test_other_users_and_groups_are_preserved(self):
         old_user = {"username": "operator", "canView": True, "canModify": False, "canDelete": False}
         group = {"name": "Administrators", "canView": True, "canModify": True, "canDelete": True}

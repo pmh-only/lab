@@ -21,5 +21,6 @@ spec:
                 key: api-token
         selector:
           dnsZones:
+            - not.ai.kr
             - pmh.so
             - pmh.codes
