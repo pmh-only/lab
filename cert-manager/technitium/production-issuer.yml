@@ -21,4 +21,5 @@ spec:
                 key: api-token
         selector:
           dnsZones:
+            - pmh.so
             - pmh.codes

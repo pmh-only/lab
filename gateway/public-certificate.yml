@@ -8,6 +8,11 @@ spec:
     labels:
       edge.pmh.codes/reload: "true"
   dnsNames:
+    - pmh.so
+    - "*.pmh.so"
+    - "*.here.pmh.so"
+    - "*.s3.pmh.so"
+    - "*.mc.pmh.so"
     - pmh.codes
     - "*.pmh.codes"
     - "*.a.certificate.for.pmh.codes"

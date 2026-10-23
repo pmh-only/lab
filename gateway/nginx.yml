@@ -26,6 +26,14 @@ data:
       server_tokens off;
       more_clear_headers Server;
 
+      # Retire the .so web domain before any app-specific or diagnostic route.
+      # $host strips an explicit port; $request_uri preserves path and query.
+      map $host $pmhso_redirect_host {
+        default "";
+        pmh.so pmh.codes;
+        ~^(?<pmhso_subdomain>.+)\.pmh\.so$ $pmhso_subdomain.pmh.codes;
+      }
+
       access_log off;
       error_log /dev/stderr warn;
 
@@ -160,6 +168,10 @@ data:
 
         server_name _;
 
+        if ($pmhso_redirect_host != "") {
+          return 301 https://$pmhso_redirect_host$request_uri;
+        }
+
         proxy_hide_header Strict-Transport-Security;
 
         add_header Alt-Svc 'h3=":443"; ma=86400' always;
@@ -182,6 +194,10 @@ data:
         listen [::]:443 quic reuseport;
 
         server_name _;
+
+        if ($pmhso_redirect_host != "") {
+          return 301 https://$pmhso_redirect_host$request_uri;
+        }
 
         proxy_hide_header Strict-Transport-Security;
 
