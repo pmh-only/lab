@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: monitoring
 resources:
   - ./grafana.yml
+  - ./grafana-dashboard-provider.yml
   - ./image-renderer.yml
   - ./ksm.yml
   - ./thanos-secrets.yml
@@ -10,6 +11,10 @@ resources:
   - ./ne.yml
   - ./prometheus.yml
   - ./secret.yml
+configMapGenerator:
+  - name: grafana-dashboards
+    files:
+      - lab-overview.json=dashboards/lab-overview.json
 images:
   - name: ghcr.io/pmh-only/grafana-image-renderer
     newTag: latest

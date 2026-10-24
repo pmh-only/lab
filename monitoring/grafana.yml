@@ -31,6 +31,8 @@ spec:
     metadata:
       labels:
         app: grafana
+      annotations:
+        pmh.codes/config-revision: "2026-10-23-dashboard-1"
     spec:
       securityContext:
         fsGroup: 472
@@ -87,6 +89,12 @@ spec:
               subPath: grafana.ini
             - name: grafana-datasources
               mountPath: /etc/grafana/provisioning/datasources
+            - name: grafana-dashboard-provider
+              mountPath: /etc/grafana/provisioning/dashboards
+              readOnly: true
+            - name: grafana-dashboards
+              mountPath: /etc/grafana/dashboards
+              readOnly: true
       volumes:
         - name: grafana-pvc
           persistentVolumeClaim:
@@ -97,6 +105,12 @@ spec:
         - name: grafana-datasources
           configMap:
             name: grafana-datasources
+        - name: grafana-dashboard-provider
+          configMap:
+            name: grafana-dashboard-provider
+        - name: grafana-dashboards
+          configMap:
+            name: grafana-dashboards
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -105,6 +119,9 @@ metadata:
   namespace: monitoring
 data:
   grafana.ini: |
+    [dashboards]
+    default_home_dashboard_path = /etc/grafana/dashboards/lab-overview.json
+
     [auth]
     oauth_allow_insecure_email_lookup = true
 

@@ -1,3 +1,4 @@
+import json
 import subprocess
 import unittest
 
@@ -43,6 +44,43 @@ class MonitoringTests(unittest.TestCase):
                 continue
             for container in doc["spec"]["template"]["spec"]["containers"]:
                 self.assertIn("@sha256:", container["image"])
+
+    def test_home_dashboard_is_provisioned_read_only_and_retained(self):
+        configs = {d["metadata"]["name"]: d for d in self.docs if d["kind"] == "ConfigMap"}
+        provider = yaml.safe_load(configs["grafana-dashboard-provider"]["data"]["dashboards.yaml"])["providers"][0]
+        self.assertTrue(provider["disableDeletion"])
+        self.assertFalse(provider["allowUiUpdates"])
+        self.assertEqual(provider["options"]["path"], "/etc/grafana/dashboards")
+        self.assertIn("default_home_dashboard_path = /etc/grafana/dashboards/lab-overview.json", configs["grafana-config"]["data"]["grafana.ini"])
+        deployment = next(d for d in self.docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "grafana")
+        pod = deployment["spec"]["template"]["spec"]
+        mounts = {m["name"]: m for m in pod["containers"][0]["volumeMounts"]}
+        for name in ["grafana-dashboard-provider", "grafana-dashboards"]:
+            self.assertTrue(mounts[name]["readOnly"])
+            self.assertNotIn("subPath", mounts[name])
+        volume = next(v for v in pod["volumes"] if v["name"] == "grafana-dashboards")
+        dashboard = json.loads(configs[volume["configMap"]["name"]]["data"]["lab-overview.json"])
+        self.assertEqual(dashboard["uid"], "lab-overview")
+        self.assertFalse(dashboard["editable"])
+        self.assertEqual(dashboard["refresh"], "30s")
+        panels = dashboard["panels"]
+        self.assertEqual(len({p["id"] for p in panels}), len(panels))
+        self.assertEqual(len(panels), 16)
+        cells = set()
+        for panel in panels:
+            grid = panel["gridPos"]
+            self.assertLessEqual(grid["x"] + grid["w"], 24)
+            for x in range(grid["x"], grid["x"] + grid["w"]):
+                for y in range(grid["y"], grid["y"] + grid["h"]):
+                    self.assertNotIn((x, y), cells)
+                    cells.add((x, y))
+            self.assertEqual(panel["datasource"]["uid"], "${datasource}")
+            for target in panel["targets"]:
+                self.assertIn('cluster="lab"', target["expr"])
+                self.assertNotIn("or vector(0)", target["expr"])
+        namespace = next(v for v in dashboard["templating"]["list"] if v["name"] == "namespace")
+        self.assertTrue(namespace["includeAll"])
+        self.assertEqual(namespace["allValue"], ".*")
 
 
 if __name__ == "__main__":

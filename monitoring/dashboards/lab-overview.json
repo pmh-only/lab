@@ -1,0 +1,146 @@
+{
+  "uid": "lab-overview",
+  "title": "Lab Overview",
+  "description": "Lab Kubernetes overview from Thanos. Node panels cover the whole cluster; workload panels respect the namespace filter. Missing metrics remain No data, not a healthy zero. Managed in Git.",
+  "tags": ["lab", "kubernetes", "overview"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": false,
+  "graphTooltip": 1,
+  "refresh": "30s",
+  "time": {"from": "now-6h", "to": "now"},
+  "timepicker": {},
+  "annotations": {"list": []},
+  "links": [],
+  "templating": {"list": [
+    {"name": "datasource", "label": "Data source", "type": "datasource", "query": "prometheus", "regex": "/^Thanos$/", "refresh": 1, "current": {"text": "Thanos", "value": "P5DCFC7561CCDE821"}},
+    {"name": "namespace", "label": "Namespace", "type": "query", "datasource": {"type": "prometheus", "uid": "${datasource}"}, "query": "label_values(kube_namespace_created{cluster=\"lab\",job=\"ksm\"}, namespace)", "refresh": 1, "sort": 1, "multi": true, "includeAll": true, "allValue": ".*", "current": {"text": "All", "value": "$__all"}}
+  ]},
+  "panels": [
+    {
+      "id": 1, "title": "Ready nodes", "type": "stat", "gridPos": {"x": 0, "y": 0, "w": 4, "h": 4},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "sum(kube_node_status_condition{cluster=\"lab\",job=\"ksm\",condition=\"Ready\",status=\"true\"})", "instant": true}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value", "graphMode": "none"}
+    },
+    {
+      "id": 2, "title": "Running pods", "type": "stat", "gridPos": {"x": 4, "y": 0, "w": 4, "h": 4},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "sum(kube_pod_status_phase{cluster=\"lab\",job=\"ksm\",namespace=~\"$namespace\",phase=\"Running\"})", "instant": true}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value", "graphMode": "none"}
+    },
+    {
+      "id": 3, "title": "Active pods not ready", "type": "stat", "gridPos": {"x": 8, "y": 0, "w": 4, "h": 4},
+      "description": "Pending, Unknown or Running pods without Ready=true; completed jobs are excluded.",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "sum((1 - kube_pod_status_ready{cluster=\"lab\",job=\"ksm\",namespace=~\"$namespace\",condition=\"true\"}) * on(namespace,pod,uid) group_left() (sum by(namespace,pod,uid) (kube_pod_status_phase{cluster=\"lab\",job=\"ksm\",namespace=~\"$namespace\",phase=~\"Pending|Running|Unknown\"})))", "instant": true}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background", "graphMode": "none"}
+    },
+    {
+      "id": 4, "title": "Container restarts · 24h", "type": "stat", "gridPos": {"x": 12, "y": 0, "w": 4, "h": 4},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "sum(increase(kube_pod_container_status_restarts_total{cluster=\"lab\",job=\"ksm\",namespace=~\"$namespace\"}[24h]))", "instant": true}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 1}, {"color": "red", "value": 10}]}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value", "graphMode": "none"}
+    },
+    {
+      "id": 5, "title": "Scrape targets down", "type": "stat", "gridPos": {"x": 16, "y": 0, "w": 4, "h": 4},
+      "description": "All configured targets, including intentionally paused or unavailable external services. Details below.",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "sum(1 - up{cluster=\"lab\"})", "instant": true}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background", "graphMode": "none"}
+    },
+    {
+      "id": 6, "title": "Missing deployment replicas", "type": "stat", "gridPos": {"x": 20, "y": 0, "w": 4, "h": 4},
+      "description": "Desired minus available replicas; intentionally scaled-to-zero deployments do not count as failures.",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "sum(clamp_min(kube_deployment_spec_replicas{cluster=\"lab\",job=\"ksm\",namespace=~\"$namespace\"} - kube_deployment_status_replicas_available{cluster=\"lab\",job=\"ksm\",namespace=~\"$namespace\"}, 0))", "instant": true}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background", "graphMode": "none"}
+    },
+    {
+      "id": 7, "title": "Node CPU usage", "type": "timeseries", "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "(100 * (1 - avg by(instance) (rate(node_cpu_seconds_total{cluster=\"lab\",job=\"ne\",mode=\"idle\"}[$__rate_interval])))) * on(instance) group_left(nodename) node_uname_info{cluster=\"lab\",job=\"ne\"}", "legendFormat": "{{nodename}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "min": 0, "max": 100}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"]}, "tooltip": {"mode": "multi"}}
+    },
+    {
+      "id": 8, "title": "Node memory usage", "type": "timeseries", "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+      "description": "Used memory excludes reclaimable cache (MemAvailable).",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "(100 * (1 - node_memory_MemAvailable_bytes{cluster=\"lab\",job=\"ne\"} / node_memory_MemTotal_bytes{cluster=\"lab\",job=\"ne\"})) * on(instance) group_left(nodename) node_uname_info{cluster=\"lab\",job=\"ne\"}", "legendFormat": "{{nodename}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "min": 0, "max": 100}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"]}, "tooltip": {"mode": "multi"}}
+    },
+    {
+      "id": 9, "title": "Root filesystem usage", "type": "timeseries", "gridPos": {"x": 0, "y": 12, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "(100 * (1 - node_filesystem_avail_bytes{cluster=\"lab\",job=\"ne\",mountpoint=\"/\",fstype!~\"tmpfs|overlay|squashfs\"} / node_filesystem_size_bytes{cluster=\"lab\",job=\"ne\",mountpoint=\"/\",fstype!~\"tmpfs|overlay|squashfs\"})) * on(instance) group_left(nodename) node_uname_info{cluster=\"lab\",job=\"ne\"}", "legendFormat": "{{nodename}} · {{device}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "min": 0, "max": 100}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"]}, "tooltip": {"mode": "multi"}}
+    },
+    {
+      "id": 10, "title": "Physical network traffic", "type": "timeseries", "gridPos": {"x": 12, "y": 12, "w": 12, "h": 8},
+      "description": "Physical Ethernet interfaces only, avoiding double-counting container, tunnel and bridge traffic. Receive and transmit are both positive.",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [
+        {"refId": "A", "expr": "sum by(instance) (rate(node_network_receive_bytes_total{cluster=\"lab\",job=\"ne\",device=~\"en.*|eth.*\"}[$__rate_interval])) * on(instance) group_left(nodename) node_uname_info{cluster=\"lab\",job=\"ne\"}", "legendFormat": "{{nodename}} RX", "range": true},
+        {"refId": "B", "expr": "sum by(instance) (rate(node_network_transmit_bytes_total{cluster=\"lab\",job=\"ne\",device=~\"en.*|eth.*\"}[$__rate_interval])) * on(instance) group_left(nodename) node_uname_info{cluster=\"lab\",job=\"ne\"}", "legendFormat": "{{nodename}} TX", "range": true}
+      ],
+      "fieldConfig": {"defaults": {"unit": "Bps", "min": 0}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"]}, "tooltip": {"mode": "multi"}}
+    },
+    {
+      "id": 11, "title": "CPU by namespace", "type": "timeseries", "gridPos": {"x": 0, "y": 20, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "sum by(namespace) (rate(container_cpu_usage_seconds_total{cluster=\"lab\",job=\"kubernetes-cadvisor\",namespace=~\"$namespace\",namespace!=\"\",container!=\"\",container!=\"POD\"}[$__rate_interval]))", "legendFormat": "{{namespace}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "cores", "min": 0}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "right", "calcs": ["lastNotNull"]}, "tooltip": {"mode": "multi"}}
+    },
+    {
+      "id": 12, "title": "Memory by namespace", "type": "timeseries", "gridPos": {"x": 12, "y": 20, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "sum by(namespace) (container_memory_working_set_bytes{cluster=\"lab\",job=\"kubernetes-cadvisor\",namespace=~\"$namespace\",namespace!=\"\",container!=\"\",container!=\"POD\"})", "legendFormat": "{{namespace}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "bytes", "min": 0}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "right", "calcs": ["lastNotNull"]}, "tooltip": {"mode": "multi"}}
+    },
+    {
+      "id": 13, "title": "Pods by phase", "type": "timeseries", "gridPos": {"x": 0, "y": 28, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "sum by(phase) (kube_pod_status_phase{cluster=\"lab\",job=\"ksm\",namespace=~\"$namespace\"})", "legendFormat": "{{phase}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "short", "min": 0, "decimals": 0}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"]}, "tooltip": {"mode": "multi"}}
+    },
+    {
+      "id": 14, "title": "Container restarts by namespace · 1h", "type": "timeseries", "gridPos": {"x": 12, "y": 28, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "sum by(namespace) (increase(kube_pod_container_status_restarts_total{cluster=\"lab\",job=\"ksm\",namespace=~\"$namespace\"}[1h]))", "legendFormat": "{{namespace}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "short", "min": 0, "decimals": 0}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "right", "calcs": ["lastNotNull"]}, "tooltip": {"mode": "multi"}}
+    },
+    {
+      "id": 15, "title": "Scrape health by job", "type": "table", "gridPos": {"x": 0, "y": 36, "w": 12, "h": 8},
+      "description": "Fraction of currently discovered targets that are up. Paused AS218822 and external devices may legitimately be down; no configuration is changed by this dashboard.",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "avg by(job) (up{cluster=\"lab\"})", "instant": true, "format": "table"}],
+      "transformations": [{"id": "organize", "options": {"excludeByName": {"Time": true}, "renameByName": {"job": "Job", "Value": "Up"}}}],
+      "fieldConfig": {"defaults": {"custom": {"align": "auto"}}, "overrides": [{"matcher": {"id": "byName", "options": "Up"}, "properties": [{"id": "unit", "value": "percentunit"}, {"id": "min", "value": 0}, {"id": "max", "value": 1}, {"id": "thresholds", "value": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}}, {"id": "custom.cellOptions", "value": {"type": "color-background"}}]}]},
+      "options": {"showHeader": true, "sortBy": [{"displayName": "Up", "desc": false}]}
+    },
+    {
+      "id": 16, "title": "Deployments below desired replicas", "type": "table", "gridPos": {"x": 12, "y": 36, "w": 12, "h": 8},
+      "description": "Only deployments with missing replicas. No data means no matching deployments if kube-state-metrics is healthy. Intentionally scaled-to-zero deployments are excluded.",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "sum by(namespace,deployment) (kube_deployment_spec_replicas{cluster=\"lab\",job=\"ksm\",namespace=~\"$namespace\"} - kube_deployment_status_replicas_available{cluster=\"lab\",job=\"ksm\",namespace=~\"$namespace\"}) > 0", "instant": true, "format": "table"}],
+      "transformations": [{"id": "organize", "options": {"excludeByName": {"Time": true}, "renameByName": {"namespace": "Namespace", "deployment": "Deployment", "Value": "Missing"}}}],
+      "fieldConfig": {"defaults": {"decimals": 0}, "overrides": []},
+      "options": {"showHeader": true, "sortBy": [{"displayName": "Missing", "desc": true}]}
+    }
+  ]
+}
