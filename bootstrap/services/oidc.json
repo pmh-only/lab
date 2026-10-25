@@ -33,6 +33,14 @@
       "expression": "return {\"rustfs_policy\": [\"consoleAdmin\"] if user.is_superuser else []}"
     }]
   },
+  "kopia": {
+    "namespace": "kopia",
+    "vaultPath": "kopia/kopia-auth-secret",
+    "clientID": "lab-kopia",
+    "launchURL": "https://backup.pmh.codes",
+    "redirectURI": "https://backup.pmh.codes/oauth2/callback",
+    "manageReader": false
+  },
   "technitium": {
     "namespace": "nameserver",
     "vaultPath": "nameserver/technitium-oidc",

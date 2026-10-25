@@ -5,9 +5,36 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./ingress.yml
-  - ./pvc.yml
-  - ./secret.yml
+  # UI-only: backup workers and their Vault reader remain owned by kopia-backup.
+  - ./ui-secret.yml
+  - ./networkpolicy.yml
+configMapGenerator:
+  - name: kopia-ui-proxy
+    files:
+      - nginx.conf.template
+patches:
+  - target:
+      kind: (ServiceAccount|VaultAuth|VaultStaticSecret)
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          argocd.argoproj.io/sync-wave: "-2"
+  - target:
+      kind: NetworkPolicy
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          argocd.argoproj.io/sync-wave: "-1"
+  - target:
+      kind: (HTTPRoute|SecurityPolicy)
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          argocd.argoproj.io/sync-wave: "1"
 images:
-  - name: ghcr.io/pmh-only/kopia
+  - name: kopia/kopia
     newTag: latest
-    digest: sha256:e190a22ef85f3d8446b22e6f49be5b38e72c3750b784245684c75ed9e87f63b3
+    digest: sha256:89fd95ee2942880ca00eae964266958a394421ddbdf69bca62e38afc55f5900e

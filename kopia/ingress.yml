@@ -34,8 +34,13 @@ spec:
   oidc:
     provider:
       issuer: "https://auth.pmh.codes/application/o/kopia/"
-      tokenEndpoint: "http://authentik-service.authentik.svc.cluster.local:9000/application/o/token/"
-    clientID: "mtDShvttXj4pxfNLgTle6zhyH32rbWHGTOQ354Fk"
+      tokenEndpoint: "https://auth.pmh.codes/application/o/token/"
+    clientID: lab-kopia
+    redirectURL: https://backup.pmh.codes/oauth2/callback
+    scopes: [profile, email]
+    forwardAccessToken: false
+    passThroughAuthHeader: false
+    csrfTokenTTL: 300s
     clientSecret:
       group: ""
       kind: "Secret"

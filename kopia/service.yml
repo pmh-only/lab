@@ -8,4 +8,4 @@ spec:
   ports:
     - protocol: TCP
       port: 51515 
-      targetPort: 51515 
+      targetPort: http

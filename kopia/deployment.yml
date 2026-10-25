@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: kopia
 spec:
+  replicas: 1
   revisionHistoryLimit: 0
   selector:
     matchLabels:
@@ -12,48 +13,96 @@ spec:
       labels:
         app: kopia
     spec:
-      hostname: pmhoci
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: kopia
-          image: ghcr.io/pmh-only/kopia:latest
-          args:
-            - server
-            - start
-            - --insecure
-            - --address=0.0.0.0:51515
+          image: kopia/kopia:latest
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              umask 077
+              # Never initialize/create a repository from the web console.
+              kopia repository connect s3 --bucket=kopia --readonly \
+                --endpoint=pmhraspberry.tailscale.svc.cluster.local:9000 \
+                --disable-tls --region=us-east-1 --no-check-for-updates \
+                --override-hostname=console --override-username=lab > /work/connect.log 2>&1 || {
+                  echo 'Read-only backup repository connection failed; details suppressed' >&2; exit 1;
+                }
+              exec kopia server start --readonly --ui --no-grpc --insecure \
+                --address=127.0.0.1:51515 --refresh-interval=5m --no-check-for-updates \
+                --ui-title-prefix='Lab Backups'
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: "1", memory: 1Gi}
           env:
-            - name: KOPIA_SERVER_USERNAME
-              value: pmh_only@pmh.codes
+            - {name: HOME, value: /work}
+            - {name: KOPIA_CONFIG_PATH, value: /work/repository.config}
+            - {name: KOPIA_CACHE_DIRECTORY, value: /work/cache}
+            - {name: KOPIA_LOG_DIR, value: /work/logs}
+            - {name: KOPIA_SERVER_USERNAME, value: lab-console}
             - name: KOPIA_SERVER_PASSWORD
               valueFrom:
-                secretKeyRef:
-                  name: kopia-secret
-                  key: ADMIN_PASSWORD
+                secretKeyRef: {name: kopia-ui-auth, key: server-password}
             - name: KOPIA_PASSWORD
               valueFrom:
-                secretKeyRef:
-                  name: kopia-secret
-                  key: REPOSITORY_PASSWORD
+                secretKeyRef: {name: kopia-ui-auth, key: repository-password}
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef: {name: kopia-ui-s3, key: access-key}
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef: {name: kopia-ui-s3, key: secret-key}
           volumeMounts:
-            - mountPath: /app/config
-              name: persistent
-              subPath: config
-            - mountPath: /app/cache
-              name: persistent
-              subPath: cache
-            - mountPath: /app/logs
-              name: persistent
-              subPath: logs
-            - mountPath: /tmp
-              name: persistent
-              subPath: tmp
-            - mountPath: /data
-              name: target
-              readOnly: true
+            - {name: work, mountPath: /work}
+            - {name: tmp, mountPath: /tmp}
+        - name: proxy
+          image: nginx:stable-alpine@sha256:47928bf67eb62a1863cb08d9ecb52d3e704304ba614eaee17884204677702951
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              umask 077
+              envsubst '${KOPIA_BASIC_AUTH}' < /config/nginx.conf.template > /run/nginx.conf
+              exec nginx -c /run/nginx.conf -g 'daemon off;'
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 10m, memory: 32Mi}
+            limits: {cpu: 250m, memory: 128Mi}
+          env:
+            - name: KOPIA_BASIC_AUTH
+              valueFrom:
+                secretKeyRef: {name: kopia-ui-auth, key: proxy-authorization}
+          ports:
+            - {name: http, containerPort: 8080}
+          readinessProbe:
+            httpGet: {path: /, port: http}
+            periodSeconds: 5
+          volumeMounts:
+            - {name: proxy-config, mountPath: /config, readOnly: true}
+            - {name: proxy-run, mountPath: /run}
       volumes:
-        - name: persistent
-          persistentVolumeClaim:
-            claimName: kopia-pvc
-        - name: target
-          hostPath:
-            path: /mnt/data/
+        - name: work
+          emptyDir: {sizeLimit: 2Gi}
+        - name: tmp
+          emptyDir: {sizeLimit: 256Mi}
+        - name: proxy-run
+          emptyDir: {sizeLimit: 64Mi}
+        - name: proxy-config
+          configMap: {name: kopia-ui-proxy}
