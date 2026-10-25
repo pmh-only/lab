@@ -63,16 +63,16 @@ images:
     digest: sha256:9b02d0299f4ca98dd64a28594c2e9ee4a107b5d7431ee67f9f6375cd84fc04a9
   - name: ghcr.io/pmh-only/redis
     newTag: alpine
-    digest: sha256:42447a15c58ed2014f8b9ed5573488331bcc9f409043b16cf6d954a6b4a36590
+    digest: sha256:25caa3e61863c0fba2088f934edada9926d54341809d115c8521f8deffee0def
   - name: ghcr.io/pmh-only/mongo
     newTag: latest
-    digest: sha256:d4fc96213fd19645a62e5a58b1151cbe1baad099b2773078f70b1028bf108385
+    digest: sha256:216f3f7931807392226b514da2a4f2e307e579d7dcecf9a5eb770f7c1ed49f0a
   - name: ghcr.io/pmh-only/mysql
     newTag: "8"
-    digest: sha256:8dc3ebeee1c1b56f9b49ac4bb5da8f7207903723a1dbe08005c0c83b465307df
+    digest: sha256:8ea28f2f679cdd73a6474f77a8d24254d084394625bab198b3fc10df8026919f
   - name: ghcr.io/pmh-only/postgres
     newTag: "18"
-    digest: sha256:edc8850c871929ad9789216ab2623d41b034c479b696964bbab94740babe44c7
+    digest: sha256:b0857e4a72495db2dcd024bedfab4d76af2ed6e536e6ce6552eb8a8ffd6d1f48
   - name: ghcr.io/pmh-only/backpack-mysql2s3
     newTag: latest
     digest: sha256:fc4b02e57a8849967ddae35b3329b6d540ed144c83aea00c01e5dc860ac29582
