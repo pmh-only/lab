@@ -32,6 +32,7 @@ class AuthentikBrandTests(unittest.TestCase):
         self.api.upload.assert_not_called()
         self.assertEqual(self.brand, before)
         self.assertEqual(set(desired), VISUAL_FIELDS)
+        self.assertEqual(desired["branding_custom_css"], self.css.strip())
         self.assertEqual(desired["attributes"]["settings"]["theme"]["base"], "dark")
         self.assertTrue(desired["attributes"]["unrelated"])
         self.assertEqual(desired["attributes"]["settings"]["locale"], "ko")
@@ -43,6 +44,7 @@ class AuthentikBrandTests(unittest.TestCase):
         self.assertEqual(self.api.patch.call_count, 2)
         self.assertEqual(set(self.api.patch.call_args_list[0].args[1]), VISUAL_FIELDS)
         self.assertEqual(self.api.patch.call_args_list[1].args[1], {"title": "Welcome back"})
+        self.assertEqual(self.api.patch.call_args_list[1].args[0], "flows/instances/default-authentication-flow/")
         for filename, content in self.assets.items():
             self.api.upload.assert_any_call(asset_name(filename, content), content)
 
@@ -56,6 +58,24 @@ class AuthentikBrandTests(unittest.TestCase):
         self.api.patch.assert_not_called()
         self.api.upload.assert_not_called()
         self.api.delete.assert_not_called()
+
+    def test_native_flow_cache_invalidation_is_not_an_authentication_change(self):
+        self.flow["cache_count"] = 5
+        def patch(path, values):
+            if path.startswith("core/"):
+                return {**self.brand, **values}
+            return {**self.flow, **values, "cache_count": 0}
+        self.api.patch.side_effect = patch
+        provision_brand(self.api, self.settings, self.css, self.assets, True)
+
+    def test_changing_an_authentication_stage_fails_verification(self):
+        def patch(path, values):
+            if path.startswith("core/"):
+                return {**self.brand, **values}
+            return {**self.flow, **values, "stages": ["password"]}
+        self.api.patch.side_effect = patch
+        with self.assertRaisesRegex(RuntimeError, "Flow title-only"):
+            provision_brand(self.api, self.settings, self.css, self.assets, True)
 
     def test_unmanaged_customizations_are_not_overwritten(self):
         self.brand["branding_custom_css"] = "/* someone else's theme */"

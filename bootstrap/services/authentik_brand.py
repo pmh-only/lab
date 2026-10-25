@@ -26,6 +26,10 @@ VISUAL_FIELDS = {
     "branding_title", "branding_logo", "branding_favicon",
     "branding_default_flow_background", "branding_custom_css", "attributes",
 }
+FLOW_FIELDS = {
+    "pk", "slug", "name", "designation", "authentication", "layout", "stages",
+    "policies", "policy_engine_mode", "compatibility_mode", "denied_action",
+}
 
 
 class BrandAPI(Authentik):
@@ -63,7 +67,8 @@ def visual_patch(brand, settings, css, assets):
     attributes.setdefault("settings", {}).setdefault("theme", {}).update(settings["theme"])
     return {
         "branding_title": settings["title"],
-        "branding_custom_css": css,
+        # DRF trims TextField whitespace; compare the same canonical value.
+        "branding_custom_css": css.strip(),
         "attributes": attributes,
         **{key: asset_name(filename, assets[filename]) for key, filename in settings["assets"].items()},
     }
@@ -110,8 +115,10 @@ def provision_brand(api, settings, css, assets, apply=False):
         if any(updated.get(k) != v for k, v in brand.items() if k not in VISUAL_FIELDS):
             raise RuntimeError("Nonvisual brand fields changed; stop and review")
     if flow["title"] != settings["flowTitle"]:
-        updated = api.patch("flows/instances/" + flow["pk"] + "/", {"title": settings["flowTitle"]})
-        if updated["title"] != settings["flowTitle"] or any(updated.get(k) != v for k, v in flow.items() if k != "title"):
+        updated = api.patch("flows/instances/" + settings["flowSlug"] + "/", {"title": settings["flowTitle"]})
+        # Cache counters and signed media URLs may legitimately change between
+        # responses. Verify the stable authentication graph, not those values.
+        if updated["title"] != settings["flowTitle"] or any(updated.get(k) != flow[k] for k in FLOW_FIELDS if k in flow):
             raise RuntimeError("Flow title-only verification failed")
     print("Authentik brand: dark login + portal applied; existing flows, users, MFA and provider permissions preserved")
     return desired
