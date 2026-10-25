@@ -18,7 +18,7 @@ configMapGenerator:
 images:
   - name: ghcr.io/pmh-only/grafana-image-renderer
     newTag: latest
-    digest: sha256:a643fd3ee669ff1b6927d5589c37ee1078b52fc76cea9a7bf8e247357e9d9dd1
+    digest: sha256:24df1663f600abc6daa8ef006a0749c1d8f532e43a4542baf55ba15c5a3eaeac
   - name: ghcr.io/pmh-only/grafana
     newTag: latest
     digest: sha256:3b83475936f2a64c0e541346f3732fb632c9c6af4de65983bbacd7bcd8d223ca
@@ -27,7 +27,7 @@ images:
     digest: sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
   - name: quay.io/prometheus/prometheus
     newTag: latest
-    digest: sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e
+    digest: sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2
   - name: registry.k8s.io/kube-state-metrics/kube-state-metrics
     newTag: v2.13.0
     digest: sha256:639a1e2da549210adddc0391ff91e270e83f7873014aec53258462812f741e6f
