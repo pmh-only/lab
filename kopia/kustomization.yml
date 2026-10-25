@@ -5,13 +5,9 @@ resources:
   - ./deployment.yml
   - ./service.yml
   - ./ingress.yml
-  # UI-only: backup workers and their Vault reader remain owned by kopia-backup.
-  - ./ui-secret.yml
+  - ./pvc.yml
+  - ./secret.yml
   - ./networkpolicy.yml
-configMapGenerator:
-  - name: kopia-ui-proxy
-    files:
-      - nginx.conf.template
 patches:
   - target:
       kind: (ServiceAccount|VaultAuth|VaultStaticSecret)

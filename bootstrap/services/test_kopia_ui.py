@@ -7,12 +7,12 @@ from unittest.mock import Mock
 
 import yaml
 
-from kopia_ui import ADMIN_EXPRESSION, admin_policy, read_policy, ui_secrets
+from kopia_ui import ADMIN_EXPRESSION, admin_policy, persistent_server_secrets, read_policy
 from provision import ROOT
 
 
 class KopiaUITests(unittest.TestCase):
-    def test_console_has_no_write_permissions_to_remote_backups(self):
+    def test_retired_read_only_identity_policy_does_not_allow_writes(self):
         policy = read_policy()
         self.assertEqual({a for s in policy["Statement"] for a in s["Action"]}, {"s3:GetObject", "s3:ListBucket", "s3:GetBucketLocation"})
         self.assertTrue(all(r.startswith("arn:aws:s3:::kopia") for s in policy["Statement"] for r in s["Resource"]))
@@ -50,31 +50,32 @@ class KopiaUITests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "binding differs"):
             admin_policy(api)
 
-    def test_dedicated_reader_does_not_overwrite_worker_permissions_or_rotate_passwords(self):
+    def test_original_persistent_server_credentials_are_not_rotated(self):
         password, repository = "s" * 64, "r" * 64
         data = {"server-password": password, "repository-password": repository,
                 "proxy-authorization": "Basic " + base64.b64encode(("lab-console:" + password).encode()).decode()}
         vault = Mock()
-        vault.get.side_effect = [{"REPOSITORY_PASSWORD": repository}, data]
-        ui_secrets(vault)
+        source = {"REPOSITORY_PASSWORD": repository, "S3_ACCESS_TOKEN": "access", "S3_SECRET_TOKEN": "secret"}
+        existing = {"ADMIN_PASSWORD": password, **source}
+        vault.get.side_effect = [source, data, existing]
+        persistent_server_secrets(vault)
         vault.create.assert_not_called()
-        self.assertEqual(vault.run.call_args_list[0].args[:3], ("policy", "write", "lab-kopia-ui"))
-        self.assertEqual(vault.run.call_args_list[1].args[:2], ("write", "auth/kubernetes/role/kopia-ui"))
+        self.assertEqual(vault.run.call_args_list[0].args[:3], ("policy", "write", "lab-kopia"))
+        self.assertEqual(vault.run.call_args_list[1].args[:2], ("write", "auth/kubernetes/role/kopia"))
         policy = vault.run.call_args_list[0].kwargs["payload"]
-        self.assertNotIn('"secret/data/kopia/s3"', policy)
+        self.assertIn('"secret/data/kopia/s3"', policy)
+        self.assertIn('"secret/data/kopia/kopia-secret"', policy)
 
-    def test_ui_is_read_only_loopback_password_protected_and_has_no_host_mounts(self):
+    def test_original_ui_server_keeps_password_csrf_and_gateway_auth(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "kopia")], text=True)))
-        self.assertFalse(any(d["kind"] == "PersistentVolumeClaim" for d in docs))
+        self.assertTrue(any(d["kind"] == "PersistentVolumeClaim" for d in docs))
         deployment = next(d for d in docs if d["kind"] == "Deployment")
         pod = deployment["spec"]["template"]["spec"]
         self.assertFalse(pod["automountServiceAccountToken"])
-        self.assertTrue(pod["securityContext"]["runAsNonRoot"])
-        self.assertTrue(all("hostPath" not in v and "persistentVolumeClaim" not in v for v in pod["volumes"]))
         native = next(c for c in pod["containers"] if c["name"] == "kopia")
-        command = native["command"][-1]
-        self.assertIn("--readonly", command)
-        self.assertIn("--address=127.0.0.1:51515", command)
+        command = " ".join(native["args"])
+        self.assertNotIn("--readonly", command)
+        self.assertIn("--address=0.0.0.0:51515", command)
         self.assertNotIn("--without-password", command)
         self.assertNotIn("allow-extremely-dangerous", command)
         self.assertNotIn("disable-csrf", command)
@@ -88,12 +89,12 @@ class KopiaUITests(unittest.TestCase):
         self.assertEqual(service["spec"]["ports"][0]["targetPort"], "http")
         policy = next(d for d in docs if d["kind"] == "NetworkPolicy")["spec"]
         self.assertEqual(policy["ingress"][0]["from"][0]["namespaceSelector"]["matchLabels"], {"kubernetes.io/metadata.name": "envoy-gateway-system"})
-        self.assertEqual(policy["ingress"][0]["ports"], [{"protocol": "TCP", "port": 8080}])
+        self.assertEqual(policy["ingress"][0]["ports"], [{"protocol": "TCP", "port": 51515}])
         oidc = next(d for d in docs if d["kind"] == "SecurityPolicy")["spec"]["oidc"]
         self.assertEqual(oidc["redirectURL"], "https://backup.pmh.codes/oauth2/callback")
         self.assertFalse(oidc["passThroughAuthHeader"])
         self.assertFalse(oidc["forwardAccessToken"])
         self.assertTrue(oidc["provider"]["tokenEndpoint"].startswith("https://"))
-        self.assertFalse(any(d["kind"] == "VaultAuth" and d["metadata"]["name"] == "vault" for d in docs))
+        self.assertTrue(any(d["kind"] == "VaultAuth" and d["metadata"]["name"] == "vault" for d in docs))
         gateway = next(d["data"]["nginx.conf"] for d in yaml.safe_load_all((ROOT / "gateway/nginx.yml").read_text()) if d and "nginx.conf" in d.get("data", {}))
         self.assertRegex(gateway, r'backup\.pmh\.codes\s+""')

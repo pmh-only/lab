@@ -21,9 +21,8 @@ spec:
   - chart: velero
     helm:
       valuesObject:
-        # Kubernetes objects only. Native DB dumps provide logical consistency;
-        # no privileged filesystem agents or misleading live-volume snapshots.
-        deployNodeAgent: false
+        # Restore the original YAML's PVC filesystem backups.
+        deployNodeAgent: true
         snapshotsEnabled: false
         upgradeCRDs: false
         cleanUpCRDs: false
@@ -36,7 +35,12 @@ spec:
           server:
             name: velero
         rbac:
-          clusterAdministrator: false
+          clusterAdministrator: true
+        nodeAgent:
+          podSecurityContext:
+            runAsUser: 0
+          containerSecurityContext:
+            privileged: false
         podSecurityContext:
           runAsNonRoot: true
           runAsUser: 65532
@@ -50,7 +54,12 @@ spec:
           capabilities:
             drop: [ALL]
         configuration:
-          defaultVolumesToFsBackup: false
+          repositoryMaintenanceJob:
+            repositoryConfigData:
+              global:
+                keepLatestMaintenanceJobs: 0
+          fsBackupTimeout: 12h
+          defaultVolumesToFsBackup: true
           backupStorageLocation:
             - name: default
               provider: aws
@@ -77,22 +86,19 @@ spec:
               - mountPath: /target
                 name: plugins
         schedules:
-          cluster-metadata:
+          backup:
             disabled: false
             schedule: "0 0 * * *"
             useOwnerReferencesInBackup: false
             paused: false
-            # This is a one-shot flag reset by the controller, not a permanent
-            # desired state. Initial metadata backup/restore has already passed.
             skipImmediately: false
             template:
               ttl: "720h"
               storageLocation: default
-              defaultVolumesToFsBackup: false
+              defaultVolumesToFsBackup: true
               snapshotVolumes: false
-              excludedNamespaces:
-                - backup-restore-*
-                - backup-velero-*
+              uploaderConfig:
+                parallelFilesUpload: 16
               excludedResources:
                 - podvolumebackups.velero.io
                 - podvolumerestores.velero.io
@@ -133,6 +139,13 @@ spec:
     chart: velero-ui
     helm:
       valuesObject:
+        image:
+          tag: 0.11.0@sha256:7b7bb90aa0b9de8241cb12d9902e685cb4a1a8c60c81f8ea839762bfa398c088
+        configuration:
+          general:
+            secretPassPhrase:
+              existingSecret: velero-ui-secrets
+              key: AUTH_SECRET_PASSPHRASE
         env:
           - name: BASIC_AUTH_ENABLED
             value: "false"
@@ -143,11 +156,11 @@ spec:
           - name: OAUTH_AUTHORIZATION_URL
             value: https://auth.pmh.codes/application/o/authorize/
           - name: OAUTH_USER_INFO_URL
-            value: http://authentik-service.authentik.svc.cluster.local:9000/application/o/userinfo/
+            value: https://auth.pmh.codes/application/o/userinfo/
           - name: OAUTH_TOKEN_URL
-            value: http://authentik-service.authentik.svc.cluster.local:9000/application/o/token/
+            value: https://auth.pmh.codes/application/o/token/
           - name: OAUTH_CLIENT_ID
-            value: jiqFkzGXFxXeRcYUJNRkPnwvh6acq0a0kCwAy0R9
+            value: lab-velero-ui
           - name: OAUTH_CLIENT_SECRET
             valueFrom:
               secretKeyRef:
@@ -156,7 +169,7 @@ spec:
           - name: OAUTH_REDIRECT_URI
             value: https://velero.pmh.codes/login
     repoURL: https://helm.otwld.com
-    targetRevision: x
+    targetRevision: 1.0.0
   syncPolicy:
     automated:
       prune: true
@@ -181,7 +194,7 @@ spec:
   project: default
   source:
     path: velero-ui_configs
-    repoURL: git@github.com:pmh-only/lab.git
+    repoURL: https://github.com/pmh-only/lab.git
     targetRevision: HEAD
   syncPolicy:
     automated:

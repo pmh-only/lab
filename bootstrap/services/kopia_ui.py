@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Connect a read-only Kopia console to existing backups and admin-only OIDC.
+"""Provision the original persistent Kopia server with existing repository keys.
 
-Never initializes repositories, mounts live source data, rotates existing keys,
-or changes the backup workers' Vault role. Remote credentials remain secret.
+Preserve existing credentials and remote data; never initialize a repository.
 """
 
 import base64
@@ -73,8 +72,8 @@ def read_identity(vault, admin):
         raise RuntimeError("UI identity unexpectedly permits deletion")
 
 
-def admin_policy(api):
-    name = "lab bootstrap: kopia console administrators only"
+def admin_policy(api, slug="kopia"):
+    name = "lab bootstrap: " + slug + " console administrators only"
     matches = [p for p in api.list("policies/expression/") if p["name"] == name]
     if len(matches) > 1:
         raise RuntimeError("Ambiguous application access policy")
@@ -84,7 +83,7 @@ def admin_policy(api):
             raise RuntimeError("Existing application access policy differs")
     else:
         policy = api.request("policies/expression/", {"name": name, "expression": ADMIN_EXPRESSION, "execution_logging": False})
-    app = api.request("core/applications/kopia/")
+    app = api.request("core/applications/" + slug + "/")
     if app["policy_engine_mode"] != "all":
         raise RuntimeError("Application must require all access policies")
     bindings = api.list("policies/bindings/?target=" + app["pk"])
@@ -131,23 +130,33 @@ def ui_secrets(vault):
     }))
 
 
+def persistent_server_secrets(vault):
+    source = vault.get("kopia/s3")
+    former_ui = vault.get("kopia/ui-auth")
+    desired = {"ADMIN_PASSWORD": former_ui["server-password"] if former_ui else secrets.token_urlsafe(48),
+               "REPOSITORY_PASSWORD": source["REPOSITORY_PASSWORD"],
+               "S3_ACCESS_TOKEN": source["S3_ACCESS_TOKEN"], "S3_SECRET_TOKEN": source["S3_SECRET_TOKEN"]}
+    existing = vault.get("kopia/kopia-secret")
+    if existing is None:
+        vault.create("kopia/kopia-secret", desired)
+    elif any(existing.get(k) != value for k, value in desired.items()):
+        raise RuntimeError("Existing Kopia server credentials differ; refusing rotation")
+    from provision import reader
+    reader(vault, "kopia", ["kopia/s3", "kopia/kopia-secret", "kopia/kopia-auth-secret"])
+
+
 def main():
     spec = importlib.util.spec_from_file_location("dns01_provision", ROOT / "bootstrap/dns01/provision.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     vault = module.VaultCLI()
     vault.verify()
-    supplied = vault.get("backup/rustfs-admin")
-    admin = Admin(supplied["access_key"], supplied["secret_key"], "http://127.0.0.1:19000")
-    if not admin.s3.bucket_exists("kopia"):
-        raise RuntimeError("Existing initialized backup repository is required")
-    read_identity(vault, admin)
     api = Authentik(vault.get("authentik/bootstrap-worker")["AUTHENTIK_BOOTSTRAP_TOKEN"])
     declaration = json.loads((ROOT / "bootstrap/services/oidc.json").read_text())["kopia"]
     provision_client(vault, api, "kopia", declaration)
     admin_policy(api)
-    ui_secrets(vault)
-    print("Kopia UI: read-only S3 enforced; native admin/non-admin access tests passed; backup worker keys and reader permissions unchanged")
+    persistent_server_secrets(vault)
+    print("Kopia: original persistent single-server credentials configured; existing repository keys preserved; admin-only OIDC verified")
 
 
 if __name__ == "__main__":

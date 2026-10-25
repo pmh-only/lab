@@ -78,10 +78,11 @@ def velero_credentials(vault):
     cloud = "[default]\naws_access_key_id=" + data["S3_ACCESS_TOKEN"] + "\naws_secret_access_key=" + data["S3_SECRET_TOKEN"] + "\n"
     if "cloud" in data and data["cloud"] != cloud:
         raise RuntimeError("Existing Velero credential file differs; refusing replacement")
-    if "cloud" not in data:
+    if "cloud" not in data or "repository-password" not in data:
         metadata = json.loads(vault.run("kv", "metadata", "get", "-format=json", "-mount=secret", path))["data"]
-        vault.run("kv", "put", "-cas=" + str(metadata["current_version"]), "-mount=secret", path, "-", payload=json.dumps({**data, "cloud": cloud}))
-    reader(vault, "velero", path)
+        vault.run("kv", "put", "-cas=" + str(metadata["current_version"]), "-mount=secret", path, "-", payload=json.dumps({**data, "cloud": cloud,
+                  "repository-password": data.get("repository-password", secrets.token_urlsafe(48))}))
+    reader(vault, "velero", [path, "velero/velero-ui-secrets"])
 
 
 def immich_credentials(vault):
@@ -104,7 +105,7 @@ def kopia_credentials(vault):
         vault.run("kv", "put", "-cas=" + str(metadata["current_version"]), "-mount=secret", path, "-", payload=json.dumps({**data, "REPOSITORY_PASSWORD": secrets.token_urlsafe(48)}))
     elif len(data["REPOSITORY_PASSWORD"]) < 48:
         raise RuntimeError("Existing Kopia repository password is not a managed fresh secret")
-    reader(vault, "kopia", path)
+    reader(vault, "kopia", [path, "kopia/kopia-secret", "kopia/kopia-auth-secret"])
 
 
 def vault_snapshot_roles(vault):

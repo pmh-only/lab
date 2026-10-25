@@ -1,7 +1,9 @@
-# Backup console
+# Kopia server
 
 `https://backup.pmh.so` redirects to `https://backup.pmh.codes`, the canonical
-Kopia console. The UI is separate from the `kopia-backup` file workers.
+Kopia server from the original manifests: one Deployment, one persistent
+`kopia-pvc`, and the read-only `/mnt/data` host mount exposed at `/data`.
+There are no separate file-backup CronJobs or read-only console replicas.
 
 Reconcile its dedicated identities with:
 
@@ -16,19 +18,21 @@ existing administrator is allowed and an existing non-administrator is denied.
 Do not recreate this application with only the generic OIDC helper: the console
 also requires its admin-only application policy binding.
 
-The UI connects read-only to the **existing** encrypted remote repository. Its
-separate S3 identity can only list and read the `kopia` bucket; writes and deletes
-are rejected. No repository is initialized and no live data/PVC is mounted in
-the console. Existing backup worker keys, policies, and repository password stay
-unchanged. Console Vault access uses a separate role, not the workers' reader.
+An init container connects the **existing** encrypted remote repository using
+the already provisioned bucket identity and repository password. It never
+initializes or resets the repository. Configuration, cache, logs, and temporary
+files use the original PVC subpaths. The server is pinned to `pmhoci`; the user
+confirms `/mnt/data` contains the same files on both nodes, so only one server
+backs it up. The local-path PVC root is not mounted into Kopia. DB backups
+remain separate; Velero handles PVC filesystem backups.
 
-Envoy handles OIDC. Inside the Pod, a minimal NGINX proxy supplies a secret-held
-Basic credential to Kopia's password-protected, loopback-only HTTP listener.
-Neither the browser nor Git receives that credential. NetworkPolicy allows only
-the main Envoy data plane to reach the proxy. Anonymous network listeners,
-disabled CSRF, and the dangerous unauthenticated-server flag are not used.
+Envoy retains the original OIDC layer. Kopia itself retains its original native
+password authentication (`pmh_only@pmh.codes` and Vault `kopia/kopia-secret` →
+`ADMIN_PASSWORD`). Its encryption password is unchanged. No password-free
+listener, disabled CSRF, proxy credential injection, or repository read-only
+restriction is used. NetworkPolicy limits ingress to the main Envoy data plane.
 
-The console is for viewing/browsing backups. Restore-to-live-host and deletion
-are deliberately not enabled. Readable repository objects and a successful UI
-login do not establish that every service has a complete, tested recovery point.
-File snapshots and database backup completion are tracked separately.
+Snapshot management and policies use the original native Kopia server/UI.
+Existing remote data, including earlier checkpoints, is preserved. A successful
+login alone does not establish a complete or tested recovery point. No live
+database restores are performed by this deployment.

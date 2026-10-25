@@ -16,6 +16,15 @@ DECLARATIONS = json.loads(Path(__file__).with_name("oidc.json").read_text())
 class OIDCTests(unittest.TestCase):
     def test_public_client_ids_match_existing_security_policies(self):
         for slug, declaration in DECLARATIONS.items():
+            if slug == "velero-ui":
+                apps = list(yaml.safe_load_all((ROOT / "apps/velero.yml").read_text()))
+                ui = next(d for d in apps if d["metadata"]["name"] == "velero-ui")
+                env = {e["name"]: e for e in ui["spec"]["source"]["helm"]["valuesObject"]["env"]}
+                self.assertEqual(env["OAUTH_CLIENT_ID"]["value"], declaration["clientID"])
+                self.assertEqual(env["OAUTH_REDIRECT_URI"]["value"], declaration["redirectURI"])
+                self.assertEqual(declaration["secretField"], "OAUTH_CLIENT_SECRET")
+                self.assertEqual(declaration["companionSecretFields"], ["AUTH_SECRET_PASSPHRASE"])
+                continue
             if slug == "argocd":
                 doc = next(yaml.safe_load_all((ROOT / "argocd-access/configuration.yml").read_text()))
                 config = yaml.safe_load(doc["data"]["oidc.config"])

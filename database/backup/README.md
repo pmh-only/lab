@@ -59,7 +59,8 @@ Only the namespace it created is deleted afterward; remote backups are retained.
 This is an actual native import check, not merely a successful upload. It does
 not constitute a complete application recovery or cross-service recovery drill.
 
-Velero is configured separately for **Kubernetes metadata only**, with no
-privileged node agent or volume snapshots. It has cluster-wide reads and Velero
-CRD management, not cluster-admin write permissions. Full disaster recovery
-writes must be granted deliberately in the recovery environment.
+Velero follows its original manifests: Kubernetes resources plus native PVC
+filesystem backups through the node agent. CSI/cloud volume snapshots remain
+disabled as in the original YAML; privileged Pods are not requested. The native
+Velero UI and controller retain their original management permissions. These
+PVC file copies do not replace the engine-native database dumps above.

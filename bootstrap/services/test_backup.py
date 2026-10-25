@@ -124,36 +124,35 @@ class BackupTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 restore_pod("backup-restore-test", "pgsql", prefix, "native", "uploader")
 
-    def test_velero_is_pinned_metadata_only_without_cluster_admin_or_node_agent(self):
+    def test_velero_restores_original_node_agent_and_default_pvc_backup_settings(self):
         app = next(yaml.safe_load_all((ROOT / "apps/velero.yml").read_text()))
         chart = app["spec"]["sources"][1]
         self.assertEqual(chart["targetRevision"], "12.2.1")
         values = chart["helm"]["valuesObject"]
-        self.assertFalse(values["deployNodeAgent"])
+        self.assertTrue(values["deployNodeAgent"])
         self.assertFalse(values["snapshotsEnabled"])
-        self.assertFalse(values["rbac"]["clusterAdministrator"])
+        self.assertTrue(values["rbac"]["clusterAdministrator"])
+        self.assertFalse(values["nodeAgent"]["containerSecurityContext"]["privileged"])
+        self.assertTrue(values["configuration"]["defaultVolumesToFsBackup"])
+        self.assertEqual(values["configuration"]["fsBackupTimeout"], "12h")
         self.assertFalse(values["cleanUpCRDs"])
         self.assertIn("sha256:", values["image"]["digest"])
         self.assertIn("@sha256:", values["initContainers"][0]["image"])
         self.assertEqual(values["credentials"]["existingSecret"], "velero-s3")
-        schedule = values["schedules"]["cluster-metadata"]
+        schedule = values["schedules"]["backup"]
         self.assertFalse(schedule["paused"])
         self.assertFalse(schedule["skipImmediately"])
         self.assertFalse(schedule["template"]["snapshotVolumes"])
-        self.assertFalse(schedule["template"]["defaultVolumesToFsBackup"])
-        rules = next(yaml.safe_load_all((ROOT / "velero_auth/rbac.yml").read_text()))["rules"]
-        self.assertEqual(rules[0]["verbs"], ["get", "list", "watch"])
-        self.assertEqual(rules[1]["apiGroups"], ["velero.io"])
+        self.assertTrue(schedule["template"]["defaultVolumesToFsBackup"])
+        self.assertEqual(schedule["template"]["uploaderConfig"]["parallelFilesUpload"], 16)
 
-    def test_kopia_sources_are_read_only_pinned_per_node_and_not_privileged(self):
-        docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "kopia/backup")], text=True)))
-        jobs = [d for d in docs if d["kind"] == "CronJob"]
-        self.assertEqual(len(jobs), 2)
-        self.assertEqual({d["spec"]["jobTemplate"]["spec"]["template"]["spec"]["nodeSelector"]["kubernetes.io/hostname"] for d in jobs}, {"pmhoci", "pmhoci2"})
-        for job in jobs:
-            self.assertTrue(job["spec"]["suspend"])
-            self.assertEqual(job["metadata"]["annotations"]["reloader.stakater.com/auto"], "false")
-            pod = job["spec"]["jobTemplate"]["spec"]["template"]["spec"]
+    def test_kopia_source_is_read_only_pinned_to_one_node_and_not_privileged(self):
+        docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "kopia")], text=True)))
+        deployments = [d for d in docs if d["kind"] == "Deployment"]
+        self.assertEqual(len(deployments), 1)
+        for deployment in deployments:
+            pod = deployment["spec"]["template"]["spec"]
+            self.assertEqual(pod["nodeSelector"], {"kubernetes.io/hostname": "pmhoci"})
             self.assertFalse(pod["automountServiceAccountToken"])
             self.assertNotIn("hostNetwork", pod)
             c = pod["containers"][0]
@@ -164,9 +163,7 @@ class BackupTests(unittest.TestCase):
             sources = {v["name"] for v in pod["volumes"] if "hostPath" in v}
             self.assertTrue(all(m["readOnly"] for m in c["volumeMounts"] if m["name"] in sources))
             self.assertTrue(all(v["hostPath"]["type"] == "Directory" for v in pod["volumes"] if "hostPath" in v))
-            self.assertIn("--pin=retention-review", c["command"][-1])
-            self.assertIn("--fail-fast", c["command"][-1])
-            self.assertNotIn("snapshot delete", c["command"][-1])
+            self.assertEqual(c["args"][:2], ["server", "start"])
 
     def test_vault_snapshot_only_gets_ca_and_dedicated_snapshot_identity(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "vault-backup")], text=True)))

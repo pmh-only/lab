@@ -33,6 +33,16 @@
       "expression": "return {\"rustfs_policy\": [\"consoleAdmin\"] if user.is_superuser else []}"
     }]
   },
+  "velero-ui": {
+    "namespace": "velero",
+    "vaultPath": "velero/velero-ui-secrets",
+    "clientID": "lab-velero-ui",
+    "secretField": "OAUTH_CLIENT_SECRET",
+    "companionSecretFields": ["AUTH_SECRET_PASSPHRASE"],
+    "launchURL": "https://velero.pmh.codes",
+    "redirectURI": "https://velero.pmh.codes/login",
+    "manageReader": false
+  },
   "kopia": {
     "namespace": "kopia",
     "vaultPath": "kopia/kopia-auth-secret",

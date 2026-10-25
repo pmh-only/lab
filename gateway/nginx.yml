@@ -146,6 +146,7 @@ data:
         default              "1";
         argo.pmh.codes       "";
         backup.pmh.codes     "";
+        velero.pmh.codes     "";
         bgp.pmh.codes        "";
         names.pmh.codes      "";
         welplan.pmh.codes    "";
