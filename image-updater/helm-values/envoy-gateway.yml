@@ -1,4 +1,4 @@
 global:
   images:
     envoyGateway:
-      image: docker.io/envoyproxy/gateway:v1.9.2
+      image: docker.io/envoyproxy/gateway:v1.9.2@sha256:9d67017c442a70e6ae9f1a358e6c80eb653c67c2e40823d9a991e0daf37ba926
