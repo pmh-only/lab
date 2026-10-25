@@ -65,7 +65,18 @@ class MonitoringTests(unittest.TestCase):
         self.assertEqual(dashboard["refresh"], "30s")
         panels = dashboard["panels"]
         self.assertEqual(len({p["id"] for p in panels}), len(panels))
-        self.assertEqual(len(panels), 16)
+        self.assertEqual(len(panels), 17)
+        disk = next(p for p in panels if p["id"] == 17)
+        self.assertEqual(disk["title"], "Disk capacity by filesystem")
+        self.assertEqual([t["refId"] for t in disk["targets"]], ["A", "B", "C", "D"])
+        for target in disk["targets"]:
+            self.assertTrue(target["instant"])
+            self.assertEqual(target["format"], "table")
+            self.assertIn("nodename,mountpoint,device,fstype", target["expr"])
+            self.assertNotIn('mountpoint="/"', target["expr"])
+            self.assertIn('fstype!~"tmpfs|devtmpfs|overlay|squashfs|nsfs|fuse"', target["expr"])
+        self.assertIn(" > 0", disk["targets"][3]["expr"])
+        self.assertEqual(disk["transformations"][0]["id"], "merge")
         cells = set()
         for panel in panels:
             grid = panel["gridPos"]
