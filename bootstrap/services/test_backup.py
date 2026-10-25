@@ -7,7 +7,7 @@ from unittest.mock import Mock
 
 import yaml
 
-from backup_s3 import PROFILES, reconcile
+from backup_s3 import PROFILES, backup_policy, reconcile
 from backup_restore import restore_pod
 from provision import ROOT
 from s3 import Admin, bucket_policy
@@ -39,12 +39,17 @@ class BackupTests(unittest.TestCase):
         admin.request.assert_not_called()
         vault.create.assert_not_called()
 
-    def test_database_jobs_are_suspended_hardened_pinned_and_do_not_mount_live_volumes(self):
+    def test_database_backup_only_allows_native_temporary_lock_deletion(self):
+        policy = backup_policy(PROFILES["database"])
+        deletes = [r for statement in policy["Statement"] if "s3:DeleteObject" in statement["Action"] for r in statement["Resource"]]
+        self.assertEqual(deletes, ["arn:aws:s3:::dbdump/clickhouse/*/.lock"])
+
+    def test_database_jobs_only_enable_verified_schedules_and_never_mount_live_volumes(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "database")], text=True)))
         jobs = [d for d in docs if d["kind"] == "CronJob"]
         self.assertEqual({j["metadata"]["name"] for j in jobs}, {"backup-" + n for n in ["pgsql", "mysql", "mongo", "clickhouse", "immich"]})
         for job in jobs:
-            self.assertTrue(job["spec"]["suspend"])
+            self.assertEqual(job["spec"]["suspend"], job["metadata"]["name"] not in {"backup-mysql", "backup-mongo"})
             self.assertEqual(job["metadata"]["annotations"]["reloader.stakater.com/auto"], "false")
             self.assertEqual(job["spec"]["concurrencyPolicy"], "Forbid")
             pod = job["spec"]["jobTemplate"]["spec"]["template"]["spec"]
@@ -126,9 +131,32 @@ class BackupTests(unittest.TestCase):
         self.assertIn("@sha256:", values["initContainers"][0]["image"])
         self.assertEqual(values["credentials"]["existingSecret"], "velero-s3")
         schedule = values["schedules"]["cluster-metadata"]
-        self.assertTrue(schedule["paused"])
+        self.assertFalse(schedule["paused"])
         self.assertFalse(schedule["template"]["snapshotVolumes"])
         self.assertFalse(schedule["template"]["defaultVolumesToFsBackup"])
         rules = next(yaml.safe_load_all((ROOT / "velero_auth/rbac.yml").read_text()))["rules"]
         self.assertEqual(rules[0]["verbs"], ["get", "list", "watch"])
         self.assertEqual(rules[1]["apiGroups"], ["velero.io"])
+
+    def test_kopia_sources_are_read_only_pinned_per_node_and_not_privileged(self):
+        docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "kopia/backup")], text=True)))
+        jobs = [d for d in docs if d["kind"] == "CronJob"]
+        self.assertEqual(len(jobs), 2)
+        self.assertEqual({d["spec"]["jobTemplate"]["spec"]["template"]["spec"]["nodeSelector"]["kubernetes.io/hostname"] for d in jobs}, {"pmhoci", "pmhoci2"})
+        for job in jobs:
+            self.assertTrue(job["spec"]["suspend"])
+            self.assertEqual(job["metadata"]["annotations"]["reloader.stakater.com/auto"], "false")
+            pod = job["spec"]["jobTemplate"]["spec"]["template"]["spec"]
+            self.assertFalse(pod["automountServiceAccountToken"])
+            self.assertNotIn("hostNetwork", pod)
+            c = pod["containers"][0]
+            self.assertFalse(c["securityContext"]["privileged"])
+            self.assertFalse(c["securityContext"]["allowPrivilegeEscalation"])
+            self.assertEqual(c["securityContext"]["capabilities"], {"drop": ["ALL"], "add": ["DAC_READ_SEARCH"]})
+            self.assertIn("@sha256:", c["image"])
+            sources = {v["name"] for v in pod["volumes"] if "hostPath" in v}
+            self.assertTrue(all(m["readOnly"] for m in c["volumeMounts"] if m["name"] in sources))
+            self.assertTrue(all(v["hostPath"]["type"] == "Directory" for v in pod["volumes"] if "hostPath" in v))
+            self.assertIn("--pin=retention-review", c["command"][-1])
+            self.assertIn("--fail-fast", c["command"][-1])
+            self.assertNotIn("snapshot delete", c["command"][-1])

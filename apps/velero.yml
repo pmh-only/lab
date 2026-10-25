@@ -81,13 +81,16 @@ spec:
             disabled: false
             schedule: "0 0 * * *"
             useOwnerReferencesInBackup: false
-            paused: true
+            paused: false
             skipImmediately: true
             template:
               ttl: "720h"
               storageLocation: default
               defaultVolumesToFsBackup: false
               snapshotVolumes: false
+              excludedNamespaces:
+                - backup-restore-*
+                - backup-velero-*
               excludedResources:
                 - podvolumebackups.velero.io
                 - podvolumerestores.velero.io

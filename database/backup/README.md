@@ -6,7 +6,9 @@ HTTP is carried inside Tailscale's encrypted tunnel. Database dumps themselves
 are not client-side encrypted; access to the Raspberry Pi storage must be secured.
 
 The database backup S3 identity can list, write, and read this bucket, but cannot
-delete objects. The remote administrator credential stays in Vault at
+delete backup data. Its only deletion permission is
+`dbdump/clickhouse/*/.lock`, required to finalize native ClickHouse backups.
+The remote administrator credential stays in Vault at
 `secret/backup/rustfs-admin` and is never mounted in backup Pods. Velero and Kopia
 have different identities restricted to their respective buckets.
 

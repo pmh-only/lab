@@ -27,6 +27,16 @@ PROFILES = {
 }
 
 
+def backup_policy(profile):
+    policy = bucket_policy(profile["bucket"], delete=profile["delete"])
+    if profile["bucket"] == "dbdump":
+        # Native ClickHouse finalization deletes this transient coordination
+        # file. Never grant deletion of the backup payload or completion marker.
+        policy["Statement"].append({"Effect": "Allow", "Action": ["s3:DeleteObject"],
+                                    "Resource": ["arn:aws:s3:::dbdump/clickhouse/*/.lock"]})
+    return policy
+
+
 def mongo_backup_user(vault):
     from mongo import shell
 
@@ -85,6 +95,17 @@ def immich_credentials(vault):
         raise RuntimeError("Immich backup password differs; refusing an implicit credential change")
 
 
+def kopia_credentials(vault):
+    path = PROFILES["kopia"]["path"]
+    data = vault.get(path)
+    if "REPOSITORY_PASSWORD" not in data:
+        metadata = json.loads(vault.run("kv", "metadata", "get", "-format=json", "-mount=secret", path))["data"]
+        vault.run("kv", "put", "-cas=" + str(metadata["current_version"]), "-mount=secret", path, "-", payload=json.dumps({**data, "REPOSITORY_PASSWORD": secrets.token_urlsafe(48)}))
+    elif len(data["REPOSITORY_PASSWORD"]) < 48:
+        raise RuntimeError("Existing Kopia repository password is not a managed fresh secret")
+    reader(vault, "kopia", path)
+
+
 def reconcile(vault, admin, name, endpoint):
     profile = PROFILES[name]
     data = vault.get(profile["path"])
@@ -96,13 +117,17 @@ def reconcile(vault, admin, name, endpoint):
     if not access.startswith("lab-backup-" + name + "-") or len(secret) < 48:
         raise RuntimeError("Unmanaged backup identity; refusing takeover")
     policy_name = access + "-bucket"
-    policy = bucket_policy(profile["bucket"], delete=profile["delete"])
+    policy = backup_policy(profile)
     users, policies = admin.request("list-users"), admin.request("list-canned-policies")
     if access in users and users[access].get("policyName") not in {None, "", policy_name}:
         raise RuntimeError("Backup identity has unrelated policies")
     if policy_name in policies:
         actual = admin.request("info-canned-policy?" + urllib.parse.urlencode({"name": policy_name}))["policy"]
-        if actual != policy:
+        if name == "database" and actual == bucket_policy("dbdump", delete=False):
+            # Explicit, narrowly scoped migration from the initial append-only
+            # policy after validating ClickHouse's native lock lifecycle.
+            admin.request("add-canned-policy?" + urllib.parse.urlencode({"name": policy_name}), policy, "PUT")
+        elif actual != policy:
             raise RuntimeError("Existing backup policy differs; refusing replacement")
     else:
         admin.request("add-canned-policy?" + urllib.parse.urlencode({"name": policy_name}), policy, "PUT")
@@ -168,6 +193,7 @@ def main():
     mongo_backup_user(vault)
     velero_credentials(vault)
     immich_credentials(vault)
+    kopia_credentials(vault)
 
 
 if __name__ == "__main__":
