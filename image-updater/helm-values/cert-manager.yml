@@ -1,0 +1,11 @@
+image:
+  repository: quay.io/jetstack/cert-manager-controller
+  tag: v1.21.3
+webhook:
+  image:
+    repository: quay.io/jetstack/cert-manager-webhook
+    tag: v1.21.3
+cainjector:
+  image:
+    repository: quay.io/jetstack/cert-manager-cainjector
+    tag: v1.21.3

@@ -10,11 +10,13 @@ spec:
     namespace: envoy-gateway-system
     server: https://kubernetes.default.svc
   project: default
-  source:
-    path: .
+  sources:
+  - path: .
     repoURL: oci://docker.io/envoyproxy/gateway-helm
     targetRevision: v1.9.2
     helm:
+      valueFiles:
+        - $imageValues/image-updater/helm-values/envoy-gateway.yml
       valuesObject:
         config:
           envoyGateway:
@@ -22,6 +24,9 @@ spec:
               enableBackend: true
               enableLua: true
               enableEnvoyPatchPolicy: true
+  - repoURL: https://github.com/pmh-only/lab.git
+    targetRevision: main
+    ref: imageValues
   syncPolicy:
     automated:
       prune: true

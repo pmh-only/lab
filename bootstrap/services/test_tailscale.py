@@ -23,8 +23,10 @@ class TailscaleTests(unittest.TestCase):
         self.assertNotIn("oauth", values)
         self.assertEqual(values["operatorConfig"]["hostname"], "lab-operator")
         self.assertEqual(values["apiServerProxyConfig"], {"mode": "false", "allowImpersonation": "false"})
+        images = yaml.safe_load((ROOT / "image-updater/helm-values/tailscale.yml").read_text())
         for part in ["operatorConfig", "proxyConfig"]:
-            self.assertTrue(values[part]["image"]["digest"].startswith("sha256:"))
+            self.assertIn("v1.104.2@sha256:", images[part]["image"]["tag"])
+            self.assertNotIn("image", values[part])
 
     def test_secret_dependency_precedes_operator_without_connector_crd_cycle(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "tailscale_auth")], text=True)))

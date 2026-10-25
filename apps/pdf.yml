@@ -8,9 +8,11 @@ spec:
     namespace: pdf
     server: https://kubernetes.default.svc
   project: default
-  source:
-    chart: stirling-pdf-chart
+  sources:
+  - chart: stirling-pdf-chart
     helm:
+      valueFiles:
+        - $imageValues/image-updater/helm-values/pdf.yml
       valuesObject:
         fullnameOverride: pdf
         persistence:
@@ -37,6 +39,9 @@ spec:
     # Official published index; avoids the old Pages URL's HTTP redirect.
     repoURL: https://raw.githubusercontent.com/Stirling-Tools/Stirling-PDF-chart/gh-pages
     targetRevision: 3.1.0
+  - repoURL: https://github.com/pmh-only/lab.git
+    targetRevision: main
+    ref: imageValues
   syncPolicy:
     automated:
       prune: true
@@ -70,21 +75,3 @@ spec:
       - PruneLast=true
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
----
-apiVersion: argocd-image-updater.argoproj.io/v1alpha1
-kind: ImageUpdater
-metadata:
-  name: pdf
-  namespace: argocd
-spec:
-  applicationRefs:
-    - namePattern: pdf
-      images:
-        - alias: stirling
-          imageName: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest-fat
-          commonUpdateSettings:
-            updateStrategy: digest
-          manifestTargets:
-            helm:
-              name: image.name
-              tag: image.tag

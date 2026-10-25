@@ -18,7 +18,8 @@ class OTPTests(unittest.TestCase):
         self.assertEqual(self.chart["targetRevision"], "0.4.0")
         self.assertEqual(self.chart["helm"]["releaseName"], "otp-inbox")
         values = self.chart["helm"]["valuesObject"]
-        self.assertIn("v0.4.0@sha256:", values["image"]["tag"])
+        images = yaml.safe_load((ROOT / "image-updater/helm-values/otp.yml").read_text())
+        self.assertIn("v0.4.0@sha256:", images["image"]["tag"])
         self.assertFalse(values["bitwarden"]["enabled"])
         self.assertTrue(values["passkey"]["enabled"])
         self.assertEqual(values["secrets"]["existingSecret"], "otp-inbox")

@@ -1,0 +1,4 @@
+image:
+  registry: docker.stirlingpdf.com
+  repository: stirlingtools/stirling-pdf
+  tag: '2.5.1'

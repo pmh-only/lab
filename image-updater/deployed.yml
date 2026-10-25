@@ -1,0 +1,210 @@
+# All running Git/Kustomize apps. Track the existing tag, never cross major versions.
+# Paused AS218822, Welplan and backup workloads are deliberately absent.
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: authentik, namespace: argocd}
+    spec:
+      writeBackConfig: &git
+        method: git:secret:argocd/git
+        gitConfig: {repository: 'git@github.com:pmh-only/lab.git', branch: main, writeBackTarget: kustomization}
+      applicationRefs:
+        - namePattern: authentik
+          images:
+            - {alias: authentik, imageName: 'ghcr.io/goauthentik/server:2026.8.4', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: database, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: database
+          images:
+            - {alias: clickhouse, imageName: 'ghcr.io/pmh-only/clickhouse-server:rybbit', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: redis, imageName: 'ghcr.io/pmh-only/redis:alpine', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: mongo, imageName: 'ghcr.io/pmh-only/mongo:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: mysql, imageName: 'ghcr.io/pmh-only/mysql:8', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: postgres, imageName: 'ghcr.io/pmh-only/postgres:18', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: gateway, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: gateway
+          images:
+            - {alias: nginx, imageName: 'ghcr.io/pmh-only/nginx:latest', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: guessaiword, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: guessaiword
+          images:
+            - {alias: guessaiword, imageName: 'ghcr.io/pmh-only/guessaiword:latest', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: image-updater, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: image-updater
+          images:
+            - {alias: updater, imageName: 'quay.io/argoprojlabs/argocd-image-updater:v1.4.0', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: immich, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: immich
+          images:
+            - {alias: server, imageName: 'ghcr.io/immich-app/immich-server:release', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: machine-learning, imageName: 'ghcr.io/immich-app/immich-machine-learning:release', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: postgres, imageName: 'ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: minio, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: minio
+          images:
+            - {alias: rustfs, imageName: 'ghcr.io/pmh-only/rustfs:latest', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: monitoring, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: monitoring
+          images:
+            - {alias: renderer, imageName: 'ghcr.io/pmh-only/grafana-image-renderer:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: grafana, imageName: 'ghcr.io/pmh-only/grafana:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: node-exporter, imageName: 'quay.io/prometheus/node-exporter:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: prometheus, imageName: 'quay.io/prometheus/prometheus:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: ksm, imageName: 'registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.13.0', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: thanos, imageName: 'quay.io/thanos/thanos:main-2026-10-10-f1e0bbc', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: nameserver, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: nameserver
+          images:
+            - {alias: technitium, imageName: 'ghcr.io/pmh-only/technitium:latest', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: notaikr, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: notaikr
+          images:
+            - {alias: notaikr, imageName: 'ghcr.io/pmh-only/notaikr:latest', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: office, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: office
+          images:
+            - {alias: onlyoffice, imageName: 'ghcr.io/pmh-only/onlyoffice:latest-linux-arm64', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: remote, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: remote
+          images:
+            - {alias: guacamole, imageName: 'ghcr.io/pmh-only/guacamole:1.6.0', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: guacd, imageName: 'ghcr.io/pmh-only/guacd:1.6.0', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: seafile, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: seafile
+          images:
+            - {alias: seafile, imageName: 'seafileltd/seafile-pro-mc:12.0.14-arm', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: sdoc, imageName: 'seafileltd/sdoc-server:1.0.5-arm', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: notification, imageName: 'seafileltd/notification-server:12.0.11-arm', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: memcached, imageName: 'memcached:1.6-alpine', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: elasticsearch, imageName: 'elasticsearch:8.19.23', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: solver, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: solver
+          images:
+            - {alias: solver, imageName: 'ghcr.io/pmh-only/solver:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: docker, imageName: 'docker:29-dind', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: spotify, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: spotify
+          images:
+            - {alias: spotify, imageName: 'ghcr.io/yooooomi/your_spotify_server:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: playstats, imageName: 'ghcr.io/pmh-only/playstats:latest', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: thepool, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: thepool
+          images:
+            - {alias: thepool, imageName: 'ghcr.io/pmh-only/thepool:latest', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: trace, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: trace
+          images:
+            - {alias: backend, imageName: 'ghcr.io/rybbit-io/rybbit-backend:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: client, imageName: 'ghcr.io/rybbit-io/rybbit-client:latest', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: track, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: track
+          images:
+            - {alias: dawarich, imageName: 'ghcr.io/pmh-only/dawarich:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: postgis, imageName: 'ghcr.io/pmh-only/postgis:17-3.5-alpine', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: redis, imageName: 'ghcr.io/pmh-only/redis:alpine', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: traffic, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: traffic
+          images:
+            - {alias: goaccess, imageName: 'ghcr.io/pmh-only/goaccess:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: fluentbit, imageName: 'cr.fluentbit.io/fluent/fluent-bit:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: busybox, imageName: 'ghcr.io/pmh-only/busybox:latest', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: visualized, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: visualized
+          images:
+            - {alias: visualized, imageName: 'ghcr.io/pmh-only/kube-universe:latest', commonUpdateSettings: {updateStrategy: digest}}

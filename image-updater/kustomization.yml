@@ -6,6 +6,8 @@ resources:
   - secret.yml
   - mail.yml
   - reviewed.yml
+  - deployed.yml
+  - helm.yml
 images:
   - name: quay.io/argoprojlabs/argocd-image-updater
     newTag: v1.4.0

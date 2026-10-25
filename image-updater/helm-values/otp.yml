@@ -1,0 +1,3 @@
+image:
+  repository: ghcr.io/pmh-only/otp
+  tag: v0.4.0@sha256:caa00c49474cdb4e184dfe3f8a71dd187b369e51ae9234c52295a2c8667d11f7

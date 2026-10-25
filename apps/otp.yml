@@ -12,14 +12,15 @@ spec:
   project: default
   sources:
     - path: otp_configs
+      ref: imageValues
       repoURL: https://github.com/pmh-only/lab.git
       targetRevision: HEAD
     - chart: otp-inbox
       helm:
         releaseName: otp-inbox
+        valueFiles:
+          - $imageValues/image-updater/helm-values/otp.yml
         valuesObject:
-          image:
-            tag: v0.4.0@sha256:caa00c49474cdb4e184dfe3f8a71dd187b369e51ae9234c52295a2c8667d11f7
           bitwarden:
             # The Bitwarden service was explicitly retired by the owner.
             enabled: false

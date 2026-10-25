@@ -1,5 +1,5 @@
 # Existing compatibility-reviewed updaters, now owned by the image-updater app.
-# Do not add paused workloads or version-specific adapters without review.
+# Explicitly enabled running apps are also in deployed.yml and helm.yml.
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
 metadata:

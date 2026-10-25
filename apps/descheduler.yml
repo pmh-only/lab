@@ -10,13 +10,18 @@ spec:
     namespace: descheduler
     server: https://kubernetes.default.svc
   project: default
-  source:
-    chart: descheduler
+  sources:
+  - chart: descheduler
     helm:
+      valueFiles:
+        - $imageValues/image-updater/helm-values/descheduler.yml
       valuesObject:
         kind: Deployment
     repoURL: https://kubernetes-sigs.github.io/descheduler/
     targetRevision: 0.37.0
+  - repoURL: https://github.com/pmh-only/lab.git
+    targetRevision: main
+    ref: imageValues
   syncPolicy:
     automated:
       prune: true

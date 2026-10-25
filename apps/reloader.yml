@@ -10,12 +10,12 @@ spec:
     namespace: reloader
     server: https://kubernetes.default.svc
   project: default
-  source:
-    chart: reloader
+  sources:
+  - chart: reloader
     helm:
+      valueFiles:
+        - $imageValues/image-updater/helm-values/reloader.yml
       valuesObject:
-        image:
-          digest: sha256:def2480040adc164b3a57340e77674eadfd88fb7f0593df25e93297f29c7fd7c
         reloader:
           reloadOnCreate: true
           reloadOnDelete: true
@@ -25,6 +25,9 @@ spec:
           revisionHistoryLimit: 0
     repoURL: https://stakater.github.io/stakater-charts
     targetRevision: 2.2.18
+  - repoURL: https://github.com/pmh-only/lab.git
+    targetRevision: main
+    ref: imageValues
   syncPolicy:
     automated:
       prune: true

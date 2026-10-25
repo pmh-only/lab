@@ -1,0 +1,3 @@
+image:
+  repository: ghcr.io/pmh-only/cert-manager-technitium-webhook
+  tag: latest@sha256:318ce07a8b078dca54316594a753052b6e27a5dcc25ab4dfcfbf983deeed3151

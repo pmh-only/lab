@@ -10,9 +10,11 @@ spec:
     namespace: cert-manager
     server: https://kubernetes.default.svc
   project: default
-  source:
-    chart: cert-manager
+  sources:
+  - chart: cert-manager
     helm:
+      valueFiles:
+        - $imageValues/image-updater/helm-values/cert-manager.yml
       valuesObject:
         crds:
           enabled: true
@@ -27,6 +29,9 @@ spec:
           - --dns01-recursive-nameservers=1.1.1.1:53,1.0.0.1:53
     repoURL: https://charts.jetstack.io
     targetRevision: x
+  - repoURL: https://github.com/pmh-only/lab.git
+    targetRevision: main
+    ref: imageValues
   syncPolicy:
     automated:
       prune: true
@@ -50,19 +55,19 @@ spec:
   project: default
   sources:
     - path: cert-manager/technitium
+      ref: imageValues
       repoURL: https://github.com/pmh-only/lab.git
       targetRevision: HEAD
     - chart: cert-manager-technitium-webhook
       repoURL: https://kittizz.github.io/cert-manager-technitium-webhook
       targetRevision: 1.0.0
       helm:
+        valueFiles:
+          - $imageValues/image-updater/helm-values/cert-manager-technitium-webhook.yml
         valuesObject:
           fullnameOverride: cert-manager-technitium-webhook
           replicaCount: 1
           groupName: acme.xver.cloud
-          image:
-            repository: ghcr.io/pmh-only/cert-manager-technitium-webhook
-            tag: latest@sha256:318ce07a8b078dca54316594a753052b6e27a5dcc25ab4dfcfbf983deeed3151
           resources:
             requests:
               cpu: 50m
