@@ -60,8 +60,13 @@ patches:
           spec:
             containers:
               - name: argocd-image-updater-controller
-                # Warming 43 registries/app selections can exceed the upstream
-                # liveness window; do not kill the controller during warm-up.
+                args:
+                  - --metrics-bind-address=:8443
+                  - run
+                  # Avoid a global warm-up barrier across all 43 applications.
+                  # Normal per-CR reconciliation populates the same cache.
+                  - --warmup-cache=false
+                # Allow a slow initial API/registry connection without restart.
                 startupProbe:
                   httpGet:
                     path: /readyz
