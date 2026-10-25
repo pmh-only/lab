@@ -1,10 +1,21 @@
 import unittest
 
-from provision import PROFILES as SERVICE_PROFILES, generated, valid_field
+import yaml
+
+from provision import ROOT, PROFILES as SERVICE_PROFILES, generated, valid_field
 from s3 import PROFILES, bucket_policy, public_download_policy
 
 
 class S3Tests(unittest.TestCase):
+    def test_console_root_redirect_does_not_rewrite_oidc_or_s3_routes(self):
+        docs = list(yaml.safe_load_all((ROOT / "minio/ingress.yml").read_text()))
+        route = next(d for d in docs if d and d["kind"] == "HTTPRoute" and d["metadata"]["name"] == "minio-console-route")
+        redirect, backend = route["spec"]["rules"]
+        self.assertEqual(redirect["matches"], [{"path": {"type": "Exact", "value": "/"}}])
+        self.assertEqual(redirect["filters"][0]["requestRedirect"]["path"], {"type": "ReplaceFullPath", "replaceFullPath": "/rustfs/console/"})
+        self.assertEqual(backend["backendRefs"][0]["port"], 9001)
+        self.assertNotIn("filters", backend)
+
     def test_app_keys_are_fresh_and_identifiable(self):
         for name in PROFILES:
             kind = "s3-access:" + name

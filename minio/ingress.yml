@@ -61,6 +61,19 @@ spec:
   hostnames:
     - rustfs.pmh.codes
   rules:
+    # The current RustFS console lives under /rustfs/console/. Keep the
+    # public entry URL usable without rewriting OIDC callbacks or API paths.
+    - matches:
+        - path:
+            type: Exact
+            value: /
+      filters:
+        - type: RequestRedirect
+          requestRedirect:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /rustfs/console/
+            statusCode: 302
     - matches:
         - path:
             type: PathPrefix
