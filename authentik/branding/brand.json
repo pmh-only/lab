@@ -1,0 +1,15 @@
+{
+  "domain": "authentik-default",
+  "title": "PMH Identity",
+  "flowSlug": "default-authentication-flow",
+  "flowTitle": "Welcome back",
+  "theme": {
+    "base": "dark",
+    "background": "background: #0b0d12; background-image: radial-gradient(ellipse at 15% 0%, #19182b 0%, transparent 55%);"
+  },
+  "assets": {
+    "branding_logo": "wordmark.svg",
+    "branding_favicon": "icon.svg",
+    "branding_default_flow_background": "background.svg"
+  }
+}

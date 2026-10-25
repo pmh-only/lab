@@ -1,0 +1,206 @@
+/* PMH Identity — native Authentik brand theme; no scripts or external assets. */
+:root,
+:host {
+    --ak-accent: #b7a5ff;
+    --ak-dark-background: #0b0d12;
+    --ak-global--Color--100: #f1f1f6;
+    --ak-global--Color--200: #a3a7b8;
+    --ak-global--BackgroundColor--100: #12151d;
+    --ak-global--BackgroundColor--200: #0b0d12;
+    --pf-global--Color--100: #f1f1f6;
+    --pf-global--Color--200: #a3a7b8;
+    --pf-global--BackgroundColor--100: #12151d;
+    --pf-global--BackgroundColor--200: #0b0d12;
+    --pf-global--BackgroundColor--300: #1b1f2a;
+    --pf-global--BackgroundColor--400: #242937;
+    --pf-global--BorderColor--100: #303644;
+    --pf-global--BorderColor--200: #262c38;
+    --pf-global--primary-color--100: #b7a5ff;
+    --pf-global--primary-color--200: #c9bcff;
+    --pf-global--link--Color: #c9bcff;
+    --pf-global--link--Color--hover: #e0d7ff;
+    --pf-global--FontFamily--text: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --pf-global--FontFamily--heading: var(--pf-global--FontFamily--text);
+    --pf-v5-global--Color--100: #f1f1f6;
+    --pf-v5-global--Color--200: #a3a7b8;
+    --pf-v5-global--BackgroundColor--100: #12151d;
+    --pf-v5-global--BackgroundColor--200: #0b0d12;
+    --pf-v5-global--primary-color--100: #b7a5ff;
+    --pf-v5-global--BorderColor--100: #303644;
+    font-family: var(--pf-global--FontFamily--text);
+}
+
+/* Flow layout only: native stages, messages, MFA and locale controls stay intact. */
+:host(ak-flow-executor) [part="login"] {
+    --pf-c-login--PaddingTop: 2rem;
+    --pf-c-login--PaddingBottom: 2rem;
+    --pf-c-login__main--BackgroundColor: #12151d;
+    --pf-c-login__main--MaxWidth: 28rem;
+}
+
+:host(ak-flow-executor) [part="main"] {
+    width: min(28rem, calc(100vw - 2rem));
+    max-width: 28rem;
+    margin-inline: auto;
+    background: #12151d;
+    border: 1px solid #2a2e3c;
+    border-radius: 1.25rem;
+    box-shadow: 0 24px 80px #00000045;
+    overflow: visible;
+}
+
+:host(ak-flow-executor) [part="branding"] {
+    padding: 2.25rem 2rem 1.25rem;
+    text-align: start;
+}
+
+:host(ak-flow-executor) .branding-logo {
+    width: 12.75rem;
+    max-width: 100%;
+    height: auto;
+    max-height: 3rem;
+    object-fit: contain;
+    object-position: left;
+}
+
+:host(ak-flow-card) .pf-c-login__main-header,
+:host(ak-flow-card) .pf-c-login__main-body,
+:host(ak-flow-card) .pf-c-login__main-footer {
+    padding-inline: 2rem;
+    background: transparent;
+}
+
+:host(ak-flow-card) .pf-c-login__main-header {
+    padding-block: 0 1.5rem;
+}
+
+:host(ak-flow-card) .pf-c-login__main-body {
+    padding-block: 0 2rem;
+}
+
+.pf-c-title,
+.pf-v5-c-title {
+    font-family: var(--pf-global--FontFamily--heading);
+    letter-spacing: -.035em;
+    font-weight: 600;
+}
+
+:host(ak-flow-card) h1 {
+    color: #f1f1f6;
+    font-size: 1.65rem;
+    line-height: 1.3;
+}
+
+.pf-c-form__label,
+.pf-v5-c-form__label {
+    color: #d3d5e0;
+    font-size: .875rem;
+    font-weight: 500;
+}
+
+.pf-c-form-control,
+.pf-v5-c-form-control {
+    --pf-c-form-control--BackgroundColor: #0d1017;
+    --pf-c-form-control--Color: #f1f1f6;
+    --pf-c-form-control--BorderBottomColor: #363d4e;
+    --pf-c-form-control--focus--BorderBottomColor: #b7a5ff;
+    min-height: 2.875rem;
+    padding: .625rem .875rem;
+    border: 1px solid #363d4e;
+    border-radius: .625rem;
+    background-color: #0d1017;
+    color: #f1f1f6;
+}
+
+.pf-c-form-control::placeholder {
+    color: #9298ab;
+}
+
+.pf-c-button.pf-m-primary,
+.pf-v5-c-button.pf-m-primary {
+    --pf-c-button--m-primary--BackgroundColor: #b7a5ff;
+    --pf-c-button--m-primary--Color: #211b35;
+    --pf-c-button--m-primary--hover--BackgroundColor: #c9bcff;
+    --pf-c-button--m-primary--hover--Color: #211b35;
+    --pf-c-button--m-primary--focus--BackgroundColor: #c9bcff;
+    --pf-c-button--m-primary--focus--Color: #211b35;
+    border-radius: .625rem;
+    min-height: 2.875rem;
+    font-weight: 600;
+}
+
+/* Native controls retain their focus indicators, validation and disabled states. */
+:is(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid #c9bcff;
+    outline-offset: 3px;
+}
+
+/* User library: quiet surfaces, clear hierarchy and generous app-card spacing. */
+:host(ak-library-impl) {
+    max-width: 90rem;
+    margin-inline: auto;
+    padding: clamp(1.5rem, 4vw, 4rem);
+}
+
+ak-library-impl::part(card),
+:host(ak-library-impl) [part="card"] {
+    background: #12151d;
+    color: #f1f1f6;
+    border: 1px solid #2a2e3c;
+    border-radius: 1rem;
+    box-shadow: none;
+    transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+ak-library-impl::part(card):hover,
+:host(ak-library-impl) [part="card"]:hover {
+    background: #191d28;
+    border-color: #8d7acb;
+}
+
+:host(ak-library-impl) [part="app-group-header"] {
+    color: #a3a7b8;
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+:host(ak-library-impl) input[name="application-search"] {
+    background: #12151d;
+    border: 1px solid #303644;
+    border-radius: .75rem;
+    padding: .75rem 1rem;
+    font-size: .95rem;
+}
+
+.pf-c-page__header,
+.pf-v5-c-masthead {
+    --pf-c-page__header--BackgroundColor: #0b0d12;
+    --pf-v5-c-masthead--BackgroundColor: #0b0d12;
+}
+
+@media (max-width: 480px) {
+    :host(ak-flow-executor) [part="branding"] {
+        padding: 1.75rem 1.5rem 1rem;
+    }
+    :host(ak-flow-card) .pf-c-login__main-header,
+    :host(ak-flow-card) .pf-c-login__main-body,
+    :host(ak-flow-card) .pf-c-login__main-footer {
+        padding-inline: 1.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :host(ak-library-impl) [part="card"] {
+        transition: none;
+    }
+}
+
+@media (forced-colors: active) {
+    :host(ak-flow-executor) [part="main"],
+    :host(ak-library-impl) [part="card"],
+    .pf-c-form-control {
+        border-color: CanvasText;
+    }
+}

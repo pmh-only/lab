@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs><radialGradient id="glow" cx="25%" cy="0%" r="75%"><stop stop-color="#201c37"/><stop offset="1" stop-color="#0b0d12"/></radialGradient></defs>
+  <path fill="#0b0d12" d="M0 0h1920v1080H0z"/>
+  <path fill="url(#glow)" opacity=".65" d="M0 0h1920v1080H0z"/>
+</svg>

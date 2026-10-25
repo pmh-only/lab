@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="204" height="48" viewBox="0 0 204 48" role="img" aria-label="PMH Identity">
+  <rect x="1" y="5" width="38" height="38" rx="12" fill="#b7a5ff"/>
+  <path d="m16 17-5 7 5 7m8-14 5 7-5 7" fill="none" stroke="#211b35" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="52" y="33" fill="#f1f1f6" font-family="system-ui,sans-serif" font-size="26" font-weight="650" letter-spacing="-1">pmh<tspan fill="#9699ac" font-weight="400" font-size="20" letter-spacing="-.5"> / identity</tspan></text>
+</svg>
