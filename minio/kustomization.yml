@@ -9,4 +9,4 @@ resources:
 images:
   - name: ghcr.io/pmh-only/rustfs
     newTag: latest
-    digest: sha256:8fb7464dd3a045746be34d37a6e43d6cc72d2e033e446f68c6fef5cc49cf232c
+    digest: sha256:fbe932e58c67b67793df9e2994965acb7c83a5b5c16f3d88a3ffd221f3fe44b7
