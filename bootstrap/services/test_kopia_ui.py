@@ -34,6 +34,22 @@ class KopiaUITests(unittest.TestCase):
             admin_policy(api)
         api.request.assert_not_called()
 
+    def test_older_binding_without_dry_run_is_idempotent_but_explicit_dry_run_is_rejected(self):
+        policy = {"pk": "policy", "name": "lab bootstrap: kopia console administrators only", "expression": ADMIN_EXPRESSION, "execution_logging": False}
+        binding = {"policy": "policy", "target": "app", "order": 0, "enabled": True, "negate": False, "failure_result": False, "timeout": 30}
+        users = [{"pk": 1, "is_active": True, "is_superuser": True, "type": "internal"},
+                 {"pk": 2, "is_active": True, "is_superuser": False, "type": "internal"}]
+        api = Mock()
+        api.list.side_effect = [[policy], [binding], users]
+        api.request.side_effect = [{"pk": "app", "policy_engine_mode": "all"}, {"passing": True}, {"passing": False}]
+        admin_policy(api)
+        self.assertTrue(all(not c.args[0].endswith("bindings/") for c in api.request.call_args_list))
+        api = Mock()
+        api.list.side_effect = [[policy], [{**binding, "dry_run": True}]]
+        api.request.return_value = {"pk": "app", "policy_engine_mode": "all"}
+        with self.assertRaisesRegex(RuntimeError, "binding differs"):
+            admin_policy(api)
+
     def test_dedicated_reader_does_not_overwrite_worker_permissions_or_rotate_passwords(self):
         password, repository = "s" * 64, "r" * 64
         data = {"server-password": password, "repository-password": repository,

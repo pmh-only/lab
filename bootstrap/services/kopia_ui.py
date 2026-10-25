@@ -93,7 +93,9 @@ def admin_policy(api):
         raise RuntimeError("Ambiguous application policy binding")
     desired = {"policy": policy["pk"], "target": app["pk"], "order": 0, "enabled": True, "negate": False, "dry_run": False, "failure_result": False, "timeout": 30}
     if existing:
-        if any(existing[0].get(k) != value for k, value in desired.items()):
+        # Older Authentik APIs omit dry_run entirely (policies are enforced).
+        # Still reject an explicitly enabled dry-run binding if supported.
+        if any(existing[0].get(k, False if k == "dry_run" else None) != value for k, value in desired.items()):
             raise RuntimeError("Application access binding differs")
     else:
         api.request("policies/bindings/", desired)
