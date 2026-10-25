@@ -33,6 +33,19 @@
       "expression": "return {\"rustfs_policy\": [\"consoleAdmin\"] if user.is_superuser else []}"
     }]
   },
+  "technitium": {
+    "namespace": "nameserver",
+    "vaultPath": "nameserver/technitium-oidc",
+    "clientID": "lab-technitium",
+    "launchURL": "https://names.pmh.codes",
+    "redirectURI": "https://names.pmh.codes/sso/callback",
+    "manageReader": false,
+    "extraScopeMappings": [{
+      "name": "lab bootstrap: technitium administrator roles",
+      "scope_name": "technitium",
+      "expression": "return {\"roles\": [\"lab-technitium-admins\"] if user.is_active and user.is_superuser and user.type == \"internal\" else []}"
+    }]
+  },
   "tailscale": {
     "namespace": "tailscale",
     "vaultPath": "tailscale/tailscale-oidc",

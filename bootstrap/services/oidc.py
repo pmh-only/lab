@@ -122,7 +122,7 @@ def provision_client(vault, api, slug, desired):
     else:
         api.request("core/applications/", {"name": slug, "slug": slug, "provider": provider["pk"],
                     "meta_launch_url": desired["launchURL"], "meta_description": "Managed by lab bootstrap", "policy_engine_mode": "all"})
-    if not public_client:
+    if not public_client and desired.get("manageReader", True):
         reader(vault, desired["namespace"], desired.get("readerPaths", desired["vaultPath"]))
     with urllib.request.urlopen("https://auth.pmh.codes/application/o/" + slug + "/.well-known/openid-configuration", timeout=20) as response:
         discovery = json.load(response)

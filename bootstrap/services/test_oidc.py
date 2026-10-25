@@ -46,6 +46,13 @@ class OIDCTests(unittest.TestCase):
                 self.assertEqual(declaration["vaultPath"], "tailscale/tailscale-oidc")
                 self.assertNotEqual(declaration["vaultPath"], "tailscale/operator-oauth")
                 continue
+            if slug == "technitium":
+                config = json.loads((ROOT / "nameserver/configuration/oidc.json").read_text())
+                self.assertEqual(declaration["clientID"], config["ssoClientId"])
+                self.assertEqual(declaration["redirectURI"], "https://names.pmh.codes/sso/callback")
+                self.assertEqual(config["ssoAuthority"], "https://auth.pmh.codes/application/o/technitium/")
+                self.assertFalse(declaration["manageReader"])
+                continue
             if slug == "track":
                 doc = next(yaml.safe_load_all((ROOT / "track/deployment.yml").read_text()))
                 env = {e["name"]: e.get("value") for e in doc["spec"]["template"]["spec"]["containers"][0]["env"]}
@@ -107,6 +114,24 @@ class OIDCTests(unittest.TestCase):
             provision_client(vault, api, "go", desired)
         vault.create.assert_not_called()
         api.request.assert_called_once_with("core/applications/go/", missing_ok=True)
+
+    def test_native_dns_client_does_not_overwrite_existing_vault_reader_permissions(self):
+        desired = DECLARATIONS["technitium"]
+        secret = "x" * 64
+        mapping = dict(desired["extraScopeMappings"][0], pk="dns-role-mapping")
+        provider = {"pk": 42, "name": "lab bootstrap: technitium", "client_id": desired["clientID"],
+                    "client_secret": secret, "issuer_mode": "per_provider", "property_mappings": [mapping["pk"]],
+                    "redirect_uris": [{"matching_mode": "strict", "url": desired["redirectURI"], "redirect_uri_type": "authorization"}]}
+        api, vault = Mock(), Mock()
+        api.list.side_effect = [[provider], [mapping]]
+        api.request.return_value = {"provider": 42}
+        vault.get.return_value = {"client-secret": secret}
+        discovery = {"issuer": "https://auth.pmh.codes/application/o/technitium/"}
+        with patch("oidc.reader") as reader, patch("oidc.urllib.request.urlopen", return_value=io.BytesIO(json.dumps(discovery).encode())):
+            provision_client(vault, api, "technitium", desired)
+        reader.assert_not_called()
+        vault.run.assert_not_called()
+        vault.create.assert_not_called()
 
     def test_rustfs_claim_never_grants_admin_to_ordinary_users(self):
         expression = DECLARATIONS["rustfs"]["extraScopeMappings"][0]["expression"]

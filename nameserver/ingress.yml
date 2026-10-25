@@ -15,6 +15,16 @@ spec:
         - path:
             type: PathPrefix
             value: /
+      filters:
+        # Technitium's native OIDC callback must use the public HTTPS origin,
+        # not the HTTP backend service or a client-supplied forwarded host.
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            set:
+              - name: X-Forwarded-Proto
+                value: https
+              - name: X-Forwarded-Host
+                value: names.pmh.codes
       backendRefs:
         - group: ""
           kind: Service

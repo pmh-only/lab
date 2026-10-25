@@ -1,0 +1,12 @@
+{
+  "ssoEnabled": true,
+  "ssoAuthority": "https://auth.pmh.codes/application/o/technitium/",
+  "ssoClientId": "lab-technitium",
+  "ssoMetadataAddress": null,
+  "ssoScopes": ["openid", "profile", "email", "technitium"],
+  "ssoAllowSignup": true,
+  "ssoAllowSignupOnlyForMappedUsers": true,
+  "ssoGroupMap": [
+    {"remoteGroup": "lab-technitium-admins", "localGroup": "Administrators"}
+  ]
+}
