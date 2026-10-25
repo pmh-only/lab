@@ -18,4 +18,4 @@ images:
     digest: sha256:9e79b879b177fbd72c34376a3dd3d91747da5db49e1f560f76aea59561471977
   - name: ghcr.io/pmh-only/solver
     newTag: latest
-    digest: sha256:f83d148853c89f1e99555636a3c86ce530ac22b71d78af98747796f74ab2a865
+    digest: sha256:f146859f0b56588b20567561a9ba0a19304bd5a25089dfee0b9339c6431f7e86
