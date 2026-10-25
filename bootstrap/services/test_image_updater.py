@@ -21,6 +21,8 @@ class ImageUpdaterTests(unittest.TestCase):
         pod = next(d for d in self.docs if d["kind"] == "Deployment")["spec"]["template"]["spec"]
         self.assertIn("@sha256:", pod["containers"][0]["image"])
         self.assertEqual(pod["securityContext"]["fsGroup"], 1000)
+        self.assertEqual(pod["containers"][0]["startupProbe"]["httpGet"], {"path": "/readyz", "port": 8081})
+        self.assertGreaterEqual(pod["containers"][0]["startupProbe"]["failureThreshold"] * pod["containers"][0]["startupProbe"]["periodSeconds"], 600)
         secret = next(v["secret"] for v in pod["volumes"] if v["name"] == "ssh-signing-key")
         self.assertEqual(secret["secretName"], "git")
         self.assertFalse(secret["optional"])

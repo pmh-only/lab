@@ -58,6 +58,17 @@ patches:
           type: Recreate
         template:
           spec:
+            containers:
+              - name: argocd-image-updater-controller
+                # Warming 43 registries/app selections can exceed the upstream
+                # liveness window; do not kill the controller during warm-up.
+                startupProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 120
             securityContext:
               runAsNonRoot: true
               runAsUser: 1000
