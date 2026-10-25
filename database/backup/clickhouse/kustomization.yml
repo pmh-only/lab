@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+nameSuffix: -clickhouse
+resources:
+  - ../base
+patches:
+  - target:
+      kind: CronJob
+    patch: |-
+      apiVersion: batch/v1
+      kind: CronJob
+      metadata:
+        name: backup
+      spec:
+        schedule: "0 4 * * *"
+        jobTemplate:
+          spec:
+            template:
+              spec:
+                initContainers:
+                  - name: export
+                    $patch: delete
+                containers:
+                  - name: upload
+                    image: ghcr.io/pmh-only/backpack-clickhouse2s3:latest
+                    command: [sh, /scripts/clickhouse.sh]
+                    env:
+                      - {name: ENGINE, value: clickhouse}
+                      - {name: BACKUP_NAME, value: clickhouse}
+                      - {name: DATABASE_HOST, value: clickhouse-service}
+                      - {name: DATABASE_USER, value: admin}
+                      - name: DATABASE_PASSWORD
+                        valueFrom:
+                          secretKeyRef: {name: clickhouse-root-password, key: password}

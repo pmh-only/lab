@@ -41,7 +41,7 @@ class SpotifyTests(unittest.TestCase):
         expected = base64.b64encode(b'test-client:private-test-secret').decode()
         self.assertEqual(request.get_header('Authorization'), 'Basic ' + expected)
 
-    def test_mongo_authentication_keeps_persistent_volume_and_backup_deferral(self):
+    def test_mongo_authentication_keeps_persistent_volume_and_legacy_sidecars_disabled(self):
         deployment = yaml.safe_load((ROOT / 'database/mongo/deployment.yml').read_text())
         pod = deployment['spec']['template']['spec']
         container = pod['containers'][0]
@@ -49,7 +49,8 @@ class SpotifyTests(unittest.TestCase):
         self.assertIn('--bind_ip_all', container['args'])
         self.assertEqual(pod['volumes'][0]['persistentVolumeClaim']['claimName'], 'mongo-pvc')
         kustomization = yaml.safe_load((ROOT / 'database/kustomization.yml').read_text())
-        self.assertIn('backpack', str(kustomization['patches']))
+        self.assertTrue(any('/spec/template/spec/initContainers' in p['patch'] for p in kustomization['patches']))
+        self.assertIn('./backup/mongo', kustomization['resources'])
 
     def test_spotify_native_workloads_use_real_secret_identity_and_scoped_database(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(['kubectl', 'kustomize', str(ROOT / 'spotify')], text=True)))

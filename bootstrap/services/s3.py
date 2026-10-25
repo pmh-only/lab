@@ -45,13 +45,17 @@ def public_download_policy(bucket):
 
 
 class Admin:
-    def __init__(self, access, secret):
+    def __init__(self, access, secret, endpoint="https://s3.pmh.codes"):
+        parsed = urllib.parse.urlsplit(endpoint)
+        if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.path not in {"", "/"} or parsed.query or parsed.fragment or parsed.username:
+            raise ValueError("Expected an S3 HTTP(S) origin")
+        self.endpoint = endpoint.rstrip("/")
         self.credentials = Credentials(access, secret)
-        self.s3 = Minio("s3.pmh.codes", access_key=access, secret_key=secret, secure=True, region="us-east-1")
+        self.s3 = Minio(parsed.netloc, access_key=access, secret_key=secret, secure=parsed.scheme == "https", region="us-east-1")
 
     def request(self, path, data=None, method="GET"):
         body = None if data is None else json.dumps(data, separators=(",", ":")).encode()
-        url = urllib.parse.urlsplit("https://s3.pmh.codes/rustfs/admin/v3/" + path)
+        url = urllib.parse.urlsplit(self.endpoint + "/rustfs/admin/v3/" + path)
         now = datetime.now(timezone.utc)
         digest = hashlib.sha256(body or b"").hexdigest()
         headers = {"Host": url.netloc, "X-Amz-Date": now.strftime("%Y%m%dT%H%M%SZ"), "X-Amz-Content-Sha256": digest}

@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+nameSuffix: -mysql
+resources:
+  - ../base
+patches:
+  - target:
+      kind: CronJob
+    patch: |-
+      apiVersion: batch/v1
+      kind: CronJob
+      metadata:
+        name: backup
+      spec:
+        schedule: "20 3 * * *"
+        jobTemplate:
+          spec:
+            template:
+              spec:
+                initContainers:
+                  - name: export
+                    image: ghcr.io/pmh-only/mysql:8
+                    env:
+                      - {name: ENGINE, value: mysql}
+                      - {name: DATABASE_HOST, value: mysql-service}
+                      - {name: DATABASE_USER, value: root}
+                      - name: DATABASE_PASSWORD
+                        valueFrom:
+                          secretKeyRef: {name: mysql-root-password, key: password}
+                containers:
+                  - name: upload
+                    env:
+                      - {name: ENGINE, value: mysql}
+                      - {name: BACKUP_NAME, value: mysql}

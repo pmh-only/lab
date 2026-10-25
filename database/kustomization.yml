@@ -22,8 +22,18 @@ resources:
   - ./mongo/service.yml
   - ./redis/deployment.yml
   - ./redis/service.yml
-# Temporary fresh-cluster bootstrap without Tailscale/S3 backups; see todo.md.
-# Remove both patches only after provisioning and testing the backup dependencies.
+  - ./backup/pgsql
+  - ./backup/mysql
+  - ./backup/mongo
+  - ./backup/clickhouse
+configMapGenerator:
+  - name: database-backup-scripts
+    files:
+      - backup/export.sh
+      - backup/upload.sh
+      - backup/clickhouse.sh
+# Legacy backup sidecars stay off: checked CronJobs back up over the Services
+# without restarting the database writers or sharing their live data volumes.
 patches:
   # A node-local RWO PVC can still be mounted by two Pods on the same node.
   # Never overlap database writers during a Secret-triggered restart.
@@ -46,17 +56,6 @@ patches:
     patch: |-
       - op: remove
         path: /spec/template/spec/initContainers
-  - target:
-      group: secrets.hashicorp.com
-      version: v1beta1
-      kind: VaultStaticSecret
-      name: backpack-secrets
-    patch: |-
-      apiVersion: secrets.hashicorp.com/v1beta1
-      kind: VaultStaticSecret
-      metadata:
-        name: backpack-secrets
-      $patch: delete
 images:
   - name: ghcr.io/pmh-only/clickhouse-server
     newTag: rybbit
