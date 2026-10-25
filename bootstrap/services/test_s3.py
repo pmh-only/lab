@@ -11,7 +11,10 @@ class S3Tests(unittest.TestCase):
         docs = list(yaml.safe_load_all((ROOT / "minio/ingress.yml").read_text()))
         route = next(d for d in docs if d and d["kind"] == "HTTPRoute" and d["metadata"]["name"] == "minio-console-route")
         redirect, backend = route["spec"]["rules"]
-        self.assertEqual(redirect["matches"], [{"path": {"type": "Exact", "value": "/"}}])
+        self.assertEqual(redirect["matches"], [{
+            "path": {"type": "Exact", "value": "/"},
+            "headers": [{"name": "Accept", "type": "RegularExpression", "value": ".*text/html.*"}],
+        }])
         self.assertEqual(redirect["filters"][0]["requestRedirect"]["path"], {"type": "ReplaceFullPath", "replaceFullPath": "/rustfs/console/"})
         self.assertEqual(backend["backendRefs"][0]["port"], 9001)
         self.assertNotIn("filters", backend)

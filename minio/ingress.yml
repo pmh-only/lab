@@ -62,11 +62,15 @@ spec:
     - rustfs.pmh.codes
   rules:
     # The current RustFS console lives under /rustfs/console/. Keep the
-    # public entry URL usable without rewriting OIDC callbacks or API paths.
+    # public HTML entry usable, but never redirect signed S3 requests to /.
     - matches:
         - path:
             type: Exact
             value: /
+          headers:
+            - name: Accept
+              type: RegularExpression
+              value: ".*text/html.*"
       filters:
         - type: RequestRedirect
           requestRedirect:
