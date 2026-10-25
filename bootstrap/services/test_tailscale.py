@@ -37,12 +37,18 @@ class TailscaleTests(unittest.TestCase):
         self.assertEqual(secret["spec"]["path"], "tailscale/operator-oauth")
         self.assertEqual(secret["spec"]["rolloutRestartTargets"], [{"kind": "Deployment", "name": "operator"}])
 
-    def test_old_remote_devices_are_not_fabricated_or_deployed_in_new_tailnet(self):
+    def test_only_verified_raspberry_is_deployed_in_current_tailnet(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "tailscale_configs")], text=True)))
-        self.assertEqual([d["kind"] for d in docs], ["Connector"])
-        self.assertNotIn("namespace", docs[0]["metadata"])
-        self.assertEqual(docs[0]["spec"]["tags"], ["tag:k8s"])
-        self.assertEqual(docs[0]["spec"]["subnetRouter"]["advertiseRoutes"], ["10.0.0.0/8", "172.16.0.0/16", "172.17.0.0/16"])
+        self.assertEqual({d["kind"] for d in docs}, {"Connector", "Service"})
+        connector = next(d for d in docs if d["kind"] == "Connector")
+        self.assertNotIn("namespace", connector["metadata"])
+        self.assertEqual(connector["spec"]["tags"], ["tag:k8s"])
+        self.assertEqual(connector["spec"]["subnetRouter"]["advertiseRoutes"], ["10.0.0.0/8", "172.16.0.0/16", "172.17.0.0/16"])
+        service = next(d for d in docs if d["kind"] == "Service")
+        self.assertEqual(service["metadata"]["name"], "pmhraspberry")
+        self.assertEqual(service["metadata"]["namespace"], "tailscale")
+        self.assertEqual(service["metadata"]["annotations"]["tailscale.com/tailnet-fqdn"], "pmhraspberry.tail712416.ts.net")
+        self.assertEqual(service["spec"], {"externalName": "placeholder", "type": "ExternalName"})
         self.assertTrue((ROOT / "tailscale_configs/service.yml").is_file())
 
     def test_oauth_values_are_only_form_body_and_missing_scopes_are_rejected(self):
