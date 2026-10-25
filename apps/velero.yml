@@ -82,7 +82,9 @@ spec:
             schedule: "0 0 * * *"
             useOwnerReferencesInBackup: false
             paused: false
-            skipImmediately: true
+            # This is a one-shot flag reset by the controller, not a permanent
+            # desired state. Initial metadata backup/restore has already passed.
+            skipImmediately: false
             template:
               ttl: "720h"
               storageLocation: default

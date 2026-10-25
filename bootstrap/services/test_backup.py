@@ -12,7 +12,7 @@ from unittest.mock import Mock
 import yaml
 
 from backup_s3 import PROFILES, backup_policy, reconcile, vault_snapshot_roles
-from backup_restore import restore_pod
+from backup_restore import RESTORE, restore_pod
 from provision import ROOT
 from s3 import Admin, bucket_policy
 
@@ -106,6 +106,8 @@ class BackupTests(unittest.TestCase):
         self.assertNotIn("--system=users", (ROOT / "database/backup/export.sh").read_text())
 
     def test_restore_can_only_target_new_ephemeral_local_databases(self):
+        for script in RESTORE.values():
+            subprocess.run(["sh", "-n"], input=script, text=True, check=True)
         for engine in ["pgsql", "mysql", "mongo"]:
             pod = restore_pod("backup-restore-test", engine, engine + "/20261025T000000Z-uuid/", "native@sha256:test", "uploader@sha256:test")
             spec = pod["spec"]
@@ -136,6 +138,7 @@ class BackupTests(unittest.TestCase):
         self.assertEqual(values["credentials"]["existingSecret"], "velero-s3")
         schedule = values["schedules"]["cluster-metadata"]
         self.assertFalse(schedule["paused"])
+        self.assertFalse(schedule["skipImmediately"])
         self.assertFalse(schedule["template"]["snapshotVolumes"])
         self.assertFalse(schedule["template"]["defaultVolumesToFsBackup"])
         rules = next(yaml.safe_load_all((ROOT / "velero_auth/rbac.yml").read_text()))["rules"]
