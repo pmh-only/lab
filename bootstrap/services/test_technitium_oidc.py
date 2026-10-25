@@ -89,6 +89,8 @@ class TechnitiumOIDCTests(unittest.TestCase):
         self.assertNotIn('post("settings/set"', code)
         self.assertNotIn('"rollout"', code)
         self.assertNotIn('"zones/create"', code)
+        gateway = next(d["data"]["nginx.conf"] for d in yaml.safe_load_all((ROOT / "gateway/nginx.yml").read_text()) if d and "nginx.conf" in d.get("data", {}))
+        self.assertRegex(gateway, r'names\.pmh\.codes\s+""')
 
 
 if __name__ == "__main__":
