@@ -7,7 +7,9 @@ metadata:
 spec:
   schedule: "40 4 * * *"
   timeZone: Asia/Seoul
-  suspend: true
+  # First native snapshot and remote checksum read-back passed. Full unseal
+  # recovery still needs a separate operator drill with the original shares.
+  suspend: false
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 3

@@ -53,7 +53,7 @@ class BackupTests(unittest.TestCase):
         jobs = [d for d in docs if d["kind"] == "CronJob"]
         self.assertEqual({j["metadata"]["name"] for j in jobs}, {"backup-" + n for n in ["pgsql", "mysql", "mongo", "clickhouse", "immich"]})
         for job in jobs:
-            self.assertEqual(job["spec"]["suspend"], job["metadata"]["name"] not in {"backup-mysql", "backup-mongo", "backup-immich"})
+            self.assertEqual(job["spec"]["suspend"], job["metadata"]["name"] == "backup-clickhouse")
             self.assertEqual(job["metadata"]["annotations"]["reloader.stakater.com/auto"], "false")
             self.assertEqual(job["spec"]["concurrencyPolicy"], "Forbid")
             pod = job["spec"]["jobTemplate"]["spec"]["template"]["spec"]
@@ -168,7 +168,7 @@ class BackupTests(unittest.TestCase):
     def test_vault_snapshot_only_gets_ca_and_dedicated_snapshot_identity(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "vault-backup")], text=True)))
         job = next(d for d in docs if d["kind"] == "CronJob")
-        self.assertTrue(job["spec"]["suspend"])
+        self.assertFalse(job["spec"]["suspend"])
         pod = job["spec"]["jobTemplate"]["spec"]["template"]["spec"]
         self.assertEqual(pod["serviceAccountName"], "vault-snapshot")
         self.assertFalse(pod["automountServiceAccountToken"])

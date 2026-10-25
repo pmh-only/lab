@@ -38,6 +38,13 @@ spec:
           containers:
             - name: kopia
               image: kopia/kopia:latest@sha256:89fd95ee2942880ca00eae964266958a394421ddbdf69bca62e38afc55f5900e
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: "1"
+                  memory: 2Gi
               securityContext:
                 privileged: false
                 allowPrivilegeEscalation: false

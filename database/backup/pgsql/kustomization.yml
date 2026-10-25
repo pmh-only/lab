@@ -3,3 +3,13 @@ kind: Kustomization
 nameSuffix: -pgsql
 resources:
   - ../base
+patches:
+  - target:
+      kind: CronJob
+    patch: |-
+      apiVersion: batch/v1
+      kind: CronJob
+      metadata:
+        name: backup
+      spec:
+        suspend: false
