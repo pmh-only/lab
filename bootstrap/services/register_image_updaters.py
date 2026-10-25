@@ -24,7 +24,7 @@ DEPLOYED = {
 }
 HELM = {
     "cert-manager", "cert-manager-technitium-webhook", "descheduler", "envoy-gateway",
-    "otp", "pdf", "reloader", "tailscale", "vault", "vault-secrets-operator",
+    "otp", "pdf", "reloader", "tailscale", "vault-secrets-operator",
 }
 ENABLED = REVIEWED | DEPLOYED | HELM | {"mail"}
 DECLARATIONS = ("reviewed.yml", "deployed.yml", "helm.yml", "mail.yml")

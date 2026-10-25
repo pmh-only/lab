@@ -1,5 +1,5 @@
 # Chart versions stay pinned; signed Git commits update only the image values.
-# Vault remains manual-sync because its single Shamir-sealed member needs unseal.
+# Vault is deliberately excluded; helm-values/vault.yml stays manually pinned.
 apiVersion: v1
 kind: List
 items:
@@ -94,17 +94,6 @@ items:
           images:
             - {alias: operator, imageName: 'tailscale/k8s-operator:v1.104.2', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: operatorConfig.image.tag}}}
             - {alias: proxy, imageName: 'tailscale/tailscale:v1.104.2', commonUpdateSettings: {updateStrategy: digest, forceUpdate: true}, manifestTargets: {helm: {tag: proxyConfig.image.tag}}}
-  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
-    kind: ImageUpdater
-    metadata: {name: vault, namespace: argocd}
-    spec:
-      writeBackConfig:
-        method: git:secret:argocd/git
-        gitConfig: {repository: 'git@github.com:pmh-only/lab.git', branch: main, writeBackTarget: 'helmvalues:/image-updater/helm-values/vault.yml'}
-      applicationRefs:
-        - namePattern: vault
-          images:
-            - {alias: vault, imageName: 'hashicorp/vault:2.0.4', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: server.image.tag}}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: vault-secrets-operator, namespace: argocd}

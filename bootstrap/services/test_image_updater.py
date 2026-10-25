@@ -45,8 +45,8 @@ class ImageUpdaterTests(unittest.TestCase):
     def test_all_enabled_apps_have_one_owned_digest_updater_without_paused_workloads(self):
         managed = {d["metadata"]["name"]: d for d in self.docs if d["kind"] == "ImageUpdater"}
         self.assertEqual(set(managed), ENABLED)
-        self.assertEqual(len(managed), 43)
-        self.assertTrue(ENABLED.isdisjoint({"as218822", "welplan", "kopia", "velero", "velero-ui", "ghost"}))
+        self.assertEqual(len(managed), 42)
+        self.assertTrue(ENABLED.isdisjoint({"as218822", "welplan", "kopia", "velero", "velero-ui", "ghost", "vault"}))
         apps = {}
         for path in (ROOT / "apps").glob("*.yml"):
             for d in yaml.safe_load_all(path.read_text()):
@@ -84,6 +84,8 @@ class ImageUpdaterTests(unittest.TestCase):
             else:
                 self.assertEqual(updater["spec"]["writeBackConfig"]["gitConfig"]["writeBackTarget"], "kustomization")
         self.assertNotIn("automated", apps["vault"]["spec"]["syncPolicy"])
+        vault_pin = yaml.safe_load((ROOT / "image-updater/helm-values/vault.yml").read_text())
+        self.assertRegex(vault_pin["server"]["image"]["tag"], r"^2\.0\.4@sha256:[a-f0-9]{64}$")
 
     def test_bootstrap_reads_the_single_gitops_owned_declaration_source(self):
         code = (ROOT / "bootstrap/services/register_image_updaters.py").read_text()

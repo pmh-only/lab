@@ -63,7 +63,7 @@ patches:
                 args:
                   - --metrics-bind-address=:8443
                   - run
-                  # Avoid a global warm-up barrier across all 43 applications.
+                  # Avoid a global warm-up barrier across all enabled apps.
                   # Normal per-CR reconciliation populates the same cache.
                   - --warmup-cache=false
                 # Allow a slow initial API/registry connection without restart.

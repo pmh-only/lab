@@ -1,3 +1,5 @@
+# Manual pin: Vault is not managed by ImageUpdater. Keep version and digest
+# changes deliberate; a restart requires the existing Shamir unseal process.
 server:
   image:
     repository: hashicorp/vault
