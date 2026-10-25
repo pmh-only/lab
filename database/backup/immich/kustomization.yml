@@ -13,6 +13,7 @@ patches:
         name: backup
       spec:
         schedule: "20 4 * * *"
+        suspend: false
         jobTemplate:
           spec:
             template:

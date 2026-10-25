@@ -1,0 +1,89 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vault-raft-snapshot
+  annotations:
+    reloader.stakater.com/auto: "false"
+spec:
+  schedule: "40 4 * * *"
+  timeZone: Asia/Seoul
+  suspend: true
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    metadata:
+      annotations:
+        reloader.stakater.com/auto: "false"
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      template:
+        metadata:
+          annotations:
+            reloader.stakater.com/auto: "false"
+        spec:
+          serviceAccountName: vault-snapshot
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          initContainers:
+            - name: snapshot
+              image: python:3.14-alpine@sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72
+              command: [python, -B, /scripts/snapshot.py]
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: [ALL]}
+              volumeMounts:
+                - {name: scripts, mountPath: /scripts, readOnly: true}
+                - {name: identity, mountPath: /identity, readOnly: true}
+                - {name: ca, mountPath: /vault-ca, readOnly: true}
+                - {name: backup, mountPath: /backup}
+          containers:
+            - name: upload
+              image: ghcr.io/pmh-only/backpack-pgsql2s3:latest@sha256:907d8a4180e0be87d01c20640b70e688f937dab3ba18b33f76602f3900001f32
+              command: [sh, /scripts/upload.sh]
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: [ALL]}
+              env:
+                - {name: HOME, value: /tmp}
+                - {name: AWS_DEFAULT_REGION, value: us-east-1}
+                - {name: S3_ENDPOINT_URL, value: "http://pmhraspberry.tailscale.svc.cluster.local:9000"}
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef: {name: vault-backup-s3, key: S3_ACCESS_TOKEN}
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef: {name: vault-backup-s3, key: S3_SECRET_TOKEN}
+              volumeMounts:
+                - {name: scripts, mountPath: /scripts, readOnly: true}
+                - {name: backup, mountPath: /backup}
+                - {name: tmp, mountPath: /tmp}
+          volumes:
+            - name: scripts
+              configMap: {name: vault-backup-scripts}
+            - name: ca
+              secret:
+                secretName: vault-server-tls
+                items:
+                  - {key: ca.crt, path: ca.crt}
+            - name: identity
+              projected:
+                sources:
+                  - serviceAccountToken:
+                      audience: vault
+                      expirationSeconds: 600
+                      path: token
+            - name: backup
+              emptyDir: {sizeLimit: 2Gi}
+            - name: tmp
+              emptyDir: {sizeLimit: 256Mi}

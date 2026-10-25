@@ -24,6 +24,7 @@ PROFILES = {
     "database": {"path": "database/backpack-secrets", "bucket": "dbdump", "delete": False},
     "velero": {"path": "velero/s3", "bucket": "velero", "delete": True},
     "kopia": {"path": "kopia/s3", "bucket": "kopia", "delete": True},
+    "vault": {"path": "vault/snapshot-s3", "bucket": "vault", "delete": False},
 }
 
 
@@ -106,6 +107,17 @@ def kopia_credentials(vault):
     reader(vault, "kopia", path)
 
 
+def vault_snapshot_roles(vault):
+    vault.run("policy", "write", "lab-vault-backup-s3", "-", payload='path "secret/data/vault/snapshot-s3" { capabilities = ["read"] }\n')
+    vault.run("policy", "write", "lab-vault-snapshot", "-", payload='path "sys/storage/raft/snapshot" { capabilities = ["read", "sudo"] }\n')
+    for role, account, policy in [("vault-backup-s3", "vault-backup-auth", "lab-vault-backup-s3"),
+                                  ("vault-snapshot", "vault-snapshot", "lab-vault-snapshot")]:
+        vault.run("write", "auth/kubernetes/role/" + role, "-", payload=json.dumps({
+            "bound_service_account_names": [account], "bound_service_account_namespaces": ["vault"],
+            "audience": "vault", "token_policies": [policy], "token_ttl": 900, "token_max_ttl": 1800,
+        }))
+
+
 def reconcile(vault, admin, name, endpoint):
     profile = PROFILES[name]
     data = vault.get(profile["path"])
@@ -164,6 +176,7 @@ def reconcile(vault, admin, name, endpoint):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("services", nargs="*", choices=sorted(PROFILES))
     parser.add_argument("--endpoint", default="http://127.0.0.1:19000")
     args = parser.parse_args()
     if urllib.parse.urlsplit(args.endpoint).hostname != "127.0.0.1":
@@ -177,7 +190,8 @@ def main():
     if not supplied or set(supplied) != {"access_key", "secret_key"}:
         raise RuntimeError("Supplied remote RustFS administrator credential is missing")
     admin = Admin(supplied["access_key"], supplied["secret_key"], args.endpoint)
-    clients = {name: reconcile(vault, admin, name, args.endpoint) for name in PROFILES}
+    selected = args.services or list(PROFILES)
+    clients = {name: reconcile(vault, admin, name, args.endpoint) for name in selected}
     for name, client in clients.items():
         foreign = next(p["bucket"] for n, p in PROFILES.items() if n != name)
         key, body = "lab-credential-check/" + secrets.token_hex(16), b"isolation check\n"
@@ -189,11 +203,16 @@ def main():
         else:
             admin.s3.remove_object(foreign, key)
             raise RuntimeError("Backup identity can write to a foreign bucket")
-    print("All three identities reject foreign-bucket writes; administrator credential is not mounted in any workload")
-    mongo_backup_user(vault)
-    velero_credentials(vault)
-    immich_credentials(vault)
-    kopia_credentials(vault)
+    print("Selected backup identities reject foreign-bucket writes; administrator credential is not mounted in any workload")
+    if "database" in selected:
+        mongo_backup_user(vault)
+        immich_credentials(vault)
+    if "velero" in selected:
+        velero_credentials(vault)
+    if "kopia" in selected:
+        kopia_credentials(vault)
+    if "vault" in selected:
+        vault_snapshot_roles(vault)
 
 
 if __name__ == "__main__":

@@ -1,13 +1,17 @@
 import json
+import hashlib
+import importlib.util
+import io
 from pathlib import Path
 import subprocess
 import tempfile
+import tarfile
 import unittest
 from unittest.mock import Mock
 
 import yaml
 
-from backup_s3 import PROFILES, backup_policy, reconcile
+from backup_s3 import PROFILES, backup_policy, reconcile, vault_snapshot_roles
 from backup_restore import restore_pod
 from provision import ROOT
 from s3 import Admin, bucket_policy
@@ -27,7 +31,7 @@ class BackupTests(unittest.TestCase):
             policy = bucket_policy(profile["bucket"], profile["delete"])
             text = json.dumps(policy)
             self.assertNotIn('"s3:*"', text)
-            self.assertEqual("s3:DeleteObject" in text, name != "database")
+            self.assertEqual("s3:DeleteObject" in text, profile["delete"])
             resources = [r for s in policy["Statement"] for r in s["Resource"]]
             self.assertTrue(all(r.startswith("arn:aws:s3:::" + profile["bucket"]) for r in resources))
 
@@ -49,7 +53,7 @@ class BackupTests(unittest.TestCase):
         jobs = [d for d in docs if d["kind"] == "CronJob"]
         self.assertEqual({j["metadata"]["name"] for j in jobs}, {"backup-" + n for n in ["pgsql", "mysql", "mongo", "clickhouse", "immich"]})
         for job in jobs:
-            self.assertEqual(job["spec"]["suspend"], job["metadata"]["name"] not in {"backup-mysql", "backup-mongo"})
+            self.assertEqual(job["spec"]["suspend"], job["metadata"]["name"] not in {"backup-mysql", "backup-mongo", "backup-immich"})
             self.assertEqual(job["metadata"]["annotations"]["reloader.stakater.com/auto"], "false")
             self.assertEqual(job["spec"]["concurrencyPolicy"], "Forbid")
             pod = job["spec"]["jobTemplate"]["spec"]["template"]["spec"]
@@ -160,3 +164,48 @@ class BackupTests(unittest.TestCase):
             self.assertIn("--pin=retention-review", c["command"][-1])
             self.assertIn("--fail-fast", c["command"][-1])
             self.assertNotIn("snapshot delete", c["command"][-1])
+
+    def test_vault_snapshot_only_gets_ca_and_dedicated_snapshot_identity(self):
+        docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "vault-backup")], text=True)))
+        job = next(d for d in docs if d["kind"] == "CronJob")
+        self.assertTrue(job["spec"]["suspend"])
+        pod = job["spec"]["jobTemplate"]["spec"]["template"]["spec"]
+        self.assertEqual(pod["serviceAccountName"], "vault-snapshot")
+        self.assertFalse(pod["automountServiceAccountToken"])
+        self.assertTrue(all("hostPath" not in v and "persistentVolumeClaim" not in v for v in pod["volumes"]))
+        ca = next(v for v in pod["volumes"] if v["name"] == "ca")
+        self.assertEqual(ca["secret"]["items"], [{"key": "ca.crt", "path": "ca.crt"}])
+        self.assertNotIn("env", pod["initContainers"][0])
+        self.assertNotIn("identity", [m["name"] for m in pod["containers"][0]["volumeMounts"]])
+        for c in pod["initContainers"] + pod["containers"]:
+            self.assertIn("@sha256:", c["image"])
+        vault = Mock()
+        vault_snapshot_roles(vault)
+        policy = next(c.kwargs["payload"] for c in vault.run.call_args_list if c.args[:3] == ("policy", "write", "lab-vault-snapshot"))
+        self.assertEqual(policy, 'path "sys/storage/raft/snapshot" { capabilities = ["read", "sudo"] }\n')
+        code = (ROOT / "vault-backup/snapshot.py").read_text()
+        self.assertNotIn('request("sys/storage/raft/snapshot",', code)
+        self.assertNotIn("snapshot-force", code)
+        self.assertNotIn("unseal", code)
+        self.assertIn('ssl.create_default_context(cafile=', code)
+
+    def test_native_vault_snapshot_validates_sealed_state_and_internal_hashes(self):
+        spec = importlib.util.spec_from_file_location("vault_backup_snapshot", ROOT / "vault-backup/snapshot.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        for corrupt in [False, True]:
+            output = io.BytesIO()
+            content = {"meta.json": b"{}", "state.bin": b"sealed-state", "SHA256SUMS.sealed": b"sealed-checksum"}
+            content["SHA256SUMS"] = b"".join((hashlib.sha256(body).hexdigest() + "  " + name + "\n").encode() for name, body in list(content.items())[:2])
+            if corrupt:
+                content["state.bin"] = b"changed"
+            with tarfile.open(fileobj=output, mode="w:gz") as archive:
+                for name, body in content.items():
+                    info = tarfile.TarInfo(name)
+                    info.size = len(body)
+                    archive.addfile(info, io.BytesIO(body))
+            if corrupt:
+                with self.assertRaisesRegex(RuntimeError, "checksum mismatch"):
+                    module.validate_snapshot(output.getvalue())
+            else:
+                module.validate_snapshot(output.getvalue())
