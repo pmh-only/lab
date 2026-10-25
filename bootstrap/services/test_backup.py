@@ -8,6 +8,7 @@ from unittest.mock import Mock
 import yaml
 
 from backup_s3 import PROFILES, reconcile
+from backup_restore import restore_pod
 from provision import ROOT
 from s3 import Admin, bucket_policy
 
@@ -44,6 +45,7 @@ class BackupTests(unittest.TestCase):
         self.assertEqual({j["metadata"]["name"] for j in jobs}, {"backup-" + n for n in ["pgsql", "mysql", "mongo", "clickhouse"]})
         for job in jobs:
             self.assertTrue(job["spec"]["suspend"])
+            self.assertEqual(job["metadata"]["annotations"]["reloader.stakater.com/auto"], "false")
             self.assertEqual(job["spec"]["concurrencyPolicy"], "Forbid")
             pod = job["spec"]["jobTemplate"]["spec"]["template"]["spec"]
             self.assertFalse(pod["automountServiceAccountToken"])
@@ -89,3 +91,40 @@ class BackupTests(unittest.TestCase):
         text = (ROOT / "database/backup/upload.sh").read_text()
         self.assertLess(text.index('test "$actual" = "$expected"'), text.index("/backup/_COMPLETE"))
         self.assertNotIn("--system=users", (ROOT / "database/backup/export.sh").read_text())
+
+    def test_restore_can_only_target_new_ephemeral_local_databases(self):
+        for engine in ["pgsql", "mysql", "mongo"]:
+            pod = restore_pod("backup-restore-test", engine, engine + "/20261025T000000Z-uuid/", "native@sha256:test", "uploader@sha256:test")
+            spec = pod["spec"]
+            self.assertFalse(spec["automountServiceAccountToken"])
+            self.assertTrue(all("emptyDir" in v for v in spec["volumes"]))
+            restore = spec["containers"][0]
+            self.assertNotIn("envFrom", restore)
+            self.assertNotIn("env", restore)
+            self.assertNotIn("-service", restore["command"][-1])
+            self.assertIn("127.0.0.1", restore["command"][-1])
+            self.assertNotIn("--drop", restore["command"][-1])
+            self.assertIn("RESTORE_OK " + engine, restore["command"][-1])
+        for prefix in ["../", "pgsql/../../", "mysql/20261025T000000Z-uuid/", "pgsql/x/;echo unsafe"]:
+            with self.assertRaises(RuntimeError):
+                restore_pod("backup-restore-test", "pgsql", prefix, "native", "uploader")
+
+    def test_velero_is_pinned_metadata_only_without_cluster_admin_or_node_agent(self):
+        app = next(yaml.safe_load_all((ROOT / "apps/velero.yml").read_text()))
+        chart = app["spec"]["sources"][1]
+        self.assertEqual(chart["targetRevision"], "12.2.1")
+        values = chart["helm"]["valuesObject"]
+        self.assertFalse(values["deployNodeAgent"])
+        self.assertFalse(values["snapshotsEnabled"])
+        self.assertFalse(values["rbac"]["clusterAdministrator"])
+        self.assertFalse(values["cleanUpCRDs"])
+        self.assertIn("sha256:", values["image"]["digest"])
+        self.assertIn("@sha256:", values["initContainers"][0]["image"])
+        self.assertEqual(values["credentials"]["existingSecret"], "velero-s3")
+        schedule = values["schedules"]["cluster-metadata"]
+        self.assertTrue(schedule["paused"])
+        self.assertFalse(schedule["template"]["snapshotVolumes"])
+        self.assertFalse(schedule["template"]["defaultVolumesToFsBackup"])
+        rules = next(yaml.safe_load_all((ROOT / "velero_auth/rbac.yml").read_text()))["rules"]
+        self.assertEqual(rules[0]["verbs"], ["get", "list", "watch"])
+        self.assertEqual(rules[1]["apiGroups"], ["velero.io"])

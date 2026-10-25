@@ -16,7 +16,7 @@ import urllib.parse
 from minio import Minio
 from minio.error import S3Error
 
-from provision import ROOT
+from provision import ROOT, reader
 from s3 import Admin, bucket_policy
 
 
@@ -59,6 +59,18 @@ if (!denied) throw new Error('Backup identity has unexpected write privileges');
 print('LAB_MONGO_OK');
 """)
     print("MongoDB dedicated backup role provisioned; authentication succeeds and application writes are denied")
+
+
+def velero_credentials(vault):
+    path = PROFILES["velero"]["path"]
+    data = vault.get(path)
+    cloud = "[default]\naws_access_key_id=" + data["S3_ACCESS_TOKEN"] + "\naws_secret_access_key=" + data["S3_SECRET_TOKEN"] + "\n"
+    if "cloud" in data and data["cloud"] != cloud:
+        raise RuntimeError("Existing Velero credential file differs; refusing replacement")
+    if "cloud" not in data:
+        metadata = json.loads(vault.run("kv", "metadata", "get", "-format=json", "-mount=secret", path))["data"]
+        vault.run("kv", "put", "-cas=" + str(metadata["current_version"]), "-mount=secret", path, "-", payload=json.dumps({**data, "cloud": cloud}))
+    reader(vault, "velero", path)
 
 
 def reconcile(vault, admin, name, endpoint):
@@ -142,6 +154,7 @@ def main():
             raise RuntimeError("Backup identity can write to a foreign bucket")
     print("All three identities reject foreign-bucket writes; administrator credential is not mounted in any workload")
     mongo_backup_user(vault)
+    velero_credentials(vault)
 
 
 if __name__ == "__main__":

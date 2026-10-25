@@ -2,6 +2,10 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: backup
+  annotations:
+    # Jobs read the current Secret on startup; a Secret/ConfigMap change must
+    # not trigger extra runs, especially while the schedule is suspended.
+    reloader.stakater.com/auto: "false"
 spec:
   schedule: "0 3 * * *"
   timeZone: Asia/Seoul
@@ -12,11 +16,16 @@ spec:
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 3
   jobTemplate:
+    metadata:
+      annotations:
+        reloader.stakater.com/auto: "false"
     spec:
       backoffLimit: 0
       activeDeadlineSeconds: 14400
       template:
         metadata:
+          annotations:
+            reloader.stakater.com/auto: "false"
           labels:
             app: database-backup
         spec:

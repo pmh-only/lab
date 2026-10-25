@@ -14,52 +14,80 @@ spec:
         - /data
       kind: Secret
   project: default
-  source:
-    chart: velero
+  sources:
+  - path: velero_auth
+    repoURL: git@github.com:pmh-only/lab.git
+    targetRevision: HEAD
+  - chart: velero
     helm:
       valuesObject:
-        deployNodeAgent: true
+        # Kubernetes objects only. Native DB dumps provide logical consistency;
+        # no privileged filesystem agents or misleading live-volume snapshots.
+        deployNodeAgent: false
         snapshotsEnabled: false
+        upgradeCRDs: false
+        cleanUpCRDs: false
+        image:
+          tag: v1.18.2
+          digest: sha256:37396519f399536e5f01427d723565ae69294ec3fb5625cf1c87c09eaa9de16b
+        credentials:
+          existingSecret: velero-s3
+        serviceAccount:
+          server:
+            name: velero
+        rbac:
+          clusterAdministrator: false
+        podSecurityContext:
+          runAsNonRoot: true
+          runAsUser: 65532
+          runAsGroup: 65532
+          fsGroup: 65532
+          seccompProfile:
+            type: RuntimeDefault
+        containerSecurityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [ALL]
         configuration:
-          repositoryMaintenanceJob:
-            repositoryConfigData:
-              global:
-                keepLatestMaintenanceJobs: 0
-          fsBackupTimeout: 12h
-          defaultVolumesToFsBackup: true
+          defaultVolumesToFsBackup: false
           backupStorageLocation:
             - name: default
               provider: aws
               bucket: velero
               default: true
               credential:
-                name: velero
-                key: rustfs
+                name: velero-s3
+                key: cloud
               config:
                 region: us-east-1
-                s3ForcePathStyle: true
+                s3ForcePathStyle: "true"
                 s3Url: http://pmhraspberry.tailscale.svc.cluster.local:9000
-                insecureSkipTLSVerify: true
+                checksumAlgorithm: ""
         initContainers:
           - name: velero-plugin-for-aws
-            image: velero/velero-plugin-for-aws:latest
+            image: velero/velero-plugin-for-aws:v1.14.0@sha256:7e82f717f44e89671212e0dfce7e061321c386ea84a33bca64a671670ca6c278
             imagePullPolicy: IfNotPresent
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: [ALL]
             volumeMounts:
               - mountPath: /target
                 name: plugins
         schedules:
-          backup:
+          cluster-metadata:
             disabled: false
             schedule: "0 0 * * *"
             useOwnerReferencesInBackup: false
-            paused: false
-            skipImmediately: false
+            paused: true
+            skipImmediately: true
             template:
               ttl: "720h"
               storageLocation: default
-              defaultVolumesToFsBackup: true
-              uploaderConfig:
-                parallelFilesUpload: 16
+              defaultVolumesToFsBackup: false
+              snapshotVolumes: false
               excludedResources:
                 - podvolumebackups.velero.io
                 - podvolumerestores.velero.io
@@ -68,11 +96,8 @@ spec:
                 - downloadrequests.velero.io
                 - deletebackuprequests.velero.io
                 - serverstatusrequests.velero.io
-        kubectl:
-          image:
-            repository: jfcoz/kubectl-deb12-basic
     repoURL: https://vmware-tanzu.github.io/helm-charts
-    targetRevision: x
+    targetRevision: 12.2.1
   syncPolicy:
     automated:
       prune: true
