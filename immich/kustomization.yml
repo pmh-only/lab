@@ -40,10 +40,10 @@ patches:
 images:
   - name: ghcr.io/immich-app/immich-server
     newTag: release
-    digest: sha256:bae7664ff3aa4c2c1fcbdcdd86b40b105643c5f861f3e6a770fc760089f25862
+    digest: sha256:485d546a2e31d6a8b4db8423fcba5c109de8c218d93410af115fd1ccfc4352a6
   - name: ghcr.io/immich-app/immich-machine-learning
     newTag: release
-    digest: sha256:73915f07e1f4289ba45b174c58443db74cef47ddf502613f475fc5e52458ea42
+    digest: sha256:5b28c9352c8374b8a1ed96fbdd8d6755fea6e43510ec43fdf6538aa02ea40f56
   - name: ghcr.io/immich-app/postgres
     newTag: 14-vectorchord0.4.3-pgvectors0.2.0
     digest: sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
