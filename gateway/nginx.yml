@@ -146,7 +146,7 @@ data:
         default              "1";
         argo.pmh.codes       "";
         bgp.pmh.codes        "";
-        welplan.pmh.codes    "578f3fabe057";
+        welplan.pmh.codes    "";
       }
 
       map $tracking_site_id $tracking_script {

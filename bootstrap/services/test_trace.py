@@ -50,15 +50,15 @@ class TraceTests(unittest.TestCase):
         self.assertNotIn("setval", script)
         self.assertNotIn("hashPassword", script)
 
-    def test_original_public_tracking_bindings_are_preserved(self):
+    def test_public_tracking_binding_preserved_but_retired_welplan_is_excluded(self):
         desired = json.loads((ROOT / "trace/bootstrap.json").read_text())
         docs = list(yaml.safe_load_all((ROOT / "gateway/nginx.yml").read_text()))
         nginx = next(d["data"]["nginx.conf"] for d in docs if d and "nginx.conf" in d.get("data", {}))
         binding = re.search(r"map \$host \$tracking_site_id \{(.*?)\}", nginx, re.S).group(1)
         self.assertRegex(binding, r'default\s+"1"')
-        self.assertRegex(binding, r'welplan\.pmh\.codes\s+"' + desired["sites"][1]["publicId"] + '"')
-        self.assertEqual([s["siteId"] for s in desired["sites"]], [1, 2])
-        self.assertEqual(desired["sites"][1]["domain"], "welplan.pmh.codes")
+        self.assertRegex(binding, r'welplan\.pmh\.codes\s+""')
+        self.assertEqual([s["siteId"] for s in desired["sites"]], [1])
+        self.assertNotIn("welplan.pmh.codes", [s["domain"] for s in desired["sites"]])
         self.assertEqual(PROFILES["trace"][1]["MAPBOX_TOKEN"], "optional-empty")
 
     def test_query_profile_keeps_upstream_readonly_limits_and_event_only_grant(self):

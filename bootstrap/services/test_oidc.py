@@ -40,12 +40,6 @@ class OIDCTests(unittest.TestCase):
                 self.assertIn("if user.is_superuser else []", declaration["extraScopeMappings"][0]["expression"])
                 self.assertEqual(declaration["readerPaths"], ["minio/minio-secrets", "minio/rustfs-oidc"])
                 continue
-            if slug == "welplan":
-                doc = yaml.safe_load((ROOT / "welplan/deployment.yml").read_text())
-                env = {e["name"]: e.get("value") for e in doc["spec"]["template"]["spec"]["containers"][0]["env"]}
-                self.assertEqual(env["ADMIN_OIDC_CLIENT_ID"], declaration["clientID"])
-                self.assertEqual(declaration["redirectURI"], "https://welplan.pmh.codes/admin/callback")
-                continue
             if slug == "tailscale":
                 self.assertEqual(declaration["clientID"], "lab-tailscale")
                 self.assertEqual(declaration["redirectURI"], "https://login.tailscale.com/a/oauth_response")
