@@ -16,7 +16,7 @@ spec:
   project: default
   sources:
   - path: velero_auth
-    repoURL: git@github.com:pmh-only/lab.git
+    repoURL: https://github.com/pmh-only/lab.git
     targetRevision: HEAD
   - chart: velero
     helm:

@@ -42,7 +42,7 @@ class BackupTests(unittest.TestCase):
     def test_database_jobs_are_suspended_hardened_pinned_and_do_not_mount_live_volumes(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "database")], text=True)))
         jobs = [d for d in docs if d["kind"] == "CronJob"]
-        self.assertEqual({j["metadata"]["name"] for j in jobs}, {"backup-" + n for n in ["pgsql", "mysql", "mongo", "clickhouse"]})
+        self.assertEqual({j["metadata"]["name"] for j in jobs}, {"backup-" + n for n in ["pgsql", "mysql", "mongo", "clickhouse", "immich"]})
         for job in jobs:
             self.assertTrue(job["spec"]["suspend"])
             self.assertEqual(job["metadata"]["annotations"]["reloader.stakater.com/auto"], "false")
@@ -57,6 +57,10 @@ class BackupTests(unittest.TestCase):
                 self.assertEqual(c["securityContext"]["capabilities"]["drop"], ["ALL"])
             if job["metadata"]["name"] == "backup-clickhouse":
                 self.assertFalse(pod.get("initContainers"))
+            elif job["metadata"]["name"] == "backup-immich":
+                immich = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "immich")], text=True)))
+                deployment = next(d for d in immich if d["kind"] == "Deployment" and d["metadata"]["name"] == "pgsql")
+                self.assertEqual(pod["initContainers"][0]["image"], deployment["spec"]["template"]["spec"]["containers"][0]["image"])
             else:
                 native = pod["initContainers"][0]["image"]
                 deployment = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == job["metadata"]["name"].removeprefix("backup-"))

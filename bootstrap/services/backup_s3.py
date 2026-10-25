@@ -73,6 +73,18 @@ def velero_credentials(vault):
     reader(vault, "velero", path)
 
 
+def immich_credentials(vault):
+    # Keep the remote backup Job outside Immich's writer Pods, without changing
+    # their existing Secret or restarting the media/database workloads.
+    path = "database/immich-backup-password"
+    desired = {"password": vault.get("immich/immich-secret")["DB_ADMIN_PASSWORD"]}
+    actual = vault.get(path)
+    if actual is None:
+        vault.create(path, desired)
+    elif actual != desired:
+        raise RuntimeError("Immich backup password differs; refusing an implicit credential change")
+
+
 def reconcile(vault, admin, name, endpoint):
     profile = PROFILES[name]
     data = vault.get(profile["path"])
@@ -155,6 +167,7 @@ def main():
     print("All three identities reject foreign-bucket writes; administrator credential is not mounted in any workload")
     mongo_backup_user(vault)
     velero_credentials(vault)
+    immich_credentials(vault)
 
 
 if __name__ == "__main__":

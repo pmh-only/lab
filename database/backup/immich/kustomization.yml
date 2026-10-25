@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+nameSuffix: -immich
+resources:
+  - ../base
+patches:
+  - target:
+      kind: CronJob
+    patch: |-
+      apiVersion: batch/v1
+      kind: CronJob
+      metadata:
+        name: backup
+      spec:
+        schedule: "20 4 * * *"
+        jobTemplate:
+          spec:
+            template:
+              spec:
+                initContainers:
+                  - name: export
+                    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
+                    env:
+                      - {name: ENGINE, value: pgsql}
+                      - {name: DATABASE_HOST, value: pgsql-service.immich.svc.cluster.local}
+                      - name: DATABASE_PASSWORD
+                        valueFrom:
+                          secretKeyRef: {name: immich-backup-password, key: password}
+                containers:
+                  - name: upload
+                    env:
+                      - {name: BACKUP_NAME, value: pgsql-immich}

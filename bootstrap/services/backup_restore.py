@@ -22,6 +22,39 @@ from provision import ROOT
 
 
 RESTORE = {
+    "clickhouse": r"""
+set -eu
+umask 077
+mkdir -p /work/data /work/access
+cat > /work/config.xml <<'XML'
+<clickhouse>
+  <logger><level>warning</level><log>/work/server.log</log><errorlog>/work/error.log</errorlog></logger>
+  <listen_host>127.0.0.1</listen_host><tcp_port>9001</tcp_port>
+  <path>/work/data/</path><tmp_path>/tmp/clickhouse/</tmp_path>
+  <user_directories><users_xml><path>/work/users.xml</path></users_xml><local_directory><path>/work/access/</path></local_directory></user_directories>
+</clickhouse>
+XML
+cat > /work/users.xml <<'XML'
+<clickhouse>
+  <profiles><default><max_memory_usage>2000000000</max_memory_usage></default></profiles>
+  <users><default><password></password><networks><ip>127.0.0.1</ip></networks><profile>default</profile><quota>default</quota><access_management>1</access_management></default></users>
+  <quotas><default><interval><duration>3600</duration><queries>0</queries><errors>0</errors><result_rows>0</result_rows><read_rows>0</read_rows><execution_time>0</execution_time></interval></default></quotas>
+</clickhouse>
+XML
+clickhouse-server --config-file=/work/config.xml > /work/start.log 2>&1 &
+server=$!
+for attempt in $(seq 1 120); do
+  if clickhouse-client --host=127.0.0.1 --port=9001 --query='SELECT 1' > /dev/null 2>&1; then break; fi
+  kill -0 "$server"
+  sleep 1
+done
+printf "RESTORE ALL FROM S3('http://pmhraspberry.tailscale.svc.cluster.local:9000/dbdump/%s', '%s', '%s')\n" "${BACKUP_PREFIX%/}" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" > /work/request.sql
+clickhouse-client --host=127.0.0.1 --port=9001 --multiquery < /work/request.sql > /work/restore.log 2>&1
+tables="$(clickhouse-client --host=127.0.0.1 --port=9001 --query="SELECT count() FROM system.tables WHERE database NOT IN ('system','INFORMATION_SCHEMA','information_schema')")"
+kill -TERM "$server"
+wait "$server"
+printf 'RESTORE_OK clickhouse tables=%s\n' "$tables"
+""",
     "pgsql": r"""
 set -eu
 umask 077
@@ -71,6 +104,8 @@ grep '^RESTORE_OK' /work/check.log
 mongod --dbpath=/work/data --shutdown > /work/stop.log 2>&1
 """,
 }
+RESTORE["immich"] = RESTORE["pgsql"].replace("RESTORE_OK pgsql", "RESTORE_OK immich").replace(
+    "-h 127.0.0.1 -k /tmp'", "-h 127.0.0.1 -k /tmp -c shared_preload_libraries=vchord.so,vectors.so'")
 
 
 def kubectl(*args, payload=None, timeout=30):
@@ -82,7 +117,8 @@ def kubectl(*args, payload=None, timeout=30):
 
 
 def restore_pod(namespace, engine, prefix, native, uploader):
-    if engine not in RESTORE or not re.fullmatch(engine + r"/[a-zA-Z0-9T-]+/", prefix):
+    prefix_engine = "pgsql-immich" if engine == "immich" else engine
+    if engine not in RESTORE or not re.fullmatch(prefix_engine + r"/[a-zA-Z0-9T-]+/", prefix):
         raise RuntimeError("Unexpected backup prefix or database engine")
     security = {"allowPrivilegeEscalation": False, "readOnlyRootFilesystem": True, "capabilities": {"drop": ["ALL"]}}
     mounts = [{"name": n, "mountPath": p} for n, p in [("backup", "/backup"), ("work", "/work"), ("tmp", "/tmp")]]
@@ -96,16 +132,30 @@ test -s _COMPLETE
 test "$(sed -n 's/^sha256=//p' _COMPLETE)" = "$(sha256sum SHA256SUMS | cut -d ' ' -f 1)"
 sha256sum -c SHA256SUMS > /dev/null
 """
-    return {"apiVersion": "v1", "kind": "Pod", "metadata": {"name": "restore-" + engine, "namespace": namespace}, "spec": {
+    if engine == "clickhouse":
+        download = r"""
+set -eu
+umask 077
+export AWS_EC2_METADATA_DISABLED=true
+aws --endpoint-url "$S3_ENDPOINT_URL" s3 cp "s3://dbdump/${BACKUP_PREFIX}_COMPLETE" /backup/_COMPLETE --quiet
+grep -q '^format=lab-clickhouse-native-v1' /backup/_COMPLETE
+"""
+    diagnostic = """trap 'result=$?; if [ "$result" -ne 0 ]; then echo RESTORE_DIAGNOSTIC exit=$result; grep -hEo "Code: [0-9]+|ERROR [0-9]+" /work/*.log 2>/dev/null | head -n 5 | sed "s/^/RESTORE_DIAGNOSTIC /"; fi' EXIT
+"""
+    result = {"apiVersion": "v1", "kind": "Pod", "metadata": {"name": "restore-" + engine, "namespace": namespace}, "spec": {
         "automountServiceAccountToken": False, "restartPolicy": "Never", "activeDeadlineSeconds": 1800,
         "securityContext": {"runAsNonRoot": True, "runAsUser": 999, "runAsGroup": 999, "fsGroup": 999, "seccompProfile": {"type": "RuntimeDefault"}},
         "initContainers": [{"name": "download", "image": uploader, "command": ["sh", "-c", download], "securityContext": security, "volumeMounts": mounts,
                             "env": [{"name": "S3_ENDPOINT_URL", "value": "http://pmhraspberry.tailscale.svc.cluster.local:9000"},
                                     {"name": "BACKUP_PREFIX", "value": prefix}, {"name": "AWS_DEFAULT_REGION", "value": "us-east-1"}, {"name": "HOME", "value": "/tmp"}],
                             "envFrom": [{"secretRef": {"name": "backup-reader"}}]}],
-        "containers": [{"name": "restore", "image": native, "command": ["sh", "-c", RESTORE[engine]], "securityContext": security, "volumeMounts": mounts}],
+        "containers": [{"name": "restore", "image": native, "command": ["sh", "-c", diagnostic + RESTORE[engine]], "securityContext": security, "volumeMounts": mounts}],
         "volumes": [{"name": n, "emptyDir": {"sizeLimit": "20Gi" if n != "tmp" else "256Mi"}} for n in ["backup", "work", "tmp"]],
     }}
+    if engine == "clickhouse":
+        result["spec"]["containers"][0]["envFrom"] = [{"secretRef": {"name": "backup-reader"}}]
+        result["spec"]["containers"][0]["env"] = [{"name": "BACKUP_PREFIX", "value": prefix}]
+    return result
 
 
 def main():
@@ -134,12 +184,17 @@ def main():
             "AWS_SECRET_ACCESS_KEY": base64.b64encode(credentials["S3_SECRET_TOKEN"].encode()).decode(),
         }})
         for engine in args.engines:
-            complete = sorted(o.object_name.removesuffix("_COMPLETE") for o in client.list_objects("dbdump", prefix=engine + "/", recursive=True) if o.object_name.endswith("/_COMPLETE"))
+            prefix_engine = "pgsql-immich" if engine == "immich" else engine
+            complete = sorted(o.object_name.removesuffix("_COMPLETE") for o in client.list_objects("dbdump", prefix=prefix_engine + "/", recursive=True) if o.object_name.endswith("/_COMPLETE"))
             if not complete:
                 raise RuntimeError("No completed remote backup is available for " + engine)
             job = next(d for d in docs if d["kind"] == "CronJob" and d["metadata"]["name"] == "backup-" + engine)
             pod = job["spec"]["jobTemplate"]["spec"]["template"]["spec"]
-            native, uploader = pod["initContainers"][0]["image"], pod["containers"][0]["image"]
+            uploader = pod["containers"][0]["image"]
+            if engine == "clickhouse":
+                native = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "clickhouse")["spec"]["template"]["spec"]["containers"][0]["image"]
+            else:
+                native = pod["initContainers"][0]["image"]
             kubectl("create", "-f", "-", payload=restore_pod(namespace, engine, complete[-1], native, uploader))
             # Wait for termination, including failure, rather than waiting 30m
             # for a Succeeded condition when a restore client rejects the dump.
@@ -150,7 +205,9 @@ def main():
                     break
                 time.sleep(5)
             if status["phase"] != "Succeeded":
-                raise RuntimeError("Isolated native restore failed for " + engine + "; namespace " + namespace + " will be removed")
+                raw = subprocess.run(["kubectl", "logs", "restore-" + engine, "-n", namespace, "-c", "restore"], text=True, capture_output=True).stdout
+                safe = [line for line in raw.splitlines() if re.fullmatch(r"RESTORE_DIAGNOSTIC (exit=\d+|Code: \d+|ERROR \d+)", line)]
+                raise RuntimeError("Isolated native restore failed for " + engine + "; " + "; ".join(safe) + "; namespace will be removed")
             output = kubectl("logs", "restore-" + engine, "-n", namespace, "-c", "restore")
             if "RESTORE_OK " + engine not in output:
                 raise RuntimeError("Native restore did not return its verification marker")

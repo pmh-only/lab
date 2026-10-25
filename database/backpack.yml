@@ -15,6 +15,23 @@ spec:
     name: backpack-secrets
     type: Opaque
 ---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: immich-backup-password
+  namespace: database
+spec:
+  vaultAuthRef: vault
+  mount: secret
+  type: kv-v2
+  path: database/immich-backup-password
+  refreshAfter: 1m
+  destination:
+    create: true
+    overwrite: false
+    name: immich-backup-password
+    type: Opaque
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:

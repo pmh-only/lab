@@ -26,6 +26,7 @@ resources:
   - ./backup/mysql
   - ./backup/mongo
   - ./backup/clickhouse
+  - ./backup/immich
 configMapGenerator:
   - name: database-backup-scripts
     files:
