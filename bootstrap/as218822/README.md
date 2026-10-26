@@ -22,13 +22,18 @@ pass in the pinned original images. Their public keys are derived from the
 Vault-held core/GRE/portal keys; no external upstream identity is rotated.
 This does not start BGP, establish a tunnel, or prove peer connectivity.
 
-Live startup found that the supplied Lunalight private key derives the same
+Initial live startup found that the supplied Lunalight private key derived the same
 public key as the image's configured **remote** peer. The kernel therefore
-has no usable Lunalight peer. Syntax validation alone cannot establish a valid
+had no usable Lunalight peer. Syntax validation alone cannot establish a valid
 identity pair; `validate-existing.sh` now rejects this `SELF_PEER` case without
-printing private keys. Preserve the tunnel addresses and obtain a matching,
-distinct local-private/remote-public pair from the operator before claiming
-the Lunalight session is operational. Never silently rotate the supplied key.
+printing private keys. At the user's explicit request, only the local
+`WG_LUNALIGHT_PRIVATE_KEY` was subsequently regenerated in Vault using CAS.
+The PSK, remote public key, internal addresses and every other key were
+preserved. The new public key and handoff are in `lunalight-peer.md`.
+The running gateway now has distinct local/remote identities and a real peer;
+remote application of the new public key and a successful handshake remain
+required before claiming the Lunalight session is operational. Never silently
+rotate the supplied key.
 
 Core/IPv6 Atlas networking uses the already-verified Sysbox runtime and user
 namespaces, with explicit capabilities instead of privileged mode. The original
