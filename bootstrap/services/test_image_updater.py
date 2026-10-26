@@ -1,11 +1,12 @@
 import re
 import subprocess
 import unittest
+from unittest.mock import patch
 
 import yaml
 
 from provision import ROOT
-from register_image_updaters import REVIEWED, DEPLOYED, HELM, ENABLED
+from register_image_updaters import REVIEWED, DEPLOYED, HELM, ENABLED, declaration
 
 
 class ImageUpdaterTests(unittest.TestCase):
@@ -43,13 +44,13 @@ class ImageUpdaterTests(unittest.TestCase):
         app_docs = list(yaml.safe_load_all((ROOT / "apps/mail.yml").read_text()))
         self.assertFalse(any(d and d["kind"] == "ImageUpdater" for d in app_docs))
 
-    def test_all_enabled_apps_have_one_owned_digest_updater_without_paused_workloads(self):
+    def test_all_enabled_apps_have_one_owned_updater_without_vault_or_paused_workloads(self):
         managed = {d["metadata"]["name"]: d for d in self.docs if d["kind"] == "ImageUpdater"}
         self.assertEqual(set(managed), ENABLED)
-        self.assertEqual(len(managed), 46)
+        self.assertEqual(len(managed), 45)
         self.assertIn("as218822", ENABLED)
         self.assertTrue({"kopia", "velero", "velero-ui"}.issubset(ENABLED))
-        self.assertTrue(ENABLED.isdisjoint({"welplan", "ghost", "vault"}))
+        self.assertTrue(ENABLED.isdisjoint({"welplan", "ghost", "vault", "vault-backup", "vault-secrets-operator", "vault-ui"}))
         apps = {}
         for path in (ROOT / "apps").glob("*.yml"):
             for d in yaml.safe_load_all(path.read_text()):
@@ -64,8 +65,16 @@ class ImageUpdaterTests(unittest.TestCase):
             self.assertEqual(updater["spec"]["applicationRefs"][0]["namePattern"], name)
             for image in updater["spec"]["applicationRefs"][0]["images"]:
                 self.assertFalse(image["imageName"].startswith("gchcr.io/"))
-                self.assertEqual(image["commonUpdateSettings"]["updateStrategy"], "digest")
-                self.assertIn(":", image["imageName"].rsplit("/", 1)[-1])
+                settings = image["commonUpdateSettings"]
+                strategy = settings["updateStrategy"]
+                self.assertIn(strategy, {"digest", "semver", "newest-build"})
+                if strategy == "semver":
+                    self.assertIn(image["imageName"].rsplit(":", 1)[-1], {"*", "*-0"})
+                elif strategy == "digest":
+                    self.assertIn(":", image["imageName"].rsplit("/", 1)[-1])
+                    self.assertFalse(re.match(r"^v?\d", image["imageName"].rsplit(":", 1)[-1]), "numeric versions must not stay digest-only")
+                else:
+                    self.assertTrue(settings["allowTags"].startswith("regexp:^"))
                 self.assertNotIn("backpack-", image["imageName"])
             if name in HELM:
                 target = updater["spec"]["writeBackConfig"]["gitConfig"]["writeBackTarget"]
@@ -92,7 +101,7 @@ class ImageUpdaterTests(unittest.TestCase):
                 self.assertEqual(updater["spec"]["writeBackConfig"]["gitConfig"]["writeBackTarget"], "kustomization")
         self.assertNotIn("automated", apps["vault"]["spec"]["syncPolicy"])
         vault_pin = yaml.safe_load((ROOT / "image-updater/helm-values/vault.yml").read_text())
-        self.assertRegex(vault_pin["server"]["image"]["tag"], r"^2\.0\.4@sha256:[a-f0-9]{64}$")
+        self.assertRegex(vault_pin["server"]["image"]["tag"], r"^2\.2\.1@sha256:[a-f0-9]{64}$")
 
     def test_as218822_tracks_all_pinned_images_with_one_owner(self):
         updater = next(d for d in self.docs if d["kind"] == "ImageUpdater" and d["metadata"]["name"] == "as218822")
@@ -107,23 +116,65 @@ class ImageUpdaterTests(unittest.TestCase):
         kopia_images = managed["kopia"]["spec"]["applicationRefs"][0]["images"]
         self.assertEqual({i["imageName"] for i in kopia_images}, {"kopia/kopia:latest", "nginx:stable-alpine"})
         velero_images = managed["velero"]["spec"]["applicationRefs"][0]["images"]
-        self.assertEqual({i["imageName"] for i in velero_images}, {"docker.io/velero/velero:v1.18.2", "velero/velero-plugin-for-aws:v1.14.0"})
+        self.assertEqual({i["imageName"] for i in velero_images}, {"docker.io/velero/velero:*", "velero/velero-plugin-for-aws:*"})
         values = yaml.safe_load((ROOT / "image-updater/helm-values/velero.yml").read_text())
         self.assertNotIn("digest", values["image"], "a separate digest would override the updated tag")
         self.assertEqual(values["initContainers"][0]["name"], "velero-plugin-for-aws")
         self.assertEqual(values["initContainers"][0]["securityContext"]["capabilities"]["drop"], ["ALL"])
         apps = {d["metadata"]["name"]: d for d in yaml.safe_load_all((ROOT / "apps/velero.yml").read_text())}
-        for name, version in [("velero", "12.2.1"), ("velero-ui", "1.0.0")]:
+        for name in ["velero", "velero-ui"]:
             chart = next(s for s in apps[name]["spec"]["sources"] if "chart" in s)
-            self.assertEqual(chart["targetRevision"], version)
+            self.assertEqual(chart["targetRevision"], "x")
             self.assertNotIn("image", chart["helm"]["valuesObject"])
         self.assertNotIn("initContainers", apps["velero"]["spec"]["sources"][1]["helm"]["valuesObject"])
+
+    def test_versioned_variants_allow_new_majors_but_exclude_prerelease_and_wrong_flavors(self):
+        managed = {d["metadata"]["name"]: d for d in self.docs if d["kind"] == "ImageUpdater"}
+        cases = [
+            ("seafile", "seafile", "99.0.0-arm", ["99.0.0", "99.0.0-rc1-arm", "99.0.0-amd64"]),
+            ("seafile", "memcached", "99.0.0-alpine", ["99.0.0", "99.0.0-rc1-alpine"]),
+            ("solver", "docker", "99.0.0-dind", ["99.0.0", "99.0.0-rc1-dind", "99.0.0-cli"]),
+            ("track", "postgis", "99-3.10-alpine", ["99-3.10", "99-3.10-alpine-rc1"]),
+            ("immich", "postgres", "99-vectorchord9.0.0-pgvectors8.0.0", ["99-alpine", "99-vectorchord9.0.0-pgvectors8.0.0-rc1"]),
+        ]
+        for app, alias, accepted, rejected in cases:
+            image = next(i for i in managed[app]["spec"]["applicationRefs"][0]["images"] if i["alias"] == alias)
+            pattern = image["commonUpdateSettings"]["allowTags"].removeprefix("regexp:")
+            self.assertRegex(accepted, pattern)
+            for tag in rejected:
+                self.assertIsNone(re.match(pattern, tag))
+
+    def test_helm_charts_track_latest_stable_except_vault(self):
+        charts = {}
+        for path in (ROOT / "apps").glob("*.yml"):
+            for app in yaml.safe_load_all(path.read_text()):
+                if not app or app["kind"] != "Application":
+                    continue
+                spec = app["spec"]
+                for source in spec.get("sources", [spec.get("source", {})]):
+                    if "chart" in source:
+                        charts[app["metadata"]["name"]] = source["targetRevision"]
+        self.assertEqual(charts.pop("vault"), "0.34.1")
+        self.assertEqual(charts.pop("vault-secrets-operator"), "1.6.0")
+        self.assertEqual(len(charts), 9)
+        self.assertTrue(all(version == "x" for version in charts.values()))
 
     def test_bootstrap_reads_the_single_gitops_owned_declaration_source(self):
         code = (ROOT / "bootstrap/services/register_image_updaters.py").read_text()
         self.assertIn('"reviewed.yml", "deployed.yml", "helm.yml", "mail.yml"', code)
         self.assertIn('"HEAD:image-updater/" + filename', code)
         self.assertNotIn("HEAD:apps/{name}.yml", code)
+
+    def test_bootstrap_accepts_each_declared_update_policy(self):
+        def committed_source(args, **kwargs):
+            return (ROOT / args[2].removeprefix("HEAD:")).read_text()
+
+        with patch("register_image_updaters.subprocess.check_output", side_effect=committed_source):
+            for name in ENABLED:
+                self.assertEqual(declaration(name)["metadata"]["name"], name)
+            for name in {"vault", "vault-backup", "vault-ui", "vault-secrets-operator"}:
+                with self.assertRaises(RuntimeError):
+                    declaration(name)
 
     def test_ssh_host_verification_is_not_disabled_by_default_secret_behavior(self):
         code = (ROOT / "bootstrap/services/image_updater.py").read_text()

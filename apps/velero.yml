@@ -97,7 +97,7 @@ spec:
                 - deletebackuprequests.velero.io
                 - serverstatusrequests.velero.io
     repoURL: https://vmware-tanzu.github.io/helm-charts
-    targetRevision: 12.2.1
+    targetRevision: x
   syncPolicy:
     automated:
       prune: true
@@ -167,7 +167,7 @@ spec:
           - name: OAUTH_REDIRECT_URI
             value: https://velero.pmh.codes/login
     repoURL: https://helm.otwld.com
-    targetRevision: 1.0.0
+    targetRevision: x
   syncPolicy:
     automated:
       prune: true

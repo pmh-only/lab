@@ -18,7 +18,7 @@ spec:
       valuesObject:
         kind: Deployment
     repoURL: https://kubernetes-sigs.github.io/descheduler/
-    targetRevision: 0.37.0
+    targetRevision: x
   - repoURL: https://github.com/pmh-only/lab.git
     targetRevision: main
     ref: imageValues

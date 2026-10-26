@@ -17,7 +17,7 @@ class TailscaleTests(unittest.TestCase):
         sources = operator["spec"]["sources"]
         self.assertEqual(sources[0]["path"], "tailscale_auth")
         chart = next(s for s in sources if s.get("chart"))
-        self.assertEqual(chart["targetRevision"], "1.104.2")
+        self.assertEqual(chart["targetRevision"], "x")
         values = chart["helm"]["valuesObject"]
         self.assertEqual(values["oauthSecretVolume"]["secret"]["secretName"], "operator-oauth")
         self.assertNotIn("oauth", values)

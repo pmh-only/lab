@@ -2,8 +2,9 @@
 """Audit committed updater declarations for deployed applications.
 
 The image-updater Application owns these resources; root apps stays manual.
-Explicitly enabled infrastructure retains its existing version tag. Helm image
-updates go to Git-backed values files; chart versions and Vault manual sync stay.
+Stable image versions can cross major releases; mutable channels track digests.
+Helm updates go to Git-backed values files; charts track latest stable versions.
+All Vault images and charts stay pinned.
 """
 
 import argparse
@@ -24,7 +25,7 @@ DEPLOYED = {
 }
 HELM = {
     "cert-manager", "cert-manager-technitium-webhook", "descheduler", "envoy-gateway",
-    "otp", "pdf", "reloader", "tailscale", "vault-secrets-operator", "velero", "velero-ui",
+    "otp", "pdf", "reloader", "tailscale", "velero", "velero-ui",
 }
 ENABLED = REVIEWED | DEPLOYED | HELM | {"mail"}
 DECLARATIONS = ("reviewed.yml", "deployed.yml", "helm.yml", "mail.yml")
@@ -46,8 +47,15 @@ def declaration(name):
     refs = updater["spec"]["applicationRefs"]
     if len(refs) != 1 or refs[0]["namePattern"] != name:
         raise RuntimeError("Refusing wildcard/multi-app bootstrap registration")
-    if any(i.get("commonUpdateSettings", {}).get("updateStrategy") != "digest" for i in refs[0]["images"]):
-        raise RuntimeError("Only existing-tag digest tracking is enabled")
+    for image in refs[0]["images"]:
+        settings = image.get("commonUpdateSettings", {})
+        strategy = settings.get("updateStrategy")
+        if strategy not in {"digest", "semver", "newest-build"}:
+            raise RuntimeError("Unsupported image update strategy")
+        if strategy == "semver" and image["imageName"].rsplit(":", 1)[-1] not in {"*", "*-0"}:
+            raise RuntimeError("Versioned images must allow updates across major releases")
+        if strategy == "newest-build" and not settings.get("allowTags", "").startswith("regexp:"):
+            raise RuntimeError("Build-based updates must explicitly filter stable image variants")
     return updater
 
 
@@ -81,7 +89,7 @@ def main():
     for name, obj in prepared:
         if args.apply:
             subprocess.run(["kubectl", "apply", "-f", "-"], input=json.dumps(obj), text=True, check=True)
-        print(f"{name}: committed digest updater {'registered' if args.apply else 'reviewed (dry run)'}")
+        print(f"{name}: committed image updater {'registered' if args.apply else 'reviewed (dry run)'}")
 
 
 if __name__ == "__main__":

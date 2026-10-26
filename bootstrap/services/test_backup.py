@@ -127,7 +127,7 @@ class BackupTests(unittest.TestCase):
     def test_velero_restores_original_node_agent_and_default_pvc_backup_settings(self):
         app = next(yaml.safe_load_all((ROOT / "apps/velero.yml").read_text()))
         chart = app["spec"]["sources"][1]
-        self.assertEqual(chart["targetRevision"], "12.2.1")
+        self.assertEqual(chart["targetRevision"], "x")
         values = chart["helm"]["valuesObject"]
         self.assertTrue(values["deployNodeAgent"])
         self.assertFalse(values["snapshotsEnabled"])

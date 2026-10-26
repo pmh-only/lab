@@ -38,7 +38,7 @@ spec:
             enabled: false
     # Official published index; avoids the old Pages URL's HTTP redirect.
     repoURL: https://raw.githubusercontent.com/Stirling-Tools/Stirling-PDF-chart/gh-pages
-    targetRevision: 3.1.0
+    targetRevision: x
   - repoURL: https://github.com/pmh-only/lab.git
     targetRevision: main
     ref: imageValues

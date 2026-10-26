@@ -1,4 +1,5 @@
-# All running Git/Kustomize apps. Track the existing tag, never cross major versions.
+# Enabled Git/Kustomize apps track the newest stable version across major releases.
+# Mutable channels keep digest tracking; versioned variants keep their image flavor.
 # Paused Welplan workloads are deliberately absent.
 apiVersion: v1
 kind: List
@@ -13,7 +14,7 @@ items:
       applicationRefs:
         - namePattern: authentik
           images:
-            - {alias: authentik, imageName: 'ghcr.io/goauthentik/server:2026.8.4', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: authentik, imageName: 'ghcr.io/goauthentik/server:*', commonUpdateSettings: {updateStrategy: semver}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: as218822, namespace: argocd}
@@ -41,8 +42,8 @@ items:
             - {alias: clickhouse, imageName: 'ghcr.io/pmh-only/clickhouse-server:rybbit', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: redis, imageName: 'ghcr.io/pmh-only/redis:alpine', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: mongo, imageName: 'ghcr.io/pmh-only/mongo:latest', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: mysql, imageName: 'ghcr.io/pmh-only/mysql:8', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: postgres, imageName: 'ghcr.io/pmh-only/postgres:18', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: mysql, imageName: 'ghcr.io/pmh-only/mysql:*', commonUpdateSettings: {updateStrategy: semver}}
+            - {alias: postgres, imageName: 'ghcr.io/pmh-only/postgres:*', commonUpdateSettings: {updateStrategy: semver}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: gateway, namespace: argocd}
@@ -69,7 +70,7 @@ items:
       applicationRefs:
         - namePattern: image-updater
           images:
-            - {alias: updater, imageName: 'quay.io/argoprojlabs/argocd-image-updater:v1.4.0', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: updater, imageName: 'quay.io/argoprojlabs/argocd-image-updater:*', commonUpdateSettings: {updateStrategy: semver}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: immich, namespace: argocd}
@@ -80,7 +81,7 @@ items:
           images:
             - {alias: server, imageName: 'ghcr.io/immich-app/immich-server:release', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: machine-learning, imageName: 'ghcr.io/immich-app/immich-machine-learning:release', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: postgres, imageName: 'ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: postgres, imageName: 'ghcr.io/immich-app/postgres', commonUpdateSettings: {updateStrategy: newest-build, allowTags: 'regexp:^[0-9]+-vectorchord[0-9.]+-pgvectors[0-9.]+$'}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: kopia, namespace: argocd}
@@ -112,8 +113,8 @@ items:
             - {alias: grafana, imageName: 'ghcr.io/pmh-only/grafana:latest', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: node-exporter, imageName: 'quay.io/prometheus/node-exporter:latest', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: prometheus, imageName: 'quay.io/prometheus/prometheus:latest', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: ksm, imageName: 'registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.13.0', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: thanos, imageName: 'quay.io/thanos/thanos:main-2026-10-10-f1e0bbc', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: ksm, imageName: 'registry.k8s.io/kube-state-metrics/kube-state-metrics:*', commonUpdateSettings: {updateStrategy: semver}}
+            - {alias: thanos, imageName: 'quay.io/thanos/thanos:*', commonUpdateSettings: {updateStrategy: semver}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: nameserver, namespace: argocd}
@@ -149,8 +150,8 @@ items:
       applicationRefs:
         - namePattern: remote
           images:
-            - {alias: guacamole, imageName: 'ghcr.io/pmh-only/guacamole:1.6.0', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: guacd, imageName: 'ghcr.io/pmh-only/guacd:1.6.0', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: guacamole, imageName: 'ghcr.io/pmh-only/guacamole:*', commonUpdateSettings: {updateStrategy: semver}}
+            - {alias: guacd, imageName: 'ghcr.io/pmh-only/guacd:*', commonUpdateSettings: {updateStrategy: semver}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: seafile, namespace: argocd}
@@ -159,11 +160,11 @@ items:
       applicationRefs:
         - namePattern: seafile
           images:
-            - {alias: seafile, imageName: 'seafileltd/seafile-pro-mc:12.0.14-arm', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: sdoc, imageName: 'seafileltd/sdoc-server:1.0.5-arm', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: notification, imageName: 'seafileltd/notification-server:12.0.11-arm', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: memcached, imageName: 'memcached:1.6-alpine', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: elasticsearch, imageName: 'elasticsearch:8.19.23', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: seafile, imageName: 'seafileltd/seafile-pro-mc:*-0', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^[0-9]+\.[0-9]+\.[0-9]+-arm$'}}
+            - {alias: sdoc, imageName: 'seafileltd/sdoc-server:*-0', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^[0-9]+\.[0-9]+\.[0-9]+-arm$'}}
+            - {alias: notification, imageName: 'seafileltd/notification-server:*-0', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^[0-9]+\.[0-9]+\.[0-9]+-arm$'}}
+            - {alias: memcached, imageName: 'memcached:*-0', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^[0-9]+\.[0-9]+\.[0-9]+-alpine$'}}
+            - {alias: elasticsearch, imageName: 'elasticsearch:*', commonUpdateSettings: {updateStrategy: semver}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: solver, namespace: argocd}
@@ -173,7 +174,7 @@ items:
         - namePattern: solver
           images:
             - {alias: solver, imageName: 'ghcr.io/pmh-only/solver:latest', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: docker, imageName: 'docker:29-dind', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: docker, imageName: 'docker:*-0', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^[0-9]+\.[0-9]+\.[0-9]+-dind$'}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: spotify, namespace: argocd}
@@ -212,7 +213,7 @@ items:
         - namePattern: track
           images:
             - {alias: dawarich, imageName: 'ghcr.io/pmh-only/dawarich:latest', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: postgis, imageName: 'ghcr.io/pmh-only/postgis:17-3.5-alpine', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: postgis, imageName: 'ghcr.io/pmh-only/postgis', commonUpdateSettings: {updateStrategy: newest-build, allowTags: 'regexp:^[0-9]+([.][0-9]+)*-[0-9]+([.][0-9]+)*-alpine$'}}
             - {alias: redis, imageName: 'ghcr.io/pmh-only/redis:alpine', commonUpdateSettings: {updateStrategy: digest}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater

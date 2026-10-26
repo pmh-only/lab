@@ -60,7 +60,7 @@ spec:
       targetRevision: HEAD
     - chart: cert-manager-technitium-webhook
       repoURL: https://kittizz.github.io/cert-manager-technitium-webhook
-      targetRevision: 1.0.0
+      targetRevision: x
       helm:
         valueFiles:
           - $imageValues/image-updater/helm-values/cert-manager-technitium-webhook.yml

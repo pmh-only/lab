@@ -55,7 +55,7 @@ spec:
             mailDiscoveryUrl: http://mailui.mail.svc.cluster.local:3000/.well-known/rostack
 
       repoURL: https://pmh-only.github.io/otp
-      targetRevision: 0.4.0
+      targetRevision: x
   syncPolicy:
     automated:
       prune: true

@@ -15,7 +15,7 @@ class OTPTests(unittest.TestCase):
         cls.chart = next(s for s in cls.app["spec"]["sources"] if s.get("chart") == "otp-inbox")
 
     def test_native_chart_and_arm64_image_are_pinned_without_retired_bitwarden(self):
-        self.assertEqual(self.chart["targetRevision"], "0.4.0")
+        self.assertEqual(self.chart["targetRevision"], "x")
         self.assertEqual(self.chart["helm"]["releaseName"], "otp-inbox")
         values = self.chart["helm"]["valuesObject"]
         images = yaml.safe_load((ROOT / "image-updater/helm-values/otp.yml").read_text())

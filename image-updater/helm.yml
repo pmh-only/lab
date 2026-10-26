@@ -1,5 +1,5 @@
-# Chart versions stay pinned; signed Git commits update only the image values.
-# Vault is deliberately excluded; helm-values/vault.yml stays manually pinned.
+# Charts track latest stable releases; signed Git commits update image values.
+# All Vault components, including vault-secrets-operator, stay manually pinned.
 apiVersion: v1
 kind: List
 items:
@@ -13,9 +13,9 @@ items:
       applicationRefs:
         - namePattern: cert-manager
           images:
-            - {alias: controller, imageName: 'quay.io/jetstack/cert-manager-controller:v1.21.3', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: image.tag}}}
-            - {alias: webhook, imageName: 'quay.io/jetstack/cert-manager-webhook:v1.21.3', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: webhook.image.tag}}}
-            - {alias: cainjector, imageName: 'quay.io/jetstack/cert-manager-cainjector:v1.21.3', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: cainjector.image.tag}}}
+            - {alias: controller, imageName: 'quay.io/jetstack/cert-manager-controller:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {tag: image.tag}}}
+            - {alias: webhook, imageName: 'quay.io/jetstack/cert-manager-webhook:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {tag: webhook.image.tag}}}
+            - {alias: cainjector, imageName: 'quay.io/jetstack/cert-manager-cainjector:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {tag: cainjector.image.tag}}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: cert-manager-technitium-webhook, namespace: argocd}
@@ -37,7 +37,7 @@ items:
       applicationRefs:
         - namePattern: descheduler
           images:
-            - {alias: descheduler, imageName: 'registry.k8s.io/descheduler/descheduler:v0.37.0', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: image.tag}}}
+            - {alias: descheduler, imageName: 'registry.k8s.io/descheduler/descheduler:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {tag: image.tag}}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: envoy-gateway, namespace: argocd}
@@ -48,7 +48,7 @@ items:
       applicationRefs:
         - namePattern: envoy-gateway
           images:
-            - {alias: gateway, imageName: 'docker.io/envoyproxy/gateway:v1.9.2', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {spec: global.images.envoyGateway.image}}}
+            - {alias: gateway, imageName: 'docker.io/envoyproxy/gateway:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {spec: global.images.envoyGateway.image}}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: otp, namespace: argocd}
@@ -59,7 +59,7 @@ items:
       applicationRefs:
         - namePattern: otp
           images:
-            - {alias: otp, imageName: 'ghcr.io/pmh-only/otp:v0.4.0', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: image.tag}}}
+            - {alias: otp, imageName: 'ghcr.io/pmh-only/otp:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {tag: image.tag}}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: pdf, namespace: argocd}
@@ -70,7 +70,7 @@ items:
       applicationRefs:
         - namePattern: pdf
           images:
-            - {alias: stirling, imageName: 'docker.stirlingpdf.com/stirlingtools/stirling-pdf:2.5.1', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: image.tag}}}
+            - {alias: stirling, imageName: 'docker.stirlingpdf.com/stirlingtools/stirling-pdf:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {tag: image.tag}}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: reloader, namespace: argocd}
@@ -81,7 +81,7 @@ items:
       applicationRefs:
         - namePattern: reloader
           images:
-            - {alias: reloader, imageName: 'ghcr.io/stakater/reloader:v1.4.22', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: image.tag}}}
+            - {alias: reloader, imageName: 'ghcr.io/stakater/reloader:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {tag: image.tag}}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: tailscale, namespace: argocd}
@@ -92,8 +92,8 @@ items:
       applicationRefs:
         - namePattern: tailscale
           images:
-            - {alias: operator, imageName: 'tailscale/k8s-operator:v1.104.2', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: operatorConfig.image.tag}}}
-            - {alias: proxy, imageName: 'tailscale/tailscale:v1.104.2', commonUpdateSettings: {updateStrategy: digest, forceUpdate: true}, manifestTargets: {helm: {tag: proxyConfig.image.tag}}}
+            - {alias: operator, imageName: 'tailscale/k8s-operator:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {tag: operatorConfig.image.tag}}}
+            - {alias: proxy, imageName: 'tailscale/tailscale:*', commonUpdateSettings: {updateStrategy: semver, forceUpdate: true}, manifestTargets: {helm: {tag: proxyConfig.image.tag}}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: velero, namespace: argocd}
@@ -104,8 +104,8 @@ items:
       applicationRefs:
         - namePattern: velero
           images:
-            - {alias: velero, imageName: 'docker.io/velero/velero:v1.18.2', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: image.tag}}}
-            - {alias: aws-plugin, imageName: 'velero/velero-plugin-for-aws:v1.14.0', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {spec: 'initContainers[0].image'}}}
+            - {alias: velero, imageName: 'docker.io/velero/velero:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {tag: image.tag}}}
+            - {alias: aws-plugin, imageName: 'velero/velero-plugin-for-aws:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {spec: 'initContainers[0].image'}}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: velero-ui, namespace: argocd}
@@ -116,16 +116,4 @@ items:
       applicationRefs:
         - namePattern: velero-ui
           images:
-            - {alias: velero-ui, imageName: 'otwld/velero-ui:0.11.0', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: image.tag}}}
-  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
-    kind: ImageUpdater
-    metadata: {name: vault-secrets-operator, namespace: argocd}
-    spec:
-      writeBackConfig:
-        method: git:secret:argocd/git
-        gitConfig: {repository: 'git@github.com:pmh-only/lab.git', branch: main, writeBackTarget: 'helmvalues:/image-updater/helm-values/vault-secrets-operator.yml'}
-      applicationRefs:
-        - namePattern: vault-secrets-operator
-          images:
-            - {alias: operator, imageName: 'hashicorp/vault-secrets-operator:1.6.0', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: controller.manager.image.tag}}}
-            - {alias: rbac-proxy, imageName: 'quay.io/brancz/kube-rbac-proxy:v0.18.1', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: controller.kubeRbacProxy.image.tag}}}
+            - {alias: velero-ui, imageName: 'otwld/velero-ui:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {tag: image.tag}}}
