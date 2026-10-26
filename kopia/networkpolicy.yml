@@ -16,7 +16,7 @@ spec:
               gateway.envoyproxy.io/owning-gateway-name: main
               gateway.envoyproxy.io/owning-gateway-namespace: gateway
       ports:
-        - {protocol: TCP, port: 51515}
+        - {protocol: TCP, port: 8080}
   egress:
     - to:
         - namespaceSelector:

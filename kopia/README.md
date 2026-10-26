@@ -26,11 +26,15 @@ confirms `/mnt/data` contains the same files on both nodes, so only one server
 backs it up. The local-path PVC root is not mounted into Kopia. DB backups
 remain separate; Velero handles PVC filesystem backups.
 
-Envoy retains the original OIDC layer. Kopia itself retains its original native
-password authentication (`pmh_only@pmh.codes` and Vault `kopia/kopia-secret` →
-`ADMIN_PASSWORD`). Its encryption password is unchanged. No password-free
-listener, disabled CSRF, proxy credential injection, or repository read-only
-restriction is used. NetworkPolicy limits ingress to the main Envoy data plane.
+Envoy retains the original admin-only OIDC layer. With user approval, a
+rootless Pod-local NGINX proxy supplies Kopia's existing native credential
+(`pmh_only@pmh.codes` and Vault `kopia/kopia-secret` → `ADMIN_PASSWORD`) so the
+browser needs only Authentik login. Kopia listens on loopback and still requires
+its password and CSRF token. Generated proxy configuration is private in a
+memory-backed volume, never Git or browser storage. The proxy mounts no source
+data or repository credentials. NetworkPolicy permits only the main Envoy data
+plane to reach proxy port 8080. There is no anonymous Kopia listener, disabled
+CSRF, repository read-only restriction, or encryption-password change.
 
 Snapshot management and policies use the original native Kopia server/UI.
 Existing remote data, including earlier checkpoints, is preserved. A successful

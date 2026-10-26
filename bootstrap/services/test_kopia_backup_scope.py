@@ -17,7 +17,9 @@ class KopiaBackupScopeTests(unittest.TestCase):
         pod = deployment["spec"]["template"]["spec"]
         self.assertEqual(pod["hostname"], "pmhoci")
         self.assertEqual(pod["nodeSelector"], {"kubernetes.io/hostname": "pmhoci"})
-        self.assertEqual(len(pod["containers"]), 1)
+        self.assertEqual([c["name"] for c in pod["containers"]], ["kopia", "proxy"])
+        proxy = pod["containers"][1]
+        self.assertFalse(any(m["name"] in ["persistent", "target"] for m in proxy["volumeMounts"]))
         self.assertEqual([v for v in pod["volumes"] if "hostPath" in v], [{"name": "target", "hostPath": {"path": "/mnt/data/", "type": "Directory"}}])
         native = pod["containers"][0]
         self.assertEqual(next(m for m in native["volumeMounts"] if m["name"] == "target"), {"name": "target", "mountPath": "/data", "readOnly": True})

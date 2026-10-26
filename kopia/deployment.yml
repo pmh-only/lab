@@ -20,6 +20,7 @@ spec:
       nodeSelector:
         kubernetes.io/hostname: pmhoci
       automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 120
       securityContext:
         runAsUser: 0
         runAsGroup: 0
@@ -78,7 +79,7 @@ spec:
             - server
             - start
             - --insecure
-            - --address=0.0.0.0:51515
+            - --address=127.0.0.1:51515
           securityContext:
             privileged: false
             allowPrivilegeEscalation: false
@@ -100,17 +101,55 @@ spec:
             - name: KOPIA_PASSWORD
               valueFrom:
                 secretKeyRef: {name: kopia-secret, key: REPOSITORY_PASSWORD}
-          ports:
-            - {name: http, containerPort: 51515}
-          readinessProbe:
-            tcpSocket: {port: http}
           volumeMounts:
             - {name: persistent, mountPath: /app/config, subPath: config}
             - {name: persistent, mountPath: /app/cache, subPath: cache}
             - {name: persistent, mountPath: /app/logs, subPath: logs}
             - {name: persistent, mountPath: /tmp, subPath: tmp}
             - {name: target, mountPath: /data, readOnly: true}
+        # Authentik authenticates at the gateway; keep Kopia's password inside
+        # the Pod instead of asking the browser for a second login.
+        - name: proxy
+          image: nginx:stable-alpine@sha256:47928bf67eb62a1863cb08d9ecb52d3e704304ba614eaee17884204677702951
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              umask 077
+              export KOPIA_BASIC_AUTH="Basic $(printf '%s:%s' "$KOPIA_SERVER_USERNAME" "$KOPIA_SERVER_PASSWORD" | base64 | tr -d '\n')"
+              envsubst '${KOPIA_BASIC_AUTH}' < /config/nginx.conf.template > /run/nginx.conf
+              unset KOPIA_BASIC_AUTH KOPIA_SERVER_PASSWORD
+              exec nginx -c /run/nginx.conf -g 'daemon off;'
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 10m, memory: 32Mi}
+            limits: {cpu: 250m, memory: 128Mi}
+          env:
+            - {name: KOPIA_SERVER_USERNAME, value: pmh_only@pmh.codes}
+            - name: KOPIA_SERVER_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: kopia-secret, key: ADMIN_PASSWORD}
+          ports:
+            - {name: http, containerPort: 8080}
+          readinessProbe:
+            httpGet: {path: /, port: http}
+            periodSeconds: 5
+          volumeMounts:
+            - {name: proxy-config, mountPath: /config, readOnly: true}
+            - {name: proxy-run, mountPath: /run}
       volumes:
+        - name: proxy-run
+          emptyDir: {medium: Memory, sizeLimit: 64Mi}
+        - name: proxy-config
+          configMap: {name: kopia-ui-proxy}
         - name: persistent
           persistentVolumeClaim: {claimName: kopia-pvc}
         - name: target
