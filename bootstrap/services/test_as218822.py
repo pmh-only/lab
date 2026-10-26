@@ -79,6 +79,7 @@ class AS218822Tests(unittest.TestCase):
         self.assertIn({"name": "TS_DEBUG_FIREWALL_MODE", "value": "nftables"}, tailscale["env"])
         self.assertNotIn("lifecycle", tailscale)
         self.assertIn("as218822_exit_snat", " ".join(core["initContainers"][0]["command"]))
+        self.assertIn("net.ipv4.ping_group_range=0 0", " ".join(core["initContainers"][0]["command"]))
         self.assertNotIn("ip6tables-legacy", str(core))
         gre = next(d for d in workloads if d["metadata"]["name"] == "bird-gre-gateway")["spec"]["template"]["spec"]
         self.assertTrue(gre["hostNetwork"])

@@ -58,6 +58,27 @@ is installed at priority 99 in the **private core network namespace** before
 Tailscale's priority-100 NAT, not by a blocking postStart legacy-iptables hook.
 The Sysbox smoke test checks the same IPv6 NAT rule without privileged mode.
 
+The non-root looking glass runs in group 0 with no effective capabilities.
+`ping_group_range=0 0` permits its ICMP echo datagram sockets only inside the
+core network namespace; no host sysctl or root execution is needed. The native
+probe to the existing BGPTunnel neighbor succeeds without `NET_RAW` acquisition.
+
+Atlas registration is an external prerequisite, not a readiness-probe bug:
+the persisted newly generated probe keys have not been accepted by RIPE's
+registration servers (`permission denied`). Preserve the keys/PVCs and register
+their public keys at <https://atlas.ripe.net/apply/swprobe/>; do not regenerate
+keys, fabricate registration state, or relax readiness. The former public probe
+1017386 is marked Written Off; 1017483 is Disconnected. Neither status proves
+the new probe identities are registered.
+
+The original source-policy table 218822 still prefers Vultr for locally
+generated aggregate traffic. That path currently fails while the forwarded
+Tailscale IPv6 exit path works through BGPTunnel. Vultr's WireGuard and iBGP are
+up and exchange the default and aggregate, but management SSH on port 22 is
+refused both publicly and through the tunnel. Obtain the real management
+user/port/access to inspect the remote forwarding/firewall/upstream; do not
+silently remove the original policy or claim BGP Established proves transit.
+
 `bootstrap/services/as218822_console.py` provisions the native console OIDC
 with the exact callback and active/internal/superuser gate, preserving existing
 Secrets. It creates an empty native `wireguard-tunnels` Secret **only if absent**;
