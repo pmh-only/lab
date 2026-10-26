@@ -88,7 +88,7 @@ spec:
             - name: OIDC_SCOPES
               value: openid profile email
             - name: WIREGUARD_ENDPOINT
-              value: 158.179.174.47:51820
+              value: 168.110.121.95:51820
             - name: WIREGUARD_PUBLIC_KEY
               valueFrom:
                 configMapKeyRef: {name: router-public-config, key: WG_PORTAL_PUBLIC_KEY}

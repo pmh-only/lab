@@ -41,6 +41,15 @@ spec:
               ip link del tun-smoke
               nft add table inet as218822_smoke
               nft delete table inet as218822_smoke
+              nft -f - <<'NFT'
+              table ip6 as218822_smoke_nat {
+                chain postrouting {
+                  type nat hook postrouting priority 99; policy accept;
+                  meta mark & 0xff0000 == 0x40000 snat to fd00:218:822:ffff::1
+                }
+              }
+              NFT
+              nft delete table ip6 as218822_smoke_nat
               echo 'PASS: isolated forwarding, WireGuard, IPv6 policy routing, TUN and nftables without privileged/hostNetwork; only the TUN character device is mounted'
           securityContext:
             privileged: false

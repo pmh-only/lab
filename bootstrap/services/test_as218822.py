@@ -75,6 +75,11 @@ class AS218822Tests(unittest.TestCase):
         self.assertEqual(core["runtimeClassName"], "sysbox-runc")
         self.assertFalse(core["hostUsers"])
         self.assertFalse(core.get("hostNetwork", False))
+        tailscale = next(c for c in core["containers"] if c["name"] == "tailscale")
+        self.assertIn({"name": "TS_DEBUG_FIREWALL_MODE", "value": "nftables"}, tailscale["env"])
+        self.assertNotIn("lifecycle", tailscale)
+        self.assertIn("as218822_exit_snat", " ".join(core["initContainers"][0]["command"]))
+        self.assertNotIn("ip6tables-legacy", str(core))
         gre = next(d for d in workloads if d["metadata"]["name"] == "bird-gre-gateway")["spec"]["template"]["spec"]
         self.assertTrue(gre["hostNetwork"])
         self.assertEqual(gre["nodeSelector"], {"kubernetes.io/hostname": "pmhoci"})
@@ -93,3 +98,10 @@ class AS218822Tests(unittest.TestCase):
         self.assertEqual(env["WIREGUARD_PUBLIC_KEY"]["valueFrom"]["configMapKeyRef"]["key"], "WG_PORTAL_PUBLIC_KEY")
         for key in ["WG_CORE_PUBLIC_KEY", "WG_GRE_GATEWAY_PUBLIC_KEY", "WG_PORTAL_PUBLIC_KEY"]:
             self.assertEqual(len(base64.b64decode(config[key], validate=True)), 32)
+
+    def test_validator_rejects_a_wireguard_self_peer_without_printing_private_keys(self):
+        source = (ROOT / "bootstrap/as218822/validate-existing.sh").read_text()
+        self.assertIn("wg pubkey", source)
+        self.assertIn('[ "$own_public" = "$peer_public" ]', source)
+        self.assertIn("SELF_PEER", source)
+        self.assertNotIn('echo "$own_public"', source)

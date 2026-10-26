@@ -22,6 +22,14 @@ pass in the pinned original images. Their public keys are derived from the
 Vault-held core/GRE/portal keys; no external upstream identity is rotated.
 This does not start BGP, establish a tunnel, or prove peer connectivity.
 
+Live startup found that the supplied Lunalight private key derives the same
+public key as the image's configured **remote** peer. The kernel therefore
+has no usable Lunalight peer. Syntax validation alone cannot establish a valid
+identity pair; `validate-existing.sh` now rejects this `SELF_PEER` case without
+printing private keys. Preserve the tunnel addresses and obtain a matching,
+distinct local-private/remote-public pair from the operator before claiming
+the Lunalight session is operational. Never silently rotate the supplied key.
+
 Core/IPv6 Atlas networking uses the already-verified Sysbox runtime and user
 namespaces, with explicit capabilities instead of privileged mode. The original
 GRE gateway still uses host networking on `pmhoci`, because its original GRE
@@ -41,6 +49,14 @@ Persistence across host reboot must be managed deliberately by the operator;
 the Pod never writes host sysctls. Do not register the Application before this
 precondition passes. The production gateway still needs host `NET_ADMIN` for
 its original interfaces/routes/nftables, but no container uses privileged mode.
+
+After the operator enabled forwarding, the Applications were registered.
+The GRE host's live public IPv4 is `168.110.121.95`; the portal endpoint uses
+that address. Core/Atlas Tailscale explicitly uses native nftables, avoiding
+unavailable host legacy `ip6_tables` modules. The original marked exit SNAT
+is installed at priority 99 in the **private core network namespace** before
+Tailscale's priority-100 NAT, not by a blocking postStart legacy-iptables hook.
+The Sysbox smoke test checks the same IPv6 NAT rule without privileged mode.
 
 `bootstrap/services/as218822_console.py` provisions the native console OIDC
 with the exact callback and active/internal/superuser gate, preserving existing

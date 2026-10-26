@@ -68,7 +68,7 @@ spec:
       terminationGracePeriodSeconds: 30
       initContainers:
         - name: network-config
-          image: ghcr.io/tailscale/tailscale:latest
+          image: ghcr.io/pmh-only/as218822:latest
           command:
             - /bin/sh
             - -ceu
@@ -81,6 +81,18 @@ spec:
               ip -6 rule add pref 5200 fwmark 0x80000/0xff0000 unreachable
               # Prefer Vultr for traffic sourced from the routed aggregate.
               ip -6 rule add pref 10000 from 2a06:9801:ff0::/44 table 218822
+              # Preserve the original exit SNAT before Tailscale's priority-100
+              # NAT without depending on host-loaded ip6_tables legacy modules.
+              nft -f - <<'NFT'
+              add table ip6 as218822_exit_snat
+              delete table ip6 as218822_exit_snat
+              table ip6 as218822_exit_snat {
+                chain postrouting {
+                  type nat hook postrouting priority 99; policy accept;
+                  meta mark & 0xff0000 == 0x40000 snat to 2a06:9801:ff0::
+                }
+              }
+              NFT
           securityContext:
             privileged: false
             allowPrivilegeEscalation: false
@@ -389,6 +401,8 @@ spec:
               value: as218822-exit
             - name: TS_USERSPACE
               value: "false"
+            - name: TS_DEBUG_FIREWALL_MODE
+              value: nftables
             - name: TS_ACCEPT_DNS
               value: "false"
             - name: TS_EXTRA_ARGS
@@ -424,36 +438,6 @@ spec:
             capabilities:
               drop: [ALL]
               add: [NET_ADMIN, NET_RAW]
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                  - /bin/sh
-                  - -ceu
-                  - |
-                    ip -6 address replace 2a06:9801:ff0::/128 dev lo
-                    attempts=0
-                    until ip6tables-legacy -w -t nat -S ts-postrouting >/dev/null 2>&1; do
-                      attempts=$((attempts + 1))
-                      [ "$attempts" -lt 120 ] || exit 1
-                      sleep 1
-                    done
-                    tailscale set --advertise-exit-node=true
-                    ip6tables-legacy -w -t nat -C POSTROUTING \
-                      -m mark --mark 0x40000/0xff0000 \
-                      -j SNAT --to-source 2a06:9801:ff0:: 2>/dev/null || \
-                    ip6tables-legacy -w -t nat -I POSTROUTING 1 \
-                      -m mark --mark 0x40000/0xff0000 \
-                      -j SNAT --to-source 2a06:9801:ff0::
-            preStop:
-              exec:
-                command:
-                  - /bin/sh
-                  - -c
-                  - |
-                    ip6tables-legacy -w -t nat -D POSTROUTING \
-                      -m mark --mark 0x40000/0xff0000 \
-                      -j SNAT --to-source 2a06:9801:ff0:: 2>/dev/null || true
           volumeMounts:
             - name: tun
               mountPath: /dev/net/tun
