@@ -61,7 +61,6 @@ images:
     digest: sha256:7fd3b12cd288b8c523d7e38bfafb390d2727d73b4133877e703c11be55d79019
   - name: ghcr.io/pmh-only/postgis
     newTag: 17-3.5-alpine
-    digest: sha256:da061e8e41e25cf8cd7c661f600269c4a81fe765ea66263d8a49d4ef9e3c34d2
   - name: ghcr.io/pmh-only/redis
     newTag: alpine
     digest: sha256:0c9ff226d290de2878f875efe2ce49e93137469331d5b10d919ce96ce7b2fa5a
