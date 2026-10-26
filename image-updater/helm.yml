@@ -96,6 +96,29 @@ items:
             - {alias: proxy, imageName: 'tailscale/tailscale:v1.104.2', commonUpdateSettings: {updateStrategy: digest, forceUpdate: true}, manifestTargets: {helm: {tag: proxyConfig.image.tag}}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
+    metadata: {name: velero, namespace: argocd}
+    spec:
+      writeBackConfig:
+        method: git:secret:argocd/git
+        gitConfig: {repository: 'git@github.com:pmh-only/lab.git', branch: main, writeBackTarget: 'helmvalues:/image-updater/helm-values/velero.yml'}
+      applicationRefs:
+        - namePattern: velero
+          images:
+            - {alias: velero, imageName: 'docker.io/velero/velero:v1.18.2', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: image.tag}}}
+            - {alias: aws-plugin, imageName: 'velero/velero-plugin-for-aws:v1.14.0', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {spec: 'initContainers[0].image'}}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: velero-ui, namespace: argocd}
+    spec:
+      writeBackConfig:
+        method: git:secret:argocd/git
+        gitConfig: {repository: 'git@github.com:pmh-only/lab.git', branch: main, writeBackTarget: 'helmvalues:/image-updater/helm-values/velero-ui.yml'}
+      applicationRefs:
+        - namePattern: velero-ui
+          images:
+            - {alias: velero-ui, imageName: 'otwld/velero-ui:0.11.0', commonUpdateSettings: {updateStrategy: digest}, manifestTargets: {helm: {tag: image.tag}}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
     metadata: {name: vault-secrets-operator, namespace: argocd}
     spec:
       writeBackConfig:

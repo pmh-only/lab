@@ -19,7 +19,8 @@ class OIDCTests(unittest.TestCase):
             if slug == "velero-ui":
                 apps = list(yaml.safe_load_all((ROOT / "apps/velero.yml").read_text()))
                 ui = next(d for d in apps if d["metadata"]["name"] == "velero-ui")
-                env = {e["name"]: e for e in ui["spec"]["source"]["helm"]["valuesObject"]["env"]}
+                values = next(s["helm"]["valuesObject"] for s in ui["spec"]["sources"] if "helm" in s)
+                env = {e["name"]: e for e in values["env"]}
                 self.assertEqual(env["OAUTH_CLIENT_ID"]["value"], declaration["clientID"])
                 self.assertEqual(env["OAUTH_REDIRECT_URI"]["value"], declaration["redirectURI"])
                 self.assertEqual(declaration["secretField"], "OAUTH_CLIENT_SECRET")

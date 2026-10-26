@@ -1,5 +1,5 @@
 # All running Git/Kustomize apps. Track the existing tag, never cross major versions.
-# Paused AS218822, Welplan and backup workloads are deliberately absent.
+# Paused Welplan workloads are deliberately absent.
 apiVersion: v1
 kind: List
 items:
@@ -14,6 +14,22 @@ items:
         - namePattern: authentik
           images:
             - {alias: authentik, imageName: 'ghcr.io/goauthentik/server:2026.8.4', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: as218822, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: as218822
+          images:
+            - {alias: ripe-atlas, imageName: 'ghcr.io/pmh-only/as218822-ripe-atlas:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: here, imageName: 'ghcr.io/pmh-only/here:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: as218822, imageName: 'ghcr.io/pmh-only/as218822:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: gre-gateway, imageName: 'ghcr.io/pmh-only/as218822-gre-gateway:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: looking-glass, imageName: 'ghcr.io/pmh-only/as218822-looking-glass:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: console, imageName: 'ghcr.io/pmh-only/as218822-console:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: website, imageName: 'ghcr.io/pmh-only/as218822-website:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: tailscale, imageName: 'ghcr.io/tailscale/tailscale:latest', commonUpdateSettings: {updateStrategy: digest}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: database, namespace: argocd}
@@ -65,6 +81,16 @@ items:
             - {alias: server, imageName: 'ghcr.io/immich-app/immich-server:release', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: machine-learning, imageName: 'ghcr.io/immich-app/immich-machine-learning:release', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: postgres, imageName: 'ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0', commonUpdateSettings: {updateStrategy: digest}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: kopia, namespace: argocd}
+    spec:
+      writeBackConfig: *git
+      applicationRefs:
+        - namePattern: kopia
+          images:
+            - {alias: kopia, imageName: 'kopia/kopia:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: nginx, imageName: 'nginx:stable-alpine', commonUpdateSettings: {updateStrategy: digest}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: minio, namespace: argocd}

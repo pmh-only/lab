@@ -31,7 +31,7 @@ patches:
       data:
         argocd.namespace: argocd
         watch.namespaces: argocd
-        interval: 2m
+        interval: 30s
         max_concurrent_apps: "1"
         max_concurrent_reconciles: "1"
         git.user: ArgoCD

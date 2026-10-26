@@ -18,17 +18,17 @@ spec:
   - path: velero_auth
     repoURL: https://github.com/pmh-only/lab.git
     targetRevision: HEAD
+    ref: imageValues
   - chart: velero
     helm:
+      valueFiles:
+        - $imageValues/image-updater/helm-values/velero.yml
       valuesObject:
         # Restore the original YAML's PVC filesystem backups.
         deployNodeAgent: true
         snapshotsEnabled: false
         upgradeCRDs: false
         cleanUpCRDs: false
-        image:
-          tag: v1.18.2
-          digest: sha256:37396519f399536e5f01427d723565ae69294ec3fb5625cf1c87c09eaa9de16b
         credentials:
           existingSecret: velero-s3
         serviceAccount:
@@ -74,18 +74,6 @@ spec:
                 s3ForcePathStyle: "true"
                 s3Url: http://pmhraspberry.tailscale.svc.cluster.local:9000
                 checksumAlgorithm: ""
-        initContainers:
-          - name: velero-plugin-for-aws
-            image: velero/velero-plugin-for-aws:v1.14.0@sha256:7e82f717f44e89671212e0dfce7e061321c386ea84a33bca64a671670ca6c278
-            imagePullPolicy: IfNotPresent
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities:
-                drop: [ALL]
-            volumeMounts:
-              - mountPath: /target
-                name: plugins
         schedules:
           backup:
             disabled: false
@@ -136,12 +124,15 @@ spec:
         - /data
       kind: Secret
   project: default
-  source:
-    chart: velero-ui
+  sources:
+  - repoURL: https://github.com/pmh-only/lab.git
+    targetRevision: HEAD
+    ref: imageValues
+  - chart: velero-ui
     helm:
+      valueFiles:
+        - $imageValues/image-updater/helm-values/velero-ui.yml
       valuesObject:
-        image:
-          tag: 0.11.0@sha256:7b7bb90aa0b9de8241cb12d9902e685cb4a1a8c60c81f8ea839762bfa398c088
         configuration:
           general:
             secretPassPhrase:

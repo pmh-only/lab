@@ -138,8 +138,9 @@ class BackupTests(unittest.TestCase):
         self.assertTrue(values["configuration"]["defaultVolumesToFsBackup"])
         self.assertEqual(values["configuration"]["fsBackupTimeout"], "12h")
         self.assertFalse(values["cleanUpCRDs"])
-        self.assertIn("sha256:", values["image"]["digest"])
-        self.assertIn("@sha256:", values["initContainers"][0]["image"])
+        image_values = yaml.safe_load((ROOT / "image-updater/helm-values/velero.yml").read_text())
+        self.assertIn("@sha256:", image_values["image"]["tag"])
+        self.assertIn("@sha256:", image_values["initContainers"][0]["image"])
         self.assertEqual(values["credentials"]["existingSecret"], "velero-s3")
         schedule = values["schedules"]["backup"]
         self.assertFalse(schedule["paused"])

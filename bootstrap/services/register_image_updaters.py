@@ -18,13 +18,13 @@ REVIEWED = {
     "here", "indexgen", "keysboard", "meta", "speed", "stmt",
 }
 DEPLOYED = {
-    "authentik", "database", "gateway", "guessaiword", "image-updater", "immich",
-    "minio", "monitoring", "nameserver", "notaikr", "office", "remote", "seafile",
+    "as218822", "authentik", "database", "gateway", "guessaiword", "image-updater", "immich",
+    "kopia", "minio", "monitoring", "nameserver", "notaikr", "office", "remote", "seafile",
     "solver", "spotify", "thepool", "trace", "track", "traffic", "visualized",
 }
 HELM = {
     "cert-manager", "cert-manager-technitium-webhook", "descheduler", "envoy-gateway",
-    "otp", "pdf", "reloader", "tailscale", "vault-secrets-operator",
+    "otp", "pdf", "reloader", "tailscale", "vault-secrets-operator", "velero", "velero-ui",
 }
 ENABLED = REVIEWED | DEPLOYED | HELM | {"mail"}
 DECLARATIONS = ("reviewed.yml", "deployed.yml", "helm.yml", "mail.yml")
