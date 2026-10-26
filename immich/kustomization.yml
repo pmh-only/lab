@@ -45,5 +45,4 @@ images:
     newTag: release
     digest: sha256:5b28c9352c8374b8a1ed96fbdd8d6755fea6e43510ec43fdf6538aa02ea40f56
   - name: ghcr.io/immich-app/postgres
-    newTag: 14-vectorchord0.4.3-pgvectors0.2.0
-    digest: sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
+    newTag: 14-vectorchord0.3.0-pgvectors0.3.0
