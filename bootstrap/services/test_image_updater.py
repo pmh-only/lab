@@ -134,6 +134,22 @@ class ImageUpdaterTests(unittest.TestCase):
             self.assertNotIn("image", chart["helm"]["valuesObject"])
         self.assertNotIn("initContainers", apps["velero"]["spec"]["sources"][1]["helm"]["valuesObject"])
 
+    def test_cert_manager_excludes_numeric_builds_and_requires_arm64(self):
+        updater = next(d for d in self.docs if d["kind"] == "ImageUpdater" and d["metadata"]["name"] == "cert-manager")
+        images = updater["spec"]["applicationRefs"][0]["images"]
+        self.assertEqual({i["alias"] for i in images}, {"controller", "webhook", "cainjector"})
+        for image in images:
+            settings = image["commonUpdateSettings"]
+            self.assertEqual(settings["platforms"], ["linux/arm64"])
+            pattern = settings["allowTags"].removeprefix("regexp:")
+            for tag in ["v1.21.3", "v2.0.0", "v99.1.2"]:
+                self.assertRegex(tag, pattern)
+            for tag in ["608111629", "v608111629", "latest", "v1.21.3-rc.1", "v1.21.3-amd64"]:
+                self.assertIsNone(re.match(pattern, tag))
+        values = yaml.safe_load((ROOT / "image-updater/helm-values/cert-manager.yml").read_text())
+        for image in [values["image"], values["webhook"]["image"], values["cainjector"]["image"]]:
+            self.assertRegex(image["tag"], r"^v\d+\.\d+\.\d+$")
+
     def test_versioned_variants_allow_new_majors_but_exclude_prerelease_and_wrong_flavors(self):
         managed = {d["metadata"]["name"]: d for d in self.docs if d["kind"] == "ImageUpdater"}
         cases = [
