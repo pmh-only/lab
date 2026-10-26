@@ -53,7 +53,7 @@ class BackupTests(unittest.TestCase):
         jobs = [d for d in docs if d["kind"] == "CronJob"]
         self.assertEqual({j["metadata"]["name"] for j in jobs}, {"backup-" + n for n in ["pgsql", "mysql", "mongo", "clickhouse", "immich"]})
         for job in jobs:
-            self.assertEqual(job["spec"]["suspend"], job["metadata"]["name"] == "backup-clickhouse")
+            self.assertFalse(job["spec"]["suspend"])
             self.assertEqual(job["metadata"]["annotations"]["reloader.stakater.com/auto"], "false")
             self.assertEqual(job["spec"]["concurrencyPolicy"], "Forbid")
             pod = job["spec"]["jobTemplate"]["spec"]["template"]["spec"]

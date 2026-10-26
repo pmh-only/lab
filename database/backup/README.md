@@ -14,8 +14,11 @@ have different identities restricted to their respective buckets.
 
 ## Jobs and completion
 
-CronJobs start **suspended**. Enable a schedule only after its first successful
-backup and isolated restore. Proposed daily times are Asia/Seoul:
+The base starts CronJobs **suspended**; the engine overlays enable the reviewed
+schedules. PostgreSQL, MySQL, MongoDB, and Immich passed isolated restore checks.
+ClickHouse's native backup succeeded; its full restore check was canceled by
+the user. The user explicitly approved enabling its schedule without resuming
+restore testing. Daily times are Asia/Seoul:
 
 | Job | Time | Format |
 | --- | --- | --- |

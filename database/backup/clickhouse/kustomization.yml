@@ -13,6 +13,8 @@ patches:
         name: backup
       spec:
         schedule: "0 4 * * *"
+        # User approved scheduled backups without resuming restore testing.
+        suspend: false
         jobTemplate:
           spec:
             template:
