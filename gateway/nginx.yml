@@ -106,7 +106,16 @@ data:
 
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection $connection_upgrade;
-      proxy_set_header Accept-Encoding "";
+
+      # Vault 2.2.x injects a CSP nonce into HTML without updating its original
+      # Content-Length. Its gzip handler avoids the resulting truncated response.
+      # Preserve browser compression negotiation only for Vault; other sites
+      # still send plain upstream HTML for the analytics sub_filter below.
+      map $host $upstream_accept_encoding {
+        default "";
+        vault.pmh.codes $http_accept_encoding;
+      }
+      proxy_set_header Accept-Encoding $upstream_accept_encoding;
 
       proxy_read_timeout 300s;
       proxy_send_timeout 300s;
@@ -147,6 +156,7 @@ data:
         argo.pmh.codes       "";
         backup.pmh.codes     "";
         velero.pmh.codes     "";
+        vault.pmh.codes      "";
         bgp.pmh.codes        "";
         names.pmh.codes      "";
         welplan.pmh.codes    "";
@@ -425,7 +435,7 @@ spec:
   template:
     metadata:
       annotations:
-        pmh.codes/config-revision: "2026-10-02-2"
+        pmh.codes/config-revision: "2026-10-26-vault-gzip"
       labels:
         app: gateway-nginx
     spec:
