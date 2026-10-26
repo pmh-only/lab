@@ -31,9 +31,10 @@ patches:
       data:
         argocd.namespace: argocd
         watch.namespaces: argocd
-        interval: 30s
+        # Leave capacity for initial-list CRs while slow registry scans requeue.
+        interval: 2m
         max_concurrent_apps: "1"
-        max_concurrent_reconciles: "1"
+        max_concurrent_reconciles: "4"
         git.user: ArgoCD
         git.email: lab@pmh.codes
         git.commit-signing-method: ssh
