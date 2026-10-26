@@ -93,7 +93,7 @@ def provision(vault):
     verify_oauth(vault)
     router = ensure_identity(vault, ROUTER_PATH, PRIVATE_FIELDS, ["WG_LUNALIGHT_PRESHARED_KEY"])
     portal = ensure_identity(vault, PORTAL_PATH, ["WG_PORTAL_PRIVATE_KEY"])
-    reader(vault, "as218822", [ROUTER_PATH, PORTAL_PATH, "as218822/tailscale-oauth", "as218822/console-oidc"])
+    reader(vault, "as218822", [ROUTER_PATH, PORTAL_PATH, "as218822/tailscale-oauth", "as218822/console-oidc", "as218822/bird-dotenvx"])
     result = {name.replace("_PRIVATE_KEY", "_PUBLIC_KEY"): public_key(value) for data in [router, portal] for name, value in data.items() if name.endswith("_PRIVATE_KEY")}
     return result
 

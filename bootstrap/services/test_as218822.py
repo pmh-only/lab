@@ -42,3 +42,17 @@ class AS218822Tests(unittest.TestCase):
         self.assertEqual(container["securityContext"]["capabilities"]["add"], ["NET_ADMIN", "NET_RAW"])
         self.assertNotIn("env", container)
         self.assertEqual(pod["volumes"], [{"name": "tun", "hostPath": {"path": "/dev/net/tun", "type": "CharDevice"}}])
+
+    def test_existing_dotenv_validation_rejects_missing_fields_before_native_fallback(self):
+        script = (ROOT / "bootstrap/as218822/validate-existing.sh").read_text()
+        self.assertIn("export BIRD_VALIDATE=1", script)
+        self.assertIn('printenv "$variable" >/dev/null', script)
+        self.assertLess(script.index('[ "$missing" = 0 ] || exit 2'), script.index("    render-bird-config"))
+        self.assertNotIn("set -x", script)
+        self.assertNotIn("cat /run/bird/validation.log", script)
+        self.assertIn("^MISSING_VARIABLE [A-Z0-9_]+$", script)
+
+    def test_reader_keeps_the_user_supplied_existing_dotenv_key_path(self):
+        source = (ROOT / "bootstrap/services/as218822.py").read_text()
+        reader_call = next(line for line in source.splitlines() if 'reader(vault, "as218822"' in line)
+        self.assertIn('"as218822/bird-dotenvx"', reader_call)
