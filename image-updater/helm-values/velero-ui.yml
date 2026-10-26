@@ -1,3 +1,3 @@
 image:
   repository: otwld/velero-ui
-  tag: 0.11.0@sha256:7b7bb90aa0b9de8241cb12d9902e685cb4a1a8c60c81f8ea839762bfa398c088
+  tag: 0.11.0
