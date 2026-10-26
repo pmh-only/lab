@@ -11,6 +11,19 @@ from provision import ROOT
 
 
 class AS218822Tests(unittest.TestCase):
+    def test_public_website_routes_html_and_same_origin_api_with_valid_edge_tls(self):
+        docs = list(yaml.safe_load_all((ROOT / "as218822/website.yml").read_text()))
+        route = next(d for d in docs if d["kind"] == "HTTPRoute")
+        self.assertEqual(route["spec"]["hostnames"], ["as218822.net"])
+        self.assertEqual(route["spec"]["parentRefs"][0]["name"], "main")
+        api, website = route["spec"]["rules"]
+        self.assertEqual(api["matches"][0]["path"], {"type": "Exact", "value": "/api/query"})
+        self.assertEqual(api["backendRefs"], [{"name": "looking-glass", "port": 8080}])
+        self.assertEqual(api["filters"][0]["requestHeaderModifier"]["remove"], ["Origin"])
+        self.assertEqual(website["backendRefs"], [{"name": "website", "port": 80}])
+        certificate = yaml.safe_load((ROOT / "gateway/public-certificate.yml").read_text())
+        self.assertIn("as218822.net", certificate["spec"]["dnsNames"])
+
     def test_console_never_overwrites_existing_tunnel_clients(self):
         with patch("as218822_console.subprocess.check_output", return_value="secret/wireguard-tunnels\n"), patch("as218822_console.subprocess.run") as create:
             ensure_tunnel_state()

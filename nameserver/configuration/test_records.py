@@ -15,6 +15,18 @@ def record(owner, record_type, data):
 
 
 class RecordImportTests(unittest.TestCase):
+    def test_as218822_website_has_ipv4_and_original_asn_ipv6(self):
+        import json
+        from pathlib import Path
+
+        desired = json.loads(Path(__file__).with_name("imported-records.json").read_text())
+        zone = next(z for z in desired["zones"] if z["zone"] == "as218822.net")
+        self.assertFalse(zone.get("authorityOnly", False))
+        self.assertFalse(zone["emptyApexWeb"])
+        self.assertEqual({(r["type"], r["data"]["ipAddress"]) for r in zone["records"]}, {
+            ("A", "168.110.121.95"), ("A", "138.2.112.39"), ("AAAA", "2a06:9801:ff0::"),
+        })
+
     def test_explicit_cname_replacement_is_exact_and_idempotent(self):
         state = [{"name": "auth.example.test", "type": "CNAME", "rData": {"cname": "old.example"}}]
         client = Mock()

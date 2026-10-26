@@ -8,6 +8,7 @@ spec:
     labels:
       edge.pmh.codes/reload: "true"
   dnsNames:
+    - as218822.net
     - not.ai.kr
     - pmh.so
     - "*.pmh.so"
