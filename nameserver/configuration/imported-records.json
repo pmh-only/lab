@@ -10,6 +10,10 @@
         }
       ],
       "records": [
+        {"name": "here.pmh.codes", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
+        {"name": "here.pmh.codes", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}},
+        {"name": "*.here.pmh.codes", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
+        {"name": "*.here.pmh.codes", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}},
         {
           "name": "pmh.codes",
           "type": "A",
@@ -192,6 +196,12 @@
         {"name": "pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}},
         {"name": "*.pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
         {"name": "*.pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}},
+        {"name": "here.pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
+        {"name": "here.pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}},
+        {"name": "s3.pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
+        {"name": "s3.pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}},
+        {"name": "mc.pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
+        {"name": "mc.pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}},
         {"name": "*.here.pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
         {"name": "*.here.pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}},
         {"name": "*.s3.pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},

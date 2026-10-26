@@ -13,6 +13,7 @@ spec:
     - pmh.so
     - "*.pmh.so"
     - "*.here.pmh.so"
+    - "*.here.pmh.codes"
     - "*.s3.pmh.so"
     - "*.mc.pmh.so"
     - pmh.codes
