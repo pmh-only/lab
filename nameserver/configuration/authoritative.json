@@ -1,7 +1,8 @@
 {
   "nameservers": [
     {"name": "ns1.pmh.codes", "node": "pmhoci", "publicIPv4": "168.110.121.95"},
-    {"name": "ns2.pmh.codes", "node": "pmhoci2", "publicIPv4": "138.2.112.39"}
+    {"name": "ns2.pmh.codes", "node": "pmhoci2", "publicIPv4": "138.2.112.39"},
+    {"name": "ns3.pmh.codes", "node": "pmhoci3", "publicIPv4": "168.107.39.218"}
   ],
   "ttl": 3600,
   "dnssec": {

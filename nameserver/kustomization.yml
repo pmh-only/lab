@@ -10,6 +10,7 @@ resources:
   - ./bootstrap-issuer.yml
   - ./configure-job.yml
   - ./secondary.yml
+  - ./tertiary.yml
 configMapGenerator:
   - name: nameserver-configuration
     files:

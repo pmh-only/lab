@@ -3,6 +3,8 @@
   "catalogDomain": "cluster-catalog.pmh.codes",
   "primaryNodeIpAddresses": "138.2.112.39",
   "secondaryNodeIpAddresses": "168.110.121.95",
+  "tertiaryNodeIpAddresses": "168.107.39.218",
+  "tertiaryNodeUrl": "https://ns3.pmh.codes:53443/",
   "primaryNodeUrl": "https://ns2.pmh.codes:53443/",
   "primaryNodeIpAddress": "10.1.0.102",
   "zones": ["pmh.codes", "pmh.so", "as218822.net", "not.ai.kr"]

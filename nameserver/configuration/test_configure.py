@@ -23,15 +23,41 @@ class ReconcileTests(unittest.TestCase):
         self.assertEqual(authority["nameservers"], [
             {"name": "ns1.pmh.codes", "node": "pmhoci", "publicIPv4": "168.110.121.95"},
             {"name": "ns2.pmh.codes", "node": "pmhoci2", "publicIPv4": "138.2.112.39"},
+            {"name": "ns3.pmh.codes", "node": "pmhoci3", "publicIPv4": "168.107.39.218"},
         ])
         cluster = json.loads((root / "native-cluster.json").read_text())
         self.assertEqual(cluster["primaryNodeUrl"], "https://ns2.pmh.codes:53443/")
         self.assertEqual(cluster["primaryNodeIpAddresses"], "138.2.112.39")
         self.assertEqual(cluster["secondaryNodeIpAddresses"], "168.110.121.95")
+        self.assertEqual(cluster["tertiaryNodeIpAddresses"], "168.107.39.218")
+        self.assertEqual(cluster["tertiaryNodeUrl"], "https://ns3.pmh.codes:53443/")
         self.assertEqual(cluster["catalogDomain"], "cluster-catalog.pmh.codes")
         self.assertEqual(json.loads((root / "configuration/settings.json").read_text())["dnsServerDomain"], "ns2.pmh.codes")
         secondary_secrets = (root / "secrets/secondary.yml").read_text().split("---")[0]
         self.assertIn("path: nameserver/nameserver-admin\n", secondary_secrets)
+
+    def test_third_node_has_independent_storage_and_verified_primary_tls(self):
+        import subprocess
+        import yaml
+
+        root = Path(__file__).resolve().parents[1]
+        docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(root)], text=True)))
+        deployment = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "nameserver-tertiary")
+        pod = deployment["spec"]["template"]["spec"]
+        self.assertEqual(pod["nodeSelector"], {"kubernetes.io/hostname": "pmhoci3"})
+        self.assertFalse(pod["automountServiceAccountToken"])
+        container = pod["containers"][0]
+        self.assertTrue(all(p["hostIP"] == "10.2.0.10" for p in container["ports"] if "hostPort" in p))
+        env = {e["name"]: e for e in container["env"]}
+        self.assertEqual(env["DNS_SERVER_DOMAIN"]["value"], "ns3.pmh.codes")
+        self.assertEqual(env["DNS_SERVER_RECURSION"]["value"], "Deny")
+        self.assertEqual(env["SSL_CERT_FILE"]["value"], "/run/secrets/nameserver-primary-ca/tls.crt")
+        volumes = {v["name"]: v for v in pod["volumes"]}
+        self.assertEqual(volumes["config"]["persistentVolumeClaim"]["claimName"], "nameserver-tertiary-config")
+        self.assertEqual(volumes["primary-ca"]["secret"]["items"], [{"key": "tls.crt", "path": "tls.crt"}])
+        settings = json.loads((root / "configuration/settings.json").read_text())
+        self.assertIn("172.16.2.0/24", settings["dnsReverseProxyNetworkACL"])
+        self.assertLess(settings["recursionNetworkACL"].index("!10.2.0.10"), settings["recursionNetworkACL"].index("10.0.0.0/8"))
 
     def test_network_acl_order_is_reconciled(self):
         client = Mock()
