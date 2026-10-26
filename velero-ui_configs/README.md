@@ -6,6 +6,12 @@ OTWLD Velero UI with its original generic OAuth login, not a replacement page.
 The new client secret and required JWT signing secret are kept in Vault at
 `velero/velero-ui-secrets`. Reconcile them with `bootstrap/services/velero_ui.py`.
 
+UI 0.11 denies federated users without an explicit permission policy. The chart
+mounts `u,pmh_only@pmh.codes,manage,all` for the existing internal Authentik
+administrator; there is no wildcard user/group grant. Authentik's independent
+active/internal/superuser policy still gates login. Permissions are embedded
+in the UI session at login, so sign out and sign in again after policy changes.
+
 Velero's original settings are restored: `deployNodeAgent: true`,
 `defaultVolumesToFsBackup: true`, a 12-hour filesystem backup timeout, the daily
 `backup` schedule, 30-day retention, and 16 parallel file uploads. Volume

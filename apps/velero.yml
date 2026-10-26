@@ -147,6 +147,12 @@ spec:
             secretPassPhrase:
               existingSecret: velero-ui-secrets
               key: AUTH_SECRET_PASSPHRASE
+          policies:
+            enabled: true
+            # OAuth authentication alone grants no API access in UI 0.11.
+            # Match the existing active internal Authentik administrator email.
+            value: |
+              u,pmh_only@pmh.codes,manage,all
         env:
           - name: BASIC_AUTH_ENABLED
             value: "false"
