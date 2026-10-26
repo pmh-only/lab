@@ -133,6 +133,8 @@ class BackupTests(unittest.TestCase):
         self.assertFalse(values["snapshotsEnabled"])
         self.assertTrue(values["rbac"]["clusterAdministrator"])
         self.assertFalse(values["nodeAgent"]["containerSecurityContext"]["privileged"])
+        self.assertFalse(values["containerSecurityContext"]["readOnlyRootFilesystem"])
+        self.assertEqual(values["podSecurityContext"]["runAsUser"], 0)
         self.assertTrue(values["configuration"]["defaultVolumesToFsBackup"])
         self.assertEqual(values["configuration"]["fsBackupTimeout"], "12h")
         self.assertFalse(values["cleanUpCRDs"])

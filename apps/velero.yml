@@ -42,10 +42,10 @@ spec:
           containerSecurityContext:
             privileged: false
         podSecurityContext:
-          runAsNonRoot: true
-          runAsUser: 65532
-          runAsGroup: 65532
-          fsGroup: 65532
+          runAsNonRoot: false
+          runAsUser: 0
+          runAsGroup: 0
+          fsGroup: 0
           seccompProfile:
             type: RuntimeDefault
         containerSecurityContext:
