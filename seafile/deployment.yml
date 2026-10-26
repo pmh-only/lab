@@ -239,6 +239,13 @@ spec:
       # Retain the existing node-local notification state and logs.
       nodeSelector:
         kubernetes.io/hostname: pmhoci
+      initContainers:
+        - name: prepare-notification-logs
+          image: seafileltd/notification-server:12.0.11-arm
+          command: ["sh", "-ec", "mkdir -p /shared/seafile/logs"]
+          volumeMounts:
+            - mountPath: /shared
+              name: seafile-noti-storage
       containers:
         - name: seafile
           image: seafileltd/notification-server:12.0.11-arm

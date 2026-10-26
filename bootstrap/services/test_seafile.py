@@ -26,6 +26,8 @@ class SeafileTests(unittest.TestCase):
         pod = deployment["spec"]["template"]["spec"]
         self.assertEqual(pod["nodeSelector"], {"kubernetes.io/hostname": "pmhoci"})
         self.assertEqual(pod["containers"][0]["volumeMounts"], [{"mountPath": "/shared", "name": "seafile-noti-storage"}])
+        self.assertEqual(pod["initContainers"][0]["command"], ["sh", "-ec", "mkdir -p /shared/seafile/logs"])
+        self.assertEqual(pod["initContainers"][0]["image"], pod["containers"][0]["image"])
         self.assertEqual(pod["volumes"][0]["hostPath"], {"path": "/mnt/data/seafile-noti", "type": "DirectoryOrCreate"})
         self.assertEqual(deployment["spec"]["strategy"]["type"], "Recreate")
 
