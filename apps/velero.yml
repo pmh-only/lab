@@ -50,7 +50,8 @@ spec:
             type: RuntimeDefault
         containerSecurityContext:
           allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
+          # Native filesystem-backup repository initialization writes /udmrepo.
+          readOnlyRootFilesystem: false
           capabilities:
             drop: [ALL]
         configuration:
