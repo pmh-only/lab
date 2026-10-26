@@ -104,8 +104,10 @@ items:
       applicationRefs:
         - namePattern: velero
           images:
-            - {alias: velero, imageName: 'docker.io/velero/velero:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {tag: image.tag}}}
-            - {alias: aws-plugin, imageName: 'velero/velero-plugin-for-aws:*', commonUpdateSettings: {updateStrategy: semver}, manifestTargets: {helm: {spec: 'initContainers[0].image'}}}
+            # Bare numeric build tags (e.g. 1220) are coerced to huge semver majors.
+            # Only official release tags are eligible; major upgrades remain allowed.
+            - {alias: velero, imageName: 'docker.io/velero/velero:*', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^v[0-9]+\.[0-9]+\.[0-9]+$'}, manifestTargets: {helm: {tag: image.tag}}}
+            - {alias: aws-plugin, imageName: 'velero/velero-plugin-for-aws:*', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^v[0-9]+\.[0-9]+\.[0-9]+$'}, manifestTargets: {helm: {spec: 'initContainers[0].image'}}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: velero-ui, namespace: argocd}

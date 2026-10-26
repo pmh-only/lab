@@ -117,6 +117,12 @@ class ImageUpdaterTests(unittest.TestCase):
         self.assertEqual({i["imageName"] for i in kopia_images}, {"kopia/kopia:latest", "nginx:stable-alpine"})
         velero_images = managed["velero"]["spec"]["applicationRefs"][0]["images"]
         self.assertEqual({i["imageName"] for i in velero_images}, {"docker.io/velero/velero:*", "velero/velero-plugin-for-aws:*"})
+        for image in velero_images:
+            pattern = image["commonUpdateSettings"]["allowTags"].removeprefix("regexp:")
+            for tag in ["v1.18.4", "v2.0.0", "v99.1.2"]:
+                self.assertRegex(tag, pattern)
+            for tag in ["1220", "v1220", "latest", "v1.18.4-rc.1", "v1.18.4-amd64"]:
+                self.assertIsNone(re.match(pattern, tag))
         values = yaml.safe_load((ROOT / "image-updater/helm-values/velero.yml").read_text())
         self.assertNotIn("digest", values["image"], "a separate digest would override the updated tag")
         self.assertEqual(values["initContainers"][0]["name"], "velero-plugin-for-aws")
