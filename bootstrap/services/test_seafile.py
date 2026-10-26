@@ -20,6 +20,15 @@ def initializer():
 
 
 class SeafileTests(unittest.TestCase):
+    def test_notification_logs_use_the_existing_shared_mount_without_nested_subpaths(self):
+        docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "seafile")], text=True)))
+        deployment = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "seafile-noti")
+        pod = deployment["spec"]["template"]["spec"]
+        self.assertEqual(pod["nodeSelector"], {"kubernetes.io/hostname": "pmhoci"})
+        self.assertEqual(pod["containers"][0]["volumeMounts"], [{"mountPath": "/shared", "name": "seafile-noti-storage"}])
+        self.assertEqual(pod["volumes"][0]["hostPath"], {"path": "/mnt/data/seafile-noti", "type": "DirectoryOrCreate"})
+        self.assertEqual(deployment["spec"]["strategy"]["type"], "Recreate")
+
     def test_mysql_sha2_plugin_is_pinned_without_weaker_server_authentication(self):
         script = (ROOT / "seafile/prepare_mysql_plugins.py").read_text()
         self.assertIn("ead7fdf6f5fc79a4809db03889763791190973591b872a93c063f5109abfe0ff", script)

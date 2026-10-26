@@ -236,6 +236,9 @@ spec:
         app: seafile-noti
     spec:
       automountServiceAccountToken: false
+      # Retain the existing node-local notification state and logs.
+      nodeSelector:
+        kubernetes.io/hostname: pmhoci
       containers:
         - name: seafile
           image: seafileltd/notification-server:12.0.11-arm
@@ -275,9 +278,6 @@ spec:
           volumeMounts:
             - mountPath: /shared
               name: seafile-noti-storage
-            - mountPath: /shared/logs
-              name: seafile-noti-storage
-              subPath: logs
       volumes:
         - name: seafile-noti-storage
           hostPath:
