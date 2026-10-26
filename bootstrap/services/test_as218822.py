@@ -23,6 +23,8 @@ class AS218822Tests(unittest.TestCase):
         self.assertEqual(website["backendRefs"], [{"name": "website", "port": 80}])
         certificate = yaml.safe_load((ROOT / "gateway/public-certificate.yml").read_text())
         self.assertIn("as218822.net", certificate["spec"]["dnsNames"])
+        issuer = yaml.safe_load((ROOT / "cert-manager/technitium/production-issuer.yml").read_text())
+        self.assertIn("as218822.net", issuer["spec"]["acme"]["solvers"][0]["selector"]["dnsZones"])
 
     def test_console_never_overwrites_existing_tunnel_clients(self):
         with patch("as218822_console.subprocess.check_output", return_value="secret/wireguard-tunnels\n"), patch("as218822_console.subprocess.run") as create:
