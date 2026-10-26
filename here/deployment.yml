@@ -22,6 +22,8 @@ spec:
               value: "/data"
             - name: HTTP_HOST_PREFIX
               value: "https://"
+            - name: SSH_DOMAIN
+              value: "here.pmh.codes"
             - name: HTTP_HOST_SUFFIX
               value: ".here.pmh.codes"
             - name: UNAUTHENTICATED_TIMEOUT
