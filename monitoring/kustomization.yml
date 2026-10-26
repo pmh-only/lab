@@ -29,8 +29,6 @@ images:
     newTag: latest
     digest: sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2
   - name: registry.k8s.io/kube-state-metrics/kube-state-metrics
-    newTag: v2.13.0
-    digest: sha256:639a1e2da549210adddc0391ff91e270e83f7873014aec53258462812f741e6f
+    newTag: v2.20.0
   - name: quay.io/thanos/thanos
-    newTag: main-2026-10-10-f1e0bbc
-    digest: sha256:b8219adce3eb31003e2412b291de8418f7b07a4e57d16f3f1f770cc07999d41d
+    newTag: v0.42.4
