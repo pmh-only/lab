@@ -9,6 +9,7 @@ resources:
   - ./gre-gateway.yml
   - ./looking-glass.yml
   - ./router-secret.yml
+  - ./router-public-config.yml
   - ./secret.yml
   - ./rpki.yml
   - ./website.yml

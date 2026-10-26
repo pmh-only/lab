@@ -39,7 +39,9 @@ spec:
               test -c /dev/net/tun
               ip tuntap add dev tun-smoke mode tun
               ip link del tun-smoke
-              echo 'PASS: isolated forwarding, WireGuard, IPv6 policy routing and TUN without privileged/hostNetwork; only the TUN character device is mounted'
+              nft add table inet as218822_smoke
+              nft delete table inet as218822_smoke
+              echo 'PASS: isolated forwarding, WireGuard, IPv6 policy routing, TUN and nftables without privileged/hostNetwork; only the TUN character device is mounted'
           securityContext:
             privileged: false
             allowPrivilegeEscalation: false

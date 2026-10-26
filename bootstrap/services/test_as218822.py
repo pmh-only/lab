@@ -1,14 +1,21 @@
 import base64
+import subprocess
 import unittest
 from unittest.mock import Mock, patch
 
 import yaml
 
 from as218822 import MARKER, PRIVATE_FIELDS, complete_identity, ensure_identity, fresh_private_key, public_key
+from as218822_console import ensure_tunnel_state
 from provision import ROOT
 
 
 class AS218822Tests(unittest.TestCase):
+    def test_console_never_overwrites_existing_tunnel_clients(self):
+        with patch("as218822_console.subprocess.check_output", return_value="secret/wireguard-tunnels\n"), patch("as218822_console.subprocess.run") as create:
+            ensure_tunnel_state()
+        create.assert_not_called()
+
     def test_fresh_local_key_is_valid_and_stable(self):
         private = fresh_private_key()
         self.assertEqual(len(base64.b64decode(private)), 32)
@@ -56,3 +63,33 @@ class AS218822Tests(unittest.TestCase):
         source = (ROOT / "bootstrap/services/as218822.py").read_text()
         reader_call = next(line for line in source.splitlines() if 'reader(vault, "as218822"' in line)
         self.assertIn('"as218822/bird-dotenvx"', reader_call)
+
+    def test_original_router_layout_has_no_privileged_containers(self):
+        docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "as218822")], text=True)))
+        workloads = [d for d in docs if d["kind"] in ["StatefulSet", "Deployment"]]
+        for workload in workloads:
+            pod = workload["spec"]["template"]["spec"]
+            for container in pod.get("initContainers", []) + pod["containers"]:
+                self.assertFalse(container.get("securityContext", {}).get("privileged", False))
+        core = next(d for d in workloads if d["metadata"]["name"] == "bird")["spec"]["template"]["spec"]
+        self.assertEqual(core["runtimeClassName"], "sysbox-runc")
+        self.assertFalse(core["hostUsers"])
+        self.assertFalse(core.get("hostNetwork", False))
+        gre = next(d for d in workloads if d["metadata"]["name"] == "bird-gre-gateway")["spec"]["template"]["spec"]
+        self.assertTrue(gre["hostNetwork"])
+        self.assertEqual(gre["nodeSelector"], {"kubernetes.io/hostname": "pmhoci"})
+        guard = gre["initContainers"][0]
+        self.assertEqual(guard["securityContext"]["capabilities"], {"drop": ["ALL"]})
+        self.assertNotIn("sysctl -w", " ".join(guard["command"]))
+        self.assertFalse(any(v.get("hostPath", {}).get("path", "").startswith("/proc") for v in gre["volumes"]))
+
+    def test_internal_peer_and_portal_public_keys_use_managed_config(self):
+        docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "as218822")], text=True)))
+        config = next(d for d in docs if d["kind"] == "ConfigMap" and d["metadata"]["name"] == "router-public-config")["data"]
+        self.assertIn("PublicKey = ${WG_CORE_PUBLIC_KEY}", config["core.conf"])
+        self.assertIn("PublicKey = ${WG_GRE_GATEWAY_PUBLIC_KEY}", config["gre-gateway.conf"])
+        console = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "console")
+        env = {e["name"]: e for e in console["spec"]["template"]["spec"]["containers"][0]["env"]}
+        self.assertEqual(env["WIREGUARD_PUBLIC_KEY"]["valueFrom"]["configMapKeyRef"]["key"], "WG_PORTAL_PUBLIC_KEY")
+        for key in ["WG_CORE_PUBLIC_KEY", "WG_GRE_GATEWAY_PUBLIC_KEY", "WG_PORTAL_PUBLIC_KEY"]:
+            self.assertEqual(len(base64.b64decode(config[key], validate=True)), 32)

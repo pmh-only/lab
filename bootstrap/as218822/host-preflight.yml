@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: as218822-host-preflight
+  namespace: as218822
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 60
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: pmhoci
+      hostNetwork: true
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      containers:
+        - name: inspect
+          image: ghcr.io/pmh-only/as218822-gre-gateway:latest@sha256:9cd07aad0dbd6d35fb5b1103c03be89d5bb243fc383130c36eaef3a670fbb422
+          command: [sh, -ec]
+          args:
+            - |
+              # Read-only checks: never invoke the router entrypoint here.
+              printf 'IPv6 forwarding: '; cat /proc/sys/net/ipv6/conf/all/forwarding
+              printf 'IPv4 forwarding: '; cat /proc/sys/net/ipv4/ip_forward
+              ip -j address show dev enp0s6
+              ip -6 rule show
+              for f in /etc/tunnels/gre/*.conf; do
+                [ -f "$f" ] || continue
+                printf 'Tunnel %s\n' "$(basename "$f")"
+                awk '$1 ~ /^(type|local|remote|dev|dstport|id)$/ { print }' "$f"
+              done
+          securityContext:
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 10m, memory: 32Mi}
+            limits: {cpu: 100m, memory: 128Mi}

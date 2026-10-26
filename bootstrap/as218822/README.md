@@ -15,14 +15,35 @@ renderer, because the renderer's validation mode otherwise substitutes dummy
 values for missing fields. Raw decrypted configuration/logs must never be
 printed or copied out of the temporary Pod.
 
-Current validation: core dotenv/templates and BIRD syntax pass with the
-prepared internal `WG_CORE_PRIVATE_KEY`. This does not start BGP, establish a
-tunnel, prove connectivity, or validate the peer's matching public key.
-The GRE image additionally requires `WG_LUNALIGHT_PRIVATE_KEY` and
-`WG_LUNALIGHT_PRESHARED_KEY`. The prepared Lunalight private key is new/unused;
-the real PSK is absent. Obtain existing matching credentials or explicit peer
-acceptance before activation; do not invent a PSK or silently disable the peer.
+Current validation: core and GRE dotenv/templates and BIRD syntax pass with
+the existing Vault inputs, including the user-supplied Lunalight credentials.
+The paired internal peer templates in `as218822/router-public-config.yml` also
+pass in the pinned original images. Their public keys are derived from the
+Vault-held core/GRE/portal keys; no external upstream identity is rotated.
+This does not start BGP, establish a tunnel, or prove peer connectivity.
 
-The production manifests still contain privileged containers and host-network
-GRE and must not be applied as a whole. Complete the non-privileged networking
-changes and internal public-key matching before registering the Application.
+Core/IPv6 Atlas networking uses the already-verified Sysbox runtime and user
+namespaces, with explicit capabilities instead of privileged mode. The original
+GRE gateway still uses host networking on `pmhoci`, because its original GRE
+underlay is bound to `10.0.0.10`/`enp0s6`. Moving it to a Pod IP would silently
+change the external tunnel design. Its privileged sysctl init was replaced by
+a read-only precondition; no writable host `/proc` mount is used.
+
+`host-preflight.yml` reads only host addresses, forwarding and rules, with no
+capabilities or service-account token. It found IPv6 forwarding **disabled** on
+`pmhoci`. An operator must enable it on the host before Application activation:
+
+```sh
+sudo sysctl -w net.ipv6.conf.all.forwarding=1
+```
+
+Persistence across host reboot must be managed deliberately by the operator;
+the Pod never writes host sysctls. Do not register the Application before this
+precondition passes. The production gateway still needs host `NET_ADMIN` for
+its original interfaces/routes/nftables, but no container uses privileged mode.
+
+`bootstrap/services/as218822_console.py` provisions the native console OIDC
+with the exact callback and active/internal/superuser gate, preserving existing
+Secrets. It creates an empty native `wireguard-tunnels` Secret **only if absent**;
+existing client state is never reconciled from Git or reset. Tailscale uses the
+dedicated `tag:as218822`, including the existing device-identity approval checks.

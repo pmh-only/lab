@@ -63,6 +63,8 @@ spec:
         app: bird
     spec:
       serviceAccountName: bird
+      runtimeClassName: sysbox-runc
+      hostUsers: false
       terminationGracePeriodSeconds: 30
       initContainers:
         - name: network-config
@@ -80,12 +82,18 @@ spec:
               # Prefer Vultr for traffic sourced from the routed aggregate.
               ip -6 rule add pref 10000 from 2a06:9801:ff0::/44 table 218822
           securityContext:
-            privileged: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+              add: [NET_ADMIN, NET_RAW]
       containers:
         - name: bird
           image: ghcr.io/pmh-only/as218822:latest
           imagePullPolicy: Always
           securityContext:
+            privileged: false
+            allowPrivilegeEscalation: false
             capabilities:
               drop:
                 - ALL
@@ -94,6 +102,9 @@ spec:
                 - NET_BIND_SERVICE
                 - NET_RAW
           env:
+            - name: WG_GRE_GATEWAY_PUBLIC_KEY
+              valueFrom:
+                configMapKeyRef: {name: router-public-config, key: WG_GRE_GATEWAY_PUBLIC_KEY}
             - name: ANYCAST_RETURN_PATHS
               value: >-
                 gre-gateway,218830,218830,9000
@@ -152,6 +163,10 @@ spec:
             failureThreshold: 3
             timeoutSeconds: 10
           volumeMounts:
+            - name: router-public-config
+              mountPath: /etc/tunnels/wireguard/gre-gateway.conf
+              subPath: gre-gateway.conf
+              readOnly: true
             - name: run
               mountPath: /run/bird
             - name: zerotier-state
@@ -377,7 +392,7 @@ spec:
             - name: TS_ACCEPT_DNS
               value: "false"
             - name: TS_EXTRA_ARGS
-              value: --advertise-exit-node --advertise-tags=tag:k8s
+              value: --advertise-exit-node --advertise-tags=tag:as218822
             - name: TS_ENABLE_METRICS
               value: "true"
             - name: TS_LOCAL_ADDR_PORT
@@ -404,7 +419,11 @@ spec:
             limits:
               memory: 512Mi
           securityContext:
-            privileged: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+              add: [NET_ADMIN, NET_RAW]
           lifecycle:
             postStart:
               exec:
@@ -439,6 +458,8 @@ spec:
             - name: tun
               mountPath: /dev/net/tun
       volumes:
+        - name: router-public-config
+          configMap: {name: router-public-config}
         - name: address-website-config
           configMap:
             name: address-website

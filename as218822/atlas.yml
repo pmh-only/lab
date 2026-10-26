@@ -129,8 +129,8 @@ spec:
         as218822.net/routing-revision: "6"
     spec:
       serviceAccountName: bird
-      nodeSelector:
-        infra.pmh.codes/bgp: enabled
+      runtimeClassName: sysbox-runc
+      hostUsers: false
       containers:
         - name: ripe-atlas
           image: ghcr.io/pmh-only/as218822-ripe-atlas:latest
@@ -215,7 +215,7 @@ spec:
             - name: TS_ACCEPT_DNS
               value: "false"
             - name: TS_EXTRA_ARGS
-              value: --advertise-tags=tag:k8s
+              value: --advertise-tags=tag:as218822
             - name: TS_ENABLE_METRICS
               value: "true"
             - name: TS_LOCAL_ADDR_PORT
@@ -243,7 +243,11 @@ spec:
             limits:
               memory: 256Mi
           securityContext:
-            privileged: true
+            privileged: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+              add: [NET_ADMIN, NET_RAW]
           volumeMounts:
             - name: tun
               mountPath: /dev/net/tun

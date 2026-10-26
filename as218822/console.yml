@@ -70,7 +70,7 @@ spec:
             - name: OIDC_ISSUER_URL
               value: https://auth.pmh.codes/application/o/as218822/
             - name: OIDC_CLIENT_ID
-              value: 8pIztfBRh51wufpeGKJysw4vUDhLbywjns3RwE4t
+              value: lab-as218822
             - name: OIDC_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -90,7 +90,8 @@ spec:
             - name: WIREGUARD_ENDPOINT
               value: 158.179.174.47:51820
             - name: WIREGUARD_PUBLIC_KEY
-              value: MYUSD8fc7jG5ti927pynJkXDZND9lngbcdqK6vV/qW8=
+              valueFrom:
+                configMapKeyRef: {name: router-public-config, key: WG_PORTAL_PUBLIC_KEY}
             - name: WIREGUARD_CLIENT_PREFIX
               value: 2a06:9801:ff0:200
             - name: WIREGUARD_CONNECTION_LIMIT

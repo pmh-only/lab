@@ -92,13 +92,15 @@ class OIDCTests(unittest.TestCase):
                 self.assertTrue(declaration["publicClient"])
                 self.assertEqual(declaration["grantTypes"], ["implicit"])
                 continue
-            if slug in {"stmt", "connect", "books"}:
-                filename = "backend.yml" if slug == "books" else "deployment.yml"
+            if slug in {"stmt", "connect", "books", "as218822"}:
+                filename = "console.yml" if slug == "as218822" else ("backend.yml" if slug == "books" else "deployment.yml")
                 docs = list(yaml.safe_load_all((ROOT / slug / filename).read_text()))
-                env = docs[0]["spec"]["template"]["spec"]["containers"][0]["env"]
+                deployment = next(d for d in docs if d["kind"] == "Deployment")
+                env = deployment["spec"]["template"]["spec"]["containers"][0]["env"]
                 actual = next(e["value"] for e in env if e["name"] == "OIDC_CLIENT_ID")
                 self.assertEqual(actual, declaration["clientID"])
-                redirect = f"https://{slug}.pmh.codes/" + ("oidc/callback" if slug == "connect" else "auth/callback")
+                hostname = "bgp" if slug == "as218822" else slug
+                redirect = f"https://{hostname}.pmh.codes/" + ("oidc/callback" if slug == "connect" else "auth/callback")
                 self.assertEqual(declaration["redirectURI"], redirect)
                 continue
             directory = "pdf_configs" if slug == "pdf" else slug

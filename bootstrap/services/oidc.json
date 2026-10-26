@@ -1,4 +1,14 @@
 {
+  "as218822": {
+    "namespace": "as218822",
+    "vaultPath": "as218822/console-oidc",
+    "clientID": "lab-as218822",
+    "secretField": "OIDC_CLIENT_SECRET",
+    "companionSecretFields": ["OIDC_SESSION_SECRET"],
+    "launchURL": "https://bgp.pmh.codes",
+    "redirectURI": "https://bgp.pmh.codes/auth/callback",
+    "manageReader": false
+  },
   "argocd": {
     "namespace": "argocd",
     "vaultPath": "argocd/oidc",

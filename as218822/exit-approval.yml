@@ -31,7 +31,7 @@ data:
       const ips = JSON.parse(await readFile("/var/run/exit-identity/device_ips", "utf8"));
       const device = await request(`/device/${encodeURIComponent(id)}`, { headers });
       if (device.hostname !== "as218822-exit" || !device.authorized ||
-          !device.tags?.includes("tag:k8s") || !device.addresses.some((ip) => ips.includes(ip))) {
+           !device.tags?.includes("tag:as218822") || !device.addresses.some((ip) => ips.includes(ip))) {
         throw new Error("Device does not match the persisted AS218822 core identity");
       }
       if (device.isEphemeral) throw new Error("Refusing to approve an ephemeral exit device");
