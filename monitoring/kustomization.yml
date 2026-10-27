@@ -21,7 +21,7 @@ images:
     digest: sha256:24df1663f600abc6daa8ef006a0749c1d8f532e43a4542baf55ba15c5a3eaeac
   - name: ghcr.io/pmh-only/grafana
     newTag: latest
-    digest: sha256:3b83475936f2a64c0e541346f3732fb632c9c6af4de65983bbacd7bcd8d223ca
+    digest: sha256:fe58e406bb8f4f790fa19739988a968ead9beb73e4a8b30384f5ce55dd919e69
   - name: quay.io/prometheus/node-exporter
     newTag: latest
     digest: sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
@@ -31,4 +31,4 @@ images:
   - name: registry.k8s.io/kube-state-metrics/kube-state-metrics
     newTag: v2.20.0
   - name: quay.io/thanos/thanos
-    newTag: v0.42.4
+    newTag: v0.42.5
