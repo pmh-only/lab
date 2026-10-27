@@ -24,4 +24,4 @@ configMapGenerator:
 images:
   - name: ghcr.io/pmh-only/technitium
     newTag: latest
-    digest: sha256:4cf766a9d46df31e73ecd0430eac47e7c3d42fd6f52aaade0206e1369f56ebb9
+    digest: sha256:00cea6a251adfef4f7cb10d6b7c8bd16c7701e28f23dd01430da0f9b7c6f2e46
