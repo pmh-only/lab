@@ -120,7 +120,12 @@
     "companionSecretFields": ["DB_PASSWORD", "JWT_PRIVATE_KEY", "INIT_SEAFILE_ADMIN_PASSWORD"],
     "clientID": "lab-seafile",
     "launchURL": "https://drive.pmh.codes",
-    "redirectURI": "https://drive.pmh.codes/oauth/callback/"
+    "redirectURI": "https://drive.pmh.codes/oauth/callback/",
+    "extraScopeMappings": [{
+      "name": "lab bootstrap: seafile Discord quota role",
+      "scope_name": "seafile",
+      "expression": "is_discord = user.sources.filter(slug=\"discord\").exists() or user.all_groups().filter(name=\"discord\").exists()\nreturn {\"seafile_role\": \"discord_10gb\"} if is_discord else {}"
+    }]
   },
   "books": {
     "namespace": "books",

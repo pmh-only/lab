@@ -22,6 +22,18 @@ def expression(name, context, entries=ENTRIES):
 
 
 class DiscordTests(unittest.TestCase):
+    def test_seafile_quota_claim_is_only_issued_for_discord_users(self):
+        entries = yaml.load(BLUEPRINT.with_name("seafile-discord-quota.yaml").read_text(),
+                            Loader=yaml.BaseLoader)["entries"]
+        for source, group in ((True, False), (False, True), (True, True), (False, False)):
+            with self.subTest(source=source, group=group):
+                user = Mock()
+                user.sources.filter.return_value.exists.return_value = source
+                user.all_groups.return_value.filter.return_value.exists.return_value = group
+                self.assertEqual(expression("lab bootstrap: seafile Discord quota role",
+                                            {"user": user}, entries),
+                                 {"seafile_role": "discord_10gb"} if source or group else {})
+
     def test_as218822_operator_claim_excludes_discord_even_if_admin(self):
         entries = yaml.load(BLUEPRINT.with_name("as218822-user-access.yaml").read_text(),
                             Loader=yaml.BaseLoader)["entries"]

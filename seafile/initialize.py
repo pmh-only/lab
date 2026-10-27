@@ -137,6 +137,13 @@ def initialize():
     plugin = DATA / "conf/seahub_lab.py"
     shutil.copyfile(INTEGRATION / "seahub_lab.py", plugin)
     plugin.chmod(0o644)
+    hook = DATA / "conf/seahub_custom_functions.py"
+    if (DATA / "conf/seahub_custom_functions").exists() or (
+        hook.exists() and not hook.read_text().startswith('"""GitOps-managed Seahub OAuth role hook;')
+    ):
+        raise RuntimeError("Unmanaged Seahub custom functions exist; refusing to overwrite")
+    shutil.copyfile(INTEGRATION / "seahub_custom_functions.py", hook)
+    hook.chmod(0o644)
     text = settings.read_text()
     include = "from seahub_lab import *"
     if include not in text.splitlines():

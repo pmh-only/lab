@@ -20,6 +20,22 @@ def initializer():
 
 
 class SeafileTests(unittest.TestCase):
+    def test_discord_quota_uses_native_oauth_role_without_changing_default_quota(self):
+        with patch.dict(os.environ, {"OAUTH_CLIENT_SECRET": "test-only"}):
+            spec = importlib.util.spec_from_file_location("seahub_lab", ROOT / "seafile/seahub_lab.py")
+            settings = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(settings)
+        self.assertIn("seafile", settings.OAUTH_SCOPE)
+        self.assertEqual(settings.OAUTH_ATTRIBUTE_MAP["seafile_role"], (False, "role"))
+        self.assertEqual(settings.ENABLED_ROLE_PERMISSIONS, {"discord_10gb": {"role_quota": "10g"}})
+        spec = importlib.util.spec_from_file_location("seahub_custom_functions", ROOT / "seafile/seahub_custom_functions.py")
+        hook = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(hook)
+        self.assertEqual(hook.custom_get_user_role("discord_10gb"), "discord_10gb")
+        for invalid in ("admin", "default", "", None):
+            with self.subTest(role=invalid), self.assertRaises(ValueError):
+                hook.custom_get_user_role(invalid)
+
     def test_notification_logs_use_the_existing_shared_mount_without_nested_subpaths(self):
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "seafile")], text=True)))
         deployment = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "seafile-noti")
@@ -76,6 +92,9 @@ class SeafileTests(unittest.TestCase):
             module.INTEGRATION = Path(directory) / "integration"
             module.INTEGRATION.mkdir()
             (module.INTEGRATION / "seahub_lab.py").write_text("# managed non-secret integration\n")
+            (module.INTEGRATION / "seahub_custom_functions.py").write_text(
+                '\"\"\"GitOps-managed Seahub OAuth role hook; test fixture.\"\"\"\n'
+            )
             upstream_dir = Path(directory) / "upstream"
             upstream_dir.mkdir()
             (upstream_dir / "setup-seafile-mysql.py").write_text("def main():\n    seahub_config.do_syncdb()\n    db_config.root_conn.close()\n")
@@ -102,6 +121,11 @@ class SeafileTests(unittest.TestCase):
                 module.initialize()
                 upstream.init_seafile_server.assert_called_once()
                 self.assertEqual((module.DATA / "conf/seahub_settings.py").read_text(), original)
+                custom_hook = module.DATA / "conf/seahub_custom_functions.py"
+                custom_hook.write_text("# unrelated operator customization\n")
+                with self.assertRaisesRegex(RuntimeError, "Unmanaged Seahub custom functions"):
+                    module.initialize()
+                self.assertEqual(custom_hook.read_text(), "# unrelated operator customization\n")
 
 
 if __name__ == "__main__":

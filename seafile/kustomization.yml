@@ -13,6 +13,7 @@ configMapGenerator:
     files:
       - initialize.py
       - seahub_lab.py
+      - seahub_custom_functions.py
       - native-schema.json
       - prepare_mysql_plugins.py
 images:

@@ -25,9 +25,14 @@ OAUTH_PROVIDER = "authentik"
 OAUTH_AUTHORIZATION_URL = "https://auth.pmh.codes/application/o/authorize/"
 OAUTH_TOKEN_URL = "https://auth.pmh.codes/application/o/token/"
 OAUTH_USER_INFO_URL = "https://auth.pmh.codes/application/o/userinfo/"
-OAUTH_SCOPE = ["openid", "email", "profile"]
+OAUTH_SCOPE = ["openid", "email", "profile", "seafile"]
 OAUTH_ATTRIBUTE_MAP = {
     "sub": (True, "uid"),
     "name": (False, "name"),
     "email": (False, "contact_email"),
+    "seafile_role": (False, "role"),
 }
+
+# Custom roles inherit ordinary user permissions in native Seahub. Only this
+# role receives a quota; default/guest roles and other users are unchanged.
+ENABLED_ROLE_PERMISSIONS = {"discord_10gb": {"role_quota": "10g"}}

@@ -15,6 +15,7 @@ configMapGenerator:
       - discord.yaml=./blueprints/discord.yaml
       - discord-application-access.yaml=./blueprints/discord-application-access.yaml
       - as218822-user-access.yaml=./blueprints/as218822-user-access.yaml
+      - seafile-discord-quota.yaml=./blueprints/seafile-discord-quota.yaml
   - name: authentik-runtime
     literals:
       - AUTHENTIK_POSTGRESQL__HOST=pgsql-service.database.svc.cluster.local
