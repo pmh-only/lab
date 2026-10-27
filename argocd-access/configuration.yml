@@ -10,6 +10,7 @@ data:
   # Preserve native local admin as recovery access; do not reset its password.
   admin.enabled: "true"
   users.anonymous.enabled: "true"
+  statusbadge.enabled: "true"
   oidc.config: |
     name: Authentik
     issuer: https://auth.pmh.codes/application/o/argocd/

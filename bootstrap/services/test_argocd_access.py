@@ -37,6 +37,7 @@ class ArgoAccessTests(unittest.TestCase):
         self.assertEqual(oidc["clientSecret"], "$argocd-oidc:client-secret")
         self.assertTrue(oidc["enablePKCEAuthentication"])
         self.assertEqual(config["users.anonymous.enabled"], "true")
+        self.assertEqual(config["statusbadge.enabled"], "true")
         self.assertEqual(config["admin.enabled"], "true")
         rbac = next(d["data"] for d in docs if d["metadata"]["name"] == "argocd-rbac-cm")
         self.assertEqual(rbac["policy.default"], "role:public")

@@ -3,6 +3,8 @@
 Anonymous visitors can view applications, resource manifests, configuration and
 AppProjects at <https://argo.pmh.codes>. This intentionally exposes application
 metadata and configuration; do not put credentials in plaintext manifests.
+Public status badges are enabled separately with `statusbadge.enabled: "true"`,
+serving `/api/badge?name=<app>` for the repository README.
 
 The custom default `role:public` grants only `applications/get` and `projects/get`.
 It does not grant logs, terminal sessions, sync, resource actions, create, update,
