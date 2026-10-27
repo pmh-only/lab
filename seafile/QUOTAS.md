@@ -2,14 +2,20 @@
 
 authentik's dedicated `seafile` scope supplies `seafile_role=discord_10gb` only
 for Discord-linked accounts or members of the `discord` group. The native Seahub
-OAuth role hook maps that claim to an ordinary user role with `role_quota=10g`:
-10,000,000,000 bytes per user. Other users' roles and quotas are not changed.
+OAuth hook marks that verified login and uses the ordinary `default` user role.
+`seahub_discord_quota.DiscordQuotaMiddleware` applies a persistent native per-user
+quota before sending the callback response: at most 10,000,000,000 bytes. A
+smaller existing limit is preserved. No Professional-only role quota API is used.
 
-The role is assigned and the native role quota is refreshed on OAuth login.
-Existing sessions must sign in again to receive a newly configured role. A
-Seafile administrator can override individual quotas; keep Discord accounts'
-individual quotas unset or no greater than 10 GB. Reducing a quota does not delete
-existing files; the server prevents further writes when the limit is reached.
+Every Discord OAuth login reapplies and verifies the per-user limit. Quota
+assignment failure logs the user out and returns an error rather than completing
+an unlimited login. Context-local state prevents another concurrent user's
+login from being classified as Discord. Other users' quotas are untouched.
+Existing Discord users are converted once during migration, so their active
+sessions and sync clients retain the limit without waiting for another login.
+Reducing a quota does not delete files; the server prevents further writes when
+the limit is reached. Administrator overrides are capped again on the next
+Discord OAuth login.
 
 Seafile administration is a separate native account flag, not an OAuth role or
 an authentik group grant. The owner's primary OAuth account is an administrator;

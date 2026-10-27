@@ -153,7 +153,8 @@ class ImageUpdaterTests(unittest.TestCase):
     def test_versioned_variants_allow_new_majors_but_exclude_prerelease_and_wrong_flavors(self):
         managed = {d["metadata"]["name"]: d for d in self.docs if d["kind"] == "ImageUpdater"}
         cases = [
-            ("seafile", "seafile", "99.0.0-arm", ["99.0.0", "99.0.0-rc1-arm", "99.0.0-amd64"]),
+            # Community migration is intentionally held on the validated 12.0 branch.
+            ("seafile", "seafile", "12.0.14-arm", ["13.0.0-arm", "12.0.14", "12.0.14-rc1-arm", "12.0.14-amd64"]),
             ("seafile", "memcached", "99.0.0-alpine", ["99.0.0", "99.0.0-rc1-alpine"]),
             ("solver", "docker", "99.0.0-dind", ["99.0.0", "99.0.0-rc1-dind", "99.0.0-cli"]),
             ("track", "postgis", "99-3.10-alpine", ["99-3.10", "99-3.10-alpine-rc1"]),

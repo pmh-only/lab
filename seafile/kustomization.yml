@@ -14,14 +14,15 @@ configMapGenerator:
       - initialize.py
       - seahub_lab.py
       - seahub_custom_functions.py
+      - seahub_discord_quota.py
       - theme.css=./branding/theme.css
       - logo.svg=./branding/logo.svg
       - icon.svg=./branding/icon.svg
       - native-schema.json
       - prepare_mysql_plugins.py
 images:
-  - name: seafileltd/seafile-pro-mc
-    newTag: 12.0.17-arm
+  - name: seafileltd/seafile-mc
+    newTag: 12.0.14-arm
   - name: seafileltd/sdoc-server
     newTag: 1.0.5-arm
   - name: seafileltd/notification-server

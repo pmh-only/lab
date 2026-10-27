@@ -90,6 +90,45 @@ def native_schema_complete(install):
         conn.close()
 
 
+def prepare_community_ccnet_config(data):
+    """Restore CE's native ccnet DB configuration when migrating a Pro install."""
+    ccnet_path = data / "conf/ccnet.conf"
+    ccnet = ConfigParser(interpolation=None)
+    ccnet.optionxform = str
+    ccnet.read(ccnet_path)
+    if ccnet.has_section("Database"):
+        return
+    seafile = ConfigParser(interpolation=None)
+    seafile.read(data / "conf/seafile.conf")
+    database = seafile["database"]
+    if database.get("type") != "mysql":
+        raise RuntimeError("Community migration requires the existing MySQL configuration")
+    ccnet["Database"] = {
+        "ENGINE": "mysql", "HOST": database["host"],
+        "PORT": database.get("port", "3306"), "USER": database["user"],
+        "PASSWD": database["password"],
+        "DB": os.environ.get("SEAFILE_MYSQL_DB_CCNET_DB_NAME", "ccnet_db"),
+    }
+    with ccnet_path.open("w") as stream:
+        ccnet.write(stream)
+    ccnet_path.chmod(0o600)
+
+
+def prepare_community_events_config(data):
+    """Disable unavailable Pro search/audit while retaining rollback settings."""
+    path = data / "conf/seafevents.conf"
+    if not path.exists():
+        return
+    config = ConfigParser(interpolation=None)
+    config.read(path)
+    for section in ("INDEX FILES", "SEASEARCH", "AUDIT"):
+        if config.has_section(section):
+            config[section]["enabled"] = "false"
+    with path.open("w") as stream:
+        config.write(stream)
+    path.chmod(0o600)
+
+
 def initialize():
     DATA.mkdir(parents=True, exist_ok=True)
     config = DATA / "conf/seafile.conf"
@@ -157,6 +196,9 @@ def initialize():
         if not config.exists() or not (DATA / "seafile-data/current_version").exists():
             raise RuntimeError("Managed Seafile state is incomplete; refusing reinitialization")
         print("Existing Seafile data, native configuration and user credentials preserved")
+    if os.environ.get("SEAFILE_SERVER") == "seafile-server":
+        prepare_community_ccnet_config(DATA)
+        prepare_community_events_config(DATA)
     settings = DATA / "conf/seahub_settings.py"
     if not settings.exists():
         raise RuntimeError("Native Seahub configuration is missing")
@@ -170,6 +212,11 @@ def initialize():
         raise RuntimeError("Unmanaged Seahub custom functions exist; refusing to overwrite")
     shutil.copyfile(INTEGRATION / "seahub_custom_functions.py", hook)
     hook.chmod(0o644)
+    quota_hook = DATA / "conf/seahub_discord_quota.py"
+    if quota_hook.exists() and not quota_hook.read_text().startswith('"""Apply a Discord account\'s native per-user quota'):
+        raise RuntimeError("Unmanaged Discord quota middleware exists; refusing to overwrite")
+    shutil.copyfile(INTEGRATION / "seahub_discord_quota.py", quota_hook)
+    quota_hook.chmod(0o644)
     install_branding(DATA, INTEGRATION)
     text = settings.read_text()
     include = "from seahub_lab import *"

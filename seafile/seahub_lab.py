@@ -4,6 +4,10 @@ import json
 import os
 from pathlib import Path
 
+# Seahub removes the configuration directory from sys.path after loading settings.
+# Import now so Django and the OAuth hook can resolve the middleware later.
+import seahub_discord_quota
+
 
 SERVICE_URL = "https://drive.pmh.codes"
 FILE_SERVER_ROOT = SERVICE_URL + "/seafhttp"
@@ -35,9 +39,9 @@ OAUTH_ATTRIBUTE_MAP = {
     "seafile_role": (False, "role"),
 }
 
-# Custom roles inherit ordinary user permissions in native Seahub. Only this
-# role receives a quota; default/guest roles and other users are unchanged.
-ENABLED_ROLE_PERMISSIONS = {"discord_10gb": {"role_quota": "10g"}}
+# The IdP's Discord claim is consumed by the native OAuth hook. Apply a native
+# per-user quota before the callback response is sent; no Pro-only roles needed.
+EXTRA_MIDDLEWARE = ["seahub_discord_quota.DiscordQuotaMiddleware"]
 
 # The init container publishes content-addressed files using native Seahub branding.
 _brand_manifest = Path(__file__).with_name("pmh-drive-brand.json")

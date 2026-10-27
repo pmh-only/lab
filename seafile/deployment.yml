@@ -20,7 +20,7 @@ spec:
       automountServiceAccountToken: false
       initContainers:
         - name: mysql-client-plugins
-          image: seafileltd/seafile-pro-mc:12.0.14-arm
+          image: seafileltd/seafile-mc:12.0.14-arm
           command: [python3, /lab-config/prepare_mysql_plugins.py]
           securityContext:
             allowPrivilegeEscalation: false
@@ -36,7 +36,7 @@ spec:
             - name: plugin-scratch
               mountPath: /tmp
         - name: native-initialize
-          image: seafileltd/seafile-pro-mc:12.0.14-arm
+          image: seafileltd/seafile-mc:12.0.14-arm
           command: [python3, /lab-config/initialize.py]
           env:
             - name: TIME_ZONE
@@ -64,7 +64,7 @@ spec:
               readOnly: true
       containers:
         - name: seafile
-          image: seafileltd/seafile-pro-mc:12.0.14-arm
+          image: seafileltd/seafile-mc:12.0.14-arm
           ports:
             - containerPort: 80
           startupProbe:

@@ -2,6 +2,7 @@ import importlib.util
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import types
 import unittest
@@ -21,6 +22,59 @@ def initializer():
 
 
 class SeafileTests(unittest.TestCase):
+    def setUp(self):
+        self.path_patch = patch.object(sys, "path", [str(ROOT / "seafile")] + sys.path)
+        self.path_patch.start()
+        self.addCleanup(self.path_patch.stop)
+
+    def test_community_ccnet_config_uses_existing_app_identity_and_preserves_custom_config(self):
+        from configparser import ConfigParser
+        module = initializer()
+        with tempfile.TemporaryDirectory() as directory:
+            data = Path(directory)
+            (data / "conf").mkdir()
+            (data / "conf/seafile.conf").write_text(
+                "[database]\ntype=mysql\nhost=mysql.example\nport=3306\nuser=seafile\npassword=test-only%literal\ndb_name=seafile_db\n"
+            )
+            with patch.dict(os.environ, {"SEAFILE_MYSQL_DB_CCNET_DB_NAME": "ccnet_db"}):
+                module.prepare_community_ccnet_config(data)
+            parser = ConfigParser(interpolation=None)
+            parser.optionxform = str
+            parser.read(data / "conf/ccnet.conf")
+            self.assertEqual(parser["Database"]["USER"], "seafile")
+            self.assertEqual(parser["Database"]["PASSWD"], "test-only%literal")
+            self.assertEqual(parser["Database"]["DB"], "ccnet_db")
+            existing = (data / "conf/ccnet.conf").read_text()
+            module.prepare_community_ccnet_config(data)
+            self.assertEqual((data / "conf/ccnet.conf").read_text(), existing)
+
+    def test_community_disables_pro_event_features_but_preserves_database(self):
+        from configparser import ConfigParser
+        module = initializer()
+        with tempfile.TemporaryDirectory() as directory:
+            data = Path(directory)
+            (data / "conf").mkdir()
+            path = data / "conf/seafevents.conf"
+            path.write_text("[DATABASE]\nname=seahub_db\n[INDEX FILES]\nenabled=true\nes_host=elasticsearch\n[AUDIT]\nenabled=true\n[STATISTICS]\nenabled=true\n")
+            module.prepare_community_events_config(data)
+            config = ConfigParser(interpolation=None)
+            config.read(path)
+            self.assertFalse(config.getboolean("INDEX FILES", "enabled"))
+            self.assertFalse(config.getboolean("AUDIT", "enabled"))
+            self.assertEqual(config["INDEX FILES"]["es_host"], "elasticsearch")
+            self.assertEqual(config["DATABASE"]["name"], "seahub_db")
+            self.assertTrue(config.getboolean("STATISTICS", "enabled"))
+
+    def test_server_and_initializers_use_community_not_pro(self):
+        docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "seafile")], text=True)))
+        deployment = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "seafile")
+        pod = deployment["spec"]["template"]["spec"]
+        for container in pod["initContainers"] + pod["containers"]:
+            self.assertRegex(container["image"], r"^seafileltd/seafile-mc:12\.0\.[0-9]+-arm$")
+        search = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "elasticsearch")
+        self.assertEqual(search["spec"]["replicas"], 0)
+        self.assertTrue(any(d["kind"] == "PersistentVolumeClaim" and d["metadata"]["name"] == "seafile-search" for d in docs))
+
     def test_branding_is_immutable_and_preserves_unrelated_customizations(self):
         module = initializer()
         with tempfile.TemporaryDirectory() as directory:
@@ -59,7 +113,8 @@ class SeafileTests(unittest.TestCase):
             self.assertEqual(settings.LOGO_PATH, manifest["logo"])
             self.assertEqual(settings.FAVICON_PATH, manifest["favicon"])
             self.assertEqual(settings.OAUTH_PROVIDER, "authentik")
-            self.assertEqual(settings.ENABLED_ROLE_PERMISSIONS["discord_10gb"]["role_quota"], "10g")
+            self.assertIn("seahub_discord_quota.DiscordQuotaMiddleware", settings.EXTRA_MIDDLEWARE)
+            self.assertFalse(hasattr(settings, "ENABLED_ROLE_PERMISSIONS"))
 
     def test_unmanaged_brand_manifest_is_not_overwritten(self):
         module = initializer()
@@ -85,18 +140,25 @@ class SeafileTests(unittest.TestCase):
             root = ET.fromstring((ROOT / "seafile/branding" / name).read_text())
             self.assertFalse(any(element.tag.endswith("script") for element in root.iter()))
 
-    def test_discord_quota_uses_native_oauth_role_without_changing_default_quota(self):
+    def test_discord_quota_uses_native_per_user_limit_without_changing_default_quota(self):
         with patch.dict(os.environ, {"OAUTH_CLIENT_SECRET": "test-only"}):
             spec = importlib.util.spec_from_file_location("seahub_lab", ROOT / "seafile/seahub_lab.py")
             settings = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(settings)
         self.assertIn("seafile", settings.OAUTH_SCOPE)
         self.assertEqual(settings.OAUTH_ATTRIBUTE_MAP["seafile_role"], (False, "role"))
-        self.assertEqual(settings.ENABLED_ROLE_PERMISSIONS, {"discord_10gb": {"role_quota": "10g"}})
+        self.assertIn("seahub_discord_quota.DiscordQuotaMiddleware", settings.EXTRA_MIDDLEWARE)
+        self.assertFalse(hasattr(settings, "ENABLED_ROLE_PERMISSIONS"))
+        # Native Seahub removes conf from sys.path before resolving middleware.
+        # Loading settings must already have cached this module for Django.
+        self.assertIn("seahub_discord_quota", sys.modules)
         spec = importlib.util.spec_from_file_location("seahub_custom_functions", ROOT / "seafile/seahub_custom_functions.py")
         hook = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(hook)
-        self.assertEqual(hook.custom_get_user_role("discord_10gb"), "discord_10gb")
+        quota = types.SimpleNamespace(mark_discord_login=Mock())
+        with patch.dict("sys.modules", {"seahub_discord_quota": quota}):
+            self.assertEqual(hook.custom_get_user_role("discord_10gb"), "default")
+        quota.mark_discord_login.assert_called_once_with()
         for invalid in ("admin", "default", "", None):
             with self.subTest(role=invalid), self.assertRaises(ValueError):
                 hook.custom_get_user_role(invalid)
@@ -135,7 +197,7 @@ class SeafileTests(unittest.TestCase):
             pod = deployment["spec"]["template"]["spec"]
             self.assertFalse(pod["automountServiceAccountToken"])
             for container in pod.get("initContainers", []) + pod["containers"]:
-                self.assertIn("@sha256:", container["image"])
+                self.assertRegex(container["image"], r"(?:@sha256:[a-f0-9]{64}|:[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z0-9.]+)?)$")
                 self.assertNotIn("DB_ROOT_PASSWD", [e["name"] for e in container.get("env", [])])
             if deployment["metadata"]["name"] != "memcached":
                 self.assertEqual(deployment["spec"]["strategy"]["type"], "Recreate")
@@ -159,6 +221,9 @@ class SeafileTests(unittest.TestCase):
             (module.INTEGRATION / "seahub_lab.py").write_text("# managed non-secret integration\n")
             (module.INTEGRATION / "seahub_custom_functions.py").write_text(
                 '\"\"\"GitOps-managed Seahub OAuth role hook; test fixture.\"\"\"\n'
+            )
+            (module.INTEGRATION / "seahub_discord_quota.py").write_bytes(
+                (ROOT / "seafile/seahub_discord_quota.py").read_bytes()
             )
             for name in ("theme.css", "logo.svg", "icon.svg"):
                 (module.INTEGRATION / name).write_bytes((ROOT / "seafile/branding" / name).read_bytes())

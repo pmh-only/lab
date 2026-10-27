@@ -55,6 +55,8 @@ kind: Deployment
 metadata:
   name: elasticsearch
 spec:
+  # Pro search is not used by Community; retain its volume for rollback.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
