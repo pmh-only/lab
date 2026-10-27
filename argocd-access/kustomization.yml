@@ -4,5 +4,7 @@ namespace: argocd
 resources:
   - oidc-secret.yml
   - configuration.yml
+  - notifications.yml
+  - notifications-secret.yml
   - certificate.yml
   - ingress.yml

@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  labels:
+    app.kubernetes.io/name: argocd-notifications-controller
+    app.kubernetes.io/part-of: argocd
+data:
+  context: |
+    argocdUrl: https://argo.pmh.codes
+  service.github: |
+    appID: 5488198
+    installationID: 175649535
+    privateKey: $github-privateKey
+  subscriptions: |
+    - recipients: ["github:"]
+      triggers: [lab-deployment]
+  # Match the sources actually synced, not a possibly newer desired revision.
+  # A sync attempt is the deduplication unit, so retrying a failed SHA works.
+  trigger.lab-deployment: |
+    - when: >-
+        (app.status?.operationState?.syncResult?.source?.repoURL == 'https://github.com/pmh-only/lab.git' or
+        any(app.status?.operationState?.syncResult?.sources ?? [], {#.repoURL == 'https://github.com/pmh-only/lab.git'})) and
+        (app.status.operationState.phase == 'Running' or
+        (app.status.operationState.phase == 'Succeeded' and app.status.health.status == 'Progressing'))
+      oncePer: app.status.operationState.startedAt
+      send: [lab-pending]
+    - when: >-
+        (app.status?.operationState?.syncResult?.source?.repoURL == 'https://github.com/pmh-only/lab.git' or
+        any(app.status?.operationState?.syncResult?.sources ?? [], {#.repoURL == 'https://github.com/pmh-only/lab.git'})) and
+        app.status.operationState.phase == 'Succeeded' and
+        app.status.sync.status == 'Synced' and app.status.health.status == 'Healthy'
+      oncePer: app.status.operationState.startedAt
+      send: [lab-succeeded]
+    - when: >-
+        (app.status?.operationState?.syncResult?.source?.repoURL == 'https://github.com/pmh-only/lab.git' or
+        any(app.status?.operationState?.syncResult?.sources ?? [], {#.repoURL == 'https://github.com/pmh-only/lab.git'})) and
+        (app.status.operationState.phase in ['Failed', 'Error'] or
+        (app.status.operationState.phase == 'Succeeded' and app.status.sync.status == 'Synced' and app.status.health.status == 'Degraded'))
+      oncePer: app.status.operationState.startedAt
+      send: [lab-failed]
+  # Multi-source apps must select lab's resolved SHA, never a Helm chart version.
+  template.lab-pending: |
+    message: Application {{.app.metadata.name}} is deploying.
+    github:
+      repoURLPath: https://github.com/pmh-only/lab.git
+      revisionPath: >-
+        {{- if .app.status.operationState.syncResult.revision -}}
+        {{ .app.status.operationState.syncResult.revision }}
+        {{- else -}}
+        {{- range $i, $source := .app.status.operationState.syncResult.sources -}}
+        {{- if eq $source.repoURL "https://github.com/pmh-only/lab.git" -}}
+        {{ index $.app.status.operationState.syncResult.revisions $i }}
+        {{- end -}}{{- end -}}{{- end -}}
+      status:
+        state: pending
+        label: continuous-delivery/{{.app.metadata.name}}
+        targetURL: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+  # Only terminal events create deployments, avoiding duplicate deployment
+  # records for pending/success transitions of the same operation.
+  template.lab-succeeded: |
+    message: Application {{.app.metadata.name}} is synced and healthy.
+    github:
+      repoURLPath: https://github.com/pmh-only/lab.git
+      revisionPath: >-
+        {{- if .app.status.operationState.syncResult.revision -}}
+        {{ .app.status.operationState.syncResult.revision }}
+        {{- else -}}
+        {{- range $i, $source := .app.status.operationState.syncResult.sources -}}
+        {{- if eq $source.repoURL "https://github.com/pmh-only/lab.git" -}}
+        {{ index $.app.status.operationState.syncResult.revisions $i }}
+        {{- end -}}{{- end -}}{{- end -}}
+      status:
+        state: success
+        label: continuous-delivery/{{.app.metadata.name}}
+        targetURL: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+      deployment:
+        state: success
+        environment: production/{{.app.metadata.name}}
+        logURL: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+        requiredContexts: []
+        autoMerge: false
+        transientEnvironment: false
+  template.lab-failed: |
+    message: Application {{.app.metadata.name}} failed to sync or is degraded.
+    github:
+      repoURLPath: https://github.com/pmh-only/lab.git
+      revisionPath: >-
+        {{- if .app.status.operationState.syncResult.revision -}}
+        {{ .app.status.operationState.syncResult.revision }}
+        {{- else -}}
+        {{- range $i, $source := .app.status.operationState.syncResult.sources -}}
+        {{- if eq $source.repoURL "https://github.com/pmh-only/lab.git" -}}
+        {{ index $.app.status.operationState.syncResult.revisions $i }}
+        {{- end -}}{{- end -}}{{- end -}}
+      status:
+        state: failure
+        label: continuous-delivery/{{.app.metadata.name}}
+        targetURL: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+      deployment:
+        state: failure
+        environment: production/{{.app.metadata.name}}
+        logURL: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+        requiredContexts: []
+        autoMerge: false
+        transientEnvironment: false
