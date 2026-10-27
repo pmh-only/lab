@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="156" height="36" viewBox="0 0 156 36" role="img" aria-label="PMH Drive">
+  <rect x="1" y="1" width="34" height="34" rx="10" fill="#20242d"/>
+  <path d="M10 13h6l2 3h8v10H10z" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M11 10h12" stroke="#fff" stroke-opacity=".5" stroke-width="1.6" stroke-linecap="round"/>
+  <text x="46" y="25" fill="#20242d" font-family="system-ui,sans-serif" font-size="23" font-weight="650" letter-spacing="-.8">pmh<tspan fill="#7c8493" font-weight="400" font-size="18" letter-spacing="-.4"> / drive</tspan></text>
+</svg>

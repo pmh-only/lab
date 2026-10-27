@@ -1,0 +1,270 @@
+/* PMH Drive — native Seahub branding. No scripts, remote assets, or hidden controls. */
+:root {
+  --pmh-ink: #20242d;
+  --pmh-muted: #687386;
+  --pmh-line: #e8ebf0;
+  --pmh-canvas: #f7f8fb;
+  --pmh-blue: #3459d8;
+  --pmh-blue-hover: #2949bd;
+  --pmh-blue-soft: #edf2ff;
+  --pmh-sidebar: #191c23;
+  --pmh-sidebar-ink: #bac1cf;
+  --pmh-font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body,
+button,
+input,
+select,
+textarea,
+.popover {
+  font-family: var(--pmh-font);
+}
+
+body {
+  color: var(--pmh-ink);
+  background: var(--pmh-canvas);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--pmh-blue); }
+a:hover { color: var(--pmh-blue-hover); }
+h1, h2, h3, h4, .sf-heading { letter-spacing: -.025em; }
+.text-muted { color: var(--pmh-muted) !important; }
+
+/* A quiet workspace, not a replacement application shell. */
+.main-panel,
+.main-panel-center,
+.cur-view-container {
+  background: #fff;
+  min-width: 0;
+}
+
+.side-panel-north,
+.main-panel-north,
+.header {
+  background: #fff;
+  border-color: var(--pmh-line);
+  box-shadow: none;
+}
+
+.cur-view-path {
+  background: #fff;
+  border-bottom-color: var(--pmh-line);
+}
+
+.cur-view-path .sf-heading {
+  font-weight: 600;
+  color: var(--pmh-ink);
+}
+
+/* Restrict the dark rail to navigation. File-preview trees stay light. */
+.side-panel:has(.side-nav),
+.side-panel:has(.side-nav) .side-panel-center,
+.side-panel:has(.side-nav) .side-panel-footer,
+.side-panel:has(.side-nav) .side-panel-north {
+  color: var(--pmh-sidebar-ink);
+  background: var(--pmh-sidebar);
+  border-color: #ffffff0c;
+}
+
+.side-panel:has(.side-nav) .top-logo img { filter: invert(1); }
+
+.side-panel .side-nav .side-nav-con {
+  padding: 1.25rem .875rem .875rem;
+}
+
+.side-panel .side-nav-con .heading {
+  color: #8d96a8;
+  font-size: .6875rem;
+  font-weight: 600 !important;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.side-panel .side-nav .side-nav-con .nav-item { background: transparent; }
+.side-panel .side-nav-con > .nav > .nav-item { margin-bottom: .25rem; }
+
+.side-panel .side-nav-con .nav .nav-item .nav-link {
+  color: var(--pmh-sidebar-ink);
+  border-radius: .5rem;
+  font-size: .875rem;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.side-panel .side-nav-con > .nav > .nav-item > .nav-link {
+  height: 40px;
+  padding-inline: .75rem;
+}
+
+.side-panel .nav-pills .nav-item .nav-link:hover {
+  color: #f4f6fb;
+  background: #ffffff09;
+  text-decoration: none;
+}
+
+.side-panel .nav-pills .nav-item .nav-link.active,
+.side-panel .nav-pills .nav-item .nav-link.active:hover {
+  color: #f0f3ff;
+  background: #3459d832;
+  box-shadow: inset 0 0 0 1px #8ba4ff22;
+}
+
+.side-panel .side-nav .side-nav-con .nav-item.active::before {
+  background: #92aaff;
+  width: 2px;
+  left: -4px;
+  height: 22px;
+  top: 9px;
+}
+
+.side-panel .side-nav-con .active .nav-text { font-weight: 600; }
+.side-panel .side-nav-con :is(.sf3-font, .nav-icon, .sharp) { color: #8d96a8; }
+.side-panel .side-nav-con .active :is(.sf3-font, .nav-icon, .sharp) { color: #a9bbff; }
+
+.side-panel .side-nav-bottom-toolbar,
+.side-panel .side-nav-footer {
+  color: #8d96a8;
+  font-size: .75rem;
+  background: transparent;
+  border-color: #ffffff0c;
+}
+
+.side-panel .side-nav-bottom-toolbar:hover { background: #ffffff09; }
+.side-panel .side-nav-bottom-toolbar img { filter: invert(.7); }
+
+/* Preserve the native folded rail and mobile slide-out behavior. */
+@media (min-width: 768px) {
+  .side-panel:has(.side-nav):not(.side-panel-folded) { flex-basis: 244px; }
+  .main-panel { flex: 1 1 0; }
+  .cur-view-path { padding-inline: 1.5rem; }
+  .cur-view-content { padding-inline: 1.5rem; }
+}
+
+/* Keep native actions, validation, danger states and disabled states intact. */
+.btn { border-radius: .5rem; font-weight: 500; }
+.btn-primary {
+  color: #fff;
+  background-color: var(--pmh-blue);
+  border-color: var(--pmh-blue);
+  box-shadow: 0 1px 2px #182d6b15;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:not(:disabled):not(.disabled):active,
+.show > .btn-primary.dropdown-toggle {
+  color: #fff;
+  background-color: var(--pmh-blue-hover);
+  border-color: var(--pmh-blue-hover);
+}
+
+.btn-primary:disabled,
+.btn-primary.disabled {
+  color: #fff;
+  background-color: #879be1;
+  border-color: #879be1;
+}
+
+.btn-secondary,
+.btn-outline-secondary {
+  color: #454d5b;
+  background-color: #fff;
+  border-color: #dce1e9;
+}
+
+.btn-secondary:hover,
+.btn-outline-secondary:hover {
+  color: var(--pmh-ink);
+  background-color: #f2f4f8;
+  border-color: #ccd3df;
+}
+
+.form-control {
+  color: var(--pmh-ink);
+  background-color: #fff;
+  border-color: #dce1e9;
+  border-radius: .5rem;
+}
+
+.form-control:focus {
+  border-color: #7290ed;
+  box-shadow: 0 0 0 3px #3459d818;
+}
+
+.form-control::placeholder { color: #6c7585; }
+.form-control:disabled, .form-control[readonly] { background: #f4f5f8; }
+.form-control.is-invalid { border-color: #dc3545; }
+
+/* Don't change row heights: Seahub virtualizes some lists. */
+.table,
+.table thead th,
+.table td,
+.table th {
+  border-color: var(--pmh-line);
+}
+
+.table thead th {
+  color: #687386;
+  background: #fafbfe;
+  font-size: .75rem;
+  font-weight: 500;
+}
+
+.table td { color: #525c6d; }
+.table .name a, .table .name { color: var(--pmh-ink); }
+.table .name a:hover { color: var(--pmh-blue); }
+.table tbody tr:hover, .table-hover tbody tr:hover { background-color: #f6f8fd; }
+.table tbody tr.selected, .table tbody tr.tr-highlight { background-color: var(--pmh-blue-soft); }
+
+.dropdown-menu {
+  border: 1px solid var(--pmh-line);
+  border-radius: .625rem;
+  padding-block: .375rem;
+  box-shadow: 0 8px 30px #1b233315;
+}
+
+.dropdown-item { color: #454d5b; }
+.dropdown-item:hover, .dropdown-item:focus { color: var(--pmh-ink); background: #f1f4fa; }
+.dropdown-item.active, .dropdown-item:active { color: #fff; background: var(--pmh-blue); }
+.dropdown-item.disabled, .dropdown-item:disabled { color: #a0a7b4; background: transparent; }
+
+.modal-content {
+  border: 1px solid var(--pmh-line);
+  border-radius: .875rem;
+  box-shadow: 0 24px 80px #11182726;
+}
+
+.modal-header, .modal-footer { border-color: var(--pmh-line); }
+.modal-title { color: var(--pmh-ink); font-weight: 600; }
+.nav-tabs { border-color: var(--pmh-line); }
+.nav-tabs .nav-link { color: var(--pmh-muted); }
+.nav-tabs .nav-link.active { color: var(--pmh-blue); border-bottom-color: var(--pmh-blue); }
+.tree-node-inner-hover { background: var(--pmh-blue-soft); }
+
+/* Native login/share screens receive the same restrained palette. */
+.login-panel,
+.login-form {
+  border-radius: 1rem;
+  border-color: var(--pmh-line);
+  box-shadow: 0 12px 50px #1b233310;
+}
+
+:is(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid #6481e4;
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  .side-panel .side-nav .side-nav-con { padding-top: .875rem; }
+  .cur-view-path, .cur-view-content { padding-inline: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side-panel .side-nav-con .nav .nav-item .nav-link { transition: none; }
+}
+
+@media (forced-colors: active) {
+  .btn, .form-control, .modal-content { border: 1px solid ButtonText; }
+  .side-panel .nav-link.active { outline: 1px solid Highlight; }
+}

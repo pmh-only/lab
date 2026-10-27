@@ -1,6 +1,8 @@
 """Non-secret native Seahub integration; credentials are supplied by Vault."""
 
+import json
 import os
+from pathlib import Path
 
 
 SERVICE_URL = "https://drive.pmh.codes"
@@ -36,3 +38,15 @@ OAUTH_ATTRIBUTE_MAP = {
 # Custom roles inherit ordinary user permissions in native Seahub. Only this
 # role receives a quota; default/guest roles and other users are unchanged.
 ENABLED_ROLE_PERMISSIONS = {"discord_10gb": {"role_quota": "10g"}}
+
+# The init container publishes content-addressed files using native Seahub branding.
+_brand_manifest = Path(__file__).with_name("pmh-drive-brand.json")
+if _brand_manifest.exists():
+    _brand = json.loads(_brand_manifest.read_text())
+    SITE_NAME = "PMH Drive"
+    SITE_TITLE = "PMH Drive"
+    BRANDING_CSS = _brand["css"]
+    LOGO_PATH = _brand["logo"]
+    FAVICON_PATH = _brand["favicon"]
+    LOGO_WIDTH = 139
+    LOGO_HEIGHT = 32

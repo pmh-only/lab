@@ -6,6 +6,7 @@ import tempfile
 import types
 import unittest
 from unittest.mock import Mock, patch
+import xml.etree.ElementTree as ET
 
 import yaml
 
@@ -20,6 +21,70 @@ def initializer():
 
 
 class SeafileTests(unittest.TestCase):
+    def test_branding_is_immutable_and_preserves_unrelated_customizations(self):
+        module = initializer()
+        with tempfile.TemporaryDirectory() as directory:
+            data = Path(directory)
+            (data / "conf").mkdir()
+            integration = ROOT / "seafile/branding"
+            unrelated = data / "seahub-data/custom/existing.css"
+            unrelated.parent.mkdir(parents=True)
+            unrelated.write_text("/* operator customization */")
+            first = module.install_branding(data, integration)
+            second = module.install_branding(data, integration)
+            self.assertEqual(first, second)
+            self.assertEqual(unrelated.read_text(), "/* operator customization */")
+            for key in ("css", "logo", "favicon"):
+                self.assertTrue((data / "seahub-data" / first[key]).is_file())
+            css_asset = data / "seahub-data" / first["css"]
+            css_asset.write_text("unmanaged content at a managed asset path")
+            with self.assertRaisesRegex(RuntimeError, "Existing brand asset differs"):
+                module.install_branding(data, integration)
+            self.assertEqual(css_asset.read_text(), "unmanaged content at a managed asset path")
+
+    def test_branding_settings_use_native_hooks_without_changing_authentication(self):
+        module = initializer()
+        with tempfile.TemporaryDirectory() as directory:
+            data = Path(directory)
+            (data / "conf").mkdir()
+            manifest = module.install_branding(data, ROOT / "seafile/branding")
+            source = data / "conf/seahub_lab.py"
+            source.write_text((ROOT / "seafile/seahub_lab.py").read_text())
+            spec = importlib.util.spec_from_file_location("branded_seahub_lab", source)
+            settings = importlib.util.module_from_spec(spec)
+            with patch.dict(os.environ, {"OAUTH_CLIENT_SECRET": "test-only"}):
+                spec.loader.exec_module(settings)
+            self.assertEqual(settings.SITE_NAME, "PMH Drive")
+            self.assertEqual(settings.BRANDING_CSS, manifest["css"])
+            self.assertEqual(settings.LOGO_PATH, manifest["logo"])
+            self.assertEqual(settings.FAVICON_PATH, manifest["favicon"])
+            self.assertEqual(settings.OAUTH_PROVIDER, "authentik")
+            self.assertEqual(settings.ENABLED_ROLE_PERMISSIONS["discord_10gb"]["role_quota"], "10g")
+
+    def test_unmanaged_brand_manifest_is_not_overwritten(self):
+        module = initializer()
+        with tempfile.TemporaryDirectory() as directory:
+            data = Path(directory)
+            (data / "conf").mkdir()
+            manifest = data / "conf/pmh-drive-brand.json"
+            manifest.write_text('{"managed_by": "operator"}')
+            with self.assertRaisesRegex(RuntimeError, "Unmanaged Seafile brand manifest"):
+                module.install_branding(data, ROOT / "seafile/branding")
+            self.assertEqual(manifest.read_text(), '{"managed_by": "operator"}')
+
+    def test_branding_keeps_native_controls_and_assets_self_contained(self):
+        css = (ROOT / "seafile/branding/theme.css").read_text()
+        self.assertNotIn("@import", css)
+        self.assertNotIn("display: none", css)
+        self.assertNotIn("http", css)
+        self.assertIn(":focus-visible", css)
+        self.assertIn("prefers-reduced-motion", css)
+        self.assertIn("forced-colors", css)
+        self.assertIn(".side-panel:has(.side-nav)", css)
+        for name in ("logo.svg", "icon.svg"):
+            root = ET.fromstring((ROOT / "seafile/branding" / name).read_text())
+            self.assertFalse(any(element.tag.endswith("script") for element in root.iter()))
+
     def test_discord_quota_uses_native_oauth_role_without_changing_default_quota(self):
         with patch.dict(os.environ, {"OAUTH_CLIENT_SECRET": "test-only"}):
             spec = importlib.util.spec_from_file_location("seahub_lab", ROOT / "seafile/seahub_lab.py")
@@ -95,6 +160,8 @@ class SeafileTests(unittest.TestCase):
             (module.INTEGRATION / "seahub_custom_functions.py").write_text(
                 '\"\"\"GitOps-managed Seahub OAuth role hook; test fixture.\"\"\"\n'
             )
+            for name in ("theme.css", "logo.svg", "icon.svg"):
+                (module.INTEGRATION / name).write_bytes((ROOT / "seafile/branding" / name).read_bytes())
             upstream_dir = Path(directory) / "upstream"
             upstream_dir.mkdir()
             (upstream_dir / "setup-seafile-mysql.py").write_text("def main():\n    seahub_config.do_syncdb()\n    db_config.root_conn.close()\n")

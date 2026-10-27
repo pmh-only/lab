@@ -14,6 +14,9 @@ configMapGenerator:
       - initialize.py
       - seahub_lab.py
       - seahub_custom_functions.py
+      - theme.css=./branding/theme.css
+      - logo.svg=./branding/logo.svg
+      - icon.svg=./branding/icon.svg
       - native-schema.json
       - prepare_mysql_plugins.py
 images:

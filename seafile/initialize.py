@@ -16,6 +16,32 @@ MARKER = DATA / ".lab-native-bootstrap-v1"
 INTEGRATION = Path("/lab-config")
 
 
+def install_branding(data, integration):
+    """Publish immutable public assets without overwriting existing custom files."""
+    manifest_path = data / "conf/pmh-drive-brand.json"
+    if manifest_path.exists():
+        existing = json.loads(manifest_path.read_text())
+        if existing.get("managed_by") != "lab/seafile/branding":
+            raise RuntimeError("Unmanaged Seafile brand manifest exists; refusing to overwrite")
+    destination = data / "seahub-data/custom/pmh-drive"
+    destination.mkdir(parents=True, exist_ok=True)
+    manifest = {"managed_by": "lab/seafile/branding"}
+    for key, filename in {"css": "theme.css", "logo": "logo.svg", "favicon": "icon.svg"}.items():
+        content = (integration / filename).read_bytes()
+        source = Path(filename)
+        name = source.stem + "-" + hashlib.sha256(content).hexdigest()[:16] + source.suffix
+        target = destination / name
+        if target.exists() and target.read_bytes() != content:
+            raise RuntimeError("Existing brand asset differs; refusing to overwrite")
+        if not target.exists():
+            target.write_bytes(content)
+            target.chmod(0o644)
+        manifest[key] = "custom/pmh-drive/" + name
+    manifest_path.write_text(json.dumps(manifest) + "\n")
+    manifest_path.chmod(0o644)
+    return manifest
+
+
 def native_schema_complete(install):
     import pymysql
 
@@ -144,6 +170,7 @@ def initialize():
         raise RuntimeError("Unmanaged Seahub custom functions exist; refusing to overwrite")
     shutil.copyfile(INTEGRATION / "seahub_custom_functions.py", hook)
     hook.chmod(0o644)
+    install_branding(DATA, INTEGRATION)
     text = settings.read_text()
     include = "from seahub_lab import *"
     if include not in text.splitlines():
