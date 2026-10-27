@@ -15,6 +15,11 @@ spec:
       containers:
         - name: go
           image: ghcr.io/pmh-only/go:latest
+          env:
+            - name: UI_HOST
+              value: https://link.pmh.codes
+            - name: PUBLIC_API_HOST
+              value: https://linkapi.pmh.codes
           volumeMounts:
             - mountPath: /data
               name: persistent
