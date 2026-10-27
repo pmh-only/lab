@@ -36,16 +36,29 @@ class ArgoAccessTests(unittest.TestCase):
         oidc = yaml.safe_load(config["oidc.config"])
         self.assertEqual(oidc["clientSecret"], "$argocd-oidc:client-secret")
         self.assertTrue(oidc["enablePKCEAuthentication"])
-        self.assertEqual(config["users.anonymous.enabled"], "false")
+        self.assertEqual(config["users.anonymous.enabled"], "true")
         self.assertEqual(config["admin.enabled"], "true")
         rbac = next(d["data"] for d in docs if d["metadata"]["name"] == "argocd-rbac-cm")
-        self.assertEqual(rbac["policy.default"], "role:unauthenticated")
+        self.assertEqual(rbac["policy.default"], "role:public")
         self.assertEqual(rbac["scopes"], "[argocd_roles]")
         self.assertNotIn("role:readonly", rbac["policy.default"])
         secrets = list(yaml.safe_load_all((ROOT / "argocd-access/oidc-secret.yml").read_text()))
         vss = next(d for d in secrets if d["kind"] == "VaultStaticSecret")
         self.assertEqual(vss["spec"]["path"], "argocd/oidc")
         self.assertEqual(vss["spec"]["destination"]["labels"]["app.kubernetes.io/part-of"], "argocd")
+
+    def test_public_access_only_grants_application_and_project_viewing(self):
+        docs = list(yaml.safe_load_all((ROOT / "argocd-access/configuration.yml").read_text()))
+        rbac = next(d["data"] for d in docs if d["metadata"]["name"] == "argocd-rbac-cm")
+        rules = [line.strip() for line in rbac["policy.csv"].splitlines() if line.strip()]
+        self.assertEqual({line for line in rules if line.startswith("p,")}, {
+            "p, role:public, applications, get, */*, allow",
+            "p, role:public, projects, get, *, allow",
+        })
+        self.assertEqual({line for line in rules if line.startswith("g,")}, {
+            "g, lab-argocd-admins, role:admin",
+            "g, admin, role:admin",
+        })
 
     def test_only_active_human_authentik_administrators_receive_admin_role(self):
         declaration = json.loads((ROOT / "bootstrap/services/oidc.json").read_text())["argocd"]

@@ -1,4 +1,18 @@
-# GitHub deployment notifications
+# Argo CD access
+
+Anonymous visitors can view applications, resource manifests, configuration and
+AppProjects at <https://argo.pmh.codes>. This intentionally exposes application
+metadata and configuration; do not put credentials in plaintext manifests.
+
+The custom default `role:public` grants only `applications/get` and `projects/get`.
+It does not grant logs, terminal sessions, sync, resource actions, create, update,
+delete, or access to repository/cluster/account administration. Do not replace it
+with the built-in `role:readonly`, which also grants log access. Unspecified
+permissions are denied; explicit denies on the default role would also affect
+authenticated administrators. Authentik administrators and the recovery local
+admin retain their existing full access.
+
+## GitHub deployment notifications
 
 Argo CD Notifications reports to `pmh-only/lab` using GitHub App `5488198`.
 The App must be installed on **pmh-only**, with access to **lab** and repository

@@ -9,7 +9,7 @@ data:
   url: https://argo.pmh.codes
   # Preserve native local admin as recovery access; do not reset its password.
   admin.enabled: "true"
-  users.anonymous.enabled: "false"
+  users.anonymous.enabled: "true"
   oidc.config: |
     name: Authentik
     issuer: https://auth.pmh.codes/application/o/argocd/
@@ -29,9 +29,13 @@ metadata:
     app.kubernetes.io/name: argocd-rbac-cm
     app.kubernetes.io/part-of: argocd
 data:
-  # An undefined default role intentionally grants no permissions.
-  policy.default: role:unauthenticated
+  # Public application viewing only. Built-in readonly also grants log access.
+  # Omit other permissions rather than denying them on the default role, which
+  # would also restrict authenticated administrators.
+  policy.default: role:public
   policy.csv: |
+    p, role:public, applications, get, */*, allow
+    p, role:public, projects, get, *, allow
     g, lab-argocd-admins, role:admin
     g, admin, role:admin
   scopes: '[argocd_roles]'
