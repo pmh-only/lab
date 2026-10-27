@@ -12,9 +12,57 @@ data:
     appID: 5488198
     installationID: 175649535
     privateKey: $github-privateKey
+  service.webhook.discord: |
+    url: $discord-webhook-url
+    headers:
+      - name: Content-Type
+        value: application/json
   subscriptions: |
     - recipients: ["github:"]
       triggers: [lab-deployment]
+    - recipients: [discord]
+      triggers: [discord-sync]
+  # Do not flood Discord with every application's historical operation when
+  # this integration is first enabled. All subsequent sync attempts are covered.
+  trigger.discord-sync: |
+    - when: >-
+        app.status?.operationState?.startedAt != nil and
+        time.Parse(app.status.operationState.startedAt).After(time.Parse('2026-10-27T02:16:01Z')) and
+        app.status.operationState.phase == 'Running'
+      oncePer: app.status.operationState.startedAt
+      send: [discord-sync]
+    - when: >-
+        app.status?.operationState?.startedAt != nil and
+        time.Parse(app.status.operationState.startedAt).After(time.Parse('2026-10-27T02:16:01Z')) and
+        app.status.operationState.phase == 'Succeeded'
+      oncePer: app.status.operationState.startedAt
+      send: [discord-sync]
+    - when: >-
+        app.status?.operationState?.startedAt != nil and
+        time.Parse(app.status.operationState.startedAt).After(time.Parse('2026-10-27T02:16:01Z')) and
+        app.status.operationState.phase in ['Failed', 'Error']
+      oncePer: app.status.operationState.startedAt
+      send: [discord-sync]
+  template.discord-sync: |
+    message: Application {{.app.metadata.name}} sync {{.app.status.operationState.phase}}.
+    webhook:
+      discord:
+        method: POST
+        body: |
+          {
+            "username": "Argo CD",
+            "allowed_mentions": {"parse": []},
+            "embeds": [{
+              "title": {{printf "Sync %s · %s" .app.status.operationState.phase .app.metadata.name | toJson}},
+              "url": {{printf "%s/applications/%s?operation=true" .context.argocdUrl .app.metadata.name | toJson}},
+              "color": {{if eq .app.status.operationState.phase "Running"}}3447003{{else if eq .app.status.operationState.phase "Succeeded"}}3066993{{else}}15158332{{end}},
+              "fields": [
+                {"name": "Phase", "value": {{.app.status.operationState.phase | toJson}}, "inline": true},
+                {"name": "Namespace", "value": {{if .app.spec.destination.namespace}}{{.app.spec.destination.namespace | toJson}}{{else}}"cluster-scoped"{{end}}, "inline": true}
+              ],
+              "timestamp": {{.app.status.operationState.startedAt | toJson}}
+            }]
+          }
   # Match the sources actually synced, not a possibly newer desired revision.
   # A sync attempt is the deduplication unit, so retrying a failed SHA works.
   trigger.lab-deployment: |

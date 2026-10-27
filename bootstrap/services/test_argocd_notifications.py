@@ -91,3 +91,10 @@ class NotificationsTests(unittest.TestCase):
         vault.get.return_value = None
         notifications.provision(vault, self.key)
         vault.create.assert_called_once_with(notifications.VAULT_PATH, {"github-privateKey": self.key})
+
+    def test_github_import_preserves_discord_webhook(self):
+        vault = Mock()
+        vault.get.return_value = {"github-privateKey": self.key, "discord-webhook-url": "existing-webhook"}
+        notifications.provision(vault, self.key)
+        vault.create.assert_not_called()
+        self.assertFalse(any(call.args[:2] == ("kv", "put") for call in vault.run.call_args_list))

@@ -66,7 +66,8 @@ def provision(vault, key):
     desired = {"github-privateKey": key}
     if stored is None:
         vault.create(VAULT_PATH, desired)
-    elif set(stored) != set(desired) or not secrets.compare_digest(stored["github-privateKey"], key):
+    elif (set(stored) not in (set(desired), {"github-privateKey", "discord-webhook-url"})
+          or not secrets.compare_digest(stored["github-privateKey"], key)):
         raise RuntimeError("Existing GitHub App key differs; refusing an uncoordinated rotation")
     vault.run("policy", "write", "lab-argocd-notifications", "-", payload=(
         f'path "secret/data/{VAULT_PATH}" {{ capabilities = ["read"] }}\n'))

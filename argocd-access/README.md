@@ -50,3 +50,30 @@ multi-source applications it selects the resolved `lab` SHA, not a chart version
 
 Sync the `argocd-access` Application after committing the manifests. No per-app
 subscription annotations are needed.
+
+## Discord sync notifications
+
+All applications also send Sync **Running**, **Succeeded**, and **Failed/Error**
+events to a Discord incoming webhook, independently of the GitHub deployment
+subscription. Success means the sync operation succeeded; it does not wait for
+Healthy. Events are deduplicated by sync attempt and phase, including retries of
+the same SHA. A fixed activation cutoff in `trigger.discord-sync` prevents an
+initial flood of historical operation notifications.
+
+Import the explicitly supplied webhook URL from a protected local file:
+
+```sh
+chmod 600 /path/to/discord-webhook.txt
+python bootstrap/services/argocd_discord.py /path/to/discord-webhook.txt
+```
+
+The helper validates the incoming webhook via a read-only Discord request, then
+CAS-merges `discord-webhook-url` into the existing Vault notification credential
+at `secret/argocd/notifications-github`. The GitHub private key, Vault reader policy,
+and existing Kubernetes secret destination are preserved. Re-importing the same
+webhook is a no-op; a differing URL requires a coordinated rotation. Notifications
+reload the synced secret automatically; the URL is never stored in Git.
+
+Messages include app name, sync phase, namespace, operation start time, and an
+Argo CD link. They do not include logs, raw error messages, or manifest contents.
+Mentions are disabled to avoid accidental mass pings.
