@@ -1,0 +1,121 @@
+version: 1
+metadata:
+  name: Lab - Discord application allowlist
+entries:
+  - model: authentik_policies_expression.expressionpolicy
+    id: discord-deny-applications
+    identifiers:
+      name: discord-deny-application-access
+    attrs:
+      expression: |
+        allowed_applications = {"as218822", "books", "go", "immich", "meta", "pdf", "seafile"}
+        is_discord = request.user.sources.filter(slug="discord").exists() or request.user.all_groups().filter(name="discord").exists()
+        return not is_discord or getattr(request.obj, "slug", None) in allowed_applications
+
+  # The AS console previously had an additional administrator-only policy.
+  # Keep its binding and non-Discord behavior, with the requested Discord exception.
+  - model: authentik_policies_expression.expressionpolicy
+    identifiers:
+      name: "lab bootstrap: as218822 console administrators only"
+    attrs:
+      expression: |
+        is_discord = request.user.sources.filter(slug="discord").exists() or request.user.all_groups().filter(name="discord").exists()
+        return request.user.is_authenticated and request.user.is_active and request.user.type == "internal" and (request.user.is_superuser or is_discord)
+
+  # These applications use ALL mode. Keep existing access bindings intact:
+  # passing this guard alone must never override another application's denial.
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, go]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, meta]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, pdf]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, stmt]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, remote]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, connect]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, books]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, seafile]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, immich]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, mail]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, track]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, tailscale]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, rustfs]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, solver]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, argocd]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, technitium]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, kopia]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, velero-ui]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !Find [authentik_core.application, [slug, as218822]]
+      policy: !KeyOf discord-deny-applications
+    attrs: {order: -100, enabled: true, failure_result: false}

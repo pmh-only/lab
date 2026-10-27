@@ -86,7 +86,8 @@ class AuthentikBrandTests(unittest.TestCase):
 
     def test_theme_is_self_contained_and_keeps_native_auth_controls_accessible(self):
         self.assertNotIn("@import", self.css)
-        self.assertNotIn("http", self.css)
+        # Inline SVG namespaces are not network requests; remote CSS assets are.
+        self.assertNotRegex(self.css, r'''url\(\s*["']?(?:https?:)?//''')
         self.assertNotIn("display: none", self.css)
         self.assertIn(":focus-visible", self.css)
         self.assertIn("prefers-reduced-motion", self.css)
@@ -96,6 +97,12 @@ class AuthentikBrandTests(unittest.TestCase):
             root = ET.fromstring(content)
             self.assertTrue(root.tag.endswith("svg"))
             self.assertFalse(any(e.tag.endswith("script") for e in root.iter()))
+
+    def test_discord_source_has_dedicated_full_width_style(self):
+        self.assertIn('button[name="source-discord"]', self.css)
+        self.assertIn('[part="source-list"]', self.css)
+        self.assertIn("#5865f2", self.css)
+        self.assertIn("mask: url(\"data:image/svg+xml,", self.css)
 
 
 if __name__ == "__main__":

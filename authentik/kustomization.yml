@@ -10,6 +10,11 @@ resources:
   - ./ingress.yml
   - ./network-policy.yml
 configMapGenerator:
+  - name: authentik-blueprints
+    files:
+      - discord.yaml=./blueprints/discord.yaml
+      - discord-application-access.yaml=./blueprints/discord-application-access.yaml
+      - as218822-user-access.yaml=./blueprints/as218822-user-access.yaml
   - name: authentik-runtime
     literals:
       - AUTHENTIK_POSTGRESQL__HOST=pgsql-service.database.svc.cluster.local

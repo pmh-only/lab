@@ -134,6 +134,8 @@ spec:
                 name: authentik-secrets
             - secretRef:
                 name: authentik-bootstrap-worker
+            - secretRef:
+                name: authentik-discord-oauth
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -167,7 +169,13 @@ spec:
             - mountPath: /certs
               name: authentik-storage
               subPath: certs
+            - mountPath: /blueprints/custom
+              name: authentik-blueprints
+              readOnly: true
       volumes:
+        - name: authentik-blueprints
+          configMap:
+            name: authentik-blueprints
         - name: authentik-storage
           persistentVolumeClaim:
             claimName: authentik-pvc

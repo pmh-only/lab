@@ -85,8 +85,12 @@ spec:
                   key: OIDC_SESSION_SECRET
             - name: OIDC_ALLOW_ANY_AUTHENTICATED
               value: "true"
+            - name: OIDC_OPERATOR_GROUPS
+              value: operator
+            - name: OIDC_GROUPS_CLAIM
+              value: as218822_roles
             - name: OIDC_SCOPES
-              value: openid profile email
+              value: openid profile email as218822
             - name: WIREGUARD_ENDPOINT
               value: 168.110.121.95:51820
             - name: WIREGUARD_PUBLIC_KEY

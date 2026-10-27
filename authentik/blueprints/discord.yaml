@@ -1,0 +1,157 @@
+version: 1
+metadata:
+  name: Lab - Discord login
+entries:
+  - model: authentik_core.group
+    identifiers:
+      name: discord
+    attrs:
+      is_superuser: false
+
+  - model: authentik_sources_oauth.oauthsourcepropertymapping
+    id: discord-user-mapping
+    identifiers:
+      name: discord-guild-membership
+    attrs:
+      expression: |
+        guild_id = "541782241131495434"
+        response = client.do_request(
+            "GET",
+            f"https://discord.com/api/v10/users/@me/guilds/{guild_id}/member",
+            token=token,
+        )
+        if response.status_code == 404:
+            is_member = False
+        else:
+            response.raise_for_status()
+            is_member = True
+        username = info["username"]
+        existing_user = ak_user_by(username=username)
+        if existing_user and not existing_user.usersourceconnection_set.filter(
+            source__slug="discord", identifier=str(info["id"])
+        ).exists():
+            username = f"{username}_discord_{info['id']}"
+        return {
+            "username": username,
+            "name": info.get("global_name") or info.get("username"),
+            "groups": ["discord"] if is_member else [],
+            "attributes": {
+                "discord": {
+                    "id": info["id"],
+                    "username": info["username"],
+                    "guild_id": guild_id,
+                    "is_member": is_member,
+                },
+            },
+        }
+
+  - model: authentik_policies_expression.expressionpolicy
+    id: discord-guild-policy
+    identifiers:
+      name: discord-required-guild
+    attrs:
+      expression: |
+        source = request.context.get("source")
+        if not ak_is_sso_flow or getattr(source, "slug", None) != "discord":
+            return False
+        discord = request.context.get("prompt_data", {}).get("attributes", {}).get("discord", {})
+        if discord.get("guild_id") != "541782241131495434" or discord.get("is_member") is not True:
+            ak_message("You must be a member of the required Discord server to sign in.")
+            return False
+        return True
+
+  - model: authentik_flows.flow
+    id: discord-authentication
+    identifiers:
+      slug: discord-authentication
+    attrs:
+      name: Discord authentication
+      title: Sign in with Discord
+      designation: authentication
+      authentication: none
+      policy_engine_mode: all
+
+  - model: authentik_flows.flow
+    id: discord-enrollment
+    identifiers:
+      slug: discord-enrollment
+    attrs:
+      name: Discord enrollment
+      title: Create your Discord account
+      designation: enrollment
+      authentication: none
+      policy_engine_mode: all
+
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf discord-authentication
+      policy: !KeyOf discord-guild-policy
+      order: 0
+    attrs:
+      failure_result: false
+
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf discord-enrollment
+      policy: !KeyOf discord-guild-policy
+      order: 0
+    attrs:
+      failure_result: false
+
+  - model: authentik_stages_user_write.userwritestage
+    id: discord-enrollment-write
+    identifiers:
+      name: discord-enrollment-write
+    attrs:
+      user_creation_mode: always_create
+      user_type: internal
+
+  - model: authentik_stages_user_login.userloginstage
+    id: discord-login
+    identifiers:
+      name: discord-login
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !KeyOf discord-enrollment
+      stage: !KeyOf discord-enrollment-write
+      order: 0
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !KeyOf discord-enrollment
+      stage: !KeyOf discord-login
+      order: 10
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !KeyOf discord-authentication
+      stage: !KeyOf discord-login
+      order: 0
+
+  - model: authentik_sources_oauth.oauthsource
+    id: discord-source
+    identifiers:
+      slug: discord
+    attrs:
+      name: Discord
+      enabled: true
+      promoted: true
+      provider_type: discord
+      consumer_key: !Env AUTHENTIK_DISCORD_CLIENT_ID
+      consumer_secret: !Env AUTHENTIK_DISCORD_CLIENT_SECRET
+      additional_scopes: guilds.members.read
+      user_matching_mode: identifier
+      group_matching_mode: name_link
+      authentication_flow: !KeyOf discord-authentication
+      enrollment_flow: !KeyOf discord-enrollment
+      user_property_mappings:
+        - !KeyOf discord-user-mapping
+
+  - model: authentik_stages_identification.identificationstage
+    state: present
+    identifiers:
+      name: default-authentication-identification
+    attrs:
+      sources:
+        - !KeyOf discord-source

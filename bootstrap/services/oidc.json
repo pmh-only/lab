@@ -7,6 +7,11 @@
     "companionSecretFields": ["OIDC_SESSION_SECRET"],
     "launchURL": "https://bgp.pmh.codes",
     "redirectURI": "https://bgp.pmh.codes/auth/callback",
+    "extraScopeMappings": [{
+      "name": "lab bootstrap: as218822 console roles",
+      "scope_name": "as218822",
+      "expression": "is_discord = user.sources.filter(slug=\"discord\").exists() or user.all_groups().filter(name=\"discord\").exists()\noperator = user.is_active and user.is_superuser and user.type == \"internal\" and not is_discord\nreturn {\"as218822_roles\": [\"operator\"] if operator else [\"user\"]}"
+    }],
     "manageReader": false
   },
   "argocd": {

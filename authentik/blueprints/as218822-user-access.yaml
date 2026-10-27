@@ -1,0 +1,25 @@
+version: 1
+metadata:
+  name: Lab - AS218822 user and operator roles
+entries:
+  - model: authentik_providers_oauth2.scopemapping
+    id: as218822-roles
+    identifiers:
+      name: "lab bootstrap: as218822 console roles"
+    attrs:
+      scope_name: as218822
+      expression: |
+        is_discord = user.sources.filter(slug="discord").exists() or user.all_groups().filter(name="discord").exists()
+        operator = user.is_active and user.is_superuser and user.type == "internal" and not is_discord
+        return {"as218822_roles": ["operator"] if operator else ["user"]}
+  - model: authentik_providers_oauth2.oauth2provider
+    state: present
+    identifiers:
+      name: "lab bootstrap: as218822"
+    attrs:
+      include_claims_in_id_token: true
+      property_mappings:
+        - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-email]]
+        - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-openid]]
+        - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile]]
+        - !KeyOf as218822-roles
