@@ -18,7 +18,7 @@ configMapGenerator:
 images:
   - name: ghcr.io/pmh-only/goaccess
     newTag: latest
-    digest: sha256:04c2d753a4f84933872a21c0cba68850ad9bc9e530557e1a0f71116686bb4e0c
+    digest: sha256:b042504ba964563360ce46273396464df7a4adbf593ad9343212c865ed8a5faf
   - name: cr.fluentbit.io/fluent/fluent-bit
     newTag: latest
     digest: sha256:2740f387f6e68fab66d28e4fa6a853387b9cab6ffb4cb78958f69bba4eb0e7b4
