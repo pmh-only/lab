@@ -53,4 +53,4 @@ patches:
 images:
   - name: ghcr.io/pmh-only/nginx
     newTag: latest
-    digest: sha256:8807f1d55ed56587d9f218792cac57f2807075dffee7b9bf4dd5d8b089055333
+    digest: sha256:2565f5f6088bd57275fa4b58a75d188d63e856f7b542220361fc185f2c95165e
