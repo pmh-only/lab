@@ -19,7 +19,7 @@ configMapGenerator:
 images:
   - name: ghcr.io/pmh-only/grafana-image-renderer
     newTag: latest
-    digest: sha256:24df1663f600abc6daa8ef006a0749c1d8f532e43a4542baf55ba15c5a3eaeac
+    digest: sha256:a7970b826f6e477461e02bf5463d92634e9ad27d525e4e50296978a2e592d2d7
   - name: ghcr.io/pmh-only/grafana
     newTag: latest
     digest: sha256:fe58e406bb8f4f790fa19739988a968ead9beb73e4a8b30384f5ce55dd919e69
