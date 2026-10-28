@@ -15,6 +15,7 @@ configMapGenerator:
   - name: grafana-dashboards
     files:
       - lab-overview.json=dashboards/lab-overview.json
+      - scd41.json=dashboards/scd41.json
 images:
   - name: ghcr.io/pmh-only/grafana-image-renderer
     newTag: latest

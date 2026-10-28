@@ -45,6 +45,48 @@ class MonitoringTests(unittest.TestCase):
             for container in doc["spec"]["template"]["spec"]["containers"]:
                 self.assertIn("@sha256:", container["image"])
 
+    def test_scd41_dashboard_uses_existing_scrape_and_reports_missing_data(self):
+        configs = {d["metadata"]["name"]: d for d in self.docs if d["kind"] == "ConfigMap"}
+        deployment = next(d for d in self.docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "grafana")
+        volume = next(v for v in deployment["spec"]["template"]["spec"]["volumes"] if v["name"] == "grafana-dashboards")
+        dashboard = json.loads(configs[volume["configMap"]["name"]]["data"]["scd41.json"])
+        self.assertEqual(dashboard["uid"], "scd41")
+        self.assertFalse(dashboard["editable"])
+        self.assertEqual(dashboard["refresh"], "15s")
+        prom = yaml.safe_load(configs["prometheus-config"]["data"]["prometheus.yml"])
+        job = next(j for j in prom["scrape_configs"] if j["job_name"] == "scd41")
+        self.assertEqual(job["static_configs"][0]["targets"], ["pmhraspberry.tailscale.svc.cluster.local:9811"])
+        instance = next(v for v in dashboard["templating"]["list"] if v["name"] == "instance")
+        self.assertIn('label_values(up{', instance["query"])
+        panels = dashboard["panels"]
+        self.assertEqual(len(panels), 11)
+        self.assertEqual(len({p["id"] for p in panels}), len(panels))
+        cells = set()
+        for panel in panels:
+            grid = panel["gridPos"]
+            self.assertLessEqual(grid["x"] + grid["w"], 24)
+            for x in range(grid["x"], grid["x"] + grid["w"]):
+                for y in range(grid["y"], grid["y"] + grid["h"]):
+                    self.assertNotIn((x, y), cells)
+                    cells.add((x, y))
+            self.assertEqual(panel["datasource"]["uid"], "${datasource}")
+            for target in panel["targets"]:
+                self.assertIn('cluster="lab",job="scd41"', target["expr"])
+                self.assertIn('instance=~"$instance"', target["expr"])
+                self.assertNotIn("or vector(0)", target["expr"])
+            if panel["id"] in {1, 2, 3, 7, 8, 9}:
+                expr = panel["targets"][0]["expr"]
+                self.assertIn("scd41_last_success_timestamp_seconds", expr)
+                self.assertIn(" < 60", expr)
+                self.assertIn("scd41_up", expr)
+                self.assertIn(" == 1", expr)
+            if panel["type"] == "stat":
+                self.assertTrue(panel["targets"][0]["instant"])
+                self.assertIn("noValue", panel["fieldConfig"]["defaults"])
+            else:
+                self.assertFalse(panel["fieldConfig"]["defaults"]["custom"]["spanNulls"])
+        self.assertIn("rate(scd41_read_errors_total", panels[-1]["targets"][0]["expr"])
+
     def test_home_dashboard_is_provisioned_read_only_and_retained(self):
         configs = {d["metadata"]["name"]: d for d in self.docs if d["kind"] == "ConfigMap"}
         provider = yaml.safe_load(configs["grafana-dashboard-provider"]["data"]["dashboards.yaml"])["providers"][0]

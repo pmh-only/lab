@@ -1,0 +1,109 @@
+{
+  "uid": "scd41",
+  "title": "SCD41 · Indoor Environment",
+  "description": "SCD41 on pmhraspberry: CO₂, temperature, humidity and sensor diagnostics. Measurements are hidden when the exporter or sensor is down, or the last measurement is older than 60 seconds. Missing data is never replaced with zero. Colour thresholds are indicative comfort/ventilation guides, not safety limits. Managed in Git.",
+  "tags": ["lab", "scd41", "pmhraspberry", "environment"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": false,
+  "graphTooltip": 1,
+  "refresh": "15s",
+  "time": {"from": "now-24h", "to": "now"},
+  "timepicker": {},
+  "annotations": {"list": []},
+  "links": [{"title": "Exporter source", "url": "https://github.com/pmh-only/scd41-exporter", "targetBlank": true}],
+  "templating": {"list": [
+    {"name": "datasource", "label": "Data source", "type": "datasource", "query": "prometheus", "regex": "/^Thanos$/", "refresh": 1, "current": {"text": "Thanos", "value": "P5DCFC7561CCDE821"}},
+    {"name": "instance", "label": "Sensor", "type": "query", "datasource": {"type": "prometheus", "uid": "${datasource}"}, "query": "label_values(up{cluster=\"lab\",job=\"scd41\"}, instance)", "refresh": 1, "sort": 1, "multi": false, "includeAll": false}
+  ]},
+  "panels": [
+    {
+      "id": 1, "title": "CO₂", "type": "stat", "gridPos": {"x": 0, "y": 0, "w": 8, "h": 5},
+      "description": "Indicative ventilation bands: below 800 ppm green, 800–999 yellow, 1000–1499 orange, 1500+ red. Not a safety assessment.",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "scd41_co2_ppm{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"} and on(job,instance) (up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (scd41_up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (time() - scd41_last_success_timestamp_seconds{cluster=\"lab\",job=\"scd41\"} < 60)", "instant": true}],
+      "fieldConfig": {"defaults": {"unit": "conppm", "decimals": 0, "noValue": "No fresh data", "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 800}, {"color": "orange", "value": 1000}, {"color": "red", "value": 1500}]}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value", "graphMode": "none"}
+    },
+    {
+      "id": 2, "title": "Temperature", "type": "stat", "gridPos": {"x": 8, "y": 0, "w": 8, "h": 5},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "scd41_temperature_celsius{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"} and on(job,instance) (up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (scd41_up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (time() - scd41_last_success_timestamp_seconds{cluster=\"lab\",job=\"scd41\"} < 60)", "instant": true}],
+      "fieldConfig": {"defaults": {"unit": "celsius", "decimals": 1, "noValue": "No fresh data", "color": {"mode": "fixed", "fixedColor": "orange"}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value", "graphMode": "none"}
+    },
+    {
+      "id": 3, "title": "Relative humidity", "type": "stat", "gridPos": {"x": 16, "y": 0, "w": 8, "h": 5},
+      "description": "Indicative comfort band 30–60%; not a safety limit.",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "scd41_relative_humidity_percent{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"} and on(job,instance) (up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (scd41_up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (time() - scd41_last_success_timestamp_seconds{cluster=\"lab\",job=\"scd41\"} < 60)", "instant": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "decimals": 1, "min": 0, "max": 100, "noValue": "No fresh data", "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "yellow", "value": null}, {"color": "green", "value": 30}, {"color": "yellow", "value": 60}, {"color": "red", "value": 80}]}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value", "graphMode": "none"}
+    },
+    {
+      "id": 4, "title": "Exporter reachable", "type": "stat", "gridPos": {"x": 0, "y": 5, "w": 8, "h": 4},
+      "description": "Prometheus scrape health, separate from sensor communication health.",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "up{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"}", "instant": true}],
+      "fieldConfig": {"defaults": {"noValue": "No scrape data", "mappings": [{"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}]}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background", "graphMode": "none"}
+    },
+    {
+      "id": 5, "title": "Sensor communication", "type": "stat", "gridPos": {"x": 8, "y": 5, "w": 8, "h": 4},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "scd41_up{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"} and on(job,instance) (up{cluster=\"lab\",job=\"scd41\"} == 1)", "instant": true}],
+      "fieldConfig": {"defaults": {"noValue": "Unknown", "mappings": [{"type": "value", "options": {"0": {"text": "ERROR", "color": "red"}, "1": {"text": "OK", "color": "green"}}}]}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background", "graphMode": "none"}
+    },
+    {
+      "id": 6, "title": "Last measurement age", "type": "stat", "gridPos": {"x": 16, "y": 5, "w": 8, "h": 4},
+      "description": "Age of last successful measurement; hidden if no successful measurement has ever been reported or exporter is unreachable. Measurements older than 60s are hidden in measurement panels.",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "(time() - (scd41_last_success_timestamp_seconds{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"} > 0)) and on(job,instance) (up{cluster=\"lab\",job=\"scd41\"} == 1)", "instant": true}],
+      "fieldConfig": {"defaults": {"unit": "s", "decimals": 0, "noValue": "Unknown", "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 30}, {"color": "red", "value": 60}]}}, "overrides": []},
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value", "graphMode": "none"}
+    },
+    {
+      "id": 7, "title": "CO₂ history", "type": "timeseries", "gridPos": {"x": 0, "y": 9, "w": 24, "h": 8},
+      "description": "Gaps indicate unavailable or stale measurements. Ventilation guide lines at 800, 1000 and 1500 ppm are not safety limits.",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "scd41_co2_ppm{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"} and on(job,instance) (up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (scd41_up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (time() - scd41_last_success_timestamp_seconds{cluster=\"lab\",job=\"scd41\"} < 60)", "legendFormat": "CO₂ · {{instance}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "conppm", "decimals": 0, "min": 0, "color": {"mode": "fixed", "fixedColor": "green"}, "custom": {"fillOpacity": 12, "lineWidth": 2, "spanNulls": false, "thresholdsStyle": {"mode": "line+area"}}, "thresholds": {"mode": "absolute", "steps": [{"color": "transparent", "value": null}, {"color": "yellow", "value": 800}, {"color": "orange", "value": 1000}, {"color": "red", "value": 1500}]}}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "mean", "max"]}, "tooltip": {"mode": "multi"}}
+    },
+    {
+      "id": 8, "title": "Temperature history", "type": "timeseries", "gridPos": {"x": 0, "y": 17, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "scd41_temperature_celsius{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"} and on(job,instance) (up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (scd41_up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (time() - scd41_last_success_timestamp_seconds{cluster=\"lab\",job=\"scd41\"} < 60)", "legendFormat": "Temperature · {{instance}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "celsius", "decimals": 1, "color": {"mode": "fixed", "fixedColor": "orange"}, "custom": {"fillOpacity": 10, "lineWidth": 2, "spanNulls": false}}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "min", "max"]}, "tooltip": {"mode": "multi"}}
+    },
+    {
+      "id": 9, "title": "Humidity history", "type": "timeseries", "gridPos": {"x": 12, "y": 17, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "scd41_relative_humidity_percent{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"} and on(job,instance) (up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (scd41_up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (time() - scd41_last_success_timestamp_seconds{cluster=\"lab\",job=\"scd41\"} < 60)", "legendFormat": "Humidity · {{instance}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "decimals": 1, "min": 0, "max": 100, "color": {"mode": "fixed", "fixedColor": "blue"}, "custom": {"fillOpacity": 10, "lineWidth": 2, "spanNulls": false}}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "min", "max"]}, "tooltip": {"mode": "multi"}}
+    },
+    {
+      "id": 10, "title": "Exporter / sensor health history", "type": "timeseries", "gridPos": {"x": 0, "y": 25, "w": 12, "h": 7},
+      "description": "Exporter: Prometheus can scrape. Sensor: latest sensor communication succeeded (only shown while exporter is reachable).",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [
+        {"refId": "A", "expr": "up{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"}", "legendFormat": "Exporter", "range": true},
+        {"refId": "B", "expr": "scd41_up{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"} and on(job,instance) (up{cluster=\"lab\",job=\"scd41\"} == 1)", "legendFormat": "Sensor", "range": true}
+      ],
+      "fieldConfig": {"defaults": {"min": 0, "max": 1, "decimals": 0, "custom": {"lineInterpolation": "stepAfter", "spanNulls": false}}, "overrides": []},
+      "options": {"legend": {"displayMode": "list", "placement": "bottom"}, "tooltip": {"mode": "multi"}}
+    },
+    {
+      "id": 11, "title": "Sensor read errors · per minute", "type": "timeseries", "gridPos": {"x": 12, "y": 25, "w": 12, "h": 7},
+      "description": "Rate of failed sensor communication attempts, scaled to errors/minute. Counter resets are handled by rate(). Missing data does not mean zero errors.",
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"refId": "A", "expr": "(60 * rate(scd41_read_errors_total{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"}[$__rate_interval])) and on(job,instance) (up{cluster=\"lab\",job=\"scd41\"} == 1)", "legendFormat": "Read errors · {{instance}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "suffix: errors/min", "min": 0, "decimals": 2, "color": {"mode": "fixed", "fixedColor": "red"}, "custom": {"fillOpacity": 15, "spanNulls": false}}, "overrides": []},
+      "options": {"legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"]}, "tooltip": {"mode": "multi"}}
+    }
+  ]
+}
