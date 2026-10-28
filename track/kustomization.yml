@@ -58,7 +58,7 @@ patches:
 images:
   - name: ghcr.io/pmh-only/dawarich
     newTag: latest
-    digest: sha256:7fd3b12cd288b8c523d7e38bfafb390d2727d73b4133877e703c11be55d79019
+    digest: sha256:4ddd2ab69675e791e5e02c814369e82e0cd39f11780395ab17773ac4470309ac
   - name: ghcr.io/pmh-only/postgis
     newTag: 17-3.5-alpine
   - name: ghcr.io/pmh-only/redis
