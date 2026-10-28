@@ -5,7 +5,7 @@
   "tags": ["lab", "scd41", "pmhraspberry", "environment"],
   "timezone": "browser",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "editable": false,
   "graphTooltip": 1,
   "refresh": "15s",
@@ -23,7 +23,7 @@
       "description": "Indicative ventilation bands: below 800 ppm green, 800–999 yellow, 1000–1499 orange, 1500+ red. Not a safety assessment.",
       "datasource": {"type": "prometheus", "uid": "${datasource}"},
       "targets": [{"refId": "A", "expr": "scd41_co2_ppm{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"} and on(job,instance) (up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (scd41_up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (time() - scd41_last_success_timestamp_seconds{cluster=\"lab\",job=\"scd41\"} < 60)", "instant": true}],
-      "fieldConfig": {"defaults": {"unit": "conppm", "decimals": 0, "noValue": "No fresh data", "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 800}, {"color": "orange", "value": 1000}, {"color": "red", "value": 1500}]}}, "overrides": []},
+      "fieldConfig": {"defaults": {"unit": "suffix: ppm", "decimals": 0, "noValue": "No fresh data", "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 800}, {"color": "orange", "value": 1000}, {"color": "red", "value": 1500}]}}, "overrides": []},
       "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "value", "graphMode": "none"}
     },
     {
@@ -69,7 +69,7 @@
       "description": "Gaps indicate unavailable or stale measurements. Ventilation guide lines at 800, 1000 and 1500 ppm are not safety limits.",
       "datasource": {"type": "prometheus", "uid": "${datasource}"},
       "targets": [{"refId": "A", "expr": "scd41_co2_ppm{cluster=\"lab\",job=\"scd41\",instance=~\"$instance\"} and on(job,instance) (up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (scd41_up{cluster=\"lab\",job=\"scd41\"} == 1) and on(job,instance) (time() - scd41_last_success_timestamp_seconds{cluster=\"lab\",job=\"scd41\"} < 60)", "legendFormat": "CO₂ · {{instance}}", "range": true}],
-      "fieldConfig": {"defaults": {"unit": "conppm", "decimals": 0, "min": 0, "color": {"mode": "fixed", "fixedColor": "green"}, "custom": {"fillOpacity": 12, "lineWidth": 2, "spanNulls": false, "thresholdsStyle": {"mode": "line+area"}}, "thresholds": {"mode": "absolute", "steps": [{"color": "transparent", "value": null}, {"color": "yellow", "value": 800}, {"color": "orange", "value": 1000}, {"color": "red", "value": 1500}]}}, "overrides": []},
+      "fieldConfig": {"defaults": {"unit": "suffix: ppm", "decimals": 0, "min": 0, "color": {"mode": "fixed", "fixedColor": "green"}, "custom": {"fillOpacity": 12, "lineWidth": 2, "spanNulls": false, "thresholdsStyle": {"mode": "line+area"}}, "thresholds": {"mode": "absolute", "steps": [{"color": "transparent", "value": null}, {"color": "yellow", "value": 800}, {"color": "orange", "value": 1000}, {"color": "red", "value": 1500}]}}, "overrides": []},
       "options": {"legend": {"displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "mean", "max"]}, "tooltip": {"mode": "multi"}}
     },
     {
