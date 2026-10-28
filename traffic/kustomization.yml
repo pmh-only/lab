@@ -24,4 +24,4 @@ images:
     digest: sha256:2740f387f6e68fab66d28e4fa6a853387b9cab6ffb4cb78958f69bba4eb0e7b4
   - name: ghcr.io/pmh-only/busybox
     newTag: latest
-    digest: sha256:31b7557d6d9e8a5402733d26b0a2e025cc080b7cc9da87f7c3303f735363f650
+    digest: sha256:acc26cdd01861f918deae268e87b15bbe179169b5fe8bc876c3f31b689db4163
