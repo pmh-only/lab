@@ -158,11 +158,11 @@ spec:
             - name: RXTXRPT
               value: "yes"
             - name: SSH_ADDRESS_FAMILY
-              # Only SSH registration/control uses IPv4 via the marked proxy.
-              # Measurement traffic keeps its IPv6 exit and IPv4 fail-closed rules.
-              value: inet
+              # Controller INIT/KEEP uses our IPv6 exit, so RIPE sees AS218822.
+              # Only bootstrap registration may bypass the exit over IPv4.
+              value: inet6
             - name: SSH_CONTROL_UNDERLAY
-              value: "1"
+              value: registration
             - name: WAIT_FOR_INTERFACE
               value: tailscale0
           resources:
