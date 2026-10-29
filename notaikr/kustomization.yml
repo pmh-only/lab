@@ -10,4 +10,4 @@ resources:
 images:
   - name: ghcr.io/pmh-only/notaikr
     newTag: latest
-    digest: sha256:56cce429f55b8411903fbcd803c3ef2b4a115161aa766d535dd53ad02f52c967
+    digest: sha256:d54f203866e70e1d069654898efdab4439295e370eec1fd71c42770bea8a2263
