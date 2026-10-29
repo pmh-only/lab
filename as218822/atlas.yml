@@ -158,7 +158,11 @@ spec:
             - name: RXTXRPT
               value: "yes"
             - name: SSH_ADDRESS_FAMILY
-              value: inet6
+              # Only SSH registration/control uses IPv4 via the marked proxy.
+              # Measurement traffic keeps its IPv6 exit and IPv4 fail-closed rules.
+              value: inet
+            - name: SSH_CONTROL_UNDERLAY
+              value: "1"
             - name: WAIT_FOR_INTERFACE
               value: tailscale0
           resources:
