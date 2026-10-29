@@ -13,7 +13,7 @@ images:
     digest: sha256:1ac80c188b56ef7dfc76562b58af264de7a8972c9b1f3110159e0cc4b1f9d365
   - name: ghcr.io/documentlane/doclane-backend
     newTag: latest
-    digest: sha256:9d1acf1d73c834014d68fdaa3b816d01969285faad80123c6443f3b450ff5e6f
+    digest: sha256:4cba53dab0811fd9bf727e8591dfc90462fc3168dd7f684192af2754f1f8bbca
   - name: ghcr.io/documentlane/doclane-worker
     newTag: latest
     digest: sha256:a795950f8f7d3de1284b87135a567563c66ced7deedceb2a285b9e6f0827092b
