@@ -38,3 +38,6 @@ images:
   - name: kopia/kopia
     newTag: latest
     digest: sha256:89fd95ee2942880ca00eae964266958a394421ddbdf69bca62e38afc55f5900e
+  - name: nginx
+    newTag: stable-alpine
+    digest: sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949
