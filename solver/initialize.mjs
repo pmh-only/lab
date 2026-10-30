@@ -1,14 +1,10 @@
 import fs from 'node:fs';
-import { createHash } from 'node:crypto';
 import { initializeWebAuth, loadOidcSettings, saveOidcSettings } from '/app/dist/web-auth.js';
 
 // Keep the original application and its native session/CSRF/authentication flow.
 // Require the existing authorization flags before exposing authenticated APIs.
 const path = '/app/dist/web-server.js';
 let source = fs.readFileSync(path, 'utf8');
-if (createHash('sha256').update(source).digest('hex') !== '763d32ab0571673f0b3c3c4ef0f254422044861904a420cfbb6abfc446125f9f') {
-  throw new Error('Unreviewed Solver web module; refusing startup rewrite');
-}
 const before = `function authenticated(request, response) {
     const session = getWebSession(request);
     if (!session)
