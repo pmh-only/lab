@@ -1,0 +1,27 @@
+version: 1
+metadata:
+  name: Lab - Solver Discord identity
+entries:
+  - model: authentik_providers_oauth2.scopemapping
+    id: solver-discord-identity
+    identifiers:
+      name: "lab bootstrap: solver Discord identity"
+    attrs:
+      scope_name: profile
+      expression: |
+        if not user.is_active:
+            return {}
+        connection = user.usersourceconnection_set.filter(source__slug="discord").first()
+        identifier = str(connection.identifier) if connection else ""
+        return {"discord_id": identifier} if identifier.isascii() and identifier.isdigit() and 17 <= len(identifier) <= 20 else {}
+
+  # Preserve the existing standard mappings and all other provider settings.
+  - model: authentik_providers_oauth2.oauth2provider
+    identifiers:
+      client_id: lab-solver
+    attrs:
+      property_mappings:
+        - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-openid]]
+        - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-email]]
+        - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile]]
+        - !KeyOf solver-discord-identity

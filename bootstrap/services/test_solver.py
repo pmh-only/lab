@@ -61,7 +61,9 @@ class SolverTests(unittest.TestCase):
         self.assertIn("if (!loadOidcSettings())", code)
         self.assertIn("if (!session.user.allowed)", code)
         self.assertIn("!session.user.admin", code)
-        self.assertIn("763d32ab0571673f0b3c3c4ef0f254422044861904a420cfbb6abfc446125f9f", code)
+        self.assertIn("source.split(before).length !== 2", code)
+        self.assertIn("Native Solver session contract differs", code)
+        self.assertNotIn("Unreviewed Solver web module", code)
         self.assertNotIn("from '/app/dist/index.js'", code)
         self.assertNotIn("allowedSubjects: '*'", code)
         declaration = json.loads((ROOT / "bootstrap/services/oidc.json").read_text())["solver"]

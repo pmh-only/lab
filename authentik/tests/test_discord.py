@@ -22,6 +22,30 @@ def expression(name, context, entries=ENTRIES):
 
 
 class DiscordTests(unittest.TestCase):
+    def test_solver_discord_identity_only_uses_verified_source_connections(self):
+        entries = yaml.load(BLUEPRINT.with_name("solver-discord-access.yaml").read_text(), Loader=yaml.BaseLoader)["entries"]
+        for identifier in ("527746745073926145", "123", "not-a-snowflake", "１" * 18, None):
+            for active in (True, False):
+                with self.subTest(identifier=identifier, active=active):
+                    user = Mock(is_active=active)
+                    user.usersourceconnection_set.filter.return_value.first.return_value = SimpleNamespace(identifier=identifier) if identifier else None
+                    expected = {"discord_id": identifier} if active and identifier == "527746745073926145" else {}
+                    self.assertEqual(expression("lab bootstrap: solver Discord identity", {"user": user}, entries), expected)
+                    if active:
+                        user.usersourceconnection_set.filter.assert_called_once_with(source__slug="discord")
+
+    def test_solver_discord_scope_matches_bootstrap_declaration(self):
+        import json
+        root = BLUEPRINT.parents[2]
+        entries = yaml.load(BLUEPRINT.with_name("solver-discord-access.yaml").read_text(), Loader=yaml.BaseLoader)["entries"]
+        declared = json.loads((root / "bootstrap/services/oidc.json").read_text())["solver"]["extraScopeMappings"][0]
+        mapping = entries[0]
+        self.assertEqual(declared["name"], mapping["identifiers"]["name"])
+        self.assertEqual(declared["expression"], mapping["attrs"]["expression"])
+        self.assertEqual(declared["scope_name"], "profile")
+        self.assertEqual(entries[1]["identifiers"], {"client_id": "lab-solver"})
+        self.assertEqual(len(entries[1]["attrs"]["property_mappings"]), 4)
+
     def test_seafile_quota_claim_is_only_issued_for_discord_users(self):
         entries = yaml.load(BLUEPRINT.with_name("seafile-discord-quota.yaml").read_text(),
                             Loader=yaml.BaseLoader)["entries"]
@@ -60,7 +84,7 @@ class DiscordTests(unittest.TestCase):
     def test_discord_allowlist_contains_only_requested_applications(self):
         user = Mock()
         user.sources.filter.return_value.exists.return_value = True
-        allowed = {"as218822", "books", "go", "immich", "meta", "pdf", "seafile"}
+        allowed = {"as218822", "books", "go", "immich", "meta", "pdf", "seafile", "solver"}
         for slug in allowed | {"argocd", "velero-ui", "kopia", "unknown"}:
             with self.subTest(slug=slug):
                 self.assertEqual(expression("discord-deny-application-access", {

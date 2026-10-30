@@ -8,7 +8,7 @@ entries:
       name: discord-deny-application-access
     attrs:
       expression: |
-        allowed_applications = {"as218822", "books", "go", "immich", "meta", "pdf", "seafile"}
+        allowed_applications = {"as218822", "books", "go", "immich", "meta", "pdf", "seafile", "solver"}
         is_discord = request.user.sources.filter(slug="discord").exists() or request.user.all_groups().filter(name="discord").exists()
         return not is_discord or getattr(request.obj, "slug", None) in allowed_applications
 
