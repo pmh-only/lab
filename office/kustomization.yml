@@ -4,7 +4,7 @@ namespace: office
 images:
   - name: ghcr.io/pmh-only/onlyoffice
     newTag: latest-linux-arm64
-    digest: sha256:cbd5df146397db1ee9bf8010fe4d851b00738b54a273d1ce737c7cbd63e0f8dd
+    digest: sha256:ca17889f10b11141cc6441836aebdd2835cf3e1b49681b2fd6e155c94b7850b3
 resources:
   - ./configmap.yml
   - ./secret.yml
