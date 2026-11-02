@@ -25,4 +25,4 @@ images:
     digest: sha256:d3f8c81fa8e4eb5649f65377418882997b8974a45762ff0704309901f70b4968
   - name: ghcr.io/pmh-only/lab-spotify
     newTag: latest
-    digest: sha256:5fee3c667d7ab758cf634f62fe45d01a1089dcee7037c0d91f70db49f4749cc9
+    digest: sha256:6d17d4e578433d0e6c66a17e4da18306eaed4a3294cda8738f074a8f8570e972
