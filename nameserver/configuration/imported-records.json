@@ -199,6 +199,7 @@
       "zone": "pmh.so",
       "emptyApexWeb": false,
       "records": [
+        {"name": "_minecraft._tcp.hawal.pmh.so", "type": "SRV", "ttl": 300, "data": {"priority": 0, "weight": 5, "port": 25565, "target": "play.pmh.codes"}},
         {"name": "pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
         {"name": "pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}},
         {"name": "*.pmh.so", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
