@@ -21,7 +21,7 @@ spec:
         fsGroup: 65532
       containers:
         - name: trace
-          image: ghcr.io/rybbit-io/rybbit-backend:latest
+          image: ghcr.io/pmh-only/lab-trace:latest
           ports:
             - containerPort: 3001
           startupProbe:

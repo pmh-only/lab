@@ -16,8 +16,7 @@ configMapGenerator:
       - redact.lua
       - backfill.conf
 images:
-  - name: ghcr.io/pmh-only/goaccess
-    newName: ghcr.io/pmh-only/lab-goaccess
+  - name: ghcr.io/pmh-only/lab-goaccess
     newTag: latest
     digest: sha256:dd049e63758e72059021534577d85bf854fdf8b0e9ace6f38c771ddb9c7c8369
   - name: cr.fluentbit.io/fluent/fluent-bit

@@ -68,6 +68,10 @@ if (!rejected) throw new Error('Changed upstream startup contract accepted');
     def test_downstream_image_updaters_cannot_bypass_reviewed_images(self):
         deployed = yaml.safe_load((ROOT / "image-updater/deployed.yml").read_text())
         expected = {"trace": "lab-trace", "spotify": "lab-spotify", "seafile": "lab-seafile", "traffic": "lab-goaccess"}
+        for app, image in expected.items():
+            images = yaml.safe_load((ROOT / app / "kustomization.yml").read_text())["images"]
+            self.assertEqual(len([i for i in images if i["name"] == f"ghcr.io/pmh-only/{image}"]), 1)
+            self.assertFalse(any(i.get("newName") == f"ghcr.io/pmh-only/{image}" for i in images))
         for item in deployed["items"]:
             app = item["metadata"]["name"]
             if app not in expected:

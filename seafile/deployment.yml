@@ -20,7 +20,7 @@ spec:
       automountServiceAccountToken: false
       initContainers:
         - name: native-initialize
-          image: seafileltd/seafile-mc:12.0.14-arm
+          image: ghcr.io/pmh-only/lab-seafile:latest
           command: [python3, /lab-config/initialize.py]
           env:
             - name: TIME_ZONE
@@ -48,7 +48,7 @@ spec:
               readOnly: true
       containers:
         - name: seafile
-          image: seafileltd/seafile-mc:12.0.14-arm
+          image: ghcr.io/pmh-only/lab-seafile:latest
           ports:
             - containerPort: 80
           startupProbe:

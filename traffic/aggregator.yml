@@ -38,7 +38,7 @@ spec:
               mountPath: /logs
       containers:
         - name: goaccess
-          image: ghcr.io/pmh-only/goaccess:latest
+          image: ghcr.io/pmh-only/lab-goaccess:latest
           args:
             - -p
             - /etc/conf/goaccess.conf

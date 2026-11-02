@@ -14,8 +14,7 @@ configMapGenerator:
       - initialize-owner.mjs
       - bootstrap.json
 images:
-  - name: ghcr.io/rybbit-io/rybbit-backend
-    newName: ghcr.io/pmh-only/lab-trace
+  - name: ghcr.io/pmh-only/lab-trace
     newTag: latest
     digest: sha256:5c21349f9cea0e500e07da7f4126a44975e46a87fe32fbefe94c94d6819447c4
   - name: ghcr.io/rybbit-io/rybbit-client

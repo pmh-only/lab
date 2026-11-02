@@ -20,7 +20,7 @@ spec:
         runAsNonRoot: true
       containers:
         - name: owner
-          image: ghcr.io/rybbit-io/rybbit-backend:latest
+          image: ghcr.io/pmh-only/lab-trace:latest
           command: [node, /bootstrap/initialize-owner.mjs]
           env:
             - name: NODE_ENV

@@ -15,7 +15,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: spotify-api
-          image: ghcr.io/yooooomi/your_spotify_server:latest
+          image: ghcr.io/pmh-only/lab-spotify:latest
           startupProbe:
             tcpSocket:
               port: 8080
