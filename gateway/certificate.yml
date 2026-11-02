@@ -3,6 +3,8 @@ kind: Certificate
 metadata:
   name: gateway-tls-secret
   namespace: gateway
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   secretTemplate:
     labels:

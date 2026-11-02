@@ -36,4 +36,3 @@ spec:
                 name: main
                 namespace: gateway
                 sectionName: http
-        waitInsteadOfSelfCheck: 30s

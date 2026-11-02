@@ -28,6 +28,7 @@ class GatewayCertificateTests(unittest.TestCase):
         self.assertEqual(set(solvers[0]["selector"]["dnsZones"]), {"as218822.net", "not.ai.kr", "pmh.so", "pmh.codes"})
         self.assertNotIn("cloudflare", solvers[0]["dns01"])
         http = next(s["http01"] for s in solvers if "http01" in s)
+        self.assertNotIn("waitInsteadOfSelfCheck", http)
         self.assertEqual(http["gatewayHTTPRoute"]["serviceType"], "ClusterIP")
         self.assertEqual(http["gatewayHTTPRoute"]["parentRefs"][0]["sectionName"], "http")
 
