@@ -16,7 +16,10 @@ for key, image in target.items():
     ], text=True).strip()
     if not digest.startswith("sha256:") or len(digest) != 71:
         raise RuntimeError("Registry returned an invalid image digest")
-    resolved[key] = image.rsplit(":", 1)[0] + "@" + digest
+    repository = image.split("@", 1)[0]
+    if ":" in repository.rsplit("/", 1)[-1]:
+        repository = repository.rsplit(":", 1)[0]
+    resolved[key] = repository + "@" + digest
 sources = [root / "images" / name / "Dockerfile"]
 sources.extend(sorted(p for p in (root / "images" / name).glob("*") if p.name != "Dockerfile"))
 extras = {"trace": ["trace/prepare-clickhouse-client.mjs"], "spotify": ["spotify/prepare-api.mjs"], "seafile": ["seafile/prepare_mysql_plugins.py"]}

@@ -16,6 +16,8 @@ Seafile deliberately remains on the approved Community 12.0 branch. The
 GoAccess image embeds the GeoIP files from the resolved upstream Rybbit image;
 they are versioned with the image, not frozen in a persistent log directory.
 No dataset download keys or runtime credentials are included in builds.
+The GoAccess base uses the deployed multiarch digest because the upstream
+`latest` channel currently lacks ARM64; GeoIP inputs still refresh daily.
 
 New GHCR packages must be made public before anonymous Kubernetes pulls can
 use them. Never work around package access by installing an expiring Actions

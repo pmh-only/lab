@@ -19,24 +19,6 @@ spec:
       automountServiceAccountToken: false
       securityContext:
         fsGroup: 65532
-      initContainers:
-        - name: native-client-compatibility
-          image: ghcr.io/rybbit-io/rybbit-backend:latest
-          command: [node, /bootstrap/prepare-clickhouse-client.mjs]
-          securityContext:
-            runAsUser: 65532
-            runAsGroup: 65532
-            runAsNonRoot: true
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            capabilities:
-              drop: [ALL]
-          volumeMounts:
-            - name: bootstrap
-              mountPath: /bootstrap
-              readOnly: true
-            - name: native-client
-              mountPath: /prepared
       containers:
         - name: trace
           image: ghcr.io/rybbit-io/rybbit-backend:latest
@@ -52,11 +34,6 @@ spec:
             httpGet:
               path: /api/health
               port: 3001
-          volumeMounts:
-            - name: native-client
-              mountPath: /app/dist/db/clickhouse/client.js
-              subPath: client.js
-              readOnly: true
           env:
             - name: NODE_ENV
               value: "production"
@@ -114,12 +91,6 @@ spec:
                 secretKeyRef:
                   name: trace-secrets
                   key: MAPBOX_TOKEN
-      volumes:
-        - name: native-client
-          emptyDir: {}
-        - name: bootstrap
-          configMap:
-            name: trace-bootstrap
 ---
 apiVersion: apps/v1
 kind: Deployment

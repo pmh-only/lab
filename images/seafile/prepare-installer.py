@@ -8,9 +8,13 @@ if len(installers) != 1:
 installer = installers[0]
 source = installer.read_text()
 patches = {
-    "    db_config.root_conn.close()": "    if db_config.root_conn:\n        db_config.root_conn.close()",
-    "    seahub_config.do_syncdb()": '    if os.environ.get("LAB_SEAFILE_NATIVE_SCHEMA_COMPLETE") != "true":\n        seahub_config.do_syncdb()',
+    "\n    seahub_config.do_syncdb()\n": '\n    if os.environ.get("LAB_SEAFILE_NATIVE_SCHEMA_COMPLETE") != "true":\n        seahub_config.do_syncdb()\n',
 }
+# Current approved upstream already guards this optional connection. Match full
+# lines so a nested native guard cannot accidentally be rewritten a second time.
+guarded_close = "\n    if db_config.root_conn:\n        db_config.root_conn.close()\n"
+if guarded_close not in source:
+    patches["\n    db_config.root_conn.close()\n"] = guarded_close
 for before, after in patches.items():
     if source.count(before) != 1:
         raise RuntimeError("Native installer differs from the reviewed compatibility contract")

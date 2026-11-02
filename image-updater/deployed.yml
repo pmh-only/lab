@@ -174,7 +174,7 @@ items:
       applicationRefs:
         - namePattern: spotify
           images:
-            - {alias: spotify, imageName: 'ghcr.io/yooooomi/your_spotify_server:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: spotify, imageName: 'ghcr.io/pmh-only/lab-spotify:latest', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: playstats, imageName: 'ghcr.io/pmh-only/playstats:latest', commonUpdateSettings: {updateStrategy: digest}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
@@ -193,7 +193,7 @@ items:
       applicationRefs:
         - namePattern: trace
           images:
-            - {alias: backend, imageName: 'ghcr.io/rybbit-io/rybbit-backend:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: backend, imageName: 'ghcr.io/pmh-only/lab-trace:latest', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: client, imageName: 'ghcr.io/rybbit-io/rybbit-client:latest', commonUpdateSettings: {updateStrategy: digest}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater

@@ -13,16 +13,6 @@ spec:
         app: spotify-api
     spec:
       automountServiceAccountToken: false
-      initContainers:
-        - name: prepare-native-api
-          image: ghcr.io/yooooomi/your_spotify_server:latest
-          command: [node, /bootstrap/prepare-api.mjs]
-          volumeMounts:
-            - name: native-bootstrap
-              mountPath: /bootstrap
-              readOnly: true
-            - name: prepared-api
-              mountPath: /prepared
       containers:
         - name: spotify-api
           image: ghcr.io/yooooomi/your_spotify_server:latest
@@ -62,18 +52,9 @@ spec:
                   name: spotify-secret
                   key: MONGO_ENDPOINT
           volumeMounts:
-            - name: prepared-api
-              mountPath: /app/apps/server/build/index.js
-              subPath: index.js
-              readOnly: true
             - mountPath: /home/node
               name: spotify-pvc
       volumes:
-        - name: native-bootstrap
-          configMap:
-            name: spotify-native-bootstrap
-        - name: prepared-api
-          emptyDir: {}
         - name: spotify-pvc
           persistentVolumeClaim:
             claimName: spotify-pvc

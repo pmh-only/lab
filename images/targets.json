@@ -9,7 +9,7 @@
     "base": "seafileltd/seafile-mc:12.0.14-arm"
   },
   "goaccess": {
-    "base": "ghcr.io/pmh-only/goaccess:latest",
+    "base": "ghcr.io/pmh-only/goaccess@sha256:30516f5e456f54267556a775680eb2dbf0ee1165eee8cd04b7b17b8337232b51",
     "geoip": "ghcr.io/rybbit-io/rybbit-backend:latest"
   }
 }
