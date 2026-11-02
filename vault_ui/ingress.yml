@@ -36,3 +36,4 @@ spec:
           kind: Service
           name: vault-ui
           port: 8200
+          weight: 1
