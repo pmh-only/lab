@@ -1,7 +1,8 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: terms-route
+  name: radio-route
+  namespace: radio
 spec:
   parentRefs:
     - group: gateway.networking.k8s.io
@@ -9,7 +10,8 @@ spec:
       name: main
       namespace: gateway
   hostnames:
-    - terms.pmh.codes
+    - ads.pmh.codes
+    - radar.pmh.codes
   rules:
     - matches:
         - path:
@@ -18,15 +20,16 @@ spec:
       backendRefs:
         - group: "gateway.envoyproxy.io"
           kind: Backend
-          name: terms-service
+          name: radio-service
           weight: 1
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: Backend
 metadata:
-  name: terms-service
+  name: radio-service
+  namespace: radio
 spec:
   endpoints:
     - fqdn:
         hostname: pmhraspberry.tailscale.svc.cluster.local
-        port: 8080
+        port: 1423

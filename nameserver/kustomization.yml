@@ -2,6 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: nameserver
 resources:
+  - ./secret.yml
+  - ./secondary-secrets.yml
   - ./deployment.yml
   - ./pvc.yml
   - ./service.yml
@@ -26,7 +28,6 @@ configMapGenerator:
       - zones/as218822.net.zone
       - configuration/records.py
       - configuration/ech.json
-# Vault authentication and Secret synchronization are owned by nameserver-secrets.
 images:
   - name: ghcr.io/pmh-only/lab-nameserver
     newTag: latest

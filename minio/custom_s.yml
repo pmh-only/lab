@@ -38,4 +38,3 @@ spec:
           response_handle:headers():remove("access-control-allow-origin")
           response_handle:headers():add("access-control-allow-origin", "*")
         end
-
