@@ -61,7 +61,7 @@ items:
       applicationRefs:
         - namePattern: guessaiword
           images:
-            - {alias: guessaiword, imageName: 'ghcr.io/pmh-only/guessaiword:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: guessaiword, imageName: 'ghcr.io/pmh-only/guess-ai-word:latest', commonUpdateSettings: {updateStrategy: digest}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: image-updater, namespace: argocd}

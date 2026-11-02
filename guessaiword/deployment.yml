@@ -20,27 +20,9 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
-      initContainers:
-        - name: copy-native-jar
-          image: ghcr.io/pmh-only/guessaiword
-          command: [cp, /app/app.jar, /source/app.jar]
-          volumeMounts:
-            - name: native-source
-              mountPath: /source
-        - name: exclude-old-configuration
-          image: python:3.14-alpine@sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72
-          command: [python, /bootstrap/prepare-jar.py]
-          volumeMounts:
-            - name: native-source
-              mountPath: /source
-            - name: prepared-jar
-              mountPath: /prepared
-            - name: native-bootstrap
-              mountPath: /bootstrap
-              readOnly: true
       containers:
         - name: guessaiword
-          image: ghcr.io/pmh-only/guessaiword
+          image: ghcr.io/pmh-only/guess-ai-word:latest
           env:
             - name: SPRING_CONFIG_LOCATION
               value: file:/app/config/application.properties
@@ -65,23 +47,12 @@ spec:
           ports:
             - containerPort: 8080
           volumeMounts:
-            - name: prepared-jar
-              mountPath: /app/app.jar
-              subPath: app.jar
-              readOnly: true
             - name: guessaiword-secret
               mountPath: "/app/config"
               readOnly: true
             - name: game-data
               mountPath: /var/lib/guessaiword
       volumes:
-        - name: native-source
-          emptyDir: {}
-        - name: prepared-jar
-          emptyDir: {}
-        - name: native-bootstrap
-          configMap:
-            name: guessaiword-native-bootstrap
         - name: guessaiword-secret
           secret:
             secretName: guessaiword-secret

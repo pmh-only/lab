@@ -8,10 +8,7 @@ resources:
   - ./pvc.yml
   # Actual native gameplay/AI/file-H2 restart persistence checked privately.
   - ./ingress.yml
-configMapGenerator:
-  - name: guessaiword-native-bootstrap
-    files: [prepare-jar.py]
 images:
-  - name: ghcr.io/pmh-only/guessaiword
+  - name: ghcr.io/pmh-only/guess-ai-word
     newTag: latest
-    digest: sha256:6e10cfc4f52be561e5e6ffccefae73fff34fb5849c29e9797a6ea7bfe5a171ae
+    digest: sha256:444ebbcc725fdf53f4ddeffd556e96235834c140bb179b8a78cb385eafbc2e3c

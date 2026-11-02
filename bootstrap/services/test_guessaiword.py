@@ -1,8 +1,5 @@
 import subprocess
-import tempfile
 import unittest
-import zipfile
-from pathlib import Path
 
 import yaml
 
@@ -60,25 +57,13 @@ class GuessAIWordTests(unittest.TestCase):
         self.assertNotIn('HttpOnly', code)
         self.assertIn('table.insert(cookies, value)', code)
 
-    def test_runtime_archive_removes_old_config_but_preserves_business_code_and_stored_libs(self):
-        with tempfile.TemporaryDirectory(prefix="guessaiword-test-", dir="/tmp/opencode" if Path("/tmp/opencode").is_dir() else None) as directory:
-            root = Path(directory)
-            source, prepared = root / "source.jar", root / "prepared.jar"
-            with zipfile.ZipFile(source, "w") as archive:
-                archive.writestr('META-INF/MANIFEST.MF', 'Main-Class: native.Launcher\n')
-                archive.writestr('BOOT-INF/classes/application.properties', 'old.compromised.fixture=not-real\n')
-                archive.writestr('BOOT-INF/classes/native/App.class', b'native-class-fixture')
-                entry = zipfile.ZipInfo('BOOT-INF/lib/native.jar')
-                entry.compress_type = zipfile.ZIP_STORED
-                archive.writestr(entry, b'unchanged-nested-library')
-            script = (ROOT / 'guessaiword/prepare-jar.py').read_text().replace("Path('/source/app.jar')", f"Path({str(source)!r})").replace("Path('/prepared/app.jar')", f"Path({str(prepared)!r})")
-            exec(compile(script, 'prepare-jar.py', 'exec'), {})
-            self.assertFalse(source.exists())
-            with zipfile.ZipFile(prepared) as archive:
-                self.assertNotIn('BOOT-INF/classes/application.properties', archive.namelist())
-                self.assertEqual(archive.read('BOOT-INF/classes/native/App.class'), b'native-class-fixture')
-                self.assertEqual(archive.read('BOOT-INF/lib/native.jar'), b'unchanged-nested-library')
-                self.assertEqual(archive.getinfo('BOOT-INF/lib/native.jar').compress_type, zipfile.ZIP_STORED)
+    def test_native_image_runs_without_runtime_archive_repacking(self):
+        pod = yaml.safe_load((ROOT / "guessaiword/deployment.yml").read_text())["spec"]["template"]["spec"]
+        self.assertNotIn("initContainers", pod)
+        self.assertEqual(pod["containers"][0]["image"], "ghcr.io/pmh-only/guess-ai-word:latest")
+        mounts = [v["mountPath"] for v in pod["containers"][0]["volumeMounts"]]
+        self.assertNotIn("/app/app.jar", mounts)
+        self.assertEqual(set(mounts), {"/app/config", "/var/lib/guessaiword"})
 
 
 if __name__ == "__main__":
