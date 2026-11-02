@@ -10,6 +10,13 @@
         }
       ],
       "records": [
+        {"name": "play.pmh.codes", "type": "A", "ttl": 300, "data": {"ipAddress": "168.107.9.91"}},
+        {"name": "mc.pmh.codes", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
+        {"name": "mc.pmh.codes", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}},
+        {"name": "map.mc.pmh.codes", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
+        {"name": "map.mc.pmh.codes", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}},
+        {"name": "_minecraft._tcp.pmh.codes", "type": "SRV", "ttl": 300, "data": {"priority": 0, "weight": 5, "port": 25565, "target": "play.pmh.codes"}},
+        {"name": "_minecraft._tcp.play.pmh.codes", "type": "SRV", "ttl": 300, "data": {"priority": 0, "weight": 5, "port": 25565, "target": "play.pmh.codes"}},
         {"name": "here.pmh.codes", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
         {"name": "here.pmh.codes", "type": "A", "ttl": 300, "data": {"ipAddress": "138.2.112.39"}},
         {"name": "*.here.pmh.codes", "type": "A", "ttl": 300, "data": {"ipAddress": "168.110.121.95"}},
