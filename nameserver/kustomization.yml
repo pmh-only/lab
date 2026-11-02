@@ -18,7 +18,12 @@ configMapGenerator:
       - configuration/settings.json
       - configuration/dns01.json
       - configuration/authoritative.json
-      - configuration/imported-records.json
+      - configuration/zones.json
+      - configuration/zonefiles.py
+      - zones/pmh.codes.zone
+      - zones/pmh.so.zone
+      - zones/not.ai.kr.zone
+      - zones/as218822.net.zone
       - configuration/records.py
       - configuration/ech.json
 # Vault authentication and Secret synchronization are owned by nameserver-secrets.

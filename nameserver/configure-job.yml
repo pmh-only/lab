@@ -22,7 +22,7 @@ spec:
         fsGroup: 65532
       containers:
         - name: configure
-          image: python:3.14-alpine@sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72
+          image: ghcr.io/pmh-only/lab-nameserver@sha256:63c4ac783e257116f105f2b55ac324a51b5c8c7ce863ed42deeef464ae30d96a
           command: ["python", "/configuration/configure.py"]
           env:
             - name: PYTHONDONTWRITEBYTECODE

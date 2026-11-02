@@ -16,6 +16,8 @@ Seafile deliberately remains on the approved Community 12.0 branch. The
 GoAccess image embeds the GeoIP files from the resolved upstream Rybbit image;
 they are versioned with the image, not frozen in a persistent log directory.
 No dataset download keys or runtime credentials are included in builds.
+The nameserver configuration image embeds hash-pinned dnspython for parsing
+the reviewed BIND zone files; the PostSync job never installs packages.
 Spotify keeps database version checks and native schema migrations synchronous;
 native missing-track repair/deduplication runs after the HTTP listener starts,
 so external API rate limits do not prevent readiness. No repair is disabled.

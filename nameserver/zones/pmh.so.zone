@@ -1,0 +1,21 @@
+; Reviewed public records. SOA, NS and DNSSEC are managed by Technitium.
+$ORIGIN pmh.so.
+$TTL 300
+
+_minecraft._tcp.hawal          IN SRV   0 5 25565 play.pmh.codes.
+@                              IN A     168.110.121.95
+@                              IN A     138.2.112.39
+*                              IN A     168.110.121.95
+*                              IN A     138.2.112.39
+here                           IN A     168.110.121.95
+here                           IN A     138.2.112.39
+s3                             IN A     168.110.121.95
+s3                             IN A     138.2.112.39
+mc                             IN A     168.110.121.95
+mc                             IN A     138.2.112.39
+*.here                         IN A     168.110.121.95
+*.here                         IN A     138.2.112.39
+*.s3                           IN A     168.110.121.95
+*.s3                           IN A     138.2.112.39
+*.mc                           IN A     168.110.121.95
+*.mc                           IN A     138.2.112.39

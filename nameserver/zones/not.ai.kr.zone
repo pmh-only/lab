@@ -1,0 +1,6 @@
+; Reviewed public records. SOA, NS and DNSSEC are managed by Technitium.
+$ORIGIN not.ai.kr.
+$TTL 300
+
+@                              IN A     168.110.121.95
+@                              IN A     138.2.112.39

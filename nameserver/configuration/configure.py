@@ -206,9 +206,10 @@ def configure(client, desired, password, dns01=None, authoritative=None, after_c
 
 def main():
     from records import reconcile_ech
+    from zonefiles import load_declaration
 
     dns01 = json.loads(Path("/configuration/dns01.json").read_text())
-    imported = json.loads(Path("/configuration/imported-records.json").read_text())
+    imported = load_declaration("/configuration", allowed_zones=dns01["zones"])
     client = Client(
         "https://nameserver.nameserver.svc.cluster.local:53443",
         Path("/run/secrets/nameserver-ca/tls.crt").read_text(),

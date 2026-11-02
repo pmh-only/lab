@@ -1,15 +1,14 @@
 """One-time, guarded migration of the game address; run before DNS reconciliation.
 
-Uses the same mounted credentials and Client as configure.py. Pass the reviewed
-imported-records.json on stdin. No unrelated records or SRV services are changed.
+Uses the same mounted credentials, zone files and Client as configure.py.
+No unrelated records or SRV services are changed.
 """
 
-import json
 from pathlib import Path
-import sys
 
 from configure import Client
 from records import canonical, reconcile
+from zonefiles import load_declaration
 
 
 def migrate(client, declaration):
@@ -56,6 +55,6 @@ if __name__ == "__main__":
         "user": "admin", "pass": Path("/run/secrets/nameserver-admin/password").read_text(),
     })["token"]
     try:
-        migrate(client, json.load(sys.stdin))
+        migrate(client, load_declaration("/configuration"))
     finally:
         client.post("user/logout")

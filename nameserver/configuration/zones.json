@@ -1,0 +1,17 @@
+{
+  "zones": [
+    {
+      "zone": "pmh.codes",
+      "emptyApexWeb": false,
+      "replaceCnames": [
+        {
+          "name": "auth.pmh.codes",
+          "expectedCname": "pmhonly-cd-wydx5vkqda3gfq8y.edge.tenants.jp.auth0.com"
+        }
+      ]
+    },
+    {"zone": "pmh.so", "emptyApexWeb": false},
+    {"zone": "not.ai.kr", "emptyApexWeb": false},
+    {"zone": "as218822.net", "emptyApexWeb": false}
+  ]
+}

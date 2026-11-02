@@ -1,0 +1,28 @@
+name: Validate DNS zone files
+on:
+  push:
+    branches: [main]
+    paths:
+      - nameserver/**
+      - images/nameserver/**
+      - .github/workflows/dns.yml
+  pull_request:
+    paths:
+      - nameserver/**
+      - images/nameserver/**
+      - .github/workflows/dns.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - run: pip install --only-binary=:all: --require-hashes -r images/nameserver/requirements.txt
+      - run: python -m unittest discover -s nameserver/configuration -p 'test_*.py'
+      - run: python nameserver/configuration/zonefiles.py nameserver/configuration nameserver/zones > /dev/null

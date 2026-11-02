@@ -5,8 +5,8 @@ The private key is never stored in Git. `nameserver/configuration/ech.json`
 contains only its public ECHConfigList, not a credential.
 
 The nameserver PostSync hook publishes HTTPS ServiceMode records with `alpn`,
-`ech`, and explicit `ipv4hint` values matching each owner's imported A records
-at every imported Gateway IPv4 owner, including existing wildcards.
+`ech`, and explicit `ipv4hint` values matching each owner's A records in
+`nameserver/zones/*.zone` at every Gateway IPv4 owner, including existing wildcards.
 It excludes external addresses (Minecraft `play`, mail CNAMEs, nameservers),
 does not introduce new DNS nodes that could shadow wildcard addresses, and
 refuses unexpected existing HTTPS records rather than replacing them. Existing
