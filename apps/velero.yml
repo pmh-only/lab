@@ -22,8 +22,107 @@ spec:
     helm:
       valueFiles:
         - $imageValues/image-updater/helm-values/velero.yml
-        - $imageValues/velero/extra-objects.yml
       valuesObject:
+        extraObjects:
+          - apiVersion: v1
+            kind: ServiceAccount
+            metadata:
+              name: vault-auth
+              namespace: velero
+              annotations:
+                argocd.argoproj.io/sync-wave: "-2"
+            automountServiceAccountToken: false
+          - apiVersion: secrets.hashicorp.com/v1beta1
+            kind: VaultAuth
+            metadata:
+              name: vault
+              namespace: velero
+              annotations:
+                argocd.argoproj.io/sync-wave: "-2"
+            spec:
+              vaultConnectionRef: vault/cluster
+              method: kubernetes
+              mount: kubernetes
+              kubernetes:
+                role: velero
+                serviceAccount: vault-auth
+                audiences: [vault]
+          - apiVersion: secrets.hashicorp.com/v1beta1
+            kind: VaultStaticSecret
+            metadata:
+              name: velero-s3
+              namespace: velero
+              annotations:
+                argocd.argoproj.io/sync-wave: "-2"
+            spec:
+              vaultAuthRef: vault
+              mount: secret
+              type: kv-v2
+              path: velero/s3
+              refreshAfter: 1m
+              destination:
+                create: true
+                overwrite: false
+                name: velero-s3
+                type: Opaque
+          - apiVersion: secrets.hashicorp.com/v1beta1
+            kind: VaultStaticSecret
+            metadata:
+              name: velero-repo-credentials
+              namespace: velero
+              annotations:
+                argocd.argoproj.io/sync-wave: "-2"
+            spec:
+              vaultAuthRef: vault
+              mount: secret
+              type: kv-v2
+              path: velero/s3
+              refreshAfter: 1m
+              destination:
+                create: true
+                overwrite: true
+                name: velero-repo-credentials
+                type: Opaque
+          - apiVersion: secrets.hashicorp.com/v1beta1
+            kind: VaultStaticSecret
+            metadata:
+              name: velero-ui-secrets
+              namespace: velero
+            spec:
+              vaultAuthRef: vault
+              mount: secret
+              type: kv-v2
+              path: velero/velero-ui-secrets
+              refreshAfter: 1m
+              destination:
+                create: true
+                overwrite: false
+                name: velero-ui-secrets
+                type: Opaque
+          - apiVersion: gateway.networking.k8s.io/v1
+            kind: HTTPRoute
+            metadata:
+              name: velero-ui-route
+              namespace: velero
+            spec:
+              parentRefs:
+                - group: gateway.networking.k8s.io
+                  kind: Gateway
+                  name: main
+                  namespace: gateway
+              hostnames:
+                - velero.pmh.codes
+              rules:
+                - matches:
+                    - path:
+                        type: PathPrefix
+                        value: /
+                  backendRefs:
+                    - group: ""
+                      kind: Service
+                      name: velero-ui
+                      port: 3000
+                      weight: 1
         # Restore the original YAML's PVC filesystem backups.
         deployNodeAgent: true
         snapshotsEnabled: false
