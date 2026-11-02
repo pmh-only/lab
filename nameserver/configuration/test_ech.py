@@ -21,9 +21,13 @@ class ECHTests(unittest.TestCase):
             self.assertEqual(path, "zones/records/add")
             self.assertEqual(payload["overwrite"], "false")
             parts = payload["svcParams"].split("|")
+            params = dict(zip(parts[::2], parts[1::2]))
+            raw = bytes.fromhex(params["ech"])
+            self.assertEqual(base64.b64encode(raw).decode(), self.desired["echConfigList"])
+            params["ech"] = raw.hex(":").upper()
             self.state.append({"name": payload["domain"], "type": "HTTPS", "rData": {
                 "svcPriority": payload["svcPriority"], "svcTargetName": "",
-                "svcParams": dict(zip(parts[::2], parts[1::2])),
+                "svcParams": params,
             }})
             return {"status": "ok"}
         self.client.post.side_effect = post

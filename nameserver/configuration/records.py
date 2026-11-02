@@ -40,7 +40,9 @@ def canonical(record_type, data):
         elif field == "svcParams":
             if not isinstance(value, dict) or set(value) != {"alpn", "ech"} or value["alpn"] != "h2,h3":
                 raise RuntimeError("Unreviewed HTTPS service parameters")
-            raw = base64.b64decode(value["ech"], validate=True)
+            # Technitium exposes ECH (SvcParamKey 5) as unknown octets in
+            # colon-hex, while the public DNS presentation uses base64.
+            raw = bytes.fromhex(value["ech"].replace(":", "")) if ":" in value["ech"] else base64.b64decode(value["ech"], validate=True)
             if len(raw) < 6 or struct.unpack("!H", raw[:2])[0] != len(raw) - 2 or raw[2:4] != b"\xfe\x0d":
                 raise RuntimeError("Malformed public ECHConfigList")
             value = {"alpn": "h2,h3", "ech": base64.b64encode(raw).decode()}
@@ -141,6 +143,7 @@ def reconcile(client, declaration, allowed_zones):
             if record_type == "TXT":
                 data["characterStringsBase64"] = ",".join(data["characterStringsBase64"])
             elif record_type == "HTTPS":
+                data["svcParams"]["ech"] = base64.b64decode(data["svcParams"]["ech"], validate=True).hex()
                 data["svcParams"] = "|".join(part for pair in sorted(data["svcParams"].items()) for part in pair)
                 data.update({"autoIpv4Hint": "false", "autoIpv6Hint": "false"})
             client.post("zones/records/add", {
