@@ -5,21 +5,29 @@ $TTL 300
 play                           IN A     168.107.9.91
 mc                             IN A     168.110.121.95
 mc                             IN A     138.2.112.39
+mc                             IN A     168.107.39.218
 map.mc                         IN A     168.110.121.95
 map.mc                         IN A     138.2.112.39
+map.mc                         IN A     168.107.39.218
 _minecraft._tcp                IN SRV   0 5 25565 play.pmh.codes.
 _minecraft._tcp.play           IN SRV   0 5 25565 play.pmh.codes.
 here                           IN A     168.110.121.95
 here                           IN A     138.2.112.39
+here                           IN A     168.107.39.218
 *.here                         IN A     168.110.121.95
 *.here                         IN A     138.2.112.39
+*.here                         IN A     168.107.39.218
 @                              IN A     168.110.121.95
 @                              IN A     138.2.112.39
+@                              IN A     168.107.39.218
 *                              IN A     168.110.121.95
+*                              IN A     138.2.112.39
+*                              IN A     168.107.39.218
 _autodiscover._tcp             IN SRV   0 0 443 autodiscover.purelymail.com.
 _dmarc                         IN CNAME dmarcroot.purelymail.com.
 auth                           IN A     138.2.112.39
 auth                           IN A     168.110.121.95
+auth                           IN A     168.107.39.218
 autoconfig                     IN CNAME autoconfig.purelymail.com.
 @                              IN MX    1 mailserver.purelymail.com.
 @                              IN TXT   "purelymail_ownership_proof=becd65c5be1aa3acf2250c722b8aef2d9adc44ec72b574f31840607c322a786beccb8efe41abed9ae3b406561d324b648c033d603d9c985d49ae951e7ffc56bc"
@@ -29,9 +37,13 @@ purelymail2._domainkey         IN CNAME key2.dkimroot.purelymail.com.
 purelymail3._domainkey         IN CNAME key3.dkimroot.purelymail.com.
 argo                           IN A     168.110.121.95
 argo                           IN A     138.2.112.39
+argo                           IN A     168.107.39.218
 pool                           IN A     168.110.121.95
 pool                           IN A     138.2.112.39
+pool                           IN A     168.107.39.218
 s                              IN A     168.110.121.95
 s                              IN A     138.2.112.39
+s                              IN A     168.107.39.218
 welplan                        IN A     168.110.121.95
 welplan                        IN A     138.2.112.39
+welplan                        IN A     168.107.39.218

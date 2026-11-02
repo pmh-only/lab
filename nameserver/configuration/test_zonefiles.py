@@ -64,6 +64,19 @@ txt IN TXT ( "one;two" "quote\034slash\092\000\255" )
         self.assertTrue(any(r["type"] == "TXT" for r in records))
         self.assertTrue(any(r["type"] == "AAAA" for r in records))
 
+    def test_all_gateway_owners_advertise_all_three_nodes(self):
+        declaration = load_declaration(CONFIGURATION, ZONES)
+        addresses = set(json.loads((CONFIGURATION / "ech.json").read_text())["gatewayIPv4"])
+        self.assertEqual(len(addresses), 3)
+        owners = {}
+        for zone in declaration["zones"]:
+            for record in zone["records"]:
+                if record["type"] == "A" and record["data"]["ipAddress"] in addresses:
+                    owners.setdefault(record["name"], set()).add(record["data"]["ipAddress"])
+        for owner, actual in owners.items():
+            with self.subTest(owner=owner):
+                self.assertEqual(actual, addresses)
+
     def test_matching_zonefiles_do_not_write_or_delete_dynamic_data(self):
         declaration = load_declaration(CONFIGURATION, ZONES)
         snapshot = [

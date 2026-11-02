@@ -82,6 +82,20 @@ class HintsTest(unittest.TestCase):
         self.assertEqual(client.records[0]["name"], "*." + OWNER)
         self.assertEqual(client.records[0]["rData"]["svcParams"]["ipv4hint"], ADDRESSES[0])
 
+    def test_expand_hints_without_changing_ech(self):
+        client = Client([https_record(ipv4hint=",".join(ADDRESSES[:2]))])
+        reconcile_ech(client, DESIRED, imported(), [OWNER])
+        self.assertEqual([path for path, _ in client.writes], ["zones/records/update"])
+        self.assertEqual(set(client.records[0]["rData"]["svcParams"]["ipv4hint"].split(",")), set(ADDRESSES))
+        reconcile_ech(client, DESIRED, imported(), [OWNER])
+        self.assertEqual(len(client.writes), 1)
+
+    def test_refuse_hint_removal(self):
+        client = Client([https_record(ipv4hint=",".join(ADDRESSES))])
+        with self.assertRaises(RuntimeError):
+            reconcile_ech(client, DESIRED, imported(ADDRESSES[:2]), [OWNER])
+        self.assertEqual(client.writes, [])
+
     def test_reject_unexpected_or_disabled_records(self):
         disabled = https_record()
         disabled["disabled"] = True

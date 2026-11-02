@@ -10,7 +10,8 @@ The nameserver PostSync hook publishes HTTPS ServiceMode records with `alpn`,
 It excludes external addresses (Minecraft `play`, mail CNAMEs, nameservers),
 does not introduce new DNS nodes that could shadow wildcard addresses, and
 refuses unexpected existing HTTPS records rather than replacing them. Existing
-records matching exactly except for a missing `ipv4hint` are updated in place;
+records matching exactly except for missing or strictly fewer reviewed
+`ipv4hint` addresses are updated in place (additions only);
 automatic hints remain disabled so only reviewed addresses are advertised.
 Technitium's API encodes ECH as hex octets; the reconciler converts those
 losslessly to/from the standard public base64 ECHConfigList.

@@ -64,7 +64,7 @@ def https_parameters(data):
     return "|".join(part for pair in sorted(params.items()) for part in pair)
 
 
-def reconcile(client, declaration, allowed_zones, *, allow_missing_ipv4_hint=False):
+def reconcile(client, declaration, allowed_zones, *, allow_ipv4_hint_expansion=False):
     plans = []
     cname_removals = []
     for zone in declaration["zones"]:
@@ -132,13 +132,16 @@ def reconcile(client, declaration, allowed_zones, *, allow_missing_ipv4_hint=Fal
                 raise RuntimeError(f"Existing disabled record needs review at {owner}")
             values = {canonical(record_type, r["rData"]) for r in selected}
             upgrades = {}
-            if record_type == "HTTPS" and allow_missing_ipv4_hint:
+            if record_type == "HTTPS" and allow_ipv4_hint_expansion:
                 for identity in expected:
-                    legacy = json.loads(identity)
-                    if "ipv4hint" in legacy["svcParams"]:
-                        del legacy["svcParams"]["ipv4hint"]
-                        old_identity = canonical("HTTPS", legacy)
-                        if old_identity in values:
+                    target = json.loads(identity)
+                    new_hints = set(target["svcParams"].pop("ipv4hint", "").split(",")) - {""}
+                    for old_identity in values - set(expected):
+                        old = json.loads(old_identity)
+                        old_hints = set(old["svcParams"].pop("ipv4hint", "").split(",")) - {""}
+                        # Only add reviewed owner addresses. ECH, ALPN, priority
+                        # and target must match exactly; removals remain manual.
+                        if old == target and old_hints < new_hints:
                             upgrades[old_identity] = identity
             if values - set(expected) - set(upgrades):
                 raise RuntimeError(f"Unexpected existing {record_type} data at {owner}; refusing to replace it")
@@ -211,4 +214,4 @@ def reconcile_ech(client, desired, imported, allowed_zones):
                 },
             }} for owner in sorted(owners)
         ]})
-    reconcile(client, {"zones": zones}, allowed_zones, allow_missing_ipv4_hint=True)
+    reconcile(client, {"zones": zones}, allowed_zones, allow_ipv4_hint_expansion=True)
