@@ -4,11 +4,14 @@ NGINX loads the existing X25519 ECH key from Vault via `gateway-ech-secrets`.
 The private key is never stored in Git. `nameserver/configuration/ech.json`
 contains only its public ECHConfigList, not a credential.
 
-The nameserver PostSync hook publishes HTTPS ServiceMode records with `alpn`
-and `ech` at every imported Gateway IPv4 owner, including existing wildcards.
+The nameserver PostSync hook publishes HTTPS ServiceMode records with `alpn`,
+`ech`, and explicit `ipv4hint` values matching each owner's imported A records
+at every imported Gateway IPv4 owner, including existing wildcards.
 It excludes external addresses (Minecraft `play`, mail CNAMEs, nameservers),
 does not introduce new DNS nodes that could shadow wildcard addresses, and
-refuses unexpected existing HTTPS records rather than replacing them.
+refuses unexpected existing HTTPS records rather than replacing them. Existing
+records matching exactly except for a missing `ipv4hint` are updated in place;
+automatic hints remain disabled so only reviewed addresses are advertised.
 Technitium's API encodes ECH as hex octets; the reconciler converts those
 losslessly to/from the standard public base64 ECHConfigList.
 

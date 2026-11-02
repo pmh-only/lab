@@ -38,14 +38,18 @@ def canonical(record_type, data):
                 raise RuntimeError("TXT character string exceeds its wire-format limit")
             value = [base64.b64encode(part).decode() for part in parts]
         elif field == "svcParams":
-            if not isinstance(value, dict) or set(value) != {"alpn", "ech"} or value["alpn"] != "h2,h3":
+            if not isinstance(value, dict) or set(value) not in ({"alpn", "ech"}, {"alpn", "ech", "ipv4hint"}) or value["alpn"] != "h2,h3":
                 raise RuntimeError("Unreviewed HTTPS service parameters")
             # Technitium exposes ECH (SvcParamKey 5) as unknown octets in
             # colon-hex, while the public DNS presentation uses base64.
             raw = bytes.fromhex(value["ech"].replace(":", "")) if ":" in value["ech"] else base64.b64decode(value["ech"], validate=True)
             if len(raw) < 6 or struct.unpack("!H", raw[:2])[0] != len(raw) - 2 or raw[2:4] != b"\xfe\x0d":
                 raise RuntimeError("Malformed public ECHConfigList")
+            hints = value.get("ipv4hint")
             value = {"alpn": "h2,h3", "ech": base64.b64encode(raw).decode()}
+            if hints is not None:
+                addresses = {ipaddress.IPv4Address(address.strip()) for address in hints.split(",")}
+                value["ipv4hint"] = ",".join(str(address) for address in sorted(addresses))
         elif type(value) is not int or not 0 <= value <= 65535:
             raise RuntimeError("DNS integer field is outside its wire-format range")
         result[field] = value
@@ -54,7 +58,13 @@ def canonical(record_type, data):
     return json.dumps(result, sort_keys=True)
 
 
-def reconcile(client, declaration, allowed_zones):
+def https_parameters(data):
+    params = dict(data["svcParams"])
+    params["ech"] = base64.b64decode(params["ech"], validate=True).hex()
+    return "|".join(part for pair in sorted(params.items()) for part in pair)
+
+
+def reconcile(client, declaration, allowed_zones, *, allow_missing_ipv4_hint=False):
     plans = []
     cname_removals = []
     for zone in declaration["zones"]:
@@ -121,9 +131,20 @@ def reconcile(client, declaration, allowed_zones):
             if any(r.get("disabled") for r in selected):
                 raise RuntimeError(f"Existing disabled record needs review at {owner}")
             values = {canonical(record_type, r["rData"]) for r in selected}
-            if values - set(expected):
+            upgrades = {}
+            if record_type == "HTTPS" and allow_missing_ipv4_hint:
+                for identity in expected:
+                    legacy = json.loads(identity)
+                    if "ipv4hint" in legacy["svcParams"]:
+                        del legacy["svcParams"]["ipv4hint"]
+                        old_identity = canonical("HTTPS", legacy)
+                        if old_identity in values:
+                            upgrades[old_identity] = identity
+            if values - set(expected) - set(upgrades):
                 raise RuntimeError(f"Unexpected existing {record_type} data at {owner}; refusing to replace it")
-            plans.append((name, owner, record_type, expected, values))
+            if upgrades and (len(values) != 1 or len(expected) != 1):
+                raise RuntimeError(f"Ambiguous HTTPS hint migration at {owner}; refusing to replace it")
+            plans.append((name, owner, record_type, expected, values, upgrades))
     # Only explicitly approved, exact old CNAMEs may be removed. Check again
     # immediately before deletion; unrelated/new data is never overwritten.
     for zone, owner, identity in cname_removals:
@@ -136,15 +157,28 @@ def reconcile(client, declaration, allowed_zones):
         remaining = client.post("zones/records/get", {"zone": zone, "domain": owner})["response"]["records"]
         if any(r["name"].rstrip(".").lower() == owner and r["type"] == "CNAME" for r in remaining):
             raise RuntimeError(f"Approved CNAME replacement did not clear the old alias at {owner}")
-    for zone, owner, record_type, expected, existing in plans:
+    for zone, owner, record_type, expected, existing, upgrades in plans:
+        for old_identity, identity in upgrades.items():
+            actual = client.post("zones/records/get", {"zone": zone, "domain": owner})["response"]["records"]
+            selected = [r for r in actual if r["name"].rstrip(".").lower() == owner and r["type"] == "HTTPS"]
+            if len(selected) != 1 or selected[0].get("disabled") or canonical("HTTPS", selected[0]["rData"]) != old_identity:
+                raise RuntimeError(f"HTTPS record changed during hint migration at {owner}; refusing update")
+            data = json.loads(identity)
+            client.post("zones/records/update", {
+                "zone": zone, "domain": owner, "type": "HTTPS", "ttl": expected[identity]["ttl"],
+                "svcPriority": data["svcPriority"], "svcTargetName": data["svcTargetName"],
+                "svcParams": https_parameters(json.loads(old_identity)), "newSvcParams": https_parameters(data),
+                "autoIpv4Hint": "false", "autoIpv6Hint": "false",
+                "comments": "Reviewed public DNS import managed by GitOps",
+            })
+            existing = (existing - {old_identity}) | {identity}
         for identity in sorted(set(expected) - existing):
             record = expected[identity]
             data = json.loads(identity)
             if record_type == "TXT":
                 data["characterStringsBase64"] = ",".join(data["characterStringsBase64"])
             elif record_type == "HTTPS":
-                data["svcParams"]["ech"] = base64.b64decode(data["svcParams"]["ech"], validate=True).hex()
-                data["svcParams"] = "|".join(part for pair in sorted(data["svcParams"].items()) for part in pair)
+                data["svcParams"] = https_parameters(data)
                 data.update({"autoIpv4Hint": "false", "autoIpv6Hint": "false"})
             client.post("zones/records/add", {
                 "zone": zone, "domain": owner, "type": record_type, "ttl": record["ttl"],
@@ -171,7 +205,10 @@ def reconcile_ech(client, desired, imported, allowed_zones):
         zones.append({"zone": zone["zone"], "records": [
             {"name": owner, "type": "HTTPS", "ttl": 300, "data": {
                 "svcPriority": 1, "svcTargetName": ".",
-                "svcParams": {"alpn": "h2,h3", "ech": desired["echConfigList"]},
+                "svcParams": {
+                    "alpn": "h2,h3", "ech": desired["echConfigList"],
+                    "ipv4hint": ",".join(sorted({r["data"]["ipAddress"] for r in records if r["name"] == owner and r["type"] == "A"})),
+                },
             }} for owner in sorted(owners)
         ]})
-    reconcile(client, {"zones": zones}, allowed_zones)
+    reconcile(client, {"zones": zones}, allowed_zones, allow_missing_ipv4_hint=True)
