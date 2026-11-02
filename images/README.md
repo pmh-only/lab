@@ -16,6 +16,9 @@ Seafile deliberately remains on the approved Community 12.0 branch. The
 GoAccess image embeds the GeoIP files from the resolved upstream Rybbit image;
 they are versioned with the image, not frozen in a persistent log directory.
 No dataset download keys or runtime credentials are included in builds.
+Spotify keeps database version checks and native schema migrations synchronous;
+native missing-track repair/deduplication runs after the HTTP listener starts,
+so external API rate limits do not prevent readiness. No repair is disabled.
 The GoAccess base uses the deployed multiarch digest because the upstream
 `latest` channel currently lacks ARM64; GeoIP inputs still refresh daily.
 

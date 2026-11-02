@@ -3,7 +3,9 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE} AS prepare
 USER root
 COPY spotify/prepare-api.mjs /image-build/prepare.mjs
+COPY images/spotify/prepare-startup.mjs /image-build/prepare-startup.mjs
 RUN mkdir /prepared && node /image-build/prepare.mjs \
+    && node /image-build/prepare-startup.mjs \
     && node --check /prepared/index.js
 
 FROM ${BASE_IMAGE}

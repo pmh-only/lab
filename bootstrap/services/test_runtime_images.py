@@ -48,6 +48,23 @@ class RuntimeImageTests(unittest.TestCase):
         self.assertEqual(lines[0], "base=ghcr.io/pmh-only/goaccess@" + digest)
         self.assertRegex(lines[-1], r"^tag=inputs-[a-f0-9]{64}$")
 
+    def test_spotify_schema_migrations_block_but_external_repairs_do_not(self):
+        script = ROOT / "images/spotify/prepare-startup.mjs"
+        code = """
+const fs = require('node:fs');
+const vm = require('node:vm');
+const patch = fs.readFileSync(process.argv[1], 'utf8').replace("import fs from 'node:fs';", '');
+const original = '        await Database.startup();\\n        server.listen(port);';
+let output;
+vm.runInNewContext(patch, { fs: { readFileSync: () => original, writeFileSync: (_path, value) => { output = value; } } });
+if (!output.includes('await Database.detectUpgrade();') || !output.includes('Database.fixMissingTrackData()') || !output.includes('Database.deletePossibleDuplicates()')) throw new Error('Native checks/repairs removed');
+if (output.indexOf('server.listen(port);') > output.indexOf('Database.fixMissingTrackData()')) throw new Error('External repairs still block listening');
+let rejected = false;
+try { vm.runInNewContext(patch, { fs: { readFileSync: () => '', writeFileSync: () => { throw new Error('Unsafe write'); } } }); } catch { rejected = true; }
+if (!rejected) throw new Error('Changed upstream startup contract accepted');
+"""
+        subprocess.run(["node", "-e", code, str(script)], check=True, capture_output=True, text=True)
+
     def test_downstream_image_updaters_cannot_bypass_reviewed_images(self):
         deployed = yaml.safe_load((ROOT / "image-updater/deployed.yml").read_text())
         expected = {"trace": "lab-trace", "spotify": "lab-spotify", "seafile": "lab-seafile", "traffic": "lab-goaccess"}
