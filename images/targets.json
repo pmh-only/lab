@@ -9,7 +9,7 @@
     "base": "ghcr.io/yooooomi/your_spotify_server:latest"
   },
   "seafile": {
-    "base": "seafileltd/seafile-mc:latest"
+    "base": "seafileltd/seafile-mc:*"
   },
   "goaccess": {
     "base": "allinurl/goaccess:latest",

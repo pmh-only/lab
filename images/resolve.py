@@ -1,6 +1,7 @@
 """Resolve immutable build inputs; never require registry access during startup."""
 import hashlib
 import json
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -11,6 +12,24 @@ root = Path(__file__).resolve().parents[1]
 target = json.loads((root / "images/targets.json").read_text())[name]
 resolved = {}
 for key, image in target.items():
+    if image.endswith(":*"):
+        # Some upstream "latest" channels still point at old major releases.
+        # Select the newest stable ARM64 release, not the most recently pushed
+        # tag (which can be a rebuild, prerelease or another architecture).
+        repository = image[:-2]
+        url = f"https://hub.docker.com/v2/repositories/{repository}/tags?page_size=100"
+        versions = []
+        while url:
+            with urllib.request.urlopen(url, timeout=30) as response:
+                page = json.load(response)
+            for tag in page["results"]:
+                match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(-arm)?", tag["name"])
+                if match and any(i.get("architecture") == "arm64" for i in tag.get("images", [])):
+                    versions.append((tuple(map(int, match.group(1, 2, 3))), not bool(match[4]), tag["name"]))
+            url = page.get("next")
+        if not versions:
+            raise RuntimeError("No stable ARM64 upstream release found")
+        image = repository + ":" + max(versions)[2]
     digest = subprocess.check_output([
         "docker", "buildx", "imagetools", "inspect", image,
         "--format", "{{.Manifest.Digest}}",
