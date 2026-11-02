@@ -10,4 +10,4 @@ resources:
 images:
   - name: ghcr.io/pmh-only/keysboard
     newTag: latest
-    digest: sha256:5a7bdc2f4632eb60229729bc1421c5846c1abd7b7a912c8a542b6f3428683e99
+    digest: sha256:99b63af57b34e517fac2351628942ddda6abd0eda74a1c643a8849bab5ff7713
