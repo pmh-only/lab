@@ -54,7 +54,3 @@ a non-member. Confirm that only the member can enroll/sign in and joins the
 Argo CD self-heals this deployment from Git. Publish the manifest changes before
 expecting the worker's custom Blueprint mount and secret environment to persist.
 An already applied Blueprint's database objects remain when its file is removed.
-
-Run expression regression tests with
-`PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s authentik/tests`
-(requires PyYAML).

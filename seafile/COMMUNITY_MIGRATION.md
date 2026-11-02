@@ -62,9 +62,3 @@ users have begun creating new files/accounts: first reconcile those new writes.
 Only re-enable automatic synchronization after the desired edition and live
 state agree. Temporary rehearsal resources are separate from production and may
 be removed after validation; never remove the migration backups as cleanup.
-
-Run quota regression tests with:
-
-```sh
-PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s seafile/tests
-```
