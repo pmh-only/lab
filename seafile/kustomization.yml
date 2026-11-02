@@ -22,7 +22,7 @@ configMapGenerator:
 images:
   - name: ghcr.io/pmh-only/lab-seafile
     newTag: latest
-    digest: sha256:bc268dc2f14037c8ca798ae049a1ebb029fc146060e73a2e7ea8beccc9412936
+    digest: sha256:358a3bcad566bccc69589763266847a81acc4012074fe721138c34c53abfc705
   - name: seafileltd/sdoc-server
     newTag: 3.0.8
   - name: seafileltd/notification-server
