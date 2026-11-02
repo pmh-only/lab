@@ -15,6 +15,10 @@ spec:
       ref: imageValues
       repoURL: https://github.com/pmh-only/lab.git
       targetRevision: HEAD
+    # The Vault chart has no extraObjects support; routing shares this app.
+    - path: vault_ui
+      repoURL: https://github.com/pmh-only/lab.git
+      targetRevision: HEAD
     - chart: vault
       repoURL: https://helm.releases.hashicorp.com
       targetRevision: x

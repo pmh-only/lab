@@ -39,34 +39,11 @@ spec:
     # Official published index; avoids the old Pages URL's HTTP redirect.
     repoURL: https://raw.githubusercontent.com/Stirling-Tools/Stirling-PDF-chart/gh-pages
     targetRevision: x
-  - repoURL: https://github.com/pmh-only/lab.git
+  # This chart has no extraObjects support; render routing/secrets in this app.
+  - path: pdf_configs
+    repoURL: https://github.com/pmh-only/lab.git
     targetRevision: main
     ref: imageValues
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - PruneLast=true
-      - ApplyOutOfSyncOnly=true
-      - CreateNamespace=true
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: pdf-configs
-  namespace: argocd
-  finalizers:
-  - resources-finalizer.argocd.argoproj.io
-spec:
-  destination:
-    namespace: pdf
-    server: https://kubernetes.default.svc
-  project: default
-  source:
-    path: pdf_configs
-    repoURL: https://github.com/pmh-only/lab.git
-    targetRevision: HEAD
   syncPolicy:
     automated:
       prune: true

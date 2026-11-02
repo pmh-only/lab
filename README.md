@@ -172,7 +172,6 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   
-  <td><img src="https://argo.pmh.codes/api/badge?name=pdf-configs&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
@@ -212,7 +211,6 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   
-  <td><img src="https://argo.pmh.codes/api/badge?name=tailscale-configs&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
   
@@ -248,10 +246,6 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   
-  <td><img src="https://argo.pmh.codes/api/badge?name=vault-ui&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
   <td><img src="https://argo.pmh.codes/api/badge?name=velero&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
@@ -260,7 +254,6 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   
-  <td><img src="https://argo.pmh.codes/api/badge?name=velero-ui-configs&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
   

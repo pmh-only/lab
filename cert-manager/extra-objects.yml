@@ -1,0 +1,121 @@
+# Render DNS-01 configuration with the cert-manager chart, not a second owner.
+# Unlike Velero, this chart expects templated YAML strings rather than maps.
+extraObjects:
+  - |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: vault-auth
+      namespace: cert-manager
+    automountServiceAccountToken: false
+  - |
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultAuth
+    metadata:
+      name: vault
+      namespace: cert-manager
+    spec:
+      vaultConnectionRef: vault/cluster
+      method: kubernetes
+      mount: kubernetes
+      kubernetes:
+        role: cert-manager
+        serviceAccount: vault-auth
+        audiences:
+          - vault
+  - |
+    apiVersion: secrets.hashicorp.com/v1beta1
+    kind: VaultStaticSecret
+    metadata:
+      name: technitium-api-token
+      namespace: cert-manager
+    spec:
+      vaultAuthRef: vault
+      mount: secret
+      type: kv-v2
+      path: cert-manager/technitium-api-token
+      refreshAfter: 1m
+      destination:
+        create: true
+        overwrite: false
+        name: technitium-api-token
+        type: Opaque
+  - |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      name: technitium-api-token-reader
+      namespace: cert-manager
+    rules:
+      - apiGroups: [""]
+        resources: ["secrets"]
+        resourceNames: ["technitium-api-token"]
+        verbs: ["get"]
+  - |
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: technitium-api-token-reader
+      namespace: cert-manager
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: technitium-api-token-reader
+    subjects:
+      - kind: ServiceAccount
+        name: cert-manager-technitium-webhook
+        namespace: cert-manager
+  # Keep separate production/staging accounts and their existing private keys.
+  - |
+    apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      name: letsencrypt-public
+    spec:
+      acme:
+        email: pmh_only@pmh.codes
+        server: https://acme-v02.api.letsencrypt.org/directory
+        privateKeySecretRef:
+          name: letsencrypt-public-account-key
+        solvers:
+          - dns01:
+              webhook:
+                groupName: acme.xver.cloud
+                solverName: technitium
+                config:
+                  serverUrl: http://nameserver.nameserver.svc.cluster.local:5380
+                  authTokenSecretRef:
+                    name: technitium-api-token
+                    key: api-token
+            selector:
+              dnsZones:
+                - as218822.net
+                - not.ai.kr
+                - pmh.so
+                - pmh.codes
+  - |
+    apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      name: letsencrypt-staging
+    spec:
+      acme:
+        email: pmh_only@pmh.codes
+        server: https://acme-staging-v02.api.letsencrypt.org/directory
+        privateKeySecretRef:
+          name: letsencrypt-staging-account-key
+        solvers:
+          - dns01:
+              webhook:
+                groupName: acme.xver.cloud
+                solverName: technitium
+                config:
+                  serverUrl: http://nameserver.nameserver.svc.cluster.local:5380
+                  authTokenSecretRef:
+                    name: technitium-api-token
+                    key: api-token
+            selector:
+              dnsZones:
+                - as218822.net
+                - pmh.so
+                - pmh.codes

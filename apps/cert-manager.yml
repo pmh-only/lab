@@ -15,6 +15,7 @@ spec:
     helm:
       valueFiles:
         - $imageValues/image-updater/helm-values/cert-manager.yml
+        - $imageValues/cert-manager/extra-objects.yml
       valuesObject:
         crds:
           enabled: true
@@ -54,8 +55,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   sources:
-    - path: cert-manager/technitium
-      ref: imageValues
+    - ref: imageValues
       repoURL: https://github.com/pmh-only/lab.git
       targetRevision: HEAD
     - chart: cert-manager-technitium-webhook
