@@ -1,8 +1,30 @@
 # Charts track latest stable releases; signed Git commits update image values.
-# All Vault components, including vault-secrets-operator, stay manually pinned.
 apiVersion: v1
 kind: List
 items:
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: vault, namespace: argocd}
+    spec:
+      writeBackConfig:
+        method: git:secret:argocd/git
+        gitConfig: {repository: 'git@github.com:pmh-only/lab.git', branch: main, writeBackTarget: 'helmvalues:/image-updater/helm-values/vault.yml'}
+      applicationRefs:
+        - namePattern: vault
+          images:
+            - {alias: vault, imageName: 'hashicorp/vault:*', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^[0-9]+\.[0-9]+\.[0-9]+$', platforms: [linux/arm64]}, manifestTargets: {helm: {tag: server.image.tag}}}
+  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+    kind: ImageUpdater
+    metadata: {name: vault-secrets-operator, namespace: argocd}
+    spec:
+      writeBackConfig:
+        method: git:secret:argocd/git
+        gitConfig: {repository: 'git@github.com:pmh-only/lab.git', branch: main, writeBackTarget: 'helmvalues:/image-updater/helm-values/vault-secrets-operator.yml'}
+      applicationRefs:
+        - namePattern: vault-secrets-operator
+          images:
+            - {alias: manager, imageName: 'hashicorp/vault-secrets-operator:*', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^[0-9]+\.[0-9]+\.[0-9]+$', platforms: [linux/arm64]}, manifestTargets: {helm: {tag: controller.manager.image.tag}}}
+            - {alias: rbac-proxy, imageName: 'quay.io/brancz/kube-rbac-proxy:*', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^v[0-9]+\.[0-9]+\.[0-9]+$', platforms: [linux/arm64]}, manifestTargets: {helm: {tag: controller.kubeRbacProxy.image.tag}}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: cert-manager, namespace: argocd}

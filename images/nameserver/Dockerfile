@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
-COPY images/nameserver/requirements.txt /image-build/requirements.txt
-RUN pip install --no-cache-dir --only-binary=:all: --require-hashes -r /image-build/requirements.txt \
-    && python -c 'import dns.zone; assert dns.__version__ == "2.9.1"'
+ARG PYTHON_REQUIREMENTS
+RUN mkdir /image-build \
+    && python -c 'import json, os, pathlib; pathlib.Path("/image-build/requirements.txt").write_text("\n".join(json.loads(os.environ["PYTHON_REQUIREMENTS"])))' \
+    && pip install --no-cache-dir --only-binary=:all: --require-hashes -r /image-build/requirements.txt \
+    && python -c 'import dns.zone'

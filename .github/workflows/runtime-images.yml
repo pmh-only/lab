@@ -65,6 +65,7 @@ jobs:
           build-args: |
             BASE_IMAGE=${{ steps.inputs.outputs.base }}
             GEOIP_IMAGE=${{ steps.inputs.outputs.geoip }}
+            PYTHON_REQUIREMENTS=${{ steps.inputs.outputs.python_requirements }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}

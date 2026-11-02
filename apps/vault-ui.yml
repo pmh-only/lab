@@ -12,7 +12,7 @@ spec:
     path: vault_ui
     repoURL: https://github.com/pmh-only/lab.git
     targetRevision: main
-  # Routing only: never sync/upgrade/restart the manually managed Vault server.
+  # Routing only; the Vault server is managed by the separate vault Application.
   syncPolicy:
     automated:
       prune: true

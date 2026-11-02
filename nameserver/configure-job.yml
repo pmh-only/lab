@@ -22,7 +22,7 @@ spec:
         fsGroup: 65532
       containers:
         - name: configure
-          image: ghcr.io/pmh-only/lab-nameserver@sha256:63c4ac783e257116f105f2b55ac324a51b5c8c7ce863ed42deeef464ae30d96a
+          image: ghcr.io/pmh-only/lab-nameserver:latest
           command: ["python", "/configuration/configure.py"]
           env:
             - name: PYTHONDONTWRITEBYTECODE

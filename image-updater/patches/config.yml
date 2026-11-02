@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-image-updater-config
+data:
+  argocd.namespace: argocd
+  watch.namespaces: argocd
+  interval: 2m
+  max_concurrent_apps: "1"
+  max_concurrent_reconciles: "4"
+  git.user: ArgoCD
+  git.email: lab@pmh.codes
+  git.commit-signing-method: ssh
+  git.commit-signing-key: /app/ssh-keys/id_rsa
+  git.commit-sign-off: "true"
+  git.commit-message-template: |
+    chore(images): update {{ .AppName }}
+
+    {{ range .AppChanges -}}
+    updates image {{ .Image }} from '{{ .OldTag }}' to '{{ .NewTag }}'
+    {{ end -}}

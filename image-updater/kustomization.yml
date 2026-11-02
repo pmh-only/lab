@@ -15,74 +15,12 @@ images:
 patches:
   - target:
       kind: CustomResourceDefinition
-    patch: |-
-      - op: add
-        path: /metadata/annotations
-        value:
-          argocd.argoproj.io/sync-wave: "-3"
+    path: patches/crd.json
   - target:
       kind: ConfigMap
       name: argocd-image-updater-config
-    patch: |-
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: argocd-image-updater-config
-      data:
-        argocd.namespace: argocd
-        watch.namespaces: argocd
-        # Leave capacity for initial-list CRs while slow registry scans requeue.
-        interval: 2m
-        max_concurrent_apps: "1"
-        max_concurrent_reconciles: "4"
-        git.user: ArgoCD
-        git.email: lab@pmh.codes
-        git.commit-signing-method: ssh
-        git.commit-signing-key: /app/ssh-keys/id_rsa
-        git.commit-sign-off: "true"
-        git.commit-message-template: |
-          chore(images): update {{ .AppName }}
-
-          {{ range .AppChanges -}}
-          updates image {{ .Image }} from '{{ .OldTag }}' to '{{ .NewTag }}'
-          {{ end -}}
+    path: patches/config.yml
   - target:
       kind: Deployment
       name: argocd-image-updater-controller
-    patch: |-
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        name: argocd-image-updater-controller
-      spec:
-        strategy:
-          type: Recreate
-        template:
-          spec:
-            containers:
-              - name: argocd-image-updater-controller
-                args:
-                  - --metrics-bind-address=:8443
-                  - run
-                  # Avoid a global warm-up barrier across all enabled apps.
-                  # Normal per-CR reconciliation populates the same cache.
-                  - --warmup-cache=false
-                # Allow a slow initial API/registry connection without restart.
-                startupProbe:
-                  httpGet:
-                    path: /readyz
-                    port: 8081
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 120
-            securityContext:
-              runAsNonRoot: true
-              runAsUser: 1000
-              runAsGroup: 1000
-              fsGroup: 1000
-            volumes:
-              - name: ssh-signing-key
-                secret:
-                  secretName: git
-                  optional: false
-                  defaultMode: 0440
+    path: patches/controller.yml

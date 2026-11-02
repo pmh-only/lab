@@ -17,7 +17,7 @@ spec:
       targetRevision: HEAD
     - chart: vault
       repoURL: https://helm.releases.hashicorp.com
-      targetRevision: 0.34.1
+      targetRevision: x
       helm:
         valueFiles:
           - $imageValues/image-updater/helm-values/vault.yml
@@ -27,6 +27,7 @@ spec:
           injector:
             enabled: false
           server:
+            updateStrategyType: RollingUpdate
             dev:
               enabled: false
             standalone:
@@ -72,9 +73,11 @@ spec:
           ui:
             enabled: true
             serviceType: ClusterIP
-  # No automated sync/prune: initialization, unseal, and upgrades are deliberate.
   # No deletion finalizer: deleting this Application must not delete Vault's data.
   syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true

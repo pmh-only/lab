@@ -4,7 +4,7 @@
 The image-updater Application owns these resources; root apps stays manual.
 Stable image versions can cross major releases; mutable channels track digests.
 Helm updates go to Git-backed values files; charts track latest stable versions.
-All Vault images and charts stay pinned.
+Vault images and charts follow stable releases; Shamir unsealing remains separate.
 """
 
 import argparse
@@ -25,7 +25,7 @@ DEPLOYED = {
 }
 HELM = {
     "cert-manager", "cert-manager-technitium-webhook", "descheduler", "envoy-gateway",
-    "otp", "pdf", "reloader", "tailscale", "velero", "velero-ui",
+    "otp", "pdf", "reloader", "tailscale", "velero", "velero-ui", "vault", "vault-secrets-operator",
 }
 ENABLED = REVIEWED | DEPLOYED | HELM | {"mail"}
 DECLARATIONS = ("reviewed.yml", "deployed.yml", "helm.yml", "mail.yml")
@@ -81,8 +81,8 @@ def main():
         images = status.get("summary", {}).get("images", [])
         for image in obj["spec"]["applicationRefs"][0]["images"]:
             repository = image["imageName"].rsplit(":", 1)[0]
-            operator_proxy = name == "tailscale" and image["alias"] == "proxy" and image.get("commonUpdateSettings", {}).get("forceUpdate")
-            if not operator_proxy and not any(actual.startswith(repository + ":") or actual.startswith(repository + "@") for actual in images):
+            force_update = image.get("commonUpdateSettings", {}).get("forceUpdate")
+            if not force_update and not any(actual.startswith(repository + ":") or actual.startswith(repository + "@") for actual in images):
                 raise RuntimeError(f"{name}: updater image is not deployed; review the stale declaration")
         prepared.append((name, obj))
     # Preflight the entire selection before creating any resources.

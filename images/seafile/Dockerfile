@@ -5,6 +5,7 @@ USER root
 COPY seafile/prepare_mysql_plugins.py /image-build/prepare_mysql_plugins.py
 COPY images/seafile/prepare-installer.py /image-build/prepare-installer.py
 RUN mkdir -p /run/mariadb-client-plugins \
+    && apt-get update \
     && python3 /image-build/prepare_mysql_plugins.py \
     && python3 /image-build/prepare-installer.py
 

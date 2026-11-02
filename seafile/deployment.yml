@@ -40,6 +40,14 @@ spec:
                 secretKeyRef:
                   name: seafile-secrets
                   key: DB_PASSWORD
+            - name: SEAFILE_MYSQL_DB_HOST
+              value: "$(DB_HOST)"
+            - name: SEAFILE_MYSQL_DB_PORT
+              value: "$(DB_PORT)"
+            - name: SEAFILE_MYSQL_DB_USER
+              value: "$(DB_USER)"
+            - name: SEAFILE_MYSQL_DB_PASSWORD
+              value: "$(DB_PASSWORD)"
           volumeMounts:
             - name: seafile-storage
               mountPath: /shared
@@ -102,6 +110,20 @@ spec:
                 secretKeyRef:
                   name: seafile-secrets
                   key: DB_PASSWORD
+            - name: SEAFILE_MYSQL_DB_HOST
+              value: "$(DB_HOST)"
+            - name: SEAFILE_MYSQL_DB_PORT
+              value: "$(DB_PORT)"
+            - name: SEAFILE_MYSQL_DB_USER
+              value: "$(DB_USER)"
+            - name: SEAFILE_MYSQL_DB_PASSWORD
+              value: "$(DB_PASSWORD)"
+            - name: CACHE_PROVIDER
+              value: memcached
+            - name: MEMCACHED_HOST
+              value: memcached
+            - name: MEMCACHED_PORT
+              value: "11211"
             - name: OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:

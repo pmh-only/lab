@@ -28,6 +28,9 @@ configMapGenerator:
       - configuration/ech.json
 # Vault authentication and Secret synchronization are owned by nameserver-secrets.
 images:
+  - name: ghcr.io/pmh-only/lab-nameserver
+    newTag: latest
+    digest: sha256:63c4ac783e257116f105f2b55ac324a51b5c8c7ce863ed42deeef464ae30d96a
   - name: ghcr.io/pmh-only/technitium
     newTag: latest
     digest: sha256:00cea6a251adfef4f7cb10d6b7c8bd16c7701e28f23dd01430da0f9b7c6f2e46
