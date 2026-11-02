@@ -15,8 +15,8 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: migrate
-          image: node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
-          command: [node, /bootstrap/migrate.cjs]
+          image: ghcr.io/pmh-only/keysboard:latest
+          command: [node, /opt/migrator/node_modules/prisma/build/index.js, migrate, deploy, --schema=/app/prisma/schema.prisma]
           env:
             - name: DATABASE_URL
               valueFrom:
@@ -33,11 +33,3 @@ spec:
               memory: 128Mi
             limits:
               memory: 512Mi
-          volumeMounts:
-            - name: migration
-              mountPath: /bootstrap
-              readOnly: true
-      volumes:
-        - name: migration
-          configMap:
-            name: keysboard-migration

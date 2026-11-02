@@ -11,7 +11,7 @@ from provision import ROOT
 
 class RuntimeImageTests(unittest.TestCase):
     def test_migrated_services_do_not_rewrite_application_code_at_startup(self):
-        for app, image in [("solver", "solver"), ("trace", "lab-trace"), ("spotify", "lab-spotify")]:
+        for app, image in [("solver", "solver"), ("trace", "lab-trace"), ("spotify", "lab-spotify"), ("thepool", "thepool"), ("keysboard", "keysboard")]:
             docs = list(yaml.safe_load_all(subprocess.check_output(
                 ["kubectl", "kustomize", str(ROOT / app)], text=True)))
             found = False
@@ -29,6 +29,14 @@ class RuntimeImageTests(unittest.TestCase):
                 for container in pod.get("initContainers", []):
                     self.assertNotIn(container["name"], ["native-client-compatibility", "prepare-native-api"])
             self.assertTrue(found, app)
+
+    def test_keysboard_migrates_with_the_exact_application_image_and_no_downloads(self):
+        docs = list(yaml.safe_load_all(subprocess.check_output(
+            ["kubectl", "kustomize", str(ROOT / "keysboard")], text=True)))
+        app = next(d for d in docs if d["kind"] == "Deployment")["spec"]["template"]["spec"]["containers"][0]
+        job = next(d for d in docs if d["kind"] == "Job")["spec"]["template"]["spec"]["containers"][0]
+        self.assertEqual(app["image"], job["image"])
+        self.assertEqual(job["command"], ["node", "/opt/migrator/node_modules/prisma/build/index.js", "migrate", "deploy", "--schema=/app/prisma/schema.prisma"])
 
     def test_resolver_handles_digest_pinned_inputs_without_corrupting_repository(self):
         digest = "sha256:" + "a" * 64

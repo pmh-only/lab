@@ -8,14 +8,6 @@ resources:
   - ./certificate.yml
   # Native storage roundtrip/cleanup, OAuth guards and private TLS verified.
   - ./ingress.yml
-configMapGenerator:
-  - name: thepool-native-bootstrap
-    files:
-      - source.json
-      - prepare.go
-      - security.go
-      - security_test.go
-      - storage_probe_test.go
 images:
   - name: ghcr.io/pmh-only/thepool
     newTag: latest
