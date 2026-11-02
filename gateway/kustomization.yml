@@ -8,27 +8,6 @@ resources:
   - ./envoy.yml
   - ./backend-policy.yml
   - ./service-alias.yml
-  - ./public-certificate.yml
-# First issue the complete original certificate while the current edge
-# certificate continues serving. Remove this mount override after Ready=True.
-patches:
-  - target:
-      group: apps
-      version: v1
-      kind: DaemonSet
-      name: gateway-nginx
-    patch: |-
-      apiVersion: apps/v1
-      kind: DaemonSet
-      metadata:
-        name: gateway-nginx
-      spec:
-        template:
-          spec:
-            volumes:
-              - name: tls
-                secret:
-                  secretName: gateway-pmh-codes-tls
 images:
   - name: ghcr.io/pmh-only/nginx
     newTag: latest

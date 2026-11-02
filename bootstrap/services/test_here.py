@@ -16,7 +16,7 @@ class HereDomainMigrationTests(unittest.TestCase):
         env = {e["name"]: e for e in deployment["spec"]["template"]["spec"]["containers"][0]["env"]}
         self.assertEqual(env["HTTP_HOST_SUFFIX"]["value"], ".here.pmh.codes")
         self.assertEqual(env["SSH_DOMAIN"]["value"], "here.pmh.codes")
-        certificate = yaml.safe_load((ROOT / "gateway/public-certificate.yml").read_text())
+        certificate = next(d for d in yaml.safe_load_all((ROOT / "gateway/certificate.yml").read_text()) if d["kind"] == "Certificate")
         self.assertIn("*.here.pmh.codes", certificate["spec"]["dnsNames"])
         self.assertIn("*.here.pmh.so", certificate["spec"]["dnsNames"])
 

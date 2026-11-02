@@ -27,10 +27,9 @@ class OriginalGatewayTests(unittest.TestCase):
         current = next(d for d in self.rendered if d["kind"] == "Service" and d["metadata"]["name"] == "gateway-nginx")
         self.assertEqual(current["spec"], original["spec"])
 
-    def test_original_daemonset_except_fresh_certificate_reference(self):
+    def test_original_daemonset_certificate_reference(self):
         original = next(d for d in self.original if d["kind"] == "DaemonSet")["spec"]
         current = next(d for d in self.rendered if d["kind"] == "DaemonSet")["spec"]
-        original["template"]["spec"]["volumes"][0]["secret"]["secretName"] = "gateway-pmh-codes-tls"
         # Kustomize resolves the existing pinned image, as it did before bootstrap.
         image = current["template"]["spec"]["containers"][0]["image"]
         self.assertIn("@sha256:", image)
@@ -48,8 +47,8 @@ class OriginalGatewayTests(unittest.TestCase):
         self.assertFalse(any(d["kind"] == "SealedSecret" for d in self.rendered))
         certificates = [d for d in self.rendered if d["kind"] == "Certificate"]
         self.assertEqual(len(certificates), 1)
-        self.assertEqual(certificates[0]["spec"]["secretName"], "gateway-pmh-codes-tls")
-        self.assertNotIn("ipAddresses", certificates[0]["spec"])
+        self.assertEqual(certificates[0]["spec"]["secretName"], "gateway-tls-secret")
+        self.assertEqual(set(certificates[0]["spec"]["ipAddresses"]), {"168.110.121.95", "138.2.112.39", "168.107.39.218"})
 
     def test_original_issuer_keeps_profile_without_fabricating_cloudflare_credentials(self):
         issuer = next(d["spec"]["acme"] for d in self.rendered if d["kind"] == "ClusterIssuer" and d["metadata"]["name"] == "letsencrypt")

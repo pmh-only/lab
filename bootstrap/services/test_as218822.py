@@ -21,7 +21,7 @@ class AS218822Tests(unittest.TestCase):
         self.assertEqual(api["backendRefs"], [{"name": "looking-glass", "port": 8080}])
         self.assertEqual(api["filters"][0]["requestHeaderModifier"]["remove"], ["Origin"])
         self.assertEqual(website["backendRefs"], [{"name": "website", "port": 80}])
-        certificate = yaml.safe_load((ROOT / "gateway/public-certificate.yml").read_text())
+        certificate = next(d for d in yaml.safe_load_all((ROOT / "gateway/certificate.yml").read_text()) if d["kind"] == "Certificate")
         self.assertIn("as218822.net", certificate["spec"]["dnsNames"])
         issuer = yaml.safe_load((ROOT / "cert-manager/technitium/production-issuer.yml").read_text())
         self.assertIn("as218822.net", issuer["spec"]["acme"]["solvers"][0]["selector"]["dnsZones"])

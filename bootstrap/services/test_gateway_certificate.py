@@ -18,8 +18,20 @@ class GatewayCertificateTests(unittest.TestCase):
         self.assertEqual(cert["spec"]["issuerRef"]["name"], "letsencrypt")
         self.assertEqual(cert["spec"]["renewBefore"], "48h")
         self.assertEqual(cert["spec"]["secretTemplate"]["labels"]["edge.pmh.codes/reload"], "true")
-        previous = yaml.safe_load((ROOT / "gateway/public-certificate.yml").read_text())
-        self.assertEqual(set(cert["spec"]["dnsNames"]), set(previous["spec"]["dnsNames"]))
+        self.assertEqual(set(cert["spec"]["dnsNames"]), {
+            "pmh.codes", "*.pmh.codes", "pmh.so", "*.pmh.so", "as218822.net", "not.ai.kr",
+            "*.here.pmh.codes", "*.here.pmh.so", "*.s3.pmh.codes", "*.s3.pmh.so",
+            "*.mc.pmh.codes", "*.mc.pmh.so", "*.a.certificate.for.pmh.codes",
+        })
+
+    def test_edge_mounts_the_single_original_certificate_without_migration_patches(self):
+        certs = [d for d in self.docs if d["kind"] == "Certificate"]
+        self.assertEqual(len(certs), 1)
+        daemon = next(d for d in self.docs if d["kind"] == "DaemonSet")
+        tls = next(v for v in daemon["spec"]["template"]["spec"]["volumes"] if v["name"] == "tls")
+        self.assertEqual(tls["secret"]["secretName"], certs[0]["spec"]["secretName"])
+        self.assertFalse((ROOT / "gateway/public-certificate.yml").exists())
+        self.assertNotIn("patches", yaml.safe_load((ROOT / "gateway/kustomization.yml").read_text()))
 
     def test_ip_http01_and_all_dns_names_have_real_solvers(self):
         issuer = next(d for d in self.docs if d["kind"] == "ClusterIssuer")
