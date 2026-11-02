@@ -18,7 +18,7 @@ spec:
         - /spec/externalName
       kind: Service
   sources:
-    - path: tailscale_auth
+    - path: tailscale
       ref: imageValues
       repoURL: https://github.com/pmh-only/lab.git
       targetRevision: main

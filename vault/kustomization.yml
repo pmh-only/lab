@@ -2,10 +2,17 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: vault
 resources:
+  - certificate.yml
   - ingress.yml
+  - backup-cronjob.yml
+  - backup-secret.yml
 configMapGenerator:
   - name: vault-ui-backend-ca
     files:
       - ca.crt=backend-ca.crt
     options:
       disableNameSuffixHash: true
+  - name: vault-backup-scripts
+    files:
+      - snapshot.py
+      - upload.sh

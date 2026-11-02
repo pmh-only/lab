@@ -12,7 +12,11 @@ spec:
   hostnames:
     - blog.pmh.codes
   rules:
-    - backendRefs: []
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs: []
 ---
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyExtensionPolicy
