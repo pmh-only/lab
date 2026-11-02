@@ -20,23 +20,8 @@ configMapGenerator:
     files:
       - initialize-owner.py
       - bootstrap.json
-# Backups to the real Tailscale/S3 target remain deferred as requested.
-# Native Immich local database backup features are not disabled.
-patches:
-  - target:
-      kind: Deployment
-      name: pgsql
-    patch: |-
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        name: pgsql
-      spec:
-        template:
-          spec:
-            initContainers:
-              - name: backpack
-                $patch: delete
+# Database offsite backups are managed by the backup CronJobs, not a sidecar.
+# Native Immich local database backups remain enabled.
 images:
   - name: ghcr.io/immich-app/immich-server
     newTag: release
