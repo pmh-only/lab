@@ -11,7 +11,6 @@ resources:
 images:
   - name: quay.io/argoprojlabs/argocd-image-updater
     newTag: v1.4.0
-    digest: sha256:a8054f5b48e0e40318d7026c50486e72acb341a4d801c32fb70ac20101cdce10
 patches:
   - target:
       kind: CustomResourceDefinition
