@@ -1,7 +1,7 @@
 operatorConfig:
   image:
     repository: tailscale/k8s-operator
-    tag: v1.104.2
+    tag: v1.104.4
 proxyConfig:
   image:
     repository: tailscale/tailscale
