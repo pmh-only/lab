@@ -16,7 +16,7 @@ import yaml
 
 REVIEWED = {
     "books", "chatsolution", "connect", "go", "heartbeat",
-    "here", "indexgen", "keysboard", "meta", "speed", "stmt",
+    "here", "indexgen", "keysboard", "speed", "stmt",
 }
 DEPLOYED = {
     "as218822", "authentik", "database", "gateway", "guessaiword", "image-updater", "immich",

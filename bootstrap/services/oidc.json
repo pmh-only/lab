@@ -158,13 +158,6 @@
     "launchURL": "https://link.pmh.codes",
     "redirectURI": "https://link.pmh.codes/oauth2/callback"
   },
-  "meta": {
-    "namespace": "meta",
-    "vaultPath": "meta/meta-auth-secrets",
-    "clientID": "f121rKrivB4rDKxIJ8K5aQsu5Zi53geShPlr2rRc",
-    "launchURL": "https://meta.pmh.codes",
-    "redirectURI": "https://meta.pmh.codes/oauth2/callback"
-  },
   "stmt": {
     "namespace": "stmt",
     "vaultPath": "stmt/stmt-secret",
