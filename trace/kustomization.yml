@@ -16,7 +16,7 @@ configMapGenerator:
 images:
   - name: ghcr.io/pmh-only/lab-trace
     newTag: latest
-    digest: sha256:5c21349f9cea0e500e07da7f4126a44975e46a87fe32fbefe94c94d6819447c4
+    digest: sha256:3412790f50344b3a3bbc42b6ab59c94b053d9ffdc1de1c45a89463bb9b3864f8
   - name: ghcr.io/rybbit-io/rybbit-client
     newTag: latest
     digest: sha256:9beb1cfe74bbb3bf7d7a74cf5d3b07639610637909f0dfafaa87d3a76b91ce2a
