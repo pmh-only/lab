@@ -1,2 +1,0 @@
-# Stable node identity; avoid scanning the host BGP IPv6 full table on boot.
-node-ip: 10.0.0.10

@@ -1,3 +1,0 @@
-cryptography==50.0.0
-PyYAML==6.0.3
-minio==7.2.20
