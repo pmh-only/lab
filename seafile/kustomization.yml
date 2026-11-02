@@ -24,9 +24,9 @@ images:
     newTag: latest
     digest: sha256:bc268dc2f14037c8ca798ae049a1ebb029fc146060e73a2e7ea8beccc9412936
   - name: seafileltd/sdoc-server
-    newTag: 1.0.5-arm
+    newTag: 3.0.8
   - name: seafileltd/notification-server
-    newTag: 13.0.7-arm
+    newTag: 14.0.8
   - name: memcached
     newTag: 1.6.45-alpine
   - name: elasticsearch
