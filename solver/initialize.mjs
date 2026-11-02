@@ -1,36 +1,4 @@
-import fs from 'node:fs';
 import { initializeWebAuth, loadOidcSettings, saveOidcSettings } from '/app/dist/web-auth.js';
-
-// Keep the original application and its native session/CSRF/authentication flow.
-// Require the existing authorization flags before exposing authenticated APIs.
-const path = '/app/dist/web-server.js';
-let source = fs.readFileSync(path, 'utf8');
-const before = `function authenticated(request, response) {
-    const session = getWebSession(request);
-    if (!session)
-        sendJson(response, 401, { error: 'Authentication required' });
-    return session;
-}`;
-const after = `function authenticated(request, response) {
-    const session = getWebSession(request);
-    if (!session) {
-        sendJson(response, 401, { error: 'Authentication required' });
-        return null;
-    }
-    if (!session.user.allowed) {
-        sendJson(response, 403, { error: 'Web assistant access is not allowed for this identity' });
-        return null;
-    }
-    const path = new URL(request.url || '/', 'http://solver.invalid').pathname;
-    if (path.startsWith('/api/admin/') && !session.user.admin) {
-        sendJson(response, 403, { error: 'Administrator access required' });
-        return null;
-    }
-    return session;
-}`;
-if (source.split(before).length !== 2) throw new Error('Native Solver session contract differs');
-source = source.replace(before, after);
-fs.writeFileSync('/prepared/web-server.js', source, { mode: 0o444 });
 
 // Initialize only configuration, before any HTTP listener, Discord or AI work.
 // Preserve subsequent settings made through the original native web interface.

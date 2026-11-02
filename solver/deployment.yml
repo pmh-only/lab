@@ -28,7 +28,7 @@ spec:
           command: [/bin/sh, -ec]
           args:
             - |
-              chown 1000:1000 /data /prepared
+              chown 1000:1000 /data
               exec gosu agent node /bootstrap/initialize.mjs
           env:
             - name: KV_STORE_PATH
@@ -54,8 +54,6 @@ spec:
             - name: native-bootstrap
               mountPath: /bootstrap
               readOnly: true
-            - name: prepared-native
-              mountPath: /prepared
       containers:
         - name: solver
           image: ghcr.io/pmh-only/solver:latest
@@ -120,10 +118,6 @@ spec:
               name: solver-pvc
             - name: docker-sock
               mountPath: /var/run
-            - name: prepared-native
-              mountPath: /app/dist/web-server.js
-              subPath: web-server.js
-              readOnly: true
             - name: cluster-view
               mountPath: /var/run/secrets/kubernetes.io/serviceaccount
               readOnly: true
@@ -183,8 +177,6 @@ spec:
         - name: native-bootstrap
           configMap:
             name: solver-native-bootstrap
-        - name: prepared-native
-          emptyDir: {}
         # Keep the original read-only Kubernetes view capability in Solver only.
         # Docker and bootstrap containers receive no Kubernetes API token.
         - name: cluster-view

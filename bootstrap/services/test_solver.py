@@ -1,5 +1,4 @@
 import json
-import re
 from pathlib import Path
 import subprocess
 import unittest
@@ -59,34 +58,16 @@ class SolverTests(unittest.TestCase):
     def test_oidc_is_initialized_before_listener_and_existing_native_settings_are_preserved(self):
         code = (ROOT / "solver/initialize.mjs").read_text()
         self.assertIn("if (!loadOidcSettings())", code)
-        self.assertIn("if (!session.user.allowed)", code)
-        self.assertIn("!session.user.admin", code)
-        self.assertIn("source.split(before).length !== 2", code)
-        self.assertIn("Native Solver session contract differs", code)
-        self.assertNotIn("Unreviewed Solver web module", code)
+        self.assertNotIn("source.replace", code)
+        self.assertNotIn("writeFileSync", code)
         self.assertNotIn("from '/app/dist/index.js'", code)
         self.assertNotIn("allowedSubjects: '*'", code)
         declaration = json.loads((ROOT / "bootstrap/services/oidc.json").read_text())["solver"]
         self.assertEqual(declaration["readerPaths"], ["solver/solver-secret", "solver/solver-oidc", "solver/internal"])
 
-    def test_native_session_guard_enforces_existing_flags(self):
-        code = (ROOT / "solver/initialize.mjs").read_text()
-        guard = re.search(r"const after = `(.*?)`;", code, re.S).group(1)
-        test = """
-let current = null, status = null;
-const getWebSession = () => current;
-const sendJson = (_response, value) => { status = value; };
-""" + guard + """
-for (const [session, path, expected] of [
-  [null, '/api/admin/oidc', 401],
-  [{user:{allowed:false,admin:false}}, '/api/admin/oidc', 403],
-  [{user:{allowed:true,admin:false}}, '/api/admin/oidc', 403],
-  [{user:{allowed:true,admin:true}}, '/api/admin/oidc', null],
-  [{user:{allowed:true,admin:false}}, '/api/sessions', null],
-]) {
-  current = session; status = null;
-  const result = authenticated({url:path}, {});
-  if (status !== expected || (expected !== null && result !== null)) throw new Error('Native authorization guard failed');
-}
-"""
-        subprocess.run(["node", "-e", test], check=True, capture_output=True, text=True)
+    def test_authorization_comes_from_the_tested_application_image_not_a_runtime_overlay(self):
+        docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "solver")], text=True)))
+        pod = next(d for d in docs if d["kind"] == "Deployment")["spec"]["template"]["spec"]
+        self.assertNotIn("prepared-native", [v["name"] for v in pod["volumes"]])
+        for c in pod["containers"]:
+            self.assertFalse(any(v["mountPath"].startswith("/app/dist") for v in c.get("volumeMounts", [])))

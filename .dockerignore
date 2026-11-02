@@ -1,0 +1,12 @@
+**
+!images/
+!images/**
+!trace/
+trace/**
+!trace/prepare-clickhouse-client.mjs
+!spotify/
+spotify/**
+!spotify/prepare-api.mjs
+!seafile/
+seafile/**
+!seafile/prepare_mysql_plugins.py

@@ -1,0 +1,15 @@
+{
+  "trace": {
+    "base": "ghcr.io/rybbit-io/rybbit-backend:latest"
+  },
+  "spotify": {
+    "base": "ghcr.io/yooooomi/your_spotify_server:latest"
+  },
+  "seafile": {
+    "base": "seafileltd/seafile-mc:12.0.14-arm"
+  },
+  "goaccess": {
+    "base": "ghcr.io/pmh-only/goaccess:latest",
+    "geoip": "ghcr.io/rybbit-io/rybbit-backend:latest"
+  }
+}
