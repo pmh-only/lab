@@ -3,14 +3,16 @@
 import base64
 import ipaddress
 import json
+import struct
 
 
 FIELDS = {
     "A": ("ipAddress",), "AAAA": ("ipAddress",), "CNAME": ("cname",),
     "MX": ("preference", "exchange"), "SRV": ("priority", "weight", "port", "target"),
     "TXT": ("characterStringsBase64",),
+    "HTTPS": ("svcPriority", "svcTargetName", "svcParams"),
 }
-DOMAIN_FIELDS = {"cname", "exchange", "target"}
+DOMAIN_FIELDS = {"cname", "exchange", "target", "svcTargetName"}
 WEB_TYPES = {"A", "AAAA", "CNAME", "ANAME", "APP", "HTTPS", "SVCB"}
 DNSSEC_TYPES = {"RRSIG", "NSEC", "NSEC3", "NSEC3PARAM", "DNSKEY", "CDS", "CDNSKEY"}
 
@@ -35,9 +37,18 @@ def canonical(record_type, data):
             if any(len(part) > 255 for part in parts):
                 raise RuntimeError("TXT character string exceeds its wire-format limit")
             value = [base64.b64encode(part).decode() for part in parts]
+        elif field == "svcParams":
+            if not isinstance(value, dict) or set(value) != {"alpn", "ech"} or value["alpn"] != "h2,h3":
+                raise RuntimeError("Unreviewed HTTPS service parameters")
+            raw = base64.b64decode(value["ech"], validate=True)
+            if len(raw) < 6 or struct.unpack("!H", raw[:2])[0] != len(raw) - 2 or raw[2:4] != b"\xfe\x0d":
+                raise RuntimeError("Malformed public ECHConfigList")
+            value = {"alpn": "h2,h3", "ech": base64.b64encode(raw).decode()}
         elif type(value) is not int or not 0 <= value <= 65535:
             raise RuntimeError("DNS integer field is outside its wire-format range")
         result[field] = value
+    if record_type == "HTTPS" and (result["svcPriority"] != 1 or result["svcTargetName"] != "."):
+        raise RuntimeError("ECH records must use ServiceMode at the existing address owner")
     return json.dumps(result, sort_keys=True)
 
 
@@ -129,6 +140,9 @@ def reconcile(client, declaration, allowed_zones):
             data = json.loads(identity)
             if record_type == "TXT":
                 data["characterStringsBase64"] = ",".join(data["characterStringsBase64"])
+            elif record_type == "HTTPS":
+                data["svcParams"] = "|".join(part for pair in sorted(data["svcParams"].items()) for part in pair)
+                data.update({"autoIpv4Hint": "false", "autoIpv6Hint": "false"})
             client.post("zones/records/add", {
                 "zone": zone, "domain": owner, "type": record_type, "ttl": record["ttl"],
                 "overwrite": "false", "comments": "Reviewed public DNS import managed by GitOps", **data,
@@ -138,3 +152,23 @@ def reconcile(client, declaration, allowed_zones):
         if values != set(expected):
             raise RuntimeError(f"Public DNS import verification failed at {owner} ({record_type})")
     print(f"Reviewed {sum(len(p[3]) for p in plans)} public DNS records match Git; declared apex and mail policies preserved")
+
+
+def reconcile_ech(client, desired, imported, allowed_zones):
+    """Publish only at existing Gateway address owners, preserving wildcard DNS."""
+    zones = []
+    addresses = set(desired["gatewayIPv4"])
+    for zone in imported["zones"]:
+        records = zone["records"]
+        owners = {r["name"] for r in records if r["type"] == "A" and r["data"]["ipAddress"] in addresses}
+        # Never advertise the Gateway's ECH config at a mixed/foreign address.
+        for owner in owners:
+            if any(r["name"] == owner and r["type"] == "A" and r["data"]["ipAddress"] not in addresses for r in records):
+                raise RuntimeError("ECH owner has a non-Gateway address")
+        zones.append({"zone": zone["zone"], "records": [
+            {"name": owner, "type": "HTTPS", "ttl": 300, "data": {
+                "svcPriority": 1, "svcTargetName": ".",
+                "svcParams": {"alpn": "h2,h3", "ech": desired["echConfigList"]},
+            }} for owner in sorted(owners)
+        ]})
+    reconcile(client, {"zones": zones}, allowed_zones)

@@ -15,12 +15,12 @@ import yaml
 
 
 REVIEWED = {
-    "books", "chatsolution", "codexlb", "connect", "go", "heartbeat",
+    "books", "chatsolution", "connect", "go", "heartbeat",
     "here", "indexgen", "keysboard", "meta", "speed", "stmt",
 }
 DEPLOYED = {
     "as218822", "authentik", "database", "gateway", "guessaiword", "image-updater", "immich",
-    "kopia", "minio", "monitoring", "nameserver", "notaikr", "office", "remote", "seafile",
+    "kopia", "minio", "monitoring", "nameserver", "notaikr", "office", "seafile",
     "solver", "spotify", "thepool", "trace", "track", "traffic", "visualized",
 }
 HELM = {

@@ -83,16 +83,6 @@ class OIDCTests(unittest.TestCase):
                 self.assertEqual(declaration["clientID"], "lab-seafile")
                 self.assertEqual(declaration["redirectURI"], "https://drive.pmh.codes/oauth/callback/")
                 continue
-            if slug == "remote":
-                docs = list(yaml.safe_load_all((ROOT / "remote/deployment.yml").read_text()))
-                server = next(d for d in docs if d["metadata"]["name"] == "remote-guacamole")
-                env = server["spec"]["template"]["spec"]["containers"][0]["env"]
-                actual = {e["name"]: e["value"] for e in env if "value" in e}
-                self.assertEqual(actual["OPENID_CLIENT_ID"], declaration["clientID"])
-                self.assertEqual(actual["OPENID_REDIRECT_URI"], declaration["redirectURI"])
-                self.assertTrue(declaration["publicClient"])
-                self.assertEqual(declaration["grantTypes"], ["implicit"])
-                continue
             if slug in {"stmt", "connect", "books", "as218822"}:
                 filename = "console.yml" if slug == "as218822" else ("backend.yml" if slug == "books" else "deployment.yml")
                 docs = list(yaml.safe_load_all((ROOT / slug / filename).read_text()))
@@ -208,17 +198,19 @@ class OIDCTests(unittest.TestCase):
         self.assertEqual(vault.get.return_value, fields)
 
     def test_native_public_client_does_not_fabricate_a_client_secret(self):
-        desired = DECLARATIONS["remote"]
-        provider = {"pk": 43, "name": "lab bootstrap: remote", "client_id": desired["clientID"],
+        desired = {"publicClient": True, "grantTypes": ["implicit"], "subMode": "user_username",
+                   "clientID": "test-public", "redirectURI": "https://public.example.test",
+                   "launchURL": "https://public.example.test", "namespace": "test-public"}
+        provider = {"pk": 43, "name": "lab bootstrap: test-public", "client_id": desired["clientID"],
                     "client_type": "public", "issuer_mode": "per_provider", "grant_types": ["implicit"],
                     "sub_mode": "user_username", "redirect_uris": [
                         {"matching_mode": "strict", "url": desired["redirectURI"], "redirect_uri_type": "authorization"}]}
         api, vault = Mock(), Mock()
         api.list.return_value = [provider]
         api.request.return_value = {"provider": 43}
-        discovery = {"issuer": "https://auth.pmh.codes/application/o/remote/"}
+        discovery = {"issuer": "https://auth.pmh.codes/application/o/test-public/"}
         with patch("oidc.urllib.request.urlopen", return_value=io.BytesIO(json.dumps(discovery).encode())):
-            provision_client(vault, api, "remote", desired)
+            provision_client(vault, api, "test-public", desired)
         vault.get.assert_not_called()
         vault.create.assert_not_called()
         vault.run.assert_not_called()

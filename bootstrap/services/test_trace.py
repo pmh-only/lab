@@ -10,6 +10,13 @@ from provision import ROOT, PROFILES
 
 
 class TraceTests(unittest.TestCase):
+    def test_root_is_not_forwarded_to_retired_site_two(self):
+        policy = next(d for d in self.docs if d["kind"] == "EnvoyExtensionPolicy")
+        code = policy["spec"]["lua"][0]["inline"]
+        self.assertNotIn("/2/main", code)
+        self.assertNotIn("envoy_on_request", code)
+        self.assertIn("access-control-allow-headers", code)
+
     @classmethod
     def setUpClass(cls):
         cls.docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "trace")], text=True)))

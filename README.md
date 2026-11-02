@@ -68,7 +68,6 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   
-  <td><img src="https://argo.pmh.codes/api/badge?name=codexlb&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
   
@@ -196,7 +195,6 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   
-  <td><img src="https://argo.pmh.codes/api/badge?name=remote&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
   

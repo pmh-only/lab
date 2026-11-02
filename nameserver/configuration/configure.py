@@ -205,7 +205,10 @@ def configure(client, desired, password, dns01=None, authoritative=None, after_c
 
 
 def main():
+    from records import reconcile_ech
+
     dns01 = json.loads(Path("/configuration/dns01.json").read_text())
+    imported = json.loads(Path("/configuration/imported-records.json").read_text())
     client = Client(
         "https://nameserver.nameserver.svc.cluster.local:53443",
         Path("/run/secrets/nameserver-ca/tls.crt").read_text(),
@@ -216,7 +219,10 @@ def main():
         Path("/run/secrets/nameserver-admin/password").read_text(),
         dns01,
         json.loads(Path("/configuration/authoritative.json").read_text()),
-        imported=json.loads(Path("/configuration/imported-records.json").read_text()),
+        imported=imported,
+        after_configure=lambda client: reconcile_ech(
+            client, json.loads(Path("/configuration/ech.json").read_text()), imported, dns01["zones"],
+        ),
     )
 
 

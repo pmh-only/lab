@@ -44,13 +44,6 @@ spec:
   lua:
     - type: Inline
       inline: |
-        function envoy_on_request(request_handle)
-          local path = request_handle:headers():get(":path")
-          if path == "/" then
-            request_handle:respond({[":status"] = "302", ["location"] = "/2/main"}, "")
-          end
-        end
-
         function envoy_on_response(response_handle)
           response_handle:headers():add("access-control-allow-headers", "signature")
         end

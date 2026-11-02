@@ -23,7 +23,6 @@ PROFILES = {
     "immich": ("immich/immich-secret", {"DB_PASSWORD": "random", "DB_ADMIN_PASSWORD": "random"}),
     "trace": ("trace/trace-secrets", {"POSTGRES_PASSWORD": "postgres-password:traffic", "CLICKHOUSE_PASSWORD": "random", "CLICKHOUSE_QUERY_PASSWORD": "random", "BETTER_AUTH_SECRET": "random", "MAPBOX_TOKEN": "optional-empty"}),
     "seafile": ("seafile/seafile-secrets", {"DB_PASSWORD": "random", "JWT_PRIVATE_KEY": "random", "INIT_SEAFILE_ADMIN_PASSWORD": "random", "OAUTH_CLIENT_SECRET": "random"}),
-    "codexlb": ("codexlb/bootstrap-login", {"ADMIN_PASSWORD": "random", "BOOTSTRAP_TOKEN": "random"}),
     "indexgen": ("indexgen/indexgen-secrets", {"S3_ACCESS_TOKEN": "s3-access:indexgen", "S3_SECRET_TOKEN": "random"}),
     "books": ("books/books-secret", {"DATABASE_URL": "postgres:books", "OIDC_CLIENT_SECRET": "random", "JWT_ACCESS_SECRET": "random", "JWT_REFRESH_SECRET": "random", "S3_ACCESS_KEY_ID": "s3-access:books", "S3_SECRET_ACCESS_KEY": "random"}),
     "monitoring": ("monitoring/monitoring-secret", {"GF_SECURITY_ADMIN_PASSWORD": "random", "GF_SECURITY_SECRET_KEY": "random", "GF_RENDERING_RENDERER_TOKEN": "random"}),
@@ -35,7 +34,6 @@ PROFILES = {
     "keysboard": ("keysboard/keysboard-secret", {"DATABASE_URL": "mysql-url:keysboard", "REDIS_URL": "redis", "JWT_SECRET": "random"}),
     "mail": ("mail/mailui-secret", {"DATABASE_URL": "postgres:mailui", "BETTER_AUTH_SECRET": "random", "MAIL_SECRET_KEY": "random"}),
     "office": ("office/office-secret", {"DB_PWD": "mysql-password:onlyoffice", "JWT_SECRET": "random"}),
-    "remote": ("remote/remote-secret", {"POSTGRESQL_PASSWORD": "postgres-password:guacamole", "GUACAMOLE_ADMIN_USERNAME": "authentik-owner", "GUACAMOLE_ADMIN_PASSWORD": "random"}),
 }
 
 
@@ -281,14 +279,6 @@ def provision(vault, name):
         data = vault.get(path)
         if data is None:
             data = {field: generated(kind) for field, kind in fields.items()}
-            if name == "remote":
-                from oidc import Authentik
-
-                bootstrap = vault.get("authentik/bootstrap-worker")
-                owner = Authentik(bootstrap["AUTHENTIK_BOOTSTRAP_TOKEN"]).request("core/users/me/")["user"]
-                if not owner["is_active"] or not owner["is_superuser"]:
-                    raise RuntimeError("Refusing to assign remote administration to a non-administrator")
-                data["GUACAMOLE_ADMIN_USERNAME"] = owner["username"]
             vault.create(path, data)
         data = repair_unused_bootstrap_driver(vault, name, path, data, fields)
         if set(data) != set(fields) or any(not valid_field(data[field], kind) for field, kind in fields.items()):

@@ -46,11 +46,6 @@ entries:
     attrs: {order: -100, enabled: true, failure_result: false}
   - model: authentik_policies.policybinding
     identifiers:
-      target: !Find [authentik_core.application, [slug, remote]]
-      policy: !KeyOf discord-deny-applications
-    attrs: {order: -100, enabled: true, failure_result: false}
-  - model: authentik_policies.policybinding
-    identifiers:
       target: !Find [authentik_core.application, [slug, connect]]
       policy: !KeyOf discord-deny-applications
     attrs: {order: -100, enabled: true, failure_result: false}

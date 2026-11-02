@@ -47,10 +47,10 @@ class ImageUpdaterTests(unittest.TestCase):
     def test_all_enabled_apps_have_one_owned_updater_without_vault_or_paused_workloads(self):
         managed = {d["metadata"]["name"]: d for d in self.docs if d["kind"] == "ImageUpdater"}
         self.assertEqual(set(managed), ENABLED)
-        self.assertEqual(len(managed), 45)
+        self.assertEqual(len(managed), 43)
         self.assertIn("as218822", ENABLED)
         self.assertTrue({"kopia", "velero", "velero-ui"}.issubset(ENABLED))
-        self.assertTrue(ENABLED.isdisjoint({"welplan", "ghost", "vault", "vault-backup", "vault-secrets-operator", "vault-ui"}))
+        self.assertTrue(ENABLED.isdisjoint({"codexlb", "remote", "welplan", "ghost", "vault", "vault-backup", "vault-secrets-operator", "vault-ui"}))
         apps = {}
         for path in (ROOT / "apps").glob("*.yml"):
             for d in yaml.safe_load_all(path.read_text()):

@@ -144,16 +144,6 @@ items:
             - {alias: onlyoffice, imageName: 'ghcr.io/pmh-only/onlyoffice:latest-linux-arm64', commonUpdateSettings: {updateStrategy: digest}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
-    metadata: {name: remote, namespace: argocd}
-    spec:
-      writeBackConfig: *git
-      applicationRefs:
-        - namePattern: remote
-          images:
-            - {alias: guacamole, imageName: 'ghcr.io/pmh-only/guacamole:*', commonUpdateSettings: {updateStrategy: semver}}
-            - {alias: guacd, imageName: 'ghcr.io/pmh-only/guacd:*', commonUpdateSettings: {updateStrategy: semver}}
-  - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
-    kind: ImageUpdater
     metadata: {name: seafile, namespace: argocd}
     spec:
       writeBackConfig: *git
