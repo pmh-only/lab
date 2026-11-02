@@ -4,6 +4,8 @@ metadata:
   name: aggregator
   namespace: traffic
 spec:
+  # Native privacy backfill of the retained multi-GB raw log precedes readiness.
+  progressDeadlineSeconds: 3600
   strategy:
     type: Recreate
   revisionHistoryLimit: 0
