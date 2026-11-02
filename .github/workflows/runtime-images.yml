@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [trace, spotify, seafile, goaccess]
+        image: [trace, spotify, seafile, goaccess, nameserver]
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
