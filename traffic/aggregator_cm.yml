@@ -56,7 +56,7 @@ data:
     anonymize-ip true
     real-os true
 
-    geoip-database /logs/GeoLite2-ASN.mmdb
-    geoip-database /logs/GeoLite2-City.mmdb
+    geoip-database /usr/share/GeoIP/GeoLite2-ASN.mmdb
+    geoip-database /usr/share/GeoIP/GeoLite2-City.mmdb
 
     html-prefs {"autoHideTables":true,"layout":"wide","perPage":24,"theme":"darkGray","hiddenPanels":[],"visitors":{"plot":{"chartType":"area-spline","metric":"bandwidth"},"columns":{"avgts":{"hide":true},"cumts":{"hide":true},"maxts":{"hide":true}}},"requests":{"plot":{"chartType":"bar","metric":"hits-visitors"},"columns":{"maxts":{"hide":true},"cumts":{"hide":true},"avgts":{"hide":true}}},"showTables":false,"not_found":{"columns":{"cumts":{"hide":true},"avgts":{"hide":true},"maxts":{"hide":true}},"chart":true,"plot":{"chartType":"bar"}},"hosts":{"columns":{"avgts":{"hide":true},"cumts":{"hide":true},"maxts":{"hide":true}}},"os":{"columns":{"cumts":{"hide":true},"maxts":{"hide":true},"avgts":{"hide":true}}},"browsers":{"columns":{"cumts":{"hide":true},"avgts":{"hide":true},"maxts":{"hide":true}}},"visit_time":{"columns":{"cumts":{"hide":true},"avgts":{"hide":true},"maxts":{"hide":true}},"plot":{"metric":"hits-visitors"}},"referrers":{"columns":{"avgts":{"hide":true},"cumts":{"hide":true},"maxts":{"hide":true}}},"referring_sites":{"columns":{"avgts":{"hide":true},"cumts":{"hide":true},"maxts":{"hide":true}}},"status_codes":{"columns":{"avgts":{"hide":true},"cumts":{"hide":true},"maxts":{"hide":true}}}}

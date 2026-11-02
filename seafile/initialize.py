@@ -139,19 +139,7 @@ def initialize():
         import bootstrap
 
         schema_complete = native_schema_complete(Path(bootstrap.get_install_dir()))
-        installer = Path(bootstrap.get_script("setup-seafile-mysql.py"))
-        source = installer.read_text()
-        cleanup = "    db_config.root_conn.close()"
-        if source.count(cleanup) != 1:
-            raise RuntimeError("Pinned native installer cleanup changed; refusing an unverified compatibility patch")
-        # 12.0.14 calls close() on an empty root connection even in its supported
-        # existing-database mode. Guard only that cleanup in this init container.
-        source = source.replace(cleanup, "    if db_config.root_conn:\n        db_config.root_conn.close()")
-        schema_import = "    seahub_config.do_syncdb()"
-        if source.count(schema_import) != 1:
-            raise RuntimeError("Pinned native schema import changed; refusing an unverified compatibility patch")
-        source = source.replace(schema_import, '    if os.environ.get("LAB_SEAFILE_NATIVE_SCHEMA_COMPLETE") != "true":\n        seahub_config.do_syncdb()')
-        installer.write_text(source)
+        # Installer compatibility and MySQL plugins are validated in image CI.
         original_call = bootstrap.call
         setup = bootstrap.get_script("setup-seafile-mysql.sh")
 

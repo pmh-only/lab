@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -70,7 +71,9 @@ class SeafileTests(unittest.TestCase):
         deployment = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "seafile")
         pod = deployment["spec"]["template"]["spec"]
         for container in pod["initContainers"] + pod["containers"]:
-            self.assertRegex(container["image"], r"^seafileltd/seafile-mc:12\.0\.[0-9]+-arm$")
+            self.assertRegex(container["image"], r"^ghcr.io/pmh-only/lab-seafile:latest@sha256:[a-f0-9]{64}$")
+        targets = json.loads((ROOT / "images/targets.json").read_text())
+        self.assertRegex(targets["seafile"]["base"], r"^seafileltd/seafile-mc:12\.0\.[0-9]+-arm$")
         search = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "elasticsearch")
         self.assertEqual(search["spec"]["replicas"], 0)
         self.assertTrue(any(d["kind"] == "PersistentVolumeClaim" and d["metadata"]["name"] == "seafile-search" for d in docs))
@@ -182,10 +185,11 @@ class SeafileTests(unittest.TestCase):
         self.assertNotIn("mysql_native_password", script)
         docs = list(yaml.safe_load_all(subprocess.check_output(["kubectl", "kustomize", str(ROOT / "seafile")], text=True)))
         pod = next(d for d in docs if d["kind"] == "Deployment" and d["metadata"]["name"] == "seafile")["spec"]["template"]["spec"]
-        self.assertEqual(pod["initContainers"][0]["name"], "mysql-client-plugins")
-        self.assertNotIn("env", pod["initContainers"][0])
+        self.assertNotIn("mysql-client-plugins", [c["name"] for c in pod["initContainers"]])
+        recipe = (ROOT / "images/seafile/Dockerfile").read_text()
+        self.assertIn("python3 /image-build/prepare_mysql_plugins.py", recipe)
         env = {e["name"]: e for e in pod["containers"][0]["env"]}
-        self.assertEqual(env["MARIADB_PLUGIN_DIR"]["value"], "/run/mariadb-client-plugins")
+        self.assertEqual(env["MARIADB_PLUGIN_DIR"]["value"], "/opt/lab/mysql-plugins")
 
     def test_no_root_credentials_and_all_images_are_pinned(self):
         self.assertNotIn("DB_ROOT_PASSWD", PROFILES["seafile"][1])
@@ -246,9 +250,8 @@ class SeafileTests(unittest.TestCase):
                 self.assertIn("--use-existing-db 1", run.call_args.args[0])
                 self.assertNotIn("MYSQL_ROOT_PASSWD", run.call_args.kwargs["env"])
                 self.assertEqual(run.call_args.kwargs["env"]["LAB_SEAFILE_NATIVE_SCHEMA_COMPLETE"], "false")
-                patched = (upstream_dir / "setup-seafile-mysql.py").read_text()
-                self.assertIn('if os.environ.get("LAB_SEAFILE_NATIVE_SCHEMA_COMPLETE") != "true":', patched)
-                self.assertIn("if db_config.root_conn:", patched)
+                self.assertEqual((upstream_dir / "setup-seafile-mysql.py").read_text(),
+                                 "def main():\n    seahub_config.do_syncdb()\n    db_config.root_conn.close()\n")
                 original = (module.DATA / "conf/seahub_settings.py").read_text()
                 module.initialize()
                 upstream.init_seafile_server.assert_called_once()

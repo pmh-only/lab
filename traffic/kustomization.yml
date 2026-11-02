@@ -12,13 +12,14 @@ resources:
 configMapGenerator:
   - name: traffic-preparation
     files:
-      - prepare-assets.mjs
+      - prepare-logs.sh
       - redact.lua
       - backfill.conf
 images:
   - name: ghcr.io/pmh-only/goaccess
+    newName: ghcr.io/pmh-only/lab-goaccess
     newTag: latest
-    digest: sha256:30516f5e456f54267556a775680eb2dbf0ee1165eee8cd04b7b17b8337232b51
+    digest: sha256:dd049e63758e72059021534577d85bf854fdf8b0e9ace6f38c771ddb9c7c8369
   - name: cr.fluentbit.io/fluent/fluent-bit
     newTag: latest
     digest: sha256:2740f387f6e68fab66d28e4fa6a853387b9cab6ffb4cb78958f69bba4eb0e7b4

@@ -151,7 +151,7 @@ items:
         - namePattern: seafile
           images:
             # Keep the edition migration on its validated 12.0 schema branch.
-            - {alias: seafile, imageName: 'seafileltd/seafile-mc:*-0', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^12\.0\.[0-9]+-arm$'}}
+            - {alias: seafile, imageName: 'ghcr.io/pmh-only/lab-seafile:latest', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: sdoc, imageName: 'seafileltd/sdoc-server:*-0', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^[0-9]+\.[0-9]+\.[0-9]+-arm$'}}
             - {alias: notification, imageName: 'seafileltd/notification-server:*-0', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^[0-9]+\.[0-9]+\.[0-9]+-arm$'}}
             - {alias: memcached, imageName: 'memcached:*-0', commonUpdateSettings: {updateStrategy: semver, allowTags: 'regexp:^[0-9]+\.[0-9]+\.[0-9]+-alpine$'}}
@@ -214,7 +214,7 @@ items:
       applicationRefs:
         - namePattern: traffic
           images:
-            - {alias: goaccess, imageName: 'ghcr.io/pmh-only/goaccess:latest', commonUpdateSettings: {updateStrategy: digest}}
+            - {alias: goaccess, imageName: 'ghcr.io/pmh-only/lab-goaccess:latest', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: fluentbit, imageName: 'cr.fluentbit.io/fluent/fluent-bit:latest', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: busybox, imageName: 'ghcr.io/pmh-only/busybox:latest', commonUpdateSettings: {updateStrategy: digest}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1

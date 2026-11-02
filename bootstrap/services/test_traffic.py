@@ -8,17 +8,17 @@ from provision import ROOT
 
 class TrafficTests(unittest.TestCase):
     def test_native_geoip_and_logs_are_preserved(self):
-        code = (ROOT / "traffic/prepare-assets.mjs").read_text()
-        self.assertIn("COPYFILE_EXCL", code)
-        self.assertIn('openSync("/logs/all.log", "a"', code)
-        self.assertNotIn("rmSync", code)
-        self.assertNotIn("truncate", code)
+        code = (ROOT / "traffic/prepare-logs.sh").read_text()
+        self.assertIn("touch /logs/all.log", code)
+        self.assertNotIn("rm ", code)
+        self.assertNotIn(": > /logs/all.log", code)
         self.assertIn('source=all.log', code)
-        self.assertIn('writeFileSync("/logs/all.safe.log", ""', code)
+        self.assertIn(": > /logs/all.safe.log", code)
+        self.assertNotIn("GeoLite2", code)
         config = yaml.safe_load((ROOT / "traffic/aggregator_cm.yml").read_text())["data"]["goaccess.conf"]
         self.assertIn("anonymize-ip true", config)
-        self.assertIn("geoip-database /logs/GeoLite2-ASN.mmdb", config)
-        self.assertIn("geoip-database /logs/GeoLite2-City.mmdb", config)
+        self.assertIn("geoip-database /usr/share/GeoIP/GeoLite2-ASN.mmdb", config)
+        self.assertIn("geoip-database /usr/share/GeoIP/GeoLite2-City.mmdb", config)
 
     def test_public_report_uses_derived_log_while_raw_logs_remain(self):
         config = yaml.safe_load((ROOT / "traffic/aggregator_cm.yml").read_text())["data"]["fluent-bit.conf"]

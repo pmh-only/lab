@@ -42,7 +42,7 @@ class RuntimeImageTests(unittest.TestCase):
 
     def test_downstream_image_updaters_cannot_bypass_reviewed_images(self):
         deployed = yaml.safe_load((ROOT / "image-updater/deployed.yml").read_text())
-        expected = {"trace": "lab-trace", "spotify": "lab-spotify"}
+        expected = {"trace": "lab-trace", "spotify": "lab-spotify", "seafile": "lab-seafile", "traffic": "lab-goaccess"}
         for item in deployed["items"]:
             app = item["metadata"]["name"]
             if app not in expected:

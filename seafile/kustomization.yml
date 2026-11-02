@@ -19,10 +19,11 @@ configMapGenerator:
       - logo.svg=./branding/logo.svg
       - icon.svg=./branding/icon.svg
       - native-schema.json
-      - prepare_mysql_plugins.py
 images:
   - name: seafileltd/seafile-mc
-    newTag: 12.0.14-arm
+    newName: ghcr.io/pmh-only/lab-seafile
+    newTag: latest
+    digest: sha256:bc268dc2f14037c8ca798ae049a1ebb029fc146060e73a2e7ea8beccc9412936
   - name: seafileltd/sdoc-server
     newTag: 1.0.5-arm
   - name: seafileltd/notification-server
