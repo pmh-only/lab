@@ -23,23 +23,17 @@ spec:
         selector:
           dnsZones:
             - as218822.net
+            - not.ai.kr
             - pmh.so
             - pmh.codes
 
-      - dns01:
-          cloudflare:
-            apiTokenSecretRef:
-              name: cloudflare-api-token-secret
-              key: api-token
-        selector:
-          dnsZones:
-            - not.ai.kr
-
       - http01:
           gatewayHTTPRoute:
+            serviceType: ClusterIP
             parentRefs:
               - group: gateway.networking.k8s.io
                 kind: Gateway
                 name: main
                 namespace: gateway
+                sectionName: http
         waitInsteadOfSelfCheck: 30s

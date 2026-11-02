@@ -9,30 +9,9 @@ resources:
   - ./backend-policy.yml
   - ./service-alias.yml
   - ./public-certificate.yml
-# Preserve the original full certificate declaration without requesting retired
-# IPs or unmigrated domains. Keep the newly issued certificate during migration.
+# First issue the complete original certificate while the current edge
+# certificate continues serving. Remove this mount override after Ready=True.
 patches:
-  # No old/fabricated Cloudflare token: keep the original issuer's active
-  # Technitium/HTTP01 solvers until fresh not.ai.kr credentials are supplied.
-  - target:
-      group: cert-manager.io
-      version: v1
-      kind: ClusterIssuer
-      name: letsencrypt
-    patch: |-
-      - op: remove
-        path: /spec/acme/solvers/1
-  - target:
-      group: cert-manager.io
-      version: v1
-      kind: Certificate
-      name: gateway-tls-secret
-    patch: |-
-      $patch: delete
-      apiVersion: cert-manager.io/v1
-      kind: Certificate
-      metadata:
-        name: gateway-tls-secret
   - target:
       group: apps
       version: v1

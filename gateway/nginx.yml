@@ -196,6 +196,14 @@ data:
         add_header Content-Security-Policy "manifest-src 'self'; frame-ancestors 'self' https://pmh.codes https://*.pmh.codes" always;
         add_header Strict-Transport-Security 'max-age=63072000; includeSubDomains; preload' always;
 
+        # IP HTTP-01 validation must succeed before HTTPS has an IP SAN.
+        # Forward only the ACME path to cert-manager's temporary HTTPRoute;
+        # every other HTTP request keeps the original HTTPS redirect.
+        location ^~ /.well-known/acme-challenge/ {
+          set $envoy_gateway envoy-gateway-main.envoy-gateway-system.svc.cluster.local;
+          proxy_pass http://$envoy_gateway:80;
+        }
+
         location / {
           return 301 https://$host$request_uri;
         }
