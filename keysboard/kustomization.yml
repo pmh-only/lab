@@ -14,4 +14,4 @@ configMapGenerator:
 images:
   - name: ghcr.io/pmh-only/keysboard
     newTag: latest
-    digest: sha256:43f236c0f6bacf51cd7b5726fa062766cd0f5245927d87772da0570a827ffb1b
+    digest: sha256:5a7bdc2f4632eb60229729bc1421c5846c1abd7b7a912c8a542b6f3428683e99
