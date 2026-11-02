@@ -19,4 +19,4 @@ configMapGenerator:
 images:
   - name: ghcr.io/pmh-only/thepool
     newTag: latest
-    digest: sha256:8c05cc757a208fb2dda28fd1922801df519dc4d4822a53a4497069ac846ebdde
+    digest: sha256:219a43c288ddd177d843899238592f49f3efd366b2452dc646f4fe3f39d35863
