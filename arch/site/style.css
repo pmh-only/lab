@@ -1,0 +1,35 @@
+:root { color-scheme: dark; font-family: system-ui, -apple-system, sans-serif; background: #142233; color: #e2e8f0; }
+* { box-sizing: border-box; }
+body { margin: 0; height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; }
+header { display: flex; align-items: center; gap: 24px; padding: 16px 22px; border-bottom: 1px solid #334155; }
+a { color: #e2e8f0; text-decoration: none; }
+a:hover { color: #93c5fd; }
+.brand { font-size: 21px; font-weight: 750; white-space: nowrap; }
+.brand span { margin-left: 8px; color: #94a3b8; font-weight: 400; font-size: 15px; }
+header p { color: #94a3b8; margin: 0; font-size: 13px; }
+nav { margin-left: auto; display: flex; gap: 18px; font-size: 14px; white-space: nowrap; }
+#viewer { min-height: 0; width: 100%; background: #e5e9ee; outline-offset: -3px; }
+.tools { position: fixed; top: 88px; left: 20px; display: flex; align-items: center; padding: 5px; gap: 4px; background: #142233f2; border: 1px solid #475569; border-radius: 10px; box-shadow: 0 4px 20px #0003; }
+button, select { font: inherit; color: #e2e8f0; border: 0; background: transparent; border-radius: 6px; height: 40px; }
+button { width: 42px; font-size: 25px; cursor: pointer; }
+button:hover { background: #334155; }
+select { padding: 0 8px; max-width: 220px; cursor: pointer; }
+option { background: #142233; }
+:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
+footer { display: flex; justify-content: space-between; gap: 12px; padding: 9px 22px max(9px, env(safe-area-inset-bottom)); color: #94a3b8; font-size: 12px; }
+#status { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); padding: 12px 18px; border-radius: 8px; background: #142233ed; max-width: 90vw; text-align: center; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (max-width: 640px) {
+  header { padding: 12px; gap: 12px; flex-wrap: wrap; }
+  header p { display: none; }
+  .brand { font-size: 18px; }
+  .brand span { font-size: 13px; }
+  nav { font-size: 12px; gap: 12px; }
+  .tools { top: auto; bottom: 48px; left: 50%; transform: translateX(-50%); max-width: calc(100vw - 20px); }
+  button { width: 36px; flex-shrink: 0; }
+  select { min-width: 0; max-width: 160px; font-size: 13px; }
+  #viewer .navigator { bottom: 80px !important; }
+  footer { padding-left: 12px; padding-right: 12px; font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }

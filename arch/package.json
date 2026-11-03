@@ -1,0 +1,14 @@
+{
+  "name": "lab-architecture-viewer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test test.mjs"
+  },
+  "dependencies": {
+    "openseadragon": "6.1.1",
+    "sharp": "0.35.5"
+  }
+}
