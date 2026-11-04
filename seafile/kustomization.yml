@@ -26,7 +26,7 @@ images:
   - name: seafileltd/sdoc-server
     newTag: 3.0.6
   - name: seafileltd/notification-server
-    newTag: 14.0.8
+    newTag: 13.0.29
   - name: memcached
     newTag: 1.6.45-alpine
   - name: elasticsearch
