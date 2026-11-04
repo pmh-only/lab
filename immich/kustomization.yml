@@ -25,7 +25,7 @@ configMapGenerator:
 images:
   - name: ghcr.io/immich-app/immich-server
     newTag: release
-    digest: sha256:485d546a2e31d6a8b4db8423fcba5c109de8c218d93410af115fd1ccfc4352a6
+    digest: sha256:e1981983b1c13f6024b57d72e7ecae3342eed1581201ab09fb248932d86c593a
   - name: ghcr.io/immich-app/immich-machine-learning
     newTag: release
     digest: sha256:14367bfb374b8576ddf49abd67c5ca0190a4c7fcf6303cdad65d7f7bf1a50bc2
