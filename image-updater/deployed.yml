@@ -81,7 +81,8 @@ items:
           images:
             - {alias: server, imageName: 'ghcr.io/immich-app/immich-server:release', commonUpdateSettings: {updateStrategy: digest}}
             - {alias: machine-learning, imageName: 'ghcr.io/immich-app/immich-machine-learning:release', commonUpdateSettings: {updateStrategy: digest}}
-            - {alias: postgres, imageName: 'ghcr.io/immich-app/postgres', commonUpdateSettings: {updateStrategy: newest-build, allowTags: 'regexp:^[0-9]+-vectorchord[0-9.]+-pgvectors[0-9.]+$'}}
+            # Keep PostgreSQL and extension versions fixed; build time is not a safe upgrade order.
+            - {alias: postgres, imageName: 'ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0', commonUpdateSettings: {updateStrategy: digest}}
   - apiVersion: argocd-image-updater.argoproj.io/v1alpha1
     kind: ImageUpdater
     metadata: {name: kopia, namespace: argocd}
