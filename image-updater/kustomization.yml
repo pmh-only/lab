@@ -5,6 +5,7 @@ resources:
   - https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/v1.4.0/config/install.yaml
   - secret.yml
   - mail.yml
+  - keepy.yml
   - reviewed.yml
   - deployed.yml
   - helm.yml

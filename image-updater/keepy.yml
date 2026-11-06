@@ -1,0 +1,19 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: keepy
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/git"
+    gitConfig:
+      repository: git@github.com:pmh-only/lab.git
+      branch: main
+      writeBackTarget: kustomization
+  applicationRefs:
+    - namePattern: keepy
+      images:
+        - alias: keepy
+          imageName: ghcr.io/pmh-only/keepy:latest
+          commonUpdateSettings:
+            updateStrategy: digest

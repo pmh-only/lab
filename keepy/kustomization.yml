@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: keepy
+resources:
+  - ./deployment.yml
+  - ./service.yml
+  - ./ingress.yml
+images:
+  - name: ghcr.io/pmh-only/keepy
+    newTag: latest
+    digest: sha256:a0e117241916948259d5fe0ba1783cebc016762f3a6af34684fbfc2ead697107
