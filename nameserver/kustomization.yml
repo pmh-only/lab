@@ -31,7 +31,7 @@ configMapGenerator:
 images:
   - name: ghcr.io/pmh-only/lab-nameserver
     newTag: latest
-    digest: sha256:0ea1319559082cb98637d668bcda1085a0bc30ebcfa1d42e8ed0ad04ed305c8e
+    digest: sha256:d276f80093517202b1a0bb8e4ac48d607626ed12803bb6bfd25d017eded9db2f
   - name: ghcr.io/pmh-only/technitium
     newTag: latest
     digest: sha256:00cea6a251adfef4f7cb10d6b7c8bd16c7701e28f23dd01430da0f9b7c6f2e46
