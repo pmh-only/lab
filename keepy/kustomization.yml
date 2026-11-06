@@ -8,4 +8,4 @@ resources:
 images:
   - name: ghcr.io/pmh-only/keepy
     newTag: latest
-    digest: sha256:a0e117241916948259d5fe0ba1783cebc016762f3a6af34684fbfc2ead697107
+    digest: sha256:4fcd707337b3ec4d2b4c832edf890be77d9ac65d3f96f21573b56095969061ba
