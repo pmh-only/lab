@@ -25,6 +25,6 @@ package publication delivery to verify it. Only images already managed by an
 
 The Vault secret is synced to `argocd-image-updater-webhook` in `argocd` and is
 required for controller startup. Secret rotation restarts the controller. Public
-TLS terminates at the existing edge; only the gateway namespace can reach the
-internal HTTP webhook port. The existing two-minute polling remains enabled as
+TLS terminates at the existing edge; only the `envoy-gateway-system` namespace
+can reach the internal HTTP webhook port. The existing two-minute polling remains enabled as
 a fallback.
