@@ -6,6 +6,11 @@ data:
   argocd.namespace: argocd
   watch.namespaces: argocd
   interval: 2m
+  webhook.enable: "true"
+  webhook.port: "8082"
+  webhook.require-secret: "true"
+  # Public TLS terminates at the edge; the gateway forwards HTTP internally.
+  disable-tls: "true"
   max_concurrent_apps: "1"
   max_concurrent_reconciles: "4"
   git.user: ArgoCD

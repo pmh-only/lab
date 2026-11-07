@@ -13,6 +13,13 @@ spec:
             - --metrics-bind-address=:8443
             - run
             - --warmup-cache=false
+          env:
+            - name: GHCR_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: argocd-image-updater-webhook
+                  key: webhook.ghcr-secret
+                  optional: false
           startupProbe:
             httpGet:
               path: /readyz

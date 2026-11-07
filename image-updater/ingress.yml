@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd-image-updater-webhook
+spec:
+  selector:
+    control-plane: argocd-image-updater-controller
+  ports:
+    - name: http
+      port: 8082
+      targetPort: 8082
+      protocol: TCP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: argocd-image-updater-webhook
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: main
+      namespace: gateway
+  hostnames:
+    - update.pmh.codes
+  rules:
+    - matches:
+        - path:
+            type: Exact
+            value: /webhook
+          method: POST
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: argocd-image-updater-webhook
+          port: 8082
+          weight: 1

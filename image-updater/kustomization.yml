@@ -4,6 +4,7 @@ namespace: argocd
 resources:
   - https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/v1.4.0/config/install.yaml
   - secret.yml
+  - ingress.yml
   - mail.yml
   - keepy.yml
   - reviewed.yml
@@ -24,3 +25,7 @@ patches:
       kind: Deployment
       name: argocd-image-updater-controller
     path: patches/controller.yml
+  - target:
+      kind: NetworkPolicy
+      name: allow-webhook-traffic
+    path: patches/webhook-network-policy.yml
