@@ -52,7 +52,7 @@ jobs:
           fi
       - name: Build and publish only after image validation
         if: steps.cache.outputs.built != 'true'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: images/${{ matrix.image }}/Dockerfile
