@@ -12,6 +12,7 @@ resources:
 configMapGenerator:
   - name: authentik-blueprints
     files:
+      - application-icons.yaml=./blueprints/application-icons.yaml
       - email-verified.yaml=./blueprints/email-verified.yaml
       - discord.yaml=./blueprints/discord.yaml
       - discord-application-access.yaml=./blueprints/discord-application-access.yaml

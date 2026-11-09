@@ -1,0 +1,81 @@
+version: 1
+metadata:
+  name: Lab - Application icons
+entries:
+  # Only update appearance; preserve providers, launch URLs, and access policies.
+  - model: authentik_core.application
+    identifiers: {slug: go}
+    attrs:
+      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/link.svg
+  - model: authentik_core.application
+    identifiers: {slug: meta}
+    attrs:
+      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/chart-no-axes-combined.svg
+  - model: authentik_core.application
+    identifiers: {slug: pdf}
+    attrs:
+      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/stirling-pdf.svg
+  - model: authentik_core.application
+    identifiers: {slug: stmt}
+    attrs:
+      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/receipt.svg
+  - model: authentik_core.application
+    identifiers: {slug: connect}
+    attrs:
+      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/network.svg
+  - model: authentik_core.application
+    identifiers: {slug: books}
+    attrs:
+      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/book-open.svg
+  - model: authentik_core.application
+    identifiers: {slug: seafile}
+    attrs:
+      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/seafile.svg
+  - model: authentik_core.application
+    identifiers: {slug: immich}
+    attrs:
+      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/immich.svg
+  - model: authentik_core.application
+    identifiers: {slug: mail}
+    attrs:
+      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/mail.svg
+  - model: authentik_core.application
+    identifiers: {slug: track}
+    attrs:
+      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/dawarich.svg
+  - model: authentik_core.application
+    identifiers: {slug: tailscale}
+    attrs:
+      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/tailscale.svg
+  - model: authentik_core.application
+    identifiers: {slug: rustfs}
+    attrs:
+      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/rustfs.svg
+  - model: authentik_core.application
+    identifiers: {slug: solver}
+    attrs:
+      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/calculator.svg
+  - model: authentik_core.application
+    identifiers: {slug: argocd}
+    attrs:
+      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/argo-cd.svg
+  - model: authentik_core.application
+    identifiers: {slug: technitium}
+    attrs:
+      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/technitium.svg
+  - model: authentik_core.application
+    identifiers: {slug: kopia}
+    attrs:
+      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/kopia.svg
+  - model: authentik_core.application
+    identifiers: {slug: velero-ui}
+    attrs:
+      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/velero.svg
+  - model: authentik_core.application
+    identifiers: {slug: as218822}
+    attrs:
+      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/network.svg
+  - model: authentik_core.application
+    identifiers: {slug: test}
+    attrs:
+      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/flask-conical.svg
