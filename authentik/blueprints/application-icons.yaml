@@ -6,76 +6,76 @@ entries:
   - model: authentik_core.application
     identifiers: {slug: go}
     attrs:
-      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/link.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/go.svg
   - model: authentik_core.application
     identifiers: {slug: meta}
     attrs:
-      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/chart-no-axes-combined.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/meta.svg
   - model: authentik_core.application
     identifiers: {slug: pdf}
     attrs:
-      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/stirling-pdf.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/pdf.svg
   - model: authentik_core.application
     identifiers: {slug: stmt}
     attrs:
-      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/receipt.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/stmt.svg
   - model: authentik_core.application
     identifiers: {slug: connect}
     attrs:
-      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/network.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/connect.svg
   - model: authentik_core.application
     identifiers: {slug: books}
     attrs:
-      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/book-open.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/books.svg
   - model: authentik_core.application
     identifiers: {slug: seafile}
     attrs:
-      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/seafile.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/seafile.svg
   - model: authentik_core.application
     identifiers: {slug: immich}
     attrs:
-      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/immich.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/immich.svg
   - model: authentik_core.application
     identifiers: {slug: mail}
     attrs:
-      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/mail.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/mail.svg
   - model: authentik_core.application
     identifiers: {slug: track}
     attrs:
-      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/dawarich.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/track.svg
   - model: authentik_core.application
     identifiers: {slug: tailscale}
     attrs:
-      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/tailscale.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/tailscale.svg
   - model: authentik_core.application
     identifiers: {slug: rustfs}
     attrs:
-      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/rustfs.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/rustfs.svg
   - model: authentik_core.application
     identifiers: {slug: solver}
     attrs:
-      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/calculator.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/solver.svg
   - model: authentik_core.application
     identifiers: {slug: argocd}
     attrs:
-      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/argo-cd.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/argocd.svg
   - model: authentik_core.application
     identifiers: {slug: technitium}
     attrs:
-      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/technitium.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/technitium.svg
   - model: authentik_core.application
     identifiers: {slug: kopia}
     attrs:
-      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/kopia.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/kopia.svg
   - model: authentik_core.application
     identifiers: {slug: velero-ui}
     attrs:
-      icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/velero.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/velero-ui.svg
   - model: authentik_core.application
     identifiers: {slug: as218822}
     attrs:
-      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/network.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/as218822.svg
   - model: authentik_core.application
     identifiers: {slug: test}
     attrs:
-      icon: https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/flask-conical.svg
+      icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/test.svg
