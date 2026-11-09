@@ -1,8 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
-  <rect x="4" y="4" width="72" height="72" rx="12" fill="#f8fafc" />
-  <svg class="lucide lucide-receipt" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" x="14" y="14" preserveAspectRatio="xMidYMid meet">
-    <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
-    <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
-    <path d="M12 17.5v-11" />
-  </svg>
+  <rect width="80" height="80" rx="18" fill="#d97706"/>
+  <g transform="translate(18 18) scale(1.83333)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m4 3 2 1 2-1 2 1 2-1 2 1 2-1 2 1 2-1v18l-2-1-2 1-2-1-2 1-2-1-2 1-2-1-2 1ZM8 8h8M8 12h8M8 16h4"/>
+  </g>
 </svg>

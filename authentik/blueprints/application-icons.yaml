@@ -1,81 +1,100 @@
 version: 1
 metadata:
-  name: Lab - Application icons
+  name: Lab - Application icons and categories
 entries:
   # Only update appearance; preserve providers, launch URLs, and access policies.
   - model: authentik_core.application
     identifiers: {slug: go}
     attrs:
+      group: 일상·문서
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/go.svg
   - model: authentik_core.application
     identifiers: {slug: meta}
     attrs:
+      group: 인프라·관리
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/meta.svg
   - model: authentik_core.application
     identifiers: {slug: pdf}
     attrs:
+      group: 일상·문서
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/pdf.svg
   - model: authentik_core.application
     identifiers: {slug: stmt}
     attrs:
+      group: 일상·문서
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/stmt.svg
   - model: authentik_core.application
     identifiers: {slug: connect}
     attrs:
+      group: 개발·네트워크
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/connect.svg
   - model: authentik_core.application
     identifiers: {slug: books}
     attrs:
+      group: 일상·문서
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/books.svg
   - model: authentik_core.application
     identifiers: {slug: seafile}
     attrs:
+      group: 일상·문서
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/seafile.svg
   - model: authentik_core.application
     identifiers: {slug: immich}
     attrs:
+      group: 일상·문서
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/immich.svg
   - model: authentik_core.application
     identifiers: {slug: mail}
     attrs:
+      group: 일상·문서
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/mail.svg
   - model: authentik_core.application
     identifiers: {slug: track}
     attrs:
+      group: 일상·문서
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/track.svg
   - model: authentik_core.application
     identifiers: {slug: tailscale}
     attrs:
+      group: 개발·네트워크
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/tailscale.svg
   - model: authentik_core.application
     identifiers: {slug: rustfs}
     attrs:
+      group: 인프라·관리
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/rustfs.svg
   - model: authentik_core.application
     identifiers: {slug: solver}
     attrs:
+      group: 개발·네트워크
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/solver.svg
   - model: authentik_core.application
     identifiers: {slug: argocd}
     attrs:
+      group: 인프라·관리
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/argocd.svg
   - model: authentik_core.application
     identifiers: {slug: technitium}
     attrs:
+      group: 인프라·관리
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/technitium.svg
   - model: authentik_core.application
     identifiers: {slug: kopia}
     attrs:
+      group: 인프라·관리
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/kopia.svg
   - model: authentik_core.application
     identifiers: {slug: velero-ui}
     attrs:
+      group: 인프라·관리
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/velero-ui.svg
   - model: authentik_core.application
     identifiers: {slug: as218822}
     attrs:
+      group: 개발·네트워크
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/as218822.svg
   - model: authentik_core.application
     identifiers: {slug: test}
     attrs:
+      group: 테스트
       icon: https://raw.githubusercontent.com/pmh-only/lab/main/authentik/branding/application-icons/test.svg
