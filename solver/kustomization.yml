@@ -17,4 +17,4 @@ images:
     newTag: 29.9.3-dind
   - name: ghcr.io/pmh-only/solver
     newTag: latest
-    digest: sha256:73fec4c25aa50287db42515235cbd2501c3b28eaf9391636f0d9ed2f8fd208c7
+    digest: sha256:8f2c35ab0923dde8730a95939f4c4306ff752129ddaabf3aafface4e86860be0
