@@ -1,6 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
-  <rect width="80" height="80" rx="18" fill="#0d9488"/>
-  <g transform="translate(18 18) scale(1.83333)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4" ry="10"/><path d="M2 12h20"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:ns1="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:ns2="http://www.inkscape.org/namespaces/inkscape" xmlns:ns3="http://www.w3.org/1999/xlink" width="80" height="80" viewBox="0 0 80 80">
+  <svg version="1.1" id="svg1" width="52" height="52" viewBox="0 0 200 200" ns1:docname="technitium.png" x="14" y="14" preserveAspectRatio="xMidYMid meet">
+    <defs id="defs1" />
+    <ns1:namedview id="namedview1" pagecolor="#ffffff" bordercolor="#000000" borderopacity="0.25" ns2:showpageshadow="2" ns2:pageopacity="0.0" ns2:pagecheckerboard="0" ns2:deskcolor="#d1d1d1" />
+    <g ns2:groupmode="layer" ns2:label="Image" id="g1">
+      <image width="200" height="200" preserveAspectRatio="none" ns3:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADIAgMAAADQNkYNAAAADFBMVEVmmf+Msv+yzP////+SQxlN&#10;AAAAsklEQVR4Ae3WgQXDUBCH8VMUCbpHl+g+maIjdIQCmoOOkFU6QgBU5eqknpbjNIQnvg/wnh/A&#10;3wnVWqd5V5G9er14g+WNIq15U30EAoFAyvTd58d4+gr56WDeS+IgkMVkMO/xRXYWB4FAINslcS0E&#10;sg45BldfQk7mjRAIBAKBLCWNerc/SGkVAoGEnTdNIBAIJF3LEgSymDQaNP8+9VMf3JZJEwQCgdRH&#10;OvUuPn15vVQavQGIzVnNMxO64QAAAABJRU5ErkJggg==&#10;" id="image1" />
+    </g>
+  </svg>
 </svg>

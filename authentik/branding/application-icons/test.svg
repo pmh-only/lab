@@ -1,6 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
-  <rect width="80" height="80" rx="18" fill="#64748b"/>
-  <g transform="translate(18 18) scale(1.83333)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M9 2h6M10 2v7L3 19a2 2 0 0 0 2 3h14a2 2 0 0 0 2-3L14 9V2M7 14h10"/>
-  </g>
+  <rect x="4" y="4" width="72" height="72" rx="12" fill="#f8fafc" />
+  <svg class="lucide lucide-flask-conical" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" x="14" y="14" preserveAspectRatio="xMidYMid meet">
+    <path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2" />
+    <path d="M6.453 15h11.094" />
+    <path d="M8.5 2h7" />
+  </svg>
 </svg>
