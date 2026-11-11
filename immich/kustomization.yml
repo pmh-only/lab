@@ -28,7 +28,7 @@ images:
     digest: sha256:7b7b575029168bfb9eb901d868ce7dbfda0d7818e78aaace29b7b8a08cd4e7d5
   - name: ghcr.io/immich-app/immich-machine-learning
     newTag: release
-    digest: sha256:f4e7275c9fbd956ed7bccc738ac57890bcbd9f9c17844d2ea0b137e38a083454
+    digest: sha256:8adebf414256f6e4f837bfbb66fa94f14f4da7260e3a1d65cbba49e4e35d8764
   - name: ghcr.io/immich-app/postgres
     newTag: 14-vectorchord0.4.3-pgvectors0.2.0
     digest: sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
