@@ -2,4 +2,4 @@
 server:
   image:
     repository: hashicorp/vault
-    tag: '2.2.1'
+    tag: '2.2.2'
