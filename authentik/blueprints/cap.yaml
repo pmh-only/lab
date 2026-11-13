@@ -10,7 +10,7 @@ entries:
       public_key: !Env AUTHENTIK_CAP_ENDPOINT
       private_key: !Env AUTHENTIK_CAP_SECRET_KEY
       interactive: true
-      js_url: https://auth.pmh.codes/static/dist/custom-cap-widget.js
+      js_url: https://auth.pmh.codes/static/dist/custom-cap-widget.js?v=2
       api_url: !Env AUTHENTIK_CAP_VERIFY_URL
       request_content_type: application/json
 

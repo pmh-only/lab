@@ -1,5 +1,9 @@
 // Loaded in authentik's CAPTCHA iframe as well as its provider-discovery context.
 // Keep the original widget and verification protocol; only customize presentation.
+// A static dependency must register the provider before authentik's load handler.
+// Top-level await can let the script load event run before registration finishes.
+import "https://cap.pmh.codes/assets/widget.js";
+
 if (window.frameElement?.id === "ak-captcha") {
     const style = document.createElement("style");
     style.textContent = `
@@ -32,5 +36,3 @@ if (window.frameElement?.id === "ak-captcha") {
         maxWidth: "100%",
     });
 }
-
-await import("https://cap.pmh.codes/assets/widget.js");
