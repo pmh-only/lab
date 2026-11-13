@@ -14,13 +14,38 @@ entries:
       api_url: !Env AUTHENTIK_CAP_VERIFY_URL
       request_content_type: application/json
 
-  # Run after password validation (20) and before MFA (30).
-  # Match the existing binding independently of its order to update it in place.
+  # Identification verifies its embedded CAPTCHA before checking the password.
+  # Cap tokens are single-use, so a failed password consumes the solved CAPTCHA.
+  - model: authentik_stages_identification.identificationstage
+    identifiers:
+      name: default-authentication-identification
+    attrs:
+      password_stage: !Find [authentik_stages_password.passwordstage, [name, default-authentication-password]]
+      captcha_stage: !KeyOf cap-captcha
+
+  # Remove standalone steps: neither may run a second time after embedding.
   - model: authentik_flows.flowstagebinding
+    state: absent
     identifiers:
       target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
       stage: !KeyOf cap-captcha
+  - model: authentik_flows.flowstagebinding
+    state: absent
+    identifiers:
+      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+      stage: !Find [authentik_stages_password.passwordstage, [name, default-authentication-password]]
+
+  # Clear the entire plan on failure. Do not keep an authenticated password or
+  # a previously solved CAPTCHA when retrying either credentials or MFA.
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+      stage: !Find [authentik_stages_identification.identificationstage, [name, default-authentication-identification]]
     attrs:
-      order: 25
-      evaluate_on_plan: true
-      re_evaluate_policies: true
+      invalid_response_action: restart
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+      stage: !Find [authentik_stages_authenticator_validate.authenticatorvalidatestage, [name, default-authentication-mfa-validation]]
+    attrs:
+      invalid_response_action: restart

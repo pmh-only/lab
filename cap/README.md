@@ -4,8 +4,11 @@
 Valkey holds keys, sessions and widget assets; DuckDB holds analytics on a separate
 PVC. Both images are digest-pinned and support the cluster's ARM64 nodes.
 
-`authentik/blueprints/cap.yaml` adds an interactive CAPTCHA **after password validation**
-in `default-authentication-flow`. Direct Discord source flows are unchanged.
+`authentik/blueprints/cap.yaml` embeds the password and interactive CAPTCHA in the
+identification form of `default-authentication-flow`. The server verifies the
+single-use CAPTCHA **before checking the password**. Invalid credentials or MFA
+restart the entire flow without retaining context, requiring a new CAPTCHA.
+Direct Discord source flows are unchanged.
 Verification uses the internal Cap service with JSON; browsers use the public
 HTTPS endpoint and self-hosted widget. A small Git-managed module served by
 authentik styles the widget dark and sizes its iframe without scrollbars.
@@ -90,8 +93,10 @@ curl --fail https://cap.pmh.codes/health
 curl --fail --output /dev/null https://cap.pmh.codes/assets/widget.js
 ```
 
-In a private browser window, confirm the default login flow presents Cap after password validation, valid
-solves allow login, invalid tokens fail, and existing MFA still runs. A Cap outage
+In a private browser window, confirm the login form presents password and Cap,
+valid solves allow password verification, invalid tokens fail, and existing MFA
+still runs. Invalid passwords and MFA must restart the flow with a new CAPTCHA.
+A Cap outage
 must fail closed. Do not claim deployment complete from manifest validation alone.
 
 ## Recovery and updates
@@ -100,7 +105,7 @@ must fail closed. Do not claim deployment complete from manifest validation alon
 - Changing `ADMIN_KEY` makes encrypted site secrets unreadable; coordinate a
   Cap site-secret reset and Vault integration update instead of rotating it alone.
 - Update image digests through Git review; do not silently follow `latest`.
-- To disable CAPTCHA, set the flow binding's blueprint `state: absent` and sync.
-  Simply removing the blueprint file does **not** delete an imported binding.
-  If locked out, an administrator can remove that binding through `ak shell`
-  using Kubernetes access, then reconcile the same change in Git.
+- To disable CAPTCHA, set the identification stage's `captcha_stage` to `null`
+  in its blueprint and sync. Removing the blueprint file does not undo imported
+  settings. For emergency recovery use `ak shell` through Kubernetes access and
+  reconcile the same change in Git.
