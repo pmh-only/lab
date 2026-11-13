@@ -1,4 +1,4 @@
-import { initializeWebAuth, loadOidcSettings, saveOidcSettings } from '/app/dist/web-auth.js';
+import { initializeWebAuth, loadOidcSettings, saveOidcSettings } from '/app/dist/web/auth/session.js';
 
 // Initialize only configuration, before any HTTP listener, Discord or AI work.
 // Preserve subsequent settings made through the original native web interface.
