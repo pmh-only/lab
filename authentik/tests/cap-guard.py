@@ -23,6 +23,7 @@ identification = IdentificationStage.objects.get(
 assert identification.password_stage is not None
 assert identification.captcha_stage is not None
 assert identification.captcha_stage.error_on_invalid_score
+assert not identification.sources.exists()
 bindings = FlowStageBinding.objects.filter(
     target__slug="default-authentication-flow"
 )
@@ -34,6 +35,9 @@ for name in (
 ):
     assert bindings.get(stage__name=name).invalid_response_action == "restart"
 assert BlueprintInstance.objects.get(path="custom/cap.yaml").status == "successful"
+assert BlueprintInstance.objects.get(path="custom/login-choice.yaml").status == "successful"
+assert bindings.get(stage__name="lab-login-choice").order == 0
+assert bindings.get(stage__name="lab-login-discord-redirect").order == 5
 
 user = User(username="captcha-regression-test")
 view = SimpleNamespace(

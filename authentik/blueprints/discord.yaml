@@ -148,10 +148,11 @@ entries:
       user_property_mappings:
         - !KeyOf discord-user-mapping
 
+  # Discord is chosen before the internal credentials form, not inside it.
   - model: authentik_stages_identification.identificationstage
     state: present
     identifiers:
       name: default-authentication-identification
     attrs:
-      sources:
-        - !KeyOf discord-source
+      user_fields: [email, username]
+      sources: []

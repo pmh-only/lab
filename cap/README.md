@@ -9,6 +9,11 @@ identification form of `default-authentication-flow`. The server verifies the
 single-use CAPTCHA **before checking the password**. Invalid credentials or MFA
 restart the entire flow without retaining context, requiring a new CAPTCHA.
 Direct Discord source flows are unchanged.
+The default login flow first asks for **Internal 로그인** or **Discord 로그인**
+using a native authentik prompt. Internal continues to credentials and CAPTCHA;
+Discord redirects directly to the existing OAuth source without a local CAPTCHA.
+The internal credentials form no longer shows OAuth source buttons. Credential
+or MFA failure restarts from the method selection screen.
 Verification uses the internal Cap service with JSON; browsers use the public
 HTTPS endpoint and self-hosted widget. A small Git-managed module served by
 authentik styles the widget dark and sizes its iframe without scrollbars.

@@ -23,6 +23,7 @@ configMapGenerator:
       - seafile-discord-quota.yaml=./blueprints/seafile-discord-quota.yaml
       - solver-discord-access.yaml=./blueprints/solver-discord-access.yaml
       - cap.yaml=./blueprints/cap.yaml
+      - login-choice.yaml=./blueprints/login-choice.yaml
   - name: authentik-runtime
     literals:
       - AUTHENTIK_POSTGRESQL__HOST=pgsql-service.database.svc.cluster.local
