@@ -4,10 +4,12 @@
 Valkey holds keys, sessions and widget assets; DuckDB holds analytics on a separate
 PVC. Both images are digest-pinned and support the cluster's ARM64 nodes.
 
-`authentik/blueprints/cap.yaml` adds an interactive CAPTCHA **before identification**
+`authentik/blueprints/cap.yaml` adds an interactive CAPTCHA **after password validation**
 in `default-authentication-flow`. Direct Discord source flows are unchanged.
 Verification uses the internal Cap service with JSON; browsers use the public
-HTTPS endpoint and self-hosted widget. Do not put the CAPTCHA endpoints behind
+HTTPS endpoint and self-hosted widget. A small Git-managed module served by
+authentik styles the widget dark and sizes its iframe without scrollbars.
+Do not put the CAPTCHA endpoints behind
 authentik authentication: that would create a login dependency loop.
 
 ## First deployment
@@ -88,7 +90,7 @@ curl --fail https://cap.pmh.codes/health
 curl --fail --output /dev/null https://cap.pmh.codes/assets/widget.js
 ```
 
-In a private browser window, confirm the default login flow presents Cap, valid
+In a private browser window, confirm the default login flow presents Cap after password validation, valid
 solves allow login, invalid tokens fail, and existing MFA still runs. A Cap outage
 must fail closed. Do not claim deployment complete from manifest validation alone.
 

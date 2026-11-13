@@ -74,6 +74,10 @@ spec:
               path: /-/health/live/
               port: 9000
           volumeMounts:
+            - mountPath: /web/dist/custom-cap-widget.js
+              name: cap-widget
+              subPath: custom-cap-widget.js
+              readOnly: true
             - mountPath: /data
               name: authentik-storage
               subPath: data
@@ -81,6 +85,9 @@ spec:
               name: authentik-storage
               subPath: templates
       volumes:
+        - name: cap-widget
+          configMap:
+            name: authentik-cap-widget
         - name: authentik-storage
           persistentVolumeClaim:
             claimName: authentik-pvc

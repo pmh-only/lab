@@ -10,6 +10,9 @@ resources:
   - ./ingress.yml
   - ./network-policy.yml
 configMapGenerator:
+  - name: authentik-cap-widget
+    files:
+      - custom-cap-widget.js=./branding/cap-widget.js
   - name: authentik-blueprints
     files:
       - application-icons.yaml=./blueprints/application-icons.yaml
