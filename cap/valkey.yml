@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cap-valkey
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: cap-valkey
+  template:
+    metadata:
+      labels:
+        app: cap-valkey
+    spec:
+      automountServiceAccountToken: false
+      nodeSelector:
+        kubernetes.io/hostname: pmhoci2
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: valkey
+          image: valkey/valkey:9-alpine
+          args:
+            - valkey-server
+            - --appendonly
+            - "yes"
+            - --appendfsync
+            - everysec
+            - --save
+            - "60 1"
+            - --maxmemory
+            - 128mb
+            - --maxmemory-policy
+            - noeviction
+            - --loglevel
+            - warning
+          ports:
+            - name: redis
+              containerPort: 6379
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          readinessProbe:
+            exec:
+              command: [valkey-cli, ping]
+          livenessProbe:
+            exec:
+              command: [valkey-cli, ping]
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              memory: 256Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cap-valkey-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cap-valkey
+spec:
+  selector:
+    app: cap-valkey
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis

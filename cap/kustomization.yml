@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: cap
+resources:
+  - ./deployment.yml
+  - ./valkey.yml
+  - ./pvc.yml
+  - ./secret.yml
+  - ./service.yml
+  - ./ingress.yml
+  - ./network-policy.yml
+images:
+  - name: tiago2/cap
+    newTag: "4"
+    digest: sha256:9eb46e4282e78dacb15b535204ececa1506650499e498a50831e0377b7ac98d1
+  - name: valkey/valkey
+    newTag: 9-alpine
+    digest: sha256:bf09d58e96d6b4524a15396b65b242bbe18beebbcc15a04d8ee75ddac62fae0b
