@@ -1,8 +1,6 @@
-// Loaded in authentik's CAPTCHA iframe as well as its provider-discovery context.
-// Keep the original widget and verification protocol; only customize presentation.
-// A static dependency must register the provider before authentik's load handler.
-// Top-level await can let the script load event run before registration finishes.
-import "https://cap.pmh.codes/assets/widget.js";
+// Appended to the checksum-verified upstream widget by the server init container.
+// authentik 2026.8 loads this as a module in the parent but a classic script in
+// its CAPTCHA iframe: this bundle must work in both, with no imports or await.
 
 if (window.frameElement?.id === "ak-captcha") {
     const style = document.createElement("style");
@@ -35,4 +33,13 @@ if (window.frameElement?.id === "ak-captcha") {
         display: "block",
         maxWidth: "100%",
     });
+    const container = document.getElementById("ak-container");
+    if (container) {
+        const resize = () => {
+            window.frameElement.style.height =
+                `${Math.ceil(container.getBoundingClientRect().height)}px`;
+        };
+        new ResizeObserver(resize).observe(container);
+        requestAnimationFrame(resize);
+    }
 }

@@ -27,6 +27,32 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
+        - name: cap-widget-bundle
+          image: ghcr.io/goauthentik/server:latest
+          command:
+            - python
+            - -c
+            - |
+              import hashlib
+              import pathlib
+              import urllib.request
+              with urllib.request.urlopen("https://cap.pmh.codes/assets/widget.js", timeout=30) as response:
+                  widget = response.read()
+              expected = "df592e172072ed0d01761ccbd557cd7caa80446d39bd70794b1f1f0a2f5e7633"
+              if hashlib.sha256(widget).hexdigest() != expected:
+                  raise RuntimeError("Cap widget checksum changed; review the asset before updating Git")
+              styling = pathlib.Path("/source/custom-cap-widget.js").read_bytes()
+              pathlib.Path("/bundle/custom-cap-widget.js").write_bytes(widget + b"\n;\n" + styling)
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: cap-widget-source
+              mountPath: /source
+              readOnly: true
+            - name: cap-widget
+              mountPath: /bundle
         - name: storage-directories
           image: ghcr.io/goauthentik/server:latest
           command: [/bin/sh, -ec, "mkdir -p /storage/data /storage/templates /storage/certs"]
@@ -86,6 +112,8 @@ spec:
               subPath: templates
       volumes:
         - name: cap-widget
+          emptyDir: {}
+        - name: cap-widget-source
           configMap:
             name: authentik-cap-widget
         - name: authentik-storage
