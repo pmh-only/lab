@@ -52,18 +52,22 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   
+  <td><img src="https://argo.pmh.codes/api/badge?name=cap&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=cert-manager&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
   
   <td><img src="https://argo.pmh.codes/api/badge?name=cert-manager-technitium-webhook&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=chatsolution&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=chatsolution&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=connect&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
@@ -73,13 +77,13 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   <td><img src="https://argo.pmh.codes/api/badge?name=descheduler&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=envoy-gateway&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=envoy-gateway&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=gateway&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
@@ -89,13 +93,13 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   <td><img src="https://argo.pmh.codes/api/badge?name=guessaiword&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=heartbeat&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=heartbeat&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=here&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
@@ -105,13 +109,13 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   <td><img src="https://argo.pmh.codes/api/badge?name=immich&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=indexgen&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=indexgen&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=keepy&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
@@ -121,13 +125,13 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   <td><img src="https://argo.pmh.codes/api/badge?name=kopia&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=mail&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=mail&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=minecraft&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
@@ -137,13 +141,13 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   <td><img src="https://argo.pmh.codes/api/badge?name=monitoring&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=nameserver&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=nameserver&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=notaikr&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
@@ -153,13 +157,13 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   <td><img src="https://argo.pmh.codes/api/badge?name=otp&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=pdf&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=pdf&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=reloader&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
@@ -169,13 +173,13 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   <td><img src="https://argo.pmh.codes/api/badge?name=solver&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=speed&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=speed&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=spotify&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
@@ -185,13 +189,13 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   <td><img src="https://argo.pmh.codes/api/badge?name=tailscale&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=thepool&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=thepool&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=trace&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
@@ -201,13 +205,13 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   <td><img src="https://argo.pmh.codes/api/badge?name=traffic&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=vault&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
   
   <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=vault&revision=false&showAppName=true" width="200px" /><br /></td>
+  
+  
+  
   <td><img src="https://argo.pmh.codes/api/badge?name=vault-secrets-operator&revision=false&showAppName=true" width="200px" /><br /></td>
   
   
@@ -217,11 +221,11 @@ This repository defines many components of Kubernetes cluster such as:
   
   
   <td><img src="https://argo.pmh.codes/api/badge?name=velero-ui&revision=false&showAppName=true" width="200px" /><br /></td>
-  
-  
-  
-  <td><img src="https://argo.pmh.codes/api/badge?name=visualized&revision=false&showAppName=true" width="200px" /><br /></td>
   </tr>
+  
+  <tr>
+  <td><img src="https://argo.pmh.codes/api/badge?name=visualized&revision=false&showAppName=true" width="200px" /><br /></td>
+  
   
 </table>
 
