@@ -99,6 +99,10 @@ still runs. Invalid passwords and MFA must restart the flow with a new CAPTCHA.
 A Cap outage
 must fail closed. Do not claim deployment complete from manifest validation alone.
 
+`authentik/tests/cap-guard.py` checks the live blueprint, retry actions and server
+verification order with mocked credentials. Run it using the command in its
+docstring; it does not attempt passwords against real accounts or alter MFA data.
+
 ## Recovery and updates
 
 - Preserve both PVCs and the Vault values. Losing Valkey loses site keys.
