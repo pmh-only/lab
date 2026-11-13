@@ -136,6 +136,8 @@ spec:
                 name: authentik-bootstrap-worker
             - secretRef:
                 name: authentik-discord-oauth
+            - secretRef:
+                name: authentik-cap
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

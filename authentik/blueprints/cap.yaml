@@ -1,0 +1,25 @@
+version: 1
+metadata:
+  name: Lab - Cap CAPTCHA
+entries:
+  - model: authentik_stages_captcha.captchastage
+    id: cap-captcha
+    identifiers:
+      name: cap-captcha
+    attrs:
+      public_key: !Env AUTHENTIK_CAP_ENDPOINT
+      private_key: !Env AUTHENTIK_CAP_SECRET_KEY
+      interactive: true
+      js_url: https://cap.pmh.codes/assets/widget.js
+      api_url: !Env AUTHENTIK_CAP_VERIFY_URL
+      request_content_type: application/json
+
+  # Run before identification (order 10), without changing built-in stages.
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+      stage: !KeyOf cap-captcha
+      order: 0
+    attrs:
+      evaluate_on_plan: true
+      re_evaluate_policies: true
