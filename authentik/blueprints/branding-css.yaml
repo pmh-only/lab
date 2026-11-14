@@ -1,0 +1,9 @@
+version: 1
+metadata:
+  name: Lab - Git-managed brand stylesheet
+entries:
+  - model: authentik_brands.brand
+    identifiers:
+      domain: authentik-default
+    attrs:
+      branding_custom_css: !Env AUTHENTIK_BRANDING_CSS

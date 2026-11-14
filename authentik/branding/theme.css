@@ -287,3 +287,123 @@ ak-library-impl::part(card):hover,
         border-color: CanvasText;
     }
 }
+
+/* Method selection only. Keep native radios, validation and keyboard behavior. */
+:host(ak-stage-prompt) .pf-c-form:has(input[name="login_method"]) {
+    gap: 1.75rem;
+}
+
+:host(ak-stage-prompt) .pf-c-form__group:has(input[name="login_method"]) {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+}
+
+:host(ak-stage-prompt) .pf-c-form__group:has(input[name="login_method"]) > .pf-c-form__label {
+    padding: 0 0 .5rem;
+    color: #92959f;
+    font-size: .875rem;
+    font-weight: 400;
+}
+
+:host(ak-stage-prompt) .pf-c-check:has(input[name="login_method"]) {
+    --method-accent: #cdd1dc;
+    --method-tint: #ffffff08;
+    --method-caption: "Your PMH account · Password & MFA";
+    --method-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='16' rx='4'/%3E%3Cpath d='m7 9 3 3-3 3m6 0h4'/%3E%3C/g%3E%3C/svg%3E");
+    display: block;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    isolation: isolate;
+}
+
+:host(ak-stage-prompt) .pf-c-check:has(input[value="discord"]) {
+    --method-accent: #a8afff;
+    --method-tint: #5865f212;
+    --method-caption: "Continue with your Discord account";
+    --method-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20.3 4.4a19.8 19.8 0 0 0-4.9-1.5l-.6 1.2a18.4 18.4 0 0 0-5.6 0l-.6-1.2a19.7 19.7 0 0 0-4.9 1.5C.6 9 .1 13.5.4 17.9a19.7 19.7 0 0 0 6 3l1.2-2a12.8 12.8 0 0 1-1.9-.9l.5-.4a14.1 14.1 0 0 0 11.6 0l.5.4a12 12 0 0 1-1.9.9l1.2 2a19.6 19.6 0 0 0 6-3c.4-5.1-.8-9.6-3.3-13.5ZM8 15.2c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Zm8 0c-1.2 0-2.1-1.1-2.1-2.4s.9-2.4 2.1-2.4 2.2 1.1 2.1 2.4c0 1.3-.9 2.4-2.1 2.4Z'/%3E%3C/svg%3E");
+}
+
+:host(ak-stage-prompt) input[name="login_method"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    clip-path: inset(50%);
+}
+
+:host(ak-stage-prompt) input[name="login_method"] + label {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: .875rem;
+    row-gap: .25rem;
+    align-items: center;
+    padding: 1.125rem 2rem 1.125rem 1rem;
+    border: 1px solid #ffffff14;
+    border-radius: .75rem;
+    background: #ffffff02;
+    color: #edeef2;
+    font-size: .9375rem;
+    font-weight: 550;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: background 140ms ease, border-color 140ms ease;
+}
+
+:host(ak-stage-prompt) input[name="login_method"] + label::before {
+    content: "";
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 1.375rem;
+    height: 1.375rem;
+    justify-self: center;
+    background: var(--method-accent);
+    mask: var(--method-icon) center / contain no-repeat;
+}
+
+:host(ak-stage-prompt) input[name="login_method"] + label::after {
+    content: var(--method-caption);
+    grid-column: 2;
+    grid-row: 2;
+    color: #8f939f;
+    font-size: .6875rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+:host(ak-stage-prompt) input[name="login_method"] + label:hover {
+    border-color: #ffffff30;
+    background: #ffffff06;
+}
+
+:host(ak-stage-prompt) input[name="login_method"]:checked + label {
+    border-color: var(--method-accent);
+    background: var(--method-tint);
+}
+
+:host(ak-stage-prompt) .pf-c-check:has(input[name="login_method"]:checked)::after {
+    content: "✓";
+    position: absolute;
+    right: .875rem;
+    top: 1.125rem;
+    color: var(--method-accent);
+    font-size: .8125rem;
+    pointer-events: none;
+}
+
+:host(ak-stage-prompt) input[name="login_method"]:focus-visible + label {
+    outline: 2px solid #9ca8e8;
+    outline-offset: 3px;
+}
+
+:host(ak-stage-prompt) .pf-c-form:has(input[name="login_method"]) .pf-m-action {
+    margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :host(ak-stage-prompt) input[name="login_method"] + label {
+        transition: none;
+    }
+}

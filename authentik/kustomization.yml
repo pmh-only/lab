@@ -10,6 +10,9 @@ resources:
   - ./ingress.yml
   - ./network-policy.yml
 configMapGenerator:
+  - name: authentik-branding-css
+    files:
+      - theme.css=./branding/theme.css
   - name: authentik-cap-widget
     files:
       - custom-cap-widget.js=./branding/cap-widget.js
@@ -24,6 +27,7 @@ configMapGenerator:
       - solver-discord-access.yaml=./blueprints/solver-discord-access.yaml
       - cap.yaml=./blueprints/cap.yaml
       - login-choice.yaml=./blueprints/login-choice.yaml
+      - branding-css.yaml=./blueprints/branding-css.yaml
   - name: authentik-runtime
     literals:
       - AUTHENTIK_POSTGRESQL__HOST=pgsql-service.database.svc.cluster.local

@@ -93,15 +93,15 @@ entries:
       name: lab-authentication-method
     attrs:
       field_key: login_method
-      label: 로그인 방식
+      label: Choose how to sign in
       type: radio-button-group
       required: true
       order: 0
       placeholder_expression: true
       placeholder: |
         return [
-            {"label": "Internal 로그인", "value": "internal"},
-            {"label": "Discord 로그인", "value": "discord"},
+            {"label": "Internal", "value": "internal"},
+            {"label": "Discord", "value": "discord"},
         ]
       initial_value: internal
   - model: authentik_stages_prompt.promptstage

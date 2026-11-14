@@ -173,6 +173,12 @@ spec:
                 name: authentik-discord-oauth
             - secretRef:
                 name: authentik-cap
+          env:
+            - name: AUTHENTIK_BRANDING_CSS
+              valueFrom:
+                configMapKeyRef:
+                  name: authentik-branding-css
+                  key: theme.css
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
