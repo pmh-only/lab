@@ -10,7 +10,7 @@ entries:
       slug: lab-internal-authentication
     attrs:
       name: Internal login
-      title: Internal 로그인
+      title: Internal sign-in
       designation: authentication
       authentication: none
 
@@ -20,7 +20,7 @@ entries:
       slug: lab-discord-entry
     attrs:
       name: Discord login
-      title: Discord 로그인
+      title: Discord sign-in
       designation: authentication
       authentication: none
 
