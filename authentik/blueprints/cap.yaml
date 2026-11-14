@@ -2,6 +2,28 @@ version: 1
 metadata:
   name: Lab - Cap CAPTCHA
 entries:
+  # Keep selection, internal credentials and source login in separate native
+  # flows. Flow-mode redirects preserve the executor's original next/OIDC query.
+  - model: authentik_flows.flow
+    id: internal-flow
+    identifiers:
+      slug: lab-internal-authentication
+    attrs:
+      name: Internal login
+      title: Internal 로그인
+      designation: authentication
+      authentication: none
+
+  - model: authentik_flows.flow
+    id: discord-entry-flow
+    identifiers:
+      slug: lab-discord-entry
+    attrs:
+      name: Discord login
+      title: Discord 로그인
+      designation: authentication
+      authentication: none
+
   - model: authentik_stages_captcha.captchastage
     id: cap-captcha
     identifiers:
@@ -14,19 +36,152 @@ entries:
       api_url: !Env AUTHENTIK_CAP_VERIFY_URL
       request_content_type: application/json
 
-  # Identification verifies its embedded CAPTCHA before checking the password.
-  # Cap tokens are single-use, so a failed password consumes the solved CAPTCHA.
+  # A dedicated stage avoids changing sources on the shared built-in stage.
   - model: authentik_stages_identification.identificationstage
+    id: internal-identification
     identifiers:
-      name: default-authentication-identification
+      name: lab-internal-identification
     attrs:
       user_fields: [email, username]
-      sources:
-        - !Find [authentik_sources_oauth.oauthsource, [slug, discord]]
+      sources: []
       password_stage: !Find [authentik_stages_password.passwordstage, [name, default-authentication-password]]
       captcha_stage: !KeyOf cap-captcha
 
-  # Remove standalone steps: neither may run a second time after embedding.
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !KeyOf internal-flow
+      stage: !KeyOf internal-identification
+      order: 10
+    attrs:
+      invalid_response_action: restart
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !KeyOf internal-flow
+      stage: !Find [authentik_stages_authenticator_validate.authenticatorvalidatestage, [name, default-authentication-mfa-validation]]
+      order: 30
+    attrs:
+      invalid_response_action: restart
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !KeyOf internal-flow
+      stage: !Find [authentik_stages_user_login.userloginstage, [name, default-authentication-login]]
+      order: 100
+
+  # Let authentik itself construct the Discord authorization URL and state.
+  # One source and no user fields triggers the native source-only login path.
+  - model: authentik_stages_identification.identificationstage
+    id: discord-identification
+    identifiers:
+      name: lab-discord-identification
+    attrs:
+      user_fields: []
+      sources:
+        - !Find [authentik_sources_oauth.oauthsource, [slug, discord]]
+      password_stage: null
+      captcha_stage: null
+      passwordless_flow: null
+      show_source_labels: true
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !KeyOf discord-entry-flow
+      stage: !KeyOf discord-identification
+      order: 0
+
+  - model: authentik_stages_prompt.prompt
+    id: login-method
+    identifiers:
+      name: lab-authentication-method
+    attrs:
+      field_key: login_method
+      label: 로그인 방식
+      type: radio-button-group
+      required: true
+      order: 0
+      placeholder_expression: true
+      placeholder: |
+        return [
+            {"label": "Internal 로그인", "value": "internal"},
+            {"label": "Discord 로그인", "value": "discord"},
+        ]
+      initial_value: internal
+  - model: authentik_stages_prompt.promptstage
+    id: method-selection
+    identifiers:
+      name: lab-auth-method-selection
+    attrs:
+      fields:
+        - !KeyOf login-method
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+      stage: !KeyOf method-selection
+      order: 0
+
+  - model: authentik_stages_redirect.redirectstage
+    id: internal-redirect
+    identifiers:
+      name: lab-auth-internal-flow
+    attrs:
+      mode: flow
+      target_flow: !KeyOf internal-flow
+      keep_context: false
+  - model: authentik_stages_redirect.redirectstage
+    id: discord-redirect
+    identifiers:
+      name: lab-auth-discord-flow
+    attrs:
+      mode: flow
+      target_flow: !KeyOf discord-entry-flow
+      keep_context: false
+  - model: authentik_policies_expression.expressionpolicy
+    id: internal-selected
+    identifiers:
+      name: lab-auth-internal-selected
+    attrs:
+      expression: |
+        return request.context.get("prompt_data", {}).get("login_method") == "internal"
+  - model: authentik_policies_expression.expressionpolicy
+    id: discord-selected
+    identifiers:
+      name: lab-auth-discord-selected
+    attrs:
+      expression: |
+        return request.context.get("prompt_data", {}).get("login_method") == "discord"
+  - model: authentik_flows.flowstagebinding
+    id: internal-redirect-binding
+    identifiers:
+      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+      stage: !KeyOf internal-redirect
+      order: 5
+    attrs:
+      evaluate_on_plan: false
+      re_evaluate_policies: true
+  - model: authentik_flows.flowstagebinding
+    id: discord-redirect-binding
+    identifiers:
+      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+      stage: !KeyOf discord-redirect
+      order: 6
+    attrs:
+      evaluate_on_plan: false
+      re_evaluate_policies: true
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf internal-redirect-binding
+      policy: !KeyOf internal-selected
+      order: 0
+    attrs:
+      failure_result: false
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf discord-redirect-binding
+      policy: !KeyOf discord-selected
+      order: 0
+    attrs:
+      failure_result: false
+
+  # Remove old authentication steps from the entry flow atomically with the
+  # selector. Authentication and session creation only happen in child flows.
   - model: authentik_flows.flowstagebinding
     state: absent
     identifiers:
@@ -38,17 +193,30 @@ entries:
       target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
       stage: !Find [authentik_stages_password.passwordstage, [name, default-authentication-password]]
 
-  # Clear the entire plan on failure. Do not keep an authenticated password or
-  # a previously solved CAPTCHA when retrying either credentials or MFA.
   - model: authentik_flows.flowstagebinding
+    state: absent
     identifiers:
       target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
       stage: !Find [authentik_stages_identification.identificationstage, [name, default-authentication-identification]]
-    attrs:
-      invalid_response_action: restart
   - model: authentik_flows.flowstagebinding
+    state: absent
     identifiers:
       target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
       stage: !Find [authentik_stages_authenticator_validate.authenticatorvalidatestage, [name, default-authentication-mfa-validation]]
+  - model: authentik_flows.flowstagebinding
+    state: absent
+    identifiers:
+      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+      stage: !Find [authentik_stages_user_login.userloginstage, [name, default-authentication-login]]
+
+  # Undo earlier embedding in the shared stage without removing its Discord
+  # source; other consumers must retain the standard native login behavior.
+  - model: authentik_stages_identification.identificationstage
+    identifiers:
+      name: default-authentication-identification
     attrs:
-      invalid_response_action: restart
+      user_fields: [email, username]
+      sources:
+        - !Find [authentik_sources_oauth.oauthsource, [slug, discord]]
+      password_stage: null
+      captcha_stage: null

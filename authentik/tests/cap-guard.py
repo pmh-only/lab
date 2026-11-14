@@ -18,19 +18,19 @@ from authentik.stages.identification.models import IdentificationStage
 from authentik.stages.identification.stage import IdentificationChallengeResponse
 
 identification = IdentificationStage.objects.get(
-    name="default-authentication-identification"
+    name="lab-internal-identification"
 )
 assert identification.password_stage is not None
 assert identification.captcha_stage is not None
 assert identification.captcha_stage.error_on_invalid_score
-assert identification.sources.filter(slug="discord", enabled=True).exists()
+assert not identification.sources.exists()
 bindings = FlowStageBinding.objects.filter(
-    target__slug="default-authentication-flow"
+    target__slug="lab-internal-authentication"
 )
 assert not bindings.filter(stage__name="cap-captcha").exists()
 assert not bindings.filter(stage=identification.password_stage).exists()
 for name in (
-    "default-authentication-identification",
+    "lab-internal-identification",
     "default-authentication-mfa-validation",
 ):
     assert bindings.get(stage__name=name).invalid_response_action == "restart"
@@ -39,6 +39,15 @@ assert BlueprintInstance.objects.get(path="custom/login-choice.yaml").status == 
 assert not bindings.filter(
     stage__name__in=["lab-login-choice", "lab-login-discord-redirect"]
 ).exists()
+entry = FlowStageBinding.objects.filter(target__slug="default-authentication-flow")
+assert set(entry.values_list("stage__name", flat=True)) == {
+    "lab-auth-method-selection", "lab-auth-internal-flow", "lab-auth-discord-flow"
+}
+discord_identification = IdentificationStage.objects.get(name="lab-discord-identification")
+assert discord_identification.user_fields == []
+assert discord_identification.password_stage is None
+assert discord_identification.captcha_stage is None
+assert discord_identification.sources.filter(slug="discord", enabled=True).exists()
 
 user = User(username="captcha-regression-test")
 view = SimpleNamespace(

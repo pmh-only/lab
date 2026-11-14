@@ -5,15 +5,18 @@ Valkey holds keys, sessions and widget assets; DuckDB holds analytics on a separ
 PVC. Both images are digest-pinned and support the cluster's ARM64 nodes.
 
 `authentik/blueprints/cap.yaml` embeds the password and interactive CAPTCHA in the
-identification form of `default-authentication-flow`. The server verifies the
+identification form of `lab-internal-authentication`. The server verifies the
 single-use CAPTCHA **before checking the password**. Invalid credentials or MFA
 restart the entire flow without retaining context, requiring a new CAPTCHA.
 Direct Discord source flows are unchanged.
-The native Discord source button remains visible alongside the internal login
-form. Discord goes directly through authentik's source-login routing without
-requiring the local CAPTCHA. A separate method-selector/redirect experiment was
-removed because shared identification stages and app return paths need native
-source handling. `login-choice.yaml` explicitly removes its imported objects.
+`default-authentication-flow` first presents **Internal 로그인 / Discord 로그인**.
+Native flow-mode redirects switch to separate internal and Discord entry flows,
+preserving the original `next`/OIDC query while clearing authentication context.
+The internal flow has its own identification stage and no source buttons.
+The Discord flow uses native source-only identification (no password/CAPTCHA),
+so authentik constructs its OAuth URL, state and return path as usual.
+The shared built-in identification stage keeps its Discord source unchanged.
+`login-choice.yaml` removes objects from the earlier selector experiment.
 Verification uses the internal Cap service with JSON; browsers use the public
 HTTPS endpoint and self-hosted widget. A small Git-managed module served by
 authentik styles the widget dark and sizes its iframe without scrollbars.
