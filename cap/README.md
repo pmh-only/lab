@@ -17,6 +17,11 @@ The Discord flow uses native source-only identification (no password/CAPTCHA),
 so authentik constructs its OAuth URL, state and return path as usual.
 The shared built-in identification stage keeps its Discord source unchanged.
 `login-choice.yaml` removes objects from the earlier selector experiment.
+Existing HTTP sessions can retain a pickled plan from before this change.
+After upgrading from the previous flow, run
+`authentik/migrate-pending-login-plans.py` to preview and selectively clear only
+obsolete unauthenticated entry plans. It preserves authenticated sessions and
+the original return query. New-browser-only tests do not cover this migration.
 Verification uses the internal Cap service with JSON; browsers use the public
 HTTPS endpoint and self-hosted widget. A small Git-managed module served by
 authentik styles the widget dark and sizes its iframe without scrollbars.
