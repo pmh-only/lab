@@ -9,11 +9,15 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from django.test import RequestFactory
+from django.http import QueryDict
+from django.contrib.auth.models import AnonymousUser
 from rest_framework.exceptions import ValidationError
 
 from authentik.blueprints.models import BlueprintInstance
 from authentik.core.models import User
 from authentik.flows.models import FlowStageBinding
+from authentik.flows.views.executor import SESSION_KEY_GET
+from authentik.stages.prompt.models import Prompt
 from authentik.stages.identification.models import IdentificationStage
 from authentik.stages.identification.stage import IdentificationChallengeResponse
 
@@ -41,13 +45,25 @@ assert not bindings.filter(
 ).exists()
 entry = FlowStageBinding.objects.filter(target__slug="default-authentication-flow")
 assert set(entry.values_list("stage__name", flat=True)) == {
-    "lab-auth-method-selection", "lab-auth-internal-flow", "lab-auth-discord-flow"
+    "lab-auth-method-selection"
 }
 discord_identification = IdentificationStage.objects.get(name="lab-discord-identification")
 assert discord_identification.user_fields == []
 assert discord_identification.password_stage is None
 assert discord_identification.captcha_stage is None
 assert discord_identification.sources.filter(slug="discord", enabled=True).exists()
+method_prompt = Prompt.objects.get(name="lab-authentication-method")
+assert method_prompt.type == "static"
+assert method_prompt.initial_value_expression
+method_request = RequestFactory().get("/")
+method_request.session = {
+    SESSION_KEY_GET: QueryDict("next=%2F%3Freturn_probe%3D1&login_hint=test%2Buser")
+}
+method_html = method_prompt.get_initial_value({}, AnonymousUser(), method_request)
+assert method_html.count("<a ") == 2
+assert "Continue with Internal" in method_html
+assert "Continue with Discord" in method_html
+assert "next=%2F%3Freturn_probe%3D1&amp;login_hint=test%2Buser" in method_html
 
 user = User(username="captcha-regression-test")
 view = SimpleNamespace(

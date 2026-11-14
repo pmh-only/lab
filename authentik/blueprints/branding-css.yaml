@@ -1,6 +1,6 @@
 version: 1
 # Bump alongside theme.css changes: blueprint file hashing does not track !Env.
-# Stylesheet revision: 2
+# Stylesheet revision: 3
 metadata:
   name: Lab - Git-managed brand stylesheet
 entries:

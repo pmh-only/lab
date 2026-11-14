@@ -3,7 +3,7 @@ metadata:
   name: Lab - Cap CAPTCHA
 entries:
   # Keep selection, internal credentials and source login in separate native
-  # flows. Flow-mode redirects preserve the executor's original next/OIDC query.
+  # flows. Direct buttons preserve the executor's original next/OIDC query.
   - model: authentik_flows.flow
     id: internal-flow
     identifiers:
@@ -93,17 +93,36 @@ entries:
       name: lab-authentication-method
     attrs:
       field_key: login_method
-      label: Choose how to sign in
-      type: radio-button-group
-      required: true
+      label: Sign-in methods
+      type: static
+      required: false
       order: 0
-      placeholder_expression: true
-      placeholder: |
-        return [
-            {"label": "Internal", "value": "internal"},
-            {"label": "Discord", "value": "discord"},
-        ]
-      initial_value: internal
+      placeholder_expression: false
+      placeholder: ""
+      initial_value_expression: true
+      initial_value: |
+        from django.utils.html import escape
+        from urllib.parse import urlencode
+        from authentik.flows.views.executor import SESSION_KEY_GET
+
+        query = http_request.session.get(SESSION_KEY_GET, http_request.GET)
+        encoded = query.urlencode() if hasattr(query, "urlencode") else urlencode(query, doseq=True)
+        suffix = ("?" + encoded) if encoded else ""
+        internal = escape("/if/flow/lab-internal-authentication/" + suffix)
+        discord = escape("/if/flow/lab-discord-entry/" + suffix)
+        return f"""
+        <span class="pmh-login-methods">
+          <span class="pmh-login-methods-intro">Choose how to sign in</span>
+          <a class="pmh-login-method pmh-login-method--internal" href="{internal}">
+            <span class="pmh-login-method-icon" aria-hidden="true"></span>
+            <span>Continue with Internal</span>
+          </a>
+          <a class="pmh-login-method pmh-login-method--discord" href="{discord}">
+            <span class="pmh-login-method-icon" aria-hidden="true"></span>
+            <span>Continue with Discord</span>
+          </a>
+        </span>
+        """
   - model: authentik_stages_prompt.promptstage
     id: method-selection
     identifiers:
@@ -118,67 +137,21 @@ entries:
       order: 0
 
   - model: authentik_stages_redirect.redirectstage
-    id: internal-redirect
+    state: absent
     identifiers:
       name: lab-auth-internal-flow
-    attrs:
-      mode: flow
-      target_flow: !KeyOf internal-flow
-      keep_context: false
   - model: authentik_stages_redirect.redirectstage
-    id: discord-redirect
+    state: absent
     identifiers:
       name: lab-auth-discord-flow
-    attrs:
-      mode: flow
-      target_flow: !KeyOf discord-entry-flow
-      keep_context: false
   - model: authentik_policies_expression.expressionpolicy
-    id: internal-selected
+    state: absent
     identifiers:
       name: lab-auth-internal-selected
-    attrs:
-      expression: |
-        return request.context.get("prompt_data", {}).get("login_method") == "internal"
   - model: authentik_policies_expression.expressionpolicy
-    id: discord-selected
+    state: absent
     identifiers:
       name: lab-auth-discord-selected
-    attrs:
-      expression: |
-        return request.context.get("prompt_data", {}).get("login_method") == "discord"
-  - model: authentik_flows.flowstagebinding
-    id: internal-redirect-binding
-    identifiers:
-      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
-      stage: !KeyOf internal-redirect
-      order: 5
-    attrs:
-      evaluate_on_plan: false
-      re_evaluate_policies: true
-  - model: authentik_flows.flowstagebinding
-    id: discord-redirect-binding
-    identifiers:
-      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
-      stage: !KeyOf discord-redirect
-      order: 6
-    attrs:
-      evaluate_on_plan: false
-      re_evaluate_policies: true
-  - model: authentik_policies.policybinding
-    identifiers:
-      target: !KeyOf internal-redirect-binding
-      policy: !KeyOf internal-selected
-      order: 0
-    attrs:
-      failure_result: false
-  - model: authentik_policies.policybinding
-    identifiers:
-      target: !KeyOf discord-redirect-binding
-      policy: !KeyOf discord-selected
-      order: 0
-    attrs:
-      failure_result: false
 
   # Remove old authentication steps from the entry flow atomically with the
   # selector. Authentication and session creation only happen in child flows.
