@@ -17,6 +17,9 @@ The Discord flow uses native source-only identification (no password/CAPTCHA),
 so authentik constructs its OAuth URL, state and return path as usual.
 The shared built-in identification stage keeps its Discord source unchanged.
 `login-choice.yaml` removes objects from the earlier selector experiment.
+The selector's card styling is CSS-only in `authentik/branding/theme.css`;
+`branding-css.yaml` reconciles it into the existing brand via a ConfigMap-backed
+worker environment value. Native radio/keyboard controls and routing stay intact.
 Existing HTTP sessions can retain a pickled plan from before this change.
 After upgrading from the previous flow, run
 `authentik/migrate-pending-login-plans.py` to preview and selectively clear only
