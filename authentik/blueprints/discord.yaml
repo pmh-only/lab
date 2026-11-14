@@ -148,11 +148,12 @@ entries:
       user_property_mappings:
         - !KeyOf discord-user-mapping
 
-  # Discord is chosen before the internal credentials form, not inside it.
+  # Keep the native source button on every flow using this shared stage.
   - model: authentik_stages_identification.identificationstage
     state: present
     identifiers:
       name: default-authentication-identification
     attrs:
       user_fields: [email, username]
-      sources: []
+      sources:
+        - !KeyOf discord-source

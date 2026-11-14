@@ -2,71 +2,21 @@ version: 1
 metadata:
   name: Lab - Login method selection
 entries:
-  - model: authentik_stages_prompt.prompt
-    id: login-method
-    identifiers:
-      name: lab-login-method
-    attrs:
-      field_key: login_method
-      label: 로그인 방식
-      type: radio-button-group
-      required: true
-      order: 0
-      placeholder_expression: true
-      placeholder: |
-        return [
-            {"label": "Internal 로그인", "value": "internal"},
-            {"label": "Discord 로그인", "value": "discord"},
-        ]
-      initial_value: internal
-
+  # Explicit deletion is required: removing the file does not undo imported
+  # stages. Restore native source routing and its OAuth/logout return context.
   - model: authentik_stages_prompt.promptstage
-    id: login-choice
+    state: absent
     identifiers:
       name: lab-login-choice
-    attrs:
-      fields:
-        - !KeyOf login-method
-
-  - model: authentik_flows.flowstagebinding
-    identifiers:
-      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
-      stage: !KeyOf login-choice
-      order: 0
-    attrs:
-      invalid_response_action: retry
-
   - model: authentik_stages_redirect.redirectstage
-    id: discord-redirect
+    state: absent
     identifiers:
       name: lab-login-discord-redirect
-    attrs:
-      mode: static
-      target_static: /source/oauth/login/discord/
-      keep_context: true
-
   - model: authentik_policies_expression.expressionpolicy
-    id: discord-selected
+    state: absent
     identifiers:
       name: lab-login-discord-selected
-    attrs:
-      expression: |
-        return request.context.get("prompt_data", {}).get("login_method") == "discord"
-
-  - model: authentik_flows.flowstagebinding
-    id: discord-redirect-binding
+  - model: authentik_stages_prompt.prompt
+    state: absent
     identifiers:
-      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
-      stage: !KeyOf discord-redirect
-      order: 5
-    attrs:
-      evaluate_on_plan: false
-      re_evaluate_policies: true
-
-  - model: authentik_policies.policybinding
-    identifiers:
-      target: !KeyOf discord-redirect-binding
-      policy: !KeyOf discord-selected
-      order: 0
-    attrs:
-      failure_result: false
+      name: lab-login-method
