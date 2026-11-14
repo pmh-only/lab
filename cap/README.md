@@ -66,8 +66,13 @@ enabling CAPTCHA.
 
 3. Open the Cap dashboard and sign in using `ADMIN_KEY` from Vault. Under
    **Instance settings**:
-   - **Visitor location / Your proxy or CDN**: use `X-Forwarded-For`.
-     The network policy restricts ingress to the gateway and authentik.
+   - **Visitor location / Your proxy or CDN**: use the custom header `X-Real-IP`.
+     The edge nginx overwrites it with the visitor address. Envoy appends its
+     preceding Kubernetes hop to `X-Forwarded-For`, and Cap reads the **last**
+     entry of a configured forwarding header, so XFF would identify that
+     `172.16.x.x` proxy instead of the visitor. The network policy restricts
+     ingress to the trusted gateway and authentik namespaces. Keep the origin
+     port private; never trust client-supplied forwarding headers directly.
    - **Widget files**: enable serving files from this server, using the versions
      bundled with the pinned image. Wait for the downloads to complete.
    - Create a site key named `authentik`, with allowed origin
