@@ -40,4 +40,4 @@ images:
     digest: sha256:89fd95ee2942880ca00eae964266958a394421ddbdf69bca62e38afc55f5900e
   - name: nginx
     newTag: stable-alpine
-    digest: sha256:9e596d26590907ed433eb53c83c4016038025d4e004b15922786ba85c8957264
+    digest: sha256:3bc3836dc0be3b811f238210360bf8e7ca8a2d0effdae46160bf1f3578710051
