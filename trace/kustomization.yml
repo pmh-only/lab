@@ -19,4 +19,4 @@ images:
     digest: sha256:3412790f50344b3a3bbc42b6ab59c94b053d9ffdc1de1c45a89463bb9b3864f8
   - name: ghcr.io/rybbit-io/rybbit-client
     newTag: latest
-    digest: sha256:9beb1cfe74bbb3bf7d7a74cf5d3b07639610637909f0dfafaa87d3a76b91ce2a
+    digest: sha256:39947e9e4da4248de27f78e2fa691eb86654945dff7b74c1d732b78f13273fb3
