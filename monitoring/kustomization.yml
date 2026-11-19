@@ -25,7 +25,7 @@ images:
     digest: sha256:fe58e406bb8f4f790fa19739988a968ead9beb73e4a8b30384f5ce55dd919e69
   - name: quay.io/prometheus/node-exporter
     newTag: latest
-    digest: sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
+    digest: sha256:011e2d12c5bff759b90804bda642664775d7b4b127bf5148539bb82d3f590bb7
   - name: quay.io/prometheus/prometheus
     newTag: latest
     digest: sha256:9332054523223e2ddc18d8101799d54a4a8d823b030c53216f063a6c117773cd
