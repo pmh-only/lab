@@ -40,4 +40,4 @@ configMapGenerator:
       - AUTHENTIK_DISABLE_STARTUP_ANALYTICS=true
 images:
   - name: ghcr.io/goauthentik/server
-    newTag: 2026.8.5
+    newTag: 2026.8.6
