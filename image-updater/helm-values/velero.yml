@@ -1,6 +1,6 @@
 image:
   repository: docker.io/velero/velero
-  tag: v1.18.4
+  tag: v1.19.0
 # Keep the entire list here: inline Helm values would override image updates.
 initContainers:
 - name: velero-plugin-for-aws
