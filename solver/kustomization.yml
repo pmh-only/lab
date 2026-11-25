@@ -14,7 +14,7 @@ configMapGenerator:
     files: [initialize.mjs]
 images:
   - name: docker
-    newTag: 29.10.0-dind
+    newTag: 29.10.1-dind
   - name: ghcr.io/pmh-only/solver
     newTag: latest
     digest: sha256:4d645702448e7f2740226571fbc3c9b2ff275352bb6c0c1ed2fa8cdaaf7cf014
