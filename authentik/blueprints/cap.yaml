@@ -60,7 +60,7 @@ entries:
       stage: !Find [authentik_stages_authenticator_validate.authenticatorvalidatestage, [name, default-authentication-mfa-validation]]
       order: 30
     attrs:
-      invalid_response_action: restart
+      invalid_response_action: retry
   - model: authentik_flows.flowstagebinding
     identifiers:
       target: !KeyOf internal-flow
